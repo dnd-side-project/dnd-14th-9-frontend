@@ -80,7 +80,9 @@
 ### 필요 조건 (Prerequisites)
 
 - [Node.js 22+](https://nodejs.org/)
-- [pnpm 9+](https://pnpm.io/)
+- [Corepack](https://nodejs.org/api/corepack.html) (Node.js 16.9+ 기본 포함)
+
+> **Note**: 이 프로젝트는 `packageManager` 필드를 통해 pnpm 버전을 강제합니다. Corepack을 활성화하면 자동으로 올바른 pnpm 버전이 사용됩니다.
 
 ### 설치 및 실행
 
@@ -88,13 +90,16 @@
 # 1. 저장소 클론
 git clone https://github.com/dnd-side-project/dnd-14th-9-frontend.git
 
-# 2. 의존성 설치
+# 2. Corepack 활성화 (최초 1회)
+corepack enable
+
+# 3. 의존성 설치 (pnpm 버전 자동 관리)
 pnpm install
 
-# 3. Husky 설정 (최초 1회)
+# 4. Husky 설정 (최초 1회)
 pnpm prepare
 
-# 4. 개발 서버 실행
+# 5. 개발 서버 실행
 pnpm dev
 ```
 
