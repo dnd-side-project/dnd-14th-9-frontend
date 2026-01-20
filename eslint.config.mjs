@@ -10,6 +10,7 @@ import { defineConfig } from "eslint/config";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  ...storybook.configs["flat/recommended"],
   {
     plugins: {
       prettier: prettierPlugin,
