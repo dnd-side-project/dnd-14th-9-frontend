@@ -1,8 +1,8 @@
 ---
 name: Bug Template
 about: 버그를 이슈에 등록한다.
-title: "'컨벤션을 지켜 이슈의 제목을 입력해주세요!'"
-labels: ""
+title: "bug: "
+labels: bug
 assignees: ""
 ---
 
