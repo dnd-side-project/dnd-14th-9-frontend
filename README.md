@@ -107,12 +107,14 @@ _(추후 필수 환경 변수 목록이 확정되면 업데이트 예정입니�
 
 ## 🤝 팀원 (Contributors)
 
-| 역할   | 이름 | GitHub |
-| ------ | ---- | ------ |
-| FE     | -    | -      |
-| FE     | -    | -      |
-| BE     | -    | -      |
-| Design | -    | -      |
+| 역할   | 이름   | GitHub                                              |
+| ------ | ------ | --------------------------------------------------- |
+| FE     | 장근호 | [Rootjang92](https://github.com/Rootjang92)         |
+| FE     | 이경환 | [tnemnorivnelee](https://github.com/tnemnorivnelee) |
+| BE     | 이소정 | [Sojeong0430](https://github.com/Sojeong0430)       |
+| BE     | 박용현 | [yonghyeonpark](https://github.com/yonghyeonpark)   |
+| Design | 김시라 | -                                                   |
+| Design | 임세원 | -                                                   |
 
 ---
 
