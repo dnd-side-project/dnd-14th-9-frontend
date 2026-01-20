@@ -1,1 +1,21 @@
-pnpm typecheck && pnpm test --passWithNoTests
+#!/bin/sh
+
+echo "\n============================================="
+echo "👀 [Pre-push] Push하기 전에 코드를 검사합니다..."
+echo "=============================================\n"
+
+echo "🔎 1. TypeScript 타입 검사 중..."
+pnpm typecheck
+if [ $? -ne 0 ]; then
+ echo "\n❌ [Error] 타입 에러가 있습니다. 수정 후 다시 푸시해주세요.\n"
+ exit 1
+fi
+
+echo "\n🧪 2. 테스트 실행 중..."
+pnpm test --passWithNoTests
+if [ $? -ne 0 ]; then
+ echo "\n❌ [Error] 테스트가 실패했습니다. 수정 후 다시 푸시해주세요.\n"
+ exit 1
+fi
+
+echo "\n✅ [Success] 모든 검사를 통과했습니다. 푸시를 진행합니다! 🚀\n"
