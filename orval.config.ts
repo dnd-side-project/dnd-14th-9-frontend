@@ -8,7 +8,7 @@ const SWAGGER_FILE_PATH = "./swagger.json";
 const FALLBACK_OPENAPI_URL = "https://example.com/openapi.json";
 
 export default defineConfig({
-  gak: {
+  api: {
     input: {
       // 로컬 파일이 있으면 사용, 없으면 fallback URL 사용
       target: existsSync(SWAGGER_FILE_PATH) ? SWAGGER_FILE_PATH : FALLBACK_OPENAPI_URL,
