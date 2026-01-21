@@ -17,7 +17,7 @@ export const customInstance = async <T>({
   headers,
   signal,
 }: RequestConfig): Promise<T> => {
-  const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "";
+  const baseURL = process.env.NEXT_PUBLIC_API_URL!;
 
   // URL 파라미터 처리
   const searchParams = new URLSearchParams(params);
