@@ -1,0 +1,153 @@
+# CodeRabbit 설정
+# 공식 문서: https://docs.coderabbit.ai/reference/configuration
+# 기술 스택: Next.js 16 + React 19 + TypeScript + Tailwind CSS
+
+# =============================================================================
+# 일반 설정
+# =============================================================================
+
+# 리뷰 언어 설정 (ISO 코드)
+language: "ko-KR"
+
+# 얼리 액세스 기능 (실험적 기능 사용 여부)
+early_access: false
+
+# =============================================================================
+# 코드 리뷰 설정
+# =============================================================================
+reviews:
+  # 리뷰 톤 설정
+  # - "chill": 부드럽고 친절한 톤 (팀 프로젝트 권장)
+  # - "assertive": 단호하고 직접적인 톤
+  profile: "chill"
+
+  # PR 변경 요청 워크플로우 활성화
+  # true: 심각한 문제 발견 시 "Request Changes" 상태로 전환
+  request_changes_workflow: false
+
+  # PR 설명에 고수준 변경 요약 자동 생성
+  high_level_summary: true
+
+  # 워크스루(Walkthrough) 섹션 접기
+  collapse_walkthrough: true
+
+  # 변경된 파일 목록 요약 표시
+  changed_files_summary: true
+
+  # 시퀀스 다이어그램 생성 (코드 흐름 시각화)
+  sequence_diagrams: true
+
+  # 코드 리뷰 난이도 추정 표시
+  estimate_code_review_effort: true
+
+  # 관련 이슈 자동 분석
+  assess_linked_issues: true
+
+  # 관련 PR 표시
+  related_prs: true
+
+  # 라벨 자동 추천
+  suggested_labels: true
+
+  # 리뷰어 자동 추천
+  suggested_reviewers: true
+
+  # 시(poem) 생성 비활성화 (깔끔한 리뷰를 위해)
+  poem: false
+
+  # 리뷰 진행 중 포춘 쿠키 메시지 표시
+  in_progress_fortune: false
+
+  # ---------------------------------------------------------------------------
+  # 무시할 파일 패턴 (glob 형식, "!"는 제외 의미)
+  # ---------------------------------------------------------------------------
+  path_filters:
+    - "!**/*.lock"
+    - "!**/pnpm-lock.yaml"
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/.next/**"
+    - "!**/coverage/**"
+    - "!**/*.min.js"
+    - "!**/*.min.css"
+
+  # ---------------------------------------------------------------------------
+  # 파일별 커스텀 리뷰 지침
+  # ---------------------------------------------------------------------------
+  path_instructions:
+    - path: "src/components/**"
+      instructions: |
+        - React 컴포넌트는 함수형으로만 작성되었는지 확인
+        - Props 타입이 명확하게 정의되었는지 확인
+        - 접근성(a11y) 속성이 적절히 사용되었는지 확인
+
+    - path: "src/app/**"
+      instructions: |
+        - Next.js App Router 규칙을 따르는지 확인
+        - 서버/클라이언트 컴포넌트 분리가 적절한지 확인
+        - 메타데이터가 올바르게 설정되었는지 확인
+
+    - path: "src/hooks/**"
+      instructions: |
+        - 커스텀 훅이 use 접두사를 사용하는지 확인
+        - 의존성 배열이 올바르게 설정되었는지 확인
+
+    - path: "src/lib/**"
+      instructions: |
+        - 유틸리티 함수가 순수 함수인지 확인
+        - 타입이 명확하게 정의되었는지 확인
+
+  # ---------------------------------------------------------------------------
+  # 자동 리뷰 설정
+  # ---------------------------------------------------------------------------
+  auto_review:
+    # 자동 리뷰 활성화
+    enabled: true
+
+    # 자동 증분 리뷰 (새 커밋 추가 시 해당 부분만 리뷰)
+    auto_incremental_review: true
+
+    # 드래프트 PR 자동 리뷰 비활성화
+    drafts: false
+
+    # 이 키워드가 PR 제목에 있으면 리뷰 건너뛰기
+    ignore_title_keywords:
+      - "WIP"
+      - "DO NOT MERGE"
+      - "DRAFT"
+
+  # ---------------------------------------------------------------------------
+  # 코드 분석 도구 설정 (기술 스택에 맞게 구성)
+  # ---------------------------------------------------------------------------
+  tools:
+    # Biome (JavaScript/TypeScript 린터)
+    biome:
+      enabled: true
+
+    # Markdownlint (마크다운 파일 검사)
+    markdownlint:
+      enabled: true
+
+    # LanguageTool (문법/철자 검사)
+    languagetool:
+      enabled: false # 한국어 지원 제한으로 비활성화
+
+# =============================================================================
+# 채팅 설정 (PR 코멘트에서 @coderabbitai 멘션 시)
+# =============================================================================
+chat:
+  # 자동 응답 활성화
+  auto_reply: true
+
+# =============================================================================
+# 코드 생성 설정 (PR 코멘트에서 요청 시 동작)
+# =============================================================================
+code_generation:
+  # Docstring 자동 생성 설정
+  docstrings:
+    language: "ko-KR"
+    path_instructions: []
+
+  # 유닛 테스트 자동 생성 설정
+  unit_tests:
+    path_instructions: []
