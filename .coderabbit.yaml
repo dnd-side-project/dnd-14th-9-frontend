@@ -101,11 +101,8 @@ reviews:
   # 자동 리뷰 설정
   # ---------------------------------------------------------------------------
   auto_review:
-    # 자동 리뷰 활성화
-    enabled: true
-
-    # 자동 증분 리뷰 (새 커밋 추가 시 해당 부분만 리뷰)
-    auto_incremental_review: true
+    # 자동 리뷰 비활성화 (Gemini Code Assist만 사용)
+    enabled: false
 
     # 드래프트 PR 자동 리뷰 비활성화
     drafts: false
