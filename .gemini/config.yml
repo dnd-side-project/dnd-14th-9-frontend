@@ -1,0 +1,32 @@
+# Gemini Code Assist 설정
+# https://developers.google.com/gemini-code-assist/docs/customize-gemini-behavior-github
+
+# 재미 기능 (PR 요약에 시 추가 등)
+have_fun: false
+
+# 무시할 파일 패턴 (glob 패턴)
+ignore_patterns:
+  - "**/*.lock"
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/.next/**"
+
+# 코드 리뷰 설정
+code_review:
+  # 코드 리뷰 비활성화 여부
+  disable: false
+  # 리뷰 코멘트 심각도 임계값 (LOW, MEDIUM, HIGH, CRITICAL)
+  comment_severity_threshold: MEDIUM
+  # 최대 리뷰 코멘트 수 (-1: 무제한)
+  max_review_comments: -1
+
+# PR 열림 이벤트 설정
+pull_request_opened:
+  # 도움말 메시지 표시
+  help: false
+  # PR 요약 자동 생성
+  summary: true
+  # 자동 코드 리뷰
+  code_review: true
+  # 드래프트 PR에도 적용
+  include_drafts: false
