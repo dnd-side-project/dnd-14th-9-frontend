@@ -490,6 +490,58 @@
             "value": "#000000",
             "type": "color"
           }
+        },
+        "gray opacity": {
+          "5": {
+            "value": "#00000014",
+            "type": "color"
+          },
+          "10": {
+            "value": "#00000029",
+            "type": "color"
+          },
+          "20": {
+            "value": "#0000003d",
+            "type": "color"
+          },
+          "30": {
+            "value": "#00000066",
+            "type": "color"
+          },
+          "40": {
+            "value": "#000000a3",
+            "type": "color"
+          },
+          "50": {
+            "value": "#000000cc",
+            "type": "color"
+          }
+        },
+        "white opacity": {
+          "5": {
+            "value": "#ffffff14",
+            "type": "color"
+          },
+          "10": {
+            "value": "#ffffff29",
+            "type": "color"
+          },
+          "20": {
+            "value": "#ffffff3d",
+            "type": "color"
+          },
+          "30": {
+            "value": "#ffffff66",
+            "type": "color"
+          },
+          "40": {
+            "value": "#ffffffa3",
+            "type": "color"
+          },
+          "50": {
+            "value": "#ffffffcc",
+            "type": "color"
+          }
         }
       }
     },
@@ -770,6 +822,192 @@
         "md": {
           "value": "{number.unit.2}",
           "type": "number"
+        }
+      }
+    },
+    "color": {
+      "surface": {
+        "white": {
+          "value": "{color.light.common.white}",
+          "type": "color"
+        },
+        "inverse": {
+          "value": "{color.light.gray.90}",
+          "type": "color"
+        },
+        "danger-subtler": {
+          "value": "{color.light.error.5}",
+          "type": "color"
+        },
+        "secondary-subtler": {
+          "value": "{color.light.secondary.5}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{color.light.gray.20}",
+          "type": "color"
+        },
+        "warning-subtler": {
+          "value": "{color.light.warning.5}",
+          "type": "color"
+        },
+        "gray-subtler": {
+          "value": "{color.light.gray.5}",
+          "type": "color"
+        },
+        "gray-subtle": {
+          "value": "{color.light.gray.10}",
+          "type": "color"
+        },
+        "point-subtler": {
+          "value": "{color.light.gray.5}",
+          "type": "color"
+        },
+        "primary-subtler": {
+          "value": "{color.light.primary.5}",
+          "type": "color"
+        },
+        "success-subtler": {
+          "value": "{color.light.success.5}",
+          "type": "color"
+        }
+      },
+      "divider": {
+        "point": {
+          "value": "{color.border.point}",
+          "type": "color"
+        },
+        "error": {
+          "value": "{color.light.error.50}",
+          "type": "color"
+        },
+        "primary-light": {
+          "value": "{color.light.primary.10}",
+          "type": "color"
+        },
+        "inverse": {
+          "value": "{color.light.common.white}",
+          "type": "color"
+        },
+        "gray-darker": {
+          "value": "{color.light.gray.90}",
+          "type": "color"
+        },
+        "gray": {
+          "value": "{color.light.gray.40}",
+          "type": "color"
+        },
+        "gray-light": {
+          "value": "{color.light.gray.20}",
+          "type": "color"
+        },
+        "secondary": {
+          "value": "{color.light.primary.70}",
+          "type": "color"
+        },
+        "secondary-light": {
+          "value": "{color.light.primary.10}",
+          "type": "color"
+        },
+        "primary": {
+          "value": "{color.light.primary.50}",
+          "type": "color"
+        },
+        "gray-dark": {
+          "value": "{color.light.gray.50}",
+          "type": "color"
+        }
+      },
+      "background": {
+        "inverse": {
+          "value": "{color.light.gray.90}",
+          "type": "color"
+        },
+        "gray-subtier": {
+          "value": "{color.light.gray.5}",
+          "type": "color"
+        },
+        "gray-subtle": {
+          "value": "{color.light.gray.10}",
+          "type": "color"
+        },
+        "dim": {
+          "value": "{color.light.common.black}",
+          "type": "color"
+        },
+        "white": {
+          "value": "{color.light.common.white}",
+          "type": "color"
+        }
+      },
+      "border": {
+        "success": {
+          "value": "{color.light.success.50}",
+          "type": "color"
+        },
+        "warning": {
+          "value": "{color.light.warning.50}",
+          "type": "color"
+        },
+        "warning-light": {
+          "value": "{color.light.warning.10}",
+          "type": "color"
+        },
+        "point": {
+          "value": "{color.light.point.50}",
+          "type": "color"
+        },
+        "success-light": {
+          "value": "{color.light.success.10}",
+          "type": "color"
+        },
+        "point-light": {
+          "value": "{color.light.point.30}",
+          "type": "color"
+        },
+        "secondary": {
+          "value": "{color.light.secondary.70}",
+          "type": "color"
+        },
+        "gray-dark": {
+          "value": "{color.light.gray.60}",
+          "type": "color"
+        },
+        "gray": {
+          "value": "{color.light.gray.30}",
+          "type": "color"
+        },
+        "primary": {
+          "value": "{color.light.primary.50}",
+          "type": "color"
+        },
+        "gray-light": {
+          "value": "{color.light.gray.20}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{color.light.gray.30}",
+          "type": "color"
+        },
+        "danger-light": {
+          "value": "{color.light.error.10}",
+          "type": "color"
+        },
+        "secondary-light": {
+          "value": "{color.light.secondary.10}",
+          "type": "color"
+        },
+        "inverse": {
+          "value": "{color.light.common.white}",
+          "type": "color"
+        },
+        "primary-light": {
+          "value": "{color.light.primary.10}",
+          "type": "color"
+        },
+        "gray-darker": {
+          "value": "{color.light.gray.90}",
+          "type": "color"
         }
       }
     }
