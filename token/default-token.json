@@ -1,193 +1,5 @@
 {
   "global": {},
-  "mode/light": {
-    "color": {
-      "background": {
-        "white": {
-          "value": "{color.light.gray.0}",
-          "type": "color"
-        },
-        "gray-subtier": {
-          "value": "{color.light.gray.5}",
-          "type": "color"
-        },
-        "gray-subtle": {
-          "value": "{color.light.gray.10}",
-          "type": "color"
-        },
-        "inverse": {
-          "value": "{color.light.gray.90}",
-          "type": "color"
-        },
-        "dim": {
-          "value": "{color.light.gray.100}",
-          "type": "color"
-        }
-      },
-      "surface": {
-        "white": {
-          "value": "{color.light.gray.0}",
-          "type": "color"
-        },
-        "inverse": {
-          "value": "{color.light.gray.90}",
-          "type": "color"
-        },
-        "gray-subtler": {
-          "value": "{color.light.gray.5}",
-          "type": "color"
-        },
-        "gray-subtle": {
-          "value": "{color.light.gray.10}",
-          "type": "color"
-        },
-        "disabled": {
-          "value": "{color.light.gray.20}",
-          "type": "color"
-        },
-        "primary-subtler": {
-          "value": "{color.light.primary.5}",
-          "type": "color"
-        },
-        "secondary-subtler": {
-          "value": "{color.light.secondary.5}",
-          "type": "color"
-        },
-        "point-subtler": {
-          "value": "{color.light.gray.5}",
-          "type": "color"
-        },
-        "danger-subtler": {
-          "value": "{color.light.error.5}",
-          "type": "color"
-        },
-        "warning-subtler": {
-          "value": "{color.light.warning.5}",
-          "type": "color"
-        },
-        "success-subtler": {
-          "value": "{color.light.success.5}",
-          "type": "color"
-        }
-      },
-      "border": {
-        "inverse": {
-          "value": "{color.light.gray.0}",
-          "type": "color"
-        },
-        "disabled": {
-          "value": "{color.light.gray.30}",
-          "type": "color"
-        },
-        "gray-light": {
-          "value": "{color.light.gray.20}",
-          "type": "color"
-        },
-        "gray": {
-          "value": "{color.light.gray.30}",
-          "type": "color"
-        },
-        "gray-dark": {
-          "value": "{color.light.gray.60}",
-          "type": "color"
-        },
-        "gray-darker": {
-          "value": "{color.light.gray.90}",
-          "type": "color"
-        },
-        "primary-light": {
-          "value": "{color.light.primary.10}",
-          "type": "color"
-        },
-        "primary": {
-          "value": "{color.light.primary.50}",
-          "type": "color"
-        },
-        "secondary-light": {
-          "value": "{color.light.secondary.10}",
-          "type": "color"
-        },
-        "secondary": {
-          "value": "{color.light.secondary.70}",
-          "type": "color"
-        },
-        "point-light": {
-          "value": "{color.light.point.10}",
-          "type": "color"
-        },
-        "point": {
-          "value": "{color.light.point.50}",
-          "type": "color"
-        },
-        "danger-light": {
-          "value": "{color.light.error.10}",
-          "type": "color"
-        },
-        "warning-light": {
-          "value": "{color.light.warning.10}",
-          "type": "color"
-        },
-        "warning": {
-          "value": "{color.light.warning.50}",
-          "type": "color"
-        },
-        "success-light": {
-          "value": "{color.light.success.10}",
-          "type": "color"
-        },
-        "success": {
-          "value": "{color.light.success.50}",
-          "type": "color"
-        }
-      },
-      "divider": {
-        "gray-light": {
-          "value": "{color.light.gray.20}",
-          "type": "color"
-        },
-        "gray": {
-          "value": "{color.light.gray.40}",
-          "type": "color"
-        },
-        "gray-dark": {
-          "value": "{color.light.gray.50}",
-          "type": "color"
-        },
-        "gray-darker": {
-          "value": "{color.light.gray.90}",
-          "type": "color"
-        },
-        "inverse": {
-          "value": "{color.light.gray.0}",
-          "type": "color"
-        },
-        "primary-light": {
-          "value": "{color.light.primary.10}",
-          "type": "color"
-        },
-        "primary": {
-          "value": "{color.light.primary.50}",
-          "type": "color"
-        },
-        "secondary-light": {
-          "value": "{color.light.primary.10}",
-          "type": "color"
-        },
-        "secondary": {
-          "value": "{color.light.primary.70}",
-          "type": "color"
-        },
-        "error": {
-          "value": "{color.light.error.50}",
-          "type": "color"
-        },
-        "point": {
-          "value": "{color.border.point}",
-          "type": "color"
-        }
-      }
-    }
-  },
   "primitive/Mode 1": {
     "color": {
       "light": {
@@ -489,6 +301,10 @@
           "black": {
             "value": "#000000",
             "type": "color"
+          },
+          "test": {
+            "value": "#121212",
+            "type": "color"
           }
         }
       }
@@ -625,6 +441,192 @@
     }
   },
   "semantic/Mode 1": {
+    "color": {
+      "surface": {
+        "white": {
+          "value": "{color.light.common.white}",
+          "type": "color"
+        },
+        "inverse": {
+          "value": "{color.light.gray.90}",
+          "type": "color"
+        },
+        "danger-subtler": {
+          "value": "{color.light.error.5}",
+          "type": "color"
+        },
+        "secondary-subtler": {
+          "value": "{color.light.secondary.5}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{color.light.gray.20}",
+          "type": "color"
+        },
+        "warning-subtler": {
+          "value": "{color.light.warning.5}",
+          "type": "color"
+        },
+        "gray-subtler": {
+          "value": "{color.light.gray.5}",
+          "type": "color"
+        },
+        "gray-subtle": {
+          "value": "{color.light.gray.10}",
+          "type": "color"
+        },
+        "point-subtler": {
+          "value": "{color.light.gray.5}",
+          "type": "color"
+        },
+        "primary-subtler": {
+          "value": "{color.light.primary.5}",
+          "type": "color"
+        },
+        "success-subtler": {
+          "value": "{color.light.success.5}",
+          "type": "color"
+        }
+      },
+      "divider": {
+        "point": {
+          "value": "{color.border.point}",
+          "type": "color"
+        },
+        "error": {
+          "value": "{color.light.error.50}",
+          "type": "color"
+        },
+        "primary-light": {
+          "value": "{color.light.primary.10}",
+          "type": "color"
+        },
+        "inverse": {
+          "value": "{color.light.common.white}",
+          "type": "color"
+        },
+        "gray-darker": {
+          "value": "{color.light.gray.90}",
+          "type": "color"
+        },
+        "gray": {
+          "value": "{color.light.gray.40}",
+          "type": "color"
+        },
+        "gray-light": {
+          "value": "{color.light.gray.20}",
+          "type": "color"
+        },
+        "secondary": {
+          "value": "{color.light.primary.70}",
+          "type": "color"
+        },
+        "secondary-light": {
+          "value": "{color.light.primary.10}",
+          "type": "color"
+        },
+        "primary": {
+          "value": "{color.light.primary.50}",
+          "type": "color"
+        },
+        "gray-dark": {
+          "value": "{color.light.gray.50}",
+          "type": "color"
+        }
+      },
+      "background": {
+        "inverse": {
+          "value": "{color.light.gray.90}",
+          "type": "color"
+        },
+        "gray-subtier": {
+          "value": "{color.light.gray.5}",
+          "type": "color"
+        },
+        "gray-subtle": {
+          "value": "{color.light.gray.10}",
+          "type": "color"
+        },
+        "dim": {
+          "value": "{color.light.common.black}",
+          "type": "color"
+        },
+        "white": {
+          "value": "{color.light.common.white}",
+          "type": "color"
+        }
+      },
+      "border": {
+        "success": {
+          "value": "{color.light.success.50}",
+          "type": "color"
+        },
+        "warning": {
+          "value": "{color.light.warning.50}",
+          "type": "color"
+        },
+        "warning-light": {
+          "value": "{color.light.warning.10}",
+          "type": "color"
+        },
+        "point": {
+          "value": "{color.light.point.50}",
+          "type": "color"
+        },
+        "success-light": {
+          "value": "{color.light.success.10}",
+          "type": "color"
+        },
+        "point-light": {
+          "value": "{color.light.point.30}",
+          "type": "color"
+        },
+        "secondary": {
+          "value": "{color.light.secondary.70}",
+          "type": "color"
+        },
+        "gray-dark": {
+          "value": "{color.light.gray.60}",
+          "type": "color"
+        },
+        "gray": {
+          "value": "{color.light.gray.30}",
+          "type": "color"
+        },
+        "primary": {
+          "value": "{color.light.primary.50}",
+          "type": "color"
+        },
+        "gray-light": {
+          "value": "{color.light.gray.20}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{color.light.gray.30}",
+          "type": "color"
+        },
+        "danger-light": {
+          "value": "{color.light.error.10}",
+          "type": "color"
+        },
+        "secondary-light": {
+          "value": "{color.light.secondary.10}",
+          "type": "color"
+        },
+        "inverse": {
+          "value": "{color.light.common.white}",
+          "type": "color"
+        },
+        "primary-light": {
+          "value": "{color.light.primary.10}",
+          "type": "color"
+        },
+        "gray-darker": {
+          "value": "{color.light.gray.90}",
+          "type": "color"
+        }
+      }
+    },
     "layout": {
       "spacing": {
         "sm": {
@@ -778,7 +780,6 @@
   "$metadata": {
     "tokenSetOrder": [
       "global",
-      "mode/light",
       "primitive/Mode 1",
       "semantic/Mode 1"
     ]
