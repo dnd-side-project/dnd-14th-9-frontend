@@ -40,7 +40,7 @@ export async function GET(request: NextRequest, { params }: { params: { provider
     // 쿠키에 토큰 저장
     const cookieStore = await cookies();
 
-    //TODO: token cookie naming 변경 가능성 존재.
+    // TODO(담당자명): 백엔드와 협의 후 토큰 쿠키 네이밍 확정 필요
     cookieStore.set("accessToken", data.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
