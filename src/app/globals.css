@@ -1,4 +1,4 @@
-@config "../../tailwind.config.cjs";
+@config "../../tailwind.config.mjs";
 
 /* 1. 토큰 CSS 변수 (가장 먼저 import) */
 @import "../styles/tokens/variables.css";
