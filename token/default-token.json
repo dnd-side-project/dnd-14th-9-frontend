@@ -192,6 +192,10 @@
     "color": {
       "light": {
         "gray": {
+          "0": {
+            "value": "#ffffff",
+            "type": "color"
+          },
           "5": {
             "value": "#f5f7fa",
             "type": "color"
@@ -234,6 +238,10 @@
           },
           "95": {
             "value": "#131416",
+            "type": "color"
+          },
+          "100": {
+            "value": "#000000",
             "type": "color"
           }
         },
@@ -330,6 +338,10 @@
           }
         },
         "point": {
+          "10": {
+            "value": "#ffe5e5",
+            "type": "color"
+          },
           "30": {
             "value": "#ff9d9d",
             "type": "color"
@@ -1366,11 +1378,6 @@
   },
   "$themes": [],
   "$metadata": {
-    "tokenSetOrder": [
-      "global",
-      "mode/light",
-      "primitive/Mode 1",
-      "semantic/Mode 1"
-    ]
+    "tokenSetOrder": ["global", "mode/light", "primitive/Mode 1", "semantic/Mode 1"]
   }
 }

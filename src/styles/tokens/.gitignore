@@ -1,0 +1,3 @@
+# 빌드된 토큰 파일 제외 (소스는 token/*.json)
+*.css
+!.gitignore
