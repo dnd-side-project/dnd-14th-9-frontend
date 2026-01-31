@@ -4,8 +4,11 @@ import { cookies } from "next/headers";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
-export async function GET(request: NextRequest, { params }: { params: { provider: string } }) {
-  const { provider } = params;
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ provider: string }> }
+) {
+  const { provider } = await params;
   const searchParams = request.nextUrl.searchParams;
 
   const code = searchParams.get("code");
