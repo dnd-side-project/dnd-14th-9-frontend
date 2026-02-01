@@ -7,3 +7,7 @@ export function isValidNickname(nickname: string): boolean {
   const regex = /^[가-힣a-zA-Z0-9]{1,5}$/;
   return regex.test(nickname);
 }
+
+export function isValidGoal(goal: string, maxLength: number = 50): boolean {
+  return goal.trim().length > 0 && goal.trim().length < maxLength;
+}
