@@ -10,3 +10,19 @@ export function formatTimer(seconds: number): string {
   }
   return `${pad(m)}:${pad(s)}`;
 }
+
+export function formatRemaningTimer(seconds: number): string {
+  if (seconds < 0) return "곧 시작";
+
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  const parts: string[] = [];
+
+  if (days > 0) parts.push(`${days}일`);
+  if (hours > 0) parts.push(`${hours}시간`);
+  if (minutes > 0 && days === 0) parts.push(`${minutes}분`);
+
+  return parts.length > 0 ? parts.join(" ") : "곧 시작";
+}
