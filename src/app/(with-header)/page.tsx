@@ -1,4 +1,13 @@
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import { Suspense } from "react";
+
+import { Banner } from "@/features/home/components/Banner";
+import { RecommendedSection } from "@/features/home/components/RecommendedSection";
+import { RecommendedSectionSkeleton } from "@/features/home/components/RecommendedSectionSkeleton";
+import { RecruitingSection } from "@/features/home/components/RecruitingSection";
+import { RecruitingSectionSkeleton } from "@/features/home/components/RecruitingSectionSkeleton";
+import { SearchFilterSection } from "@/features/home/components/SearchFilterSection";
+import { SearchFilterSectionSkeleton } from "@/features/home/components/SearchFilterSectionSkeleton";
 
 /**
  * 홈 화면 (메인 페이지)
@@ -10,8 +19,8 @@ import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query
  * 4. 각 섹션 컴포넌트에서 useSuspenseQuery로 즉시 사용
  *
  * 섹션 구성:
- * - HeroSection: 검색창 + 카테고리 필터 (URL 상태 관리)
- * - FeedbackBanner: 정적/단순 컴포넌트
+ * - SearchFilterSection: 검색창 + 카테고리 필터 (URL 상태 관리)
+ * - Banner: 정적/단순 컴포넌트
  * - RecommendedSection: 추천 세션 (로그인 시 조건부 렌더링)
  * - RecruitingSection: 모집 중 세션 (필터 + 페이지네이션)
  */
@@ -30,21 +39,25 @@ export default async function HomePage({ searchParams }: HomePageProps) {
    * await queryClient.prefetchQuery(homeQueries.recommended());
    * await queryClient.prefetchQuery(homeQueries.recruiting(params));
    */
+  // params는 prefetch 시 사용 예정
+  void params;
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      {/* HeroSection - 검색창 + 카테고리 필터, URL searchParams 제어 */}
+      <Suspense fallback={<SearchFilterSectionSkeleton />}>
+        <SearchFilterSection />
+      </Suspense>
 
-      {/* FeedbackBanner - 정적 배너 컴포넌트 */}
+      <Banner />
 
-      {/* RecommendedSection - 로그인 사용자만 표시 (조건부 렌더링) */}
       {/* TODO(이경환): 팀 논의 필요 - 비로그인 시 빈 공간 vs 대체 콘텐츠 */}
+      <Suspense fallback={<RecommendedSectionSkeleton />}>
+        <RecommendedSection />
+      </Suspense>
 
-      {/* RecruitingSection - 모집 중 세션 목록, 필터/페이지네이션 */}
-
-      {/* 임시: 기존 콘텐츠 */}
-      <h1>Page</h1>
-      <pre>{JSON.stringify(params, null, 2)}</pre>
+      <Suspense fallback={<RecruitingSectionSkeleton />}>
+        <RecruitingSection />
+      </Suspense>
     </HydrationBoundary>
   );
 }
