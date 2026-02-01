@@ -1,7 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-
 /**
  * RecruitingSection - 모집 중 세션
  *
@@ -16,16 +14,14 @@ import { useSearchParams } from "next/navigation";
  * - 페이지네이션 UI
  */
 export function RecruitingSection() {
-  const searchParams = useSearchParams();
-
   // TODO(이경환): API 스펙 확정 후 구현
+  // const searchParams = useSearchParams();
   // const params = Object.fromEntries(searchParams.entries());
   // const { data } = useSuspenseQuery(homeQueries.recruiting(params));
 
   return (
     <section>
       <div>RecruitingSection placeholder</div>
-      <pre>{JSON.stringify(Object.fromEntries(searchParams.entries()), null, 2)}</pre>
     </section>
   );
 }
