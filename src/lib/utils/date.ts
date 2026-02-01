@@ -14,3 +14,12 @@ export function formatTimeHHMM(date: Date | string): string {
 
   return `${hours}:${minutes}`;
 }
+
+export function formatDateTime(date: Date | string): string {
+  const d = new Date(date);
+  const month = d.getMonth() + 1;
+  const day = d.getDate();
+  const time = formatTimeHHMM(d);
+
+  return `${month}월 ${day}일 ${time}`;
+}
