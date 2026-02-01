@@ -8,7 +8,7 @@ import { useSearchParams } from "next/navigation";
  * 역할:
  * - URL searchParams 기반 필터링/페이지네이션
  * - useSuspenseQuery로 모집 중 세션 데이터 사용
- * - HeroSection의 검색/카테고리 변경에 반응
+ * - SearchFilterSection의 검색/카테고리 변경에 반응
  *
  * TODO(이경환): API 스펙 확정 후 구현
  * - useSuspenseQuery + Query Options
