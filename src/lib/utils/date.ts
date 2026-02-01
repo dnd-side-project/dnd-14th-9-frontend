@@ -23,3 +23,14 @@ export function formatDateTime(date: Date | string): string {
 
   return `${month}월 ${day}일 ${time}`;
 }
+
+export function isToday(date: Date | string): boolean {
+  const d = new Date(date);
+  const today = new Date();
+
+  return (
+    d.getFullYear() === today.getFullYear() &&
+    d.getMonth() === today.getMonth() &&
+    d.getDate() === today.getDate()
+  );
+}
