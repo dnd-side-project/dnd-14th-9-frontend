@@ -6,3 +6,11 @@ export function formatDateDot(date: Date | string): string {
 
   return `${year}.${month}.${day}`;
 }
+
+export function formatTimeHHMM(date: Date | string): string {
+  const d = new Date(date);
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+
+  return `${hours}:${minutes}`;
+}
