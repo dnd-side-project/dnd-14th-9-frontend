@@ -19,3 +19,14 @@ export function buildQueryString(
   const query = searchParams.toString();
   return query ? `${query}` : "";
 }
+
+export function parseQueryString<T extends Record<string, string>>(search: string): Partial<T> {
+  const params = new URLSearchParams(search);
+  const result: Record<string, string> = {};
+
+  params.forEach((value, key) => {
+    result[key] = value;
+  });
+
+  return result as Partial<T>;
+}
