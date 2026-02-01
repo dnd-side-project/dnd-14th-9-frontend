@@ -24,5 +24,9 @@ export function formatRemaningTimer(seconds: number): string {
   if (hours > 0) parts.push(`${hours}시간`);
   if (minutes > 0 && days === 0) parts.push(`${minutes}분`);
 
-  return parts.length > 0 ? parts.join(" ") : "곧 시작";
+  return parts.length > 0 ? parts.join(" ") : "1분 미만";
+}
+
+export function isUrgent(seconds: number): boolean {
+  return seconds > 0 && seconds < 3600;
 }
