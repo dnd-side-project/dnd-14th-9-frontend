@@ -7,7 +7,18 @@ type SectionProps = {
   children: ReactNode;
 };
 
+type TokenSectionProps = {
+  title: string;
+  items: TokenItem[];
+};
+
 type ColorGridColumns = 3 | 4 | 5 | 6 | 11;
+
+type ColorSectionProps = {
+  title: string;
+  items: TokenItem[];
+  columns?: ColorGridColumns;
+};
 
 const colorGridColumns: Record<ColorGridColumns, string> = {
   3: "grid-cols-3",
@@ -35,15 +46,7 @@ export function SectionGroup({ title, children }: SectionProps) {
   );
 }
 
-export function ColorSection({
-  title,
-  items,
-  columns = 6,
-}: {
-  title: string;
-  items: TokenItem[];
-  columns?: ColorGridColumns;
-}) {
+export function ColorSection({ title, items, columns = 6 }: ColorSectionProps) {
   const gridCols = colorGridColumns[columns];
 
   return (
@@ -75,7 +78,7 @@ export function ColorSection({
   );
 }
 
-export function DividerSection({ title, items }: { title: string; items: TokenItem[] }) {
+export function DividerSection({ title, items }: TokenSectionProps) {
   return (
     <SectionBlock title={title}>
       <div className="gap-md grid grid-cols-2 md:grid-cols-4">
@@ -95,7 +98,7 @@ export function DividerSection({ title, items }: { title: string; items: TokenIt
   );
 }
 
-export function BorderSection({ title, items }: { title: string; items: TokenItem[] }) {
+export function BorderSection({ title, items }: TokenSectionProps) {
   return (
     <SectionBlock title={title}>
       <div className="gap-md grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
@@ -112,7 +115,7 @@ export function BorderSection({ title, items }: { title: string; items: TokenIte
   );
 }
 
-export function SpacingSection({ title, items }: { title: string; items: TokenItem[] }) {
+export function SpacingSection({ title, items }: TokenSectionProps) {
   return (
     <SectionBlock title={title}>
       <div className="gap-md grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
@@ -130,7 +133,7 @@ export function SpacingSection({ title, items }: { title: string; items: TokenIt
   );
 }
 
-export function GapSection({ title, items }: { title: string; items: TokenItem[] }) {
+export function GapSection({ title, items }: TokenSectionProps) {
   return (
     <SectionBlock title={title}>
       <div className="gap-md grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
@@ -149,7 +152,7 @@ export function GapSection({ title, items }: { title: string; items: TokenItem[]
   );
 }
 
-export function RadiusSection({ title, items }: { title: string; items: TokenItem[] }) {
+export function RadiusSection({ title, items }: TokenSectionProps) {
   return (
     <SectionBlock title={title}>
       <div className="gap-md grid grid-cols-2 md:grid-cols-5">
@@ -166,7 +169,7 @@ export function RadiusSection({ title, items }: { title: string; items: TokenIte
   );
 }
 
-export function BorderWidthSection({ title, items }: { title: string; items: TokenItem[] }) {
+export function BorderWidthSection({ title, items }: TokenSectionProps) {
   return (
     <SectionBlock title={title}>
       <div className="gap-md grid grid-cols-3">
@@ -183,7 +186,7 @@ export function BorderWidthSection({ title, items }: { title: string; items: Tok
   );
 }
 
-export function TypographySection({ title, items }: { title: string; items: TokenItem[] }) {
+export function TypographySection({ title, items }: TokenSectionProps) {
   return (
     <SectionBlock title={title}>
       <div className="gap-md grid grid-cols-1 md:grid-cols-2">
