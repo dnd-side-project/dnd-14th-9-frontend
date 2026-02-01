@@ -1,9 +1,9 @@
-/* Tailwind v4 Design Tokens - Style Dictionary가 자동 생성 */
-@import "../styles/tokens/theme.css";
-
 /* Tailwind CSS */
 @import "tailwindcss";
 @import "tw-animate-css";
+
+/* Tailwind v4 Design Tokens - Style Dictionary가 자동 생성 */
+@import "../styles/tokens/theme.css";
 
 /* 다크 모드 variant */
 @custom-variant dark (&:is(.dark *));

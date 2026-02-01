@@ -12,6 +12,14 @@ StyleDictionary.registerFormat({
   name: "css/tailwind-theme",
   format({ dictionary, options = {} }) {
     const { outputReferences = true } = options;
+    const numberOnly = /^-?\d+(\.\d+)?$/;
+    const withPx = (value) => {
+      if (typeof value === "number") return `${value}px`;
+      if (typeof value !== "string") return value;
+      if (value.startsWith("var(")) return `calc(${value} * 1px)`;
+      if (numberOnly.test(value)) return `${value}px`;
+      return value;
+    };
 
     // 토큰을 카테고리별로 그룹화
     const tokensByCategory = {
@@ -26,6 +34,11 @@ StyleDictionary.registerFormat({
 
     dictionary.allTokens.forEach((token) => {
       const category = token.path[0]; // 첫 번째 경로 세그먼트로 분류
+      const isSpacing = category === "layout" && token.path[1] === "spacing";
+      const isGap = category === "layout" && token.path[1] === "gap";
+      const isRadius = category === "shape" && token.path[1] === "radius";
+      const isBorderWidth = category === "shape" && token.path[1] === "border-width";
+      const needsLengthUnit = isSpacing || isGap || isRadius || isBorderWidth;
 
       // outputReferences 처리 - 토큰 값이 다른 토큰을 참조하는지 확인
       let value = token.value;
@@ -38,19 +51,34 @@ StyleDictionary.registerFormat({
         const refName = token.original.value.replace(/[{}]/g, "").replace(/\./g, "-");
         value = `var(--${refName})`;
       }
+      if (needsLengthUnit) {
+        value = withPx(value);
+      }
 
-      const cssVar = `  --${token.name}: ${value};`;
+      // Tailwind v4 호환 네이밍으로 변환
+      let tokenName = token.name;
+      if (tokenName.startsWith("layout-spacing-")) {
+        tokenName = tokenName.replace("layout-spacing-", "spacing-");
+      } else if (tokenName.startsWith("layout-gap-")) {
+        tokenName = tokenName.replace("layout-gap-", "gap-");
+      } else if (tokenName.startsWith("shape-radius-")) {
+        tokenName = tokenName.replace("shape-radius-", "radius-");
+      } else if (tokenName.startsWith("shape-border-width-")) {
+        tokenName = tokenName.replace("shape-border-width-", "border-width-");
+      }
+
+      const cssVar = `  --${tokenName}: ${value};`;
 
       // 카테고리별로 분류
       if (category === "color") {
         tokensByCategory.colors.push(cssVar);
-      } else if (category === "layout" && token.path[1] === "spacing") {
+      } else if (isSpacing) {
         tokensByCategory.spacing.push(cssVar);
-      } else if (category === "layout" && token.path[1] === "gap") {
+      } else if (isGap) {
         tokensByCategory.gap.push(cssVar);
-      } else if (category === "shape" && token.path[1] === "radius") {
+      } else if (isRadius) {
         tokensByCategory.radius.push(cssVar);
-      } else if (category === "shape" && token.path[1] === "border-width") {
+      } else if (isBorderWidth) {
         tokensByCategory.borderWidth.push(cssVar);
       } else if (category === "typo") {
         tokensByCategory.typography.push(cssVar);
