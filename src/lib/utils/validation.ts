@@ -11,3 +11,8 @@ export function isValidNickname(nickname: string): boolean {
 export function isValidGoal(goal: string, maxLength: number = 50): boolean {
   return goal.trim().length > 0 && goal.trim().length < maxLength;
 }
+
+// TODO: 세션 제목 길이 제한 확인 필요.
+export function isValidSessionTitle(title: string): boolean {
+  return title.trim().length >= 2 && title.length <= 20;
+}
