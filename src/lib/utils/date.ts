@@ -34,3 +34,7 @@ export function isToday(date: Date | string): boolean {
     d.getDate() === today.getDate()
   );
 }
+
+export function isPastTime(date: Date | string): boolean {
+  return new Date(date).getTime() < Date.now();
+}
