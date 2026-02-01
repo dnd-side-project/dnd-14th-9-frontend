@@ -1,6 +1,8 @@
+const SECONDS_IN_HOUR = 3600;
+
 export function formatTimer(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
+  const h = Math.floor(seconds / SECONDS_IN_HOUR);
+  const m = Math.floor((seconds % SECONDS_IN_HOUR) / 60);
   const s = seconds % 60;
 
   const pad = (n: number) => n.toString().padStart(2, "0");
@@ -15,8 +17,8 @@ export function formatRemaningTimer(seconds: number): string {
   if (seconds < 0) return "곧 시작";
 
   const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
+  const hours = Math.floor((seconds % 86400) / SECONDS_IN_HOUR);
+  const minutes = Math.floor((seconds % SECONDS_IN_HOUR) / 60);
 
   const parts: string[] = [];
 
@@ -28,7 +30,7 @@ export function formatRemaningTimer(seconds: number): string {
 }
 
 export function isUrgent(seconds: number): boolean {
-  return seconds > 0 && seconds < 3600;
+  return seconds > 0 && seconds < SECONDS_IN_HOUR;
 }
 
 export function formatParticipantCount(current: number, max: number): string {
