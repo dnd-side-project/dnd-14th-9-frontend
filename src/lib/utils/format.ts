@@ -30,3 +30,7 @@ export function formatRemaningTimer(seconds: number): string {
 export function isUrgent(seconds: number): boolean {
   return seconds > 0 && seconds < 3600;
 }
+
+export function formatParticipantCount(current: number, max: number): string {
+  return `${current}/${max}명`;
+}
