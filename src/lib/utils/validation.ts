@@ -15,5 +15,6 @@ export function isValidGoal(goal: string, maxLength: number = 50): boolean {
 
 // TODO(장근호): 세션 제목 길이 제한 확인 필요.
 export function isValidSessionTitle(title: string): boolean {
-  return title.trim().length >= 2 && title.length <= 20;
+  const trimmedTitle = title.trim();
+  return trimmedTitle.length >= 2 && trimmedTitle.length <= 20;
 }
