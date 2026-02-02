@@ -459,8 +459,8 @@ export const BORDER_WIDTH_SAMPLES: TokenItem[] = [
 // Typography
 // ============================================================
 export const TYPOGRAPHY_SAMPLES: TokenItem[] = [
-  { label: "family: Pretendard", className: "font-[family-name:var(--typo-family-pretendard)]" },
-  { label: "weight: regular (400)", className: "font-[var(--typo-weight-regular)]" },
-  { label: "weight: semibold (600)", className: "font-[var(--typo-weight-semibold)]" },
-  { label: "weight: bold (700)", className: "font-[var(--typo-weight-bold)]" },
+  { label: "family: Pretendard", className: "font-pretendard" },
+  { label: "weight: regular (400)", className: "font-regular" },
+  { label: "weight: semibold (600)", className: "font-semibold" },
+  { label: "weight: bold (700)", className: "font-bold" },
 ];

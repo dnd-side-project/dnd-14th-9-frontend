@@ -43,6 +43,8 @@ function convertTokenName(tokenName) {
     "layout-gap-": "gap-",
     "shape-radius-": "radius-",
     "shape-border-width-": "border-width-",
+    "typo-family-": "font-",
+    "typo-weight-": "font-weight-",
   };
 
   for (const [prefix, replacement] of Object.entries(nameMapping)) {
