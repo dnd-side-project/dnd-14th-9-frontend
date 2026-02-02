@@ -1,25 +1,29 @@
 import { register } from "@tokens-studio/sd-transforms";
 import StyleDictionary from "style-dictionary";
+import { tailwindV4Format } from "./style-dictionary/formats/tailwind-v4.mjs";
 
 // Tokens Studio transforms 등록
 register(StyleDictionary, { excludeParentKeys: true });
 
+// Tailwind v4 커스텀 포맷 등록
+StyleDictionary.registerFormat(tailwindV4Format);
+
+// Style Dictionary 설정
 const sd = new StyleDictionary({
   source: ["token/**/*.json"],
   preprocessors: ["tokens-studio"], // Tokens Studio 전처리기
 
   platforms: {
-    css: {
+    tailwind: {
       transformGroup: "tokens-studio",
-      transforms: ["name/kebab"], // 변수명을 kebab-case로 변환
+      transforms: ["name/kebab"],
       buildPath: "src/styles/tokens/",
-
       files: [
         {
-          destination: "variables.css",
-          format: "css/variables",
+          destination: "theme.css",
+          format: "css/tailwind-theme",
           options: {
-            outputReferences: true, // 토큰 참조를 CSS var()로 유지
+            outputReferences: true,
           },
         },
       ],
@@ -30,7 +34,7 @@ const sd = new StyleDictionary({
     warnings: "warn",
     verbosity: "verbose",
     errors: {
-      brokenReferences: "console", // 참조 에러를 콘솔에 출력
+      brokenReferences: "console",
     },
   },
 });
