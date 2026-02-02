@@ -1,9 +1,18 @@
 /**
  * Tailwind v4 @theme Format
  * tokens-studio/sd-tailwindv4 레포지토리 패턴 기반
+ *
+ * 역할:
+ * - Style Dictionary 토큰을 Tailwind v4의 `@theme inline` 블록으로 변환
+ * - Figma/Token Studio 토큰 구조(path)를 기반으로 카테고리 분류
+ * - Tailwind v4 호환 네이밍으로 변환하고 CSS 변수 선언을 생성
+ * - 참조 토큰은 CSS 변수(var(--...))로 치환하고 길이 값은 px 단위로 보정
+ *
+ * 입력: dictionary.allTokens (Style Dictionary 토큰 목록)
+ * 출력: @theme inline { --token-name: value; } 형태의 CSS 문자열
  */
 
-import { withPx, convertTokenReference } from "../helpers/unit-converter.mjs";
+import { convertTokenReference, withPx } from "../helpers/unit-converter.mjs";
 
 /**
  * 토큰 카테고리 분류

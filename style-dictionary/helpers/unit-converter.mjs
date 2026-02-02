@@ -1,6 +1,12 @@
 /**
  * Unit Converter Helper
- * 숫자 값을 px 단위로 변환
+ *
+ * 역할:
+ * - 숫자/문자열 토큰 값을 px 단위로 정규화
+ * - Token Studio 참조 표기("{color.primary.50}")를 CSS 변수로 변환
+ *
+ * 사용처:
+ * - style-dictionary/formats/tailwind-v4.mjs에서 토큰 값 보정에 사용
  */
 
 const numberOnly = /^-?\d+(\.\d+)?$/;
