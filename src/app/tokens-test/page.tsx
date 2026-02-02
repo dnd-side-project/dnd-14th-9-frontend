@@ -36,8 +36,8 @@ import {
   SUCCESS_SCALE,
   TYPOGRAPHY_SAMPLES,
   WARNING_SCALE,
-  WHITE_OPACITY_COLORS,
-  WHITE_OPACITY_COLORS_2,
+  PRIMITIVE_WHITE_OPACITY_COLORS,
+  ALIAS_WHITE_OPACITY_COLORS,
 } from "./tokensData";
 
 export default function TokensTestPage() {
@@ -78,14 +78,14 @@ export default function TokensTestPage() {
         <SectionGroup title="Opacity Colors">
           <ColorSection title="Light Gray Opacity" items={GRAY_OPACITY_COLORS} columns={6} />
           <ColorSection
-            title="Light White Opacity (dark bg)"
-            items={WHITE_OPACITY_COLORS}
+            title="Primitive White Opacity (light.*)"
+            items={PRIMITIVE_WHITE_OPACITY_COLORS}
             columns={6}
           />
           <ColorSection title="Black Opacity" items={BLACK_OPACITY_COLORS} columns={6} />
           <ColorSection
-            title="White Opacity (dark bg)"
-            items={WHITE_OPACITY_COLORS_2}
+            title="Alias White Opacity"
+            items={ALIAS_WHITE_OPACITY_COLORS}
             columns={6}
           />
         </SectionGroup>

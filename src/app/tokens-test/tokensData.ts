@@ -211,7 +211,7 @@ export const GRAY_OPACITY_COLORS: TokenItem[] = [
   { label: "light.gray-opacity.50", className: "bg-light-gray-opacity-50 text-light-gray-0" },
 ];
 
-export const WHITE_OPACITY_COLORS: TokenItem[] = [
+export const PRIMITIVE_WHITE_OPACITY_COLORS: TokenItem[] = [
   {
     label: "light.white-opacity.5",
     className: "bg-light-white-opacity-5 text-light-gray-0",
@@ -253,7 +253,7 @@ export const BLACK_OPACITY_COLORS: TokenItem[] = [
   { label: "black-opacity.50", className: "bg-black-opacity-50 text-light-gray-0" },
 ];
 
-export const WHITE_OPACITY_COLORS_2: TokenItem[] = [
+export const ALIAS_WHITE_OPACITY_COLORS: TokenItem[] = [
   {
     label: "white-opacity.5",
     className: "bg-white-opacity-5 text-light-gray-0",
