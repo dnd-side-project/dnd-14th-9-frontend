@@ -31,6 +31,9 @@ interface HomePageProps {
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
+  const q = params["q"];
+  const isSearchMode = !!q;
+
   const queryClient = new QueryClient();
 
   /**
@@ -48,7 +51,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <SearchFilterSection />
       </Suspense>
 
-      <Banner />
+      {!isSearchMode && <Banner />}
 
       {/* TODO(이경환): 팀 논의 필요 - 비로그인 시 빈 공간 vs 대체 콘텐츠 */}
       <Suspense fallback={<RecommendedSectionSkeleton />}>
