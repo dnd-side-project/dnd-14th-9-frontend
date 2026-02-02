@@ -7,7 +7,7 @@ export type TokenItem = {
 // ============================================================
 // Semantic Background Colors
 // ============================================================
-export const semanticBackgrounds: TokenItem[] = [
+export const SEMANTIC_BACKGROUNDS: TokenItem[] = [
   { label: "background.white", className: "bg-background-white text-light-gray-90" },
   { label: "background.gray-subtier", className: "bg-background-gray-subtier text-light-gray-90" },
   { label: "background.gray-subtle", className: "bg-background-gray-subtle text-light-gray-90" },
@@ -18,7 +18,7 @@ export const semanticBackgrounds: TokenItem[] = [
 // ============================================================
 // Semantic Surface Colors
 // ============================================================
-export const semanticSurfaces: TokenItem[] = [
+export const SEMANTIC_SURFACES: TokenItem[] = [
   { label: "surface.white", className: "bg-surface-white text-light-gray-90" },
   { label: "surface.inverse", className: "bg-surface-inverse text-light-gray-0" },
   { label: "surface.gray-subtler", className: "bg-surface-gray-subtler text-light-gray-90" },
@@ -38,7 +38,7 @@ export const semanticSurfaces: TokenItem[] = [
 // ============================================================
 // Border Colors
 // ============================================================
-export const borderSamples: TokenItem[] = [
+export const BORDER_SAMPLES: TokenItem[] = [
   { label: "border-inverse", className: "border-border-inverse bg-gray-90" },
   { label: "border-disabled", className: "border-border-disabled" },
   { label: "border-gray-light", className: "border-border-gray-light" },
@@ -61,7 +61,7 @@ export const borderSamples: TokenItem[] = [
 // ============================================================
 // Divider Colors
 // ============================================================
-export const dividerSamples: TokenItem[] = [
+export const DIVIDER_SAMPLES: TokenItem[] = [
   { label: "divider-gray-light", className: "border-divider-gray-light" },
   { label: "divider-gray", className: "border-divider-gray" },
   { label: "divider-gray-dark", className: "border-divider-gray-dark" },
@@ -78,7 +78,7 @@ export const dividerSamples: TokenItem[] = [
 // ============================================================
 // Primitive Gray Scale (light.gray.*)
 // ============================================================
-export const lightGrayScale: TokenItem[] = [
+export const LIGHT_GRAY_SCALE: TokenItem[] = [
   { label: "light.gray.0", className: "bg-light-gray-0 text-light-gray-90" },
   { label: "light.gray.5", className: "bg-light-gray-5 text-light-gray-90" },
   { label: "light.gray.10", className: "bg-light-gray-10 text-light-gray-90" },
@@ -97,7 +97,7 @@ export const lightGrayScale: TokenItem[] = [
 // ============================================================
 // Primitive Primary Scale (light.primary.*)
 // ============================================================
-export const lightPrimaryScale: TokenItem[] = [
+export const LIGHT_PRIMARY_SCALE: TokenItem[] = [
   { label: "light.primary.5", className: "bg-light-primary-5 text-light-gray-90" },
   { label: "light.primary.10", className: "bg-light-primary-10 text-light-gray-90" },
   { label: "light.primary.20", className: "bg-light-primary-20 text-light-gray-90" },
@@ -114,7 +114,7 @@ export const lightPrimaryScale: TokenItem[] = [
 // ============================================================
 // Primitive Secondary Scale (light.secondary.*)
 // ============================================================
-export const lightSecondaryScale: TokenItem[] = [
+export const LIGHT_SECONDARY_SCALE: TokenItem[] = [
   { label: "light.secondary.5", className: "bg-light-secondary-5 text-light-gray-90" },
   { label: "light.secondary.10", className: "bg-light-secondary-10 text-light-gray-90" },
   { label: "light.secondary.20", className: "bg-light-secondary-20 text-light-gray-90" },
@@ -131,7 +131,7 @@ export const lightSecondaryScale: TokenItem[] = [
 // ============================================================
 // Primitive Point Scale (light.point.*)
 // ============================================================
-export const lightPointScale: TokenItem[] = [
+export const LIGHT_POINT_SCALE: TokenItem[] = [
   { label: "light.point.10", className: "bg-light-point-10 text-light-gray-90" },
   { label: "light.point.30", className: "bg-light-point-30 text-light-gray-90" },
   { label: "light.point.40", className: "bg-light-point-40 text-light-gray-90" },
@@ -141,7 +141,7 @@ export const lightPointScale: TokenItem[] = [
 // ============================================================
 // Primitive Error Scale (light.error.*)
 // ============================================================
-export const lightErrorScale: TokenItem[] = [
+export const LIGHT_ERROR_SCALE: TokenItem[] = [
   { label: "light.error.5", className: "bg-light-error-5 text-light-gray-90" },
   { label: "light.error.10", className: "bg-light-error-10 text-light-gray-90" },
   { label: "light.error.20", className: "bg-light-error-20 text-light-gray-90" },
@@ -158,7 +158,7 @@ export const lightErrorScale: TokenItem[] = [
 // ============================================================
 // Primitive Warning Scale (light.warning.*)
 // ============================================================
-export const lightWarningScale: TokenItem[] = [
+export const LIGHT_WARNING_SCALE: TokenItem[] = [
   { label: "light.warning.5", className: "bg-light-warning-5 text-light-gray-90" },
   { label: "light.warning.10", className: "bg-light-warning-10 text-light-gray-90" },
   { label: "light.warning.20", className: "bg-light-warning-20 text-light-gray-90" },
@@ -175,7 +175,7 @@ export const lightWarningScale: TokenItem[] = [
 // ============================================================
 // Primitive Success Scale (light.success.*)
 // ============================================================
-export const lightSuccessScale: TokenItem[] = [
+export const LIGHT_SUCCESS_SCALE: TokenItem[] = [
   { label: "light.success.5", className: "bg-light-success-5 text-light-gray-90" },
   { label: "light.success.10", className: "bg-light-success-10 text-light-gray-90" },
   { label: "light.success.20", className: "bg-light-success-20 text-light-gray-90" },
@@ -192,7 +192,7 @@ export const lightSuccessScale: TokenItem[] = [
 // ============================================================
 // Common Colors
 // ============================================================
-export const commonColors: TokenItem[] = [
+export const COMMON_COLORS: TokenItem[] = [
   { label: "light.common.white", className: "bg-light-common-white text-light-gray-90" },
   { label: "light.common.black", className: "bg-light-common-black text-light-gray-0" },
   { label: "common.white", className: "bg-common-white text-light-gray-90" },
@@ -202,7 +202,7 @@ export const commonColors: TokenItem[] = [
 // ============================================================
 // Opacity Colors (Gray/Black/White)
 // ============================================================
-export const grayOpacityColors: TokenItem[] = [
+export const GRAY_OPACITY_COLORS: TokenItem[] = [
   { label: "light.gray-opacity.5", className: "bg-light-gray-opacity-5 text-light-gray-90" },
   { label: "light.gray-opacity.10", className: "bg-light-gray-opacity-10 text-light-gray-90" },
   { label: "light.gray-opacity.20", className: "bg-light-gray-opacity-20 text-light-gray-90" },
@@ -211,7 +211,7 @@ export const grayOpacityColors: TokenItem[] = [
   { label: "light.gray-opacity.50", className: "bg-light-gray-opacity-50 text-light-gray-0" },
 ];
 
-export const whiteOpacityColors: TokenItem[] = [
+export const WHITE_OPACITY_COLORS: TokenItem[] = [
   {
     label: "light.white-opacity.5",
     className: "bg-light-white-opacity-5 text-light-gray-0",
@@ -244,7 +244,7 @@ export const whiteOpacityColors: TokenItem[] = [
   },
 ];
 
-export const blackOpacityColors: TokenItem[] = [
+export const BLACK_OPACITY_COLORS: TokenItem[] = [
   { label: "black-opacity.5", className: "bg-black-opacity-5 text-light-gray-90" },
   { label: "black-opacity.10", className: "bg-black-opacity-10 text-light-gray-90" },
   { label: "black-opacity.20", className: "bg-black-opacity-20 text-light-gray-90" },
@@ -253,7 +253,7 @@ export const blackOpacityColors: TokenItem[] = [
   { label: "black-opacity.50", className: "bg-black-opacity-50 text-light-gray-0" },
 ];
 
-export const whiteOpacityColors2: TokenItem[] = [
+export const WHITE_OPACITY_COLORS_2: TokenItem[] = [
   {
     label: "white-opacity.5",
     className: "bg-white-opacity-5 text-light-gray-0",
@@ -289,7 +289,7 @@ export const whiteOpacityColors2: TokenItem[] = [
 // ============================================================
 // Alias Gray Scale (gray.*)
 // ============================================================
-export const grayScale: TokenItem[] = [
+export const GRAY_SCALE: TokenItem[] = [
   { label: "gray.5", className: "bg-gray-5 text-light-gray-90" },
   { label: "gray.10", className: "bg-gray-10 text-light-gray-90" },
   { label: "gray.20", className: "bg-gray-20 text-light-gray-90" },
@@ -306,7 +306,7 @@ export const grayScale: TokenItem[] = [
 // ============================================================
 // Alias Primary Scale (primary.*)
 // ============================================================
-export const primaryScale: TokenItem[] = [
+export const PRIMARY_SCALE: TokenItem[] = [
   { label: "primary.5", className: "bg-primary-5 text-light-gray-90" },
   { label: "primary.10", className: "bg-primary-10 text-light-gray-90" },
   { label: "primary.20", className: "bg-primary-20 text-light-gray-90" },
@@ -323,7 +323,7 @@ export const primaryScale: TokenItem[] = [
 // ============================================================
 // Alias Secondary Scale (secondary.*)
 // ============================================================
-export const secondaryScale: TokenItem[] = [
+export const SECONDARY_SCALE: TokenItem[] = [
   { label: "secondary.5", className: "bg-secondary-5 text-light-gray-90" },
   { label: "secondary.10", className: "bg-secondary-10 text-light-gray-90" },
   { label: "secondary.20", className: "bg-secondary-20 text-light-gray-90" },
@@ -340,7 +340,7 @@ export const secondaryScale: TokenItem[] = [
 // ============================================================
 // Alias Point Scale (point.*)
 // ============================================================
-export const pointScale: TokenItem[] = [
+export const POINT_SCALE: TokenItem[] = [
   { label: "point.30", className: "bg-point-30 text-light-gray-90" },
   { label: "point.40", className: "bg-point-40 text-light-gray-90" },
   { label: "point.50", className: "bg-point-50 text-light-gray-0" },
@@ -349,7 +349,7 @@ export const pointScale: TokenItem[] = [
 // ============================================================
 // Alias Error Scale (error.*)
 // ============================================================
-export const errorScale: TokenItem[] = [
+export const ERROR_SCALE: TokenItem[] = [
   { label: "error.5", className: "bg-error-5 text-light-gray-90" },
   { label: "error.10", className: "bg-error-10 text-light-gray-90" },
   { label: "error.20", className: "bg-error-20 text-light-gray-90" },
@@ -366,7 +366,7 @@ export const errorScale: TokenItem[] = [
 // ============================================================
 // Alias Warning Scale (warning.*)
 // ============================================================
-export const warningScale: TokenItem[] = [
+export const WARNING_SCALE: TokenItem[] = [
   { label: "warning.5", className: "bg-warning-5 text-light-gray-90" },
   { label: "warning.10", className: "bg-warning-10 text-light-gray-90" },
   { label: "warning.20", className: "bg-warning-20 text-light-gray-90" },
@@ -383,7 +383,7 @@ export const warningScale: TokenItem[] = [
 // ============================================================
 // Alias Success Scale (success.*)
 // ============================================================
-export const successScale: TokenItem[] = [
+export const SUCCESS_SCALE: TokenItem[] = [
   { label: "success.5", className: "bg-success-5 text-light-gray-90" },
   { label: "success.10", className: "bg-success-10 text-light-gray-90" },
   { label: "success.20", className: "bg-success-20 text-light-gray-90" },
@@ -400,7 +400,7 @@ export const successScale: TokenItem[] = [
 // ============================================================
 // Spacing
 // ============================================================
-export const spacingSamples: TokenItem[] = [
+export const SPACING_SAMPLES: TokenItem[] = [
   { label: "none", className: "p-none" },
   { label: "3xs", className: "p-3xs" },
   { label: "2xs", className: "p-2xs" },
@@ -417,7 +417,7 @@ export const spacingSamples: TokenItem[] = [
 // ============================================================
 // Gap
 // ============================================================
-export const gapSamples: TokenItem[] = [
+export const GAP_SAMPLES: TokenItem[] = [
   { label: "none", className: "gap-none" },
   { label: "3xs", className: "gap-3xs" },
   { label: "2xs", className: "gap-2xs" },
@@ -433,7 +433,7 @@ export const gapSamples: TokenItem[] = [
 // ============================================================
 // Border Radius
 // ============================================================
-export const radiusSamples: TokenItem[] = [
+export const RADIUS_SAMPLES: TokenItem[] = [
   { label: "none", className: "rounded-none" },
   { label: "2xs", className: "rounded-2xs" },
   { label: "xs", className: "rounded-xs" },
@@ -449,7 +449,7 @@ export const radiusSamples: TokenItem[] = [
 // ============================================================
 // Border Width
 // ============================================================
-export const borderWidthSamples: TokenItem[] = [
+export const BORDER_WIDTH_SAMPLES: TokenItem[] = [
   { label: "sm", className: "border-sm" },
   { label: "md", className: "border-md" },
   { label: "lg", className: "border-lg" },
@@ -458,7 +458,7 @@ export const borderWidthSamples: TokenItem[] = [
 // ============================================================
 // Typography
 // ============================================================
-export const typographySamples: TokenItem[] = [
+export const TYPOGRAPHY_SAMPLES: TokenItem[] = [
   { label: "family: Pretendard", className: "font-[family-name:var(--typo-family-pretendard)]" },
   { label: "weight: regular (400)", className: "font-[var(--typo-weight-regular)]" },
   { label: "weight: semibold (600)", className: "font-[var(--typo-weight-semibold)]" },

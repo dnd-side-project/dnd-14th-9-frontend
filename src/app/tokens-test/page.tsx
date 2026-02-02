@@ -10,38 +10,38 @@ import {
   TypographySection,
 } from "./TokenSections";
 import {
-  blackOpacityColors,
-  borderSamples,
-  borderWidthSamples,
-  commonColors,
-  dividerSamples,
-  errorScale,
-  gapSamples,
-  grayOpacityColors,
-  grayScale,
-  lightErrorScale,
-  lightGrayScale,
-  lightPointScale,
-  lightPrimaryScale,
-  lightSecondaryScale,
-  lightSuccessScale,
-  lightWarningScale,
-  pointScale,
-  primaryScale,
-  radiusSamples,
-  secondaryScale,
-  semanticBackgrounds,
-  semanticSurfaces,
-  spacingSamples,
-  successScale,
-  typographySamples,
-  warningScale,
-  whiteOpacityColors,
-  whiteOpacityColors2,
+  BLACK_OPACITY_COLORS,
+  BORDER_SAMPLES,
+  BORDER_WIDTH_SAMPLES,
+  COMMON_COLORS,
+  DIVIDER_SAMPLES,
+  ERROR_SCALE,
+  GAP_SAMPLES,
+  GRAY_OPACITY_COLORS,
+  GRAY_SCALE,
+  LIGHT_ERROR_SCALE,
+  LIGHT_GRAY_SCALE,
+  LIGHT_POINT_SCALE,
+  LIGHT_PRIMARY_SCALE,
+  LIGHT_SECONDARY_SCALE,
+  LIGHT_SUCCESS_SCALE,
+  LIGHT_WARNING_SCALE,
+  POINT_SCALE,
+  PRIMARY_SCALE,
+  RADIUS_SAMPLES,
+  SECONDARY_SCALE,
+  SEMANTIC_BACKGROUNDS,
+  SEMANTIC_SURFACES,
+  SPACING_SAMPLES,
+  SUCCESS_SCALE,
+  TYPOGRAPHY_SAMPLES,
+  WARNING_SCALE,
+  WHITE_OPACITY_COLORS,
+  WHITE_OPACITY_COLORS_2,
 } from "./tokensData";
 
 export default function TokensTestPage() {
-  const borderWidthLabels = borderWidthSamples.map((item) => item.label).join(", ");
+  const borderWidthLabels = BORDER_WIDTH_SAMPLES.map((item) => item.label).join(", ");
 
   return (
     <div className="bg-background-white text-light-gray-90 min-h-screen">
@@ -55,59 +55,63 @@ export default function TokensTestPage() {
         </header>
 
         <SectionGroup title="Semantic Colors">
-          <ColorSection title="Background Colors" items={semanticBackgrounds} columns={5} />
-          <ColorSection title="Surface Colors" items={semanticSurfaces} columns={6} />
+          <ColorSection title="Background Colors" items={SEMANTIC_BACKGROUNDS} columns={5} />
+          <ColorSection title="Surface Colors" items={SEMANTIC_SURFACES} columns={6} />
         </SectionGroup>
 
         <SectionGroup title="Border & Divider Colors">
-          <BorderSection title="Border Colors" items={borderSamples} />
-          <DividerSection title="Divider Colors" items={dividerSamples} />
+          <BorderSection title="Border Colors" items={BORDER_SAMPLES} />
+          <DividerSection title="Divider Colors" items={DIVIDER_SAMPLES} />
         </SectionGroup>
 
         <SectionGroup title="Primitive Colors (light.*)">
-          <ColorSection title="Light Gray Scale" items={lightGrayScale} columns={6} />
-          <ColorSection title="Light Primary Scale" items={lightPrimaryScale} columns={11} />
-          <ColorSection title="Light Secondary Scale" items={lightSecondaryScale} columns={11} />
-          <ColorSection title="Light Point Scale" items={lightPointScale} columns={4} />
-          <ColorSection title="Light Error Scale" items={lightErrorScale} columns={11} />
-          <ColorSection title="Light Warning Scale" items={lightWarningScale} columns={11} />
-          <ColorSection title="Light Success Scale" items={lightSuccessScale} columns={11} />
-          <ColorSection title="Common Colors" items={commonColors} columns={4} />
+          <ColorSection title="Light Gray Scale" items={LIGHT_GRAY_SCALE} columns={6} />
+          <ColorSection title="Light Primary Scale" items={LIGHT_PRIMARY_SCALE} columns={11} />
+          <ColorSection title="Light Secondary Scale" items={LIGHT_SECONDARY_SCALE} columns={11} />
+          <ColorSection title="Light Point Scale" items={LIGHT_POINT_SCALE} columns={4} />
+          <ColorSection title="Light Error Scale" items={LIGHT_ERROR_SCALE} columns={11} />
+          <ColorSection title="Light Warning Scale" items={LIGHT_WARNING_SCALE} columns={11} />
+          <ColorSection title="Light Success Scale" items={LIGHT_SUCCESS_SCALE} columns={11} />
+          <ColorSection title="Common Colors" items={COMMON_COLORS} columns={4} />
         </SectionGroup>
 
         <SectionGroup title="Opacity Colors">
-          <ColorSection title="Light Gray Opacity" items={grayOpacityColors} columns={6} />
+          <ColorSection title="Light Gray Opacity" items={GRAY_OPACITY_COLORS} columns={6} />
           <ColorSection
             title="Light White Opacity (dark bg)"
-            items={whiteOpacityColors}
+            items={WHITE_OPACITY_COLORS}
             columns={6}
           />
-          <ColorSection title="Black Opacity" items={blackOpacityColors} columns={6} />
-          <ColorSection title="White Opacity (dark bg)" items={whiteOpacityColors2} columns={6} />
+          <ColorSection title="Black Opacity" items={BLACK_OPACITY_COLORS} columns={6} />
+          <ColorSection
+            title="White Opacity (dark bg)"
+            items={WHITE_OPACITY_COLORS_2}
+            columns={6}
+          />
         </SectionGroup>
 
         <SectionGroup title="Alias Colors">
-          <ColorSection title="Gray Scale" items={grayScale} columns={11} />
-          <ColorSection title="Primary Scale" items={primaryScale} columns={11} />
-          <ColorSection title="Secondary Scale" items={secondaryScale} columns={11} />
-          <ColorSection title="Point Scale" items={pointScale} columns={3} />
-          <ColorSection title="Error Scale" items={errorScale} columns={11} />
-          <ColorSection title="Warning Scale" items={warningScale} columns={11} />
-          <ColorSection title="Success Scale" items={successScale} columns={11} />
+          <ColorSection title="Gray Scale" items={GRAY_SCALE} columns={11} />
+          <ColorSection title="Primary Scale" items={PRIMARY_SCALE} columns={11} />
+          <ColorSection title="Secondary Scale" items={SECONDARY_SCALE} columns={11} />
+          <ColorSection title="Point Scale" items={POINT_SCALE} columns={3} />
+          <ColorSection title="Error Scale" items={ERROR_SCALE} columns={11} />
+          <ColorSection title="Warning Scale" items={WARNING_SCALE} columns={11} />
+          <ColorSection title="Success Scale" items={SUCCESS_SCALE} columns={11} />
         </SectionGroup>
 
         <SectionGroup title="Spacing & Layout">
-          <SpacingSection title="Spacing Scale (padding)" items={spacingSamples} />
-          <GapSection title="Gap Scale" items={gapSamples} />
+          <SpacingSection title="Spacing Scale (padding)" items={SPACING_SAMPLES} />
+          <GapSection title="Gap Scale" items={GAP_SAMPLES} />
         </SectionGroup>
 
         <SectionGroup title="Shape (Radius & Border Width)">
-          <RadiusSection title="Border Radius" items={radiusSamples} />
-          <BorderWidthSection title="Border Width" items={borderWidthSamples} />
+          <RadiusSection title="Border Radius" items={RADIUS_SAMPLES} />
+          <BorderWidthSection title="Border Width" items={BORDER_WIDTH_SAMPLES} />
         </SectionGroup>
 
         <SectionGroup title="Typography">
-          <TypographySection title="Font Family & Weights" items={typographySamples} />
+          <TypographySection title="Font Family & Weights" items={TYPOGRAPHY_SAMPLES} />
         </SectionGroup>
 
         <footer className="mt-xl border-border-gray-light pt-xl border-t">
@@ -118,8 +122,8 @@ export default function TokensTestPage() {
                 <strong>Semantic Colors:</strong> Background, Surface
               </li>
               <li>
-                <strong>Border/Divider:</strong> {borderSamples.length} borders,{" "}
-                {dividerSamples.length} dividers
+                <strong>Border/Divider:</strong> {BORDER_SAMPLES.length} borders,{" "}
+                {DIVIDER_SAMPLES.length} dividers
               </li>
               <li>
                 <strong>Primitive Colors:</strong> Gray, Primary, Secondary, Point, Error, Warning,
@@ -129,13 +133,13 @@ export default function TokensTestPage() {
                 <strong>Opacity Colors:</strong> Gray, White, Black opacity variants
               </li>
               <li>
-                <strong>Spacing:</strong> none ~ 4xl ({spacingSamples.length} values)
+                <strong>Spacing:</strong> none ~ 4xl ({SPACING_SAMPLES.length} values)
               </li>
               <li>
-                <strong>Gap:</strong> none ~ 3xl ({gapSamples.length} values)
+                <strong>Gap:</strong> none ~ 3xl ({GAP_SAMPLES.length} values)
               </li>
               <li>
-                <strong>Radius:</strong> none ~ max ({radiusSamples.length} values)
+                <strong>Radius:</strong> none ~ max ({RADIUS_SAMPLES.length} values)
               </li>
               <li>
                 <strong>Border Width:</strong> {borderWidthLabels}
