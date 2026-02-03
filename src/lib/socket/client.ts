@@ -13,12 +13,14 @@ type EventCallback<T extends SessionEventType> = (data: EventData<T>) => void;
 interface SocketOptions {
   maxReconnectAttempts?: number;
   reconnectInterval?: number;
+  maxReconnectDelay?: number;
   debug?: boolean;
 }
 
 const DEFAULT_OPTIONS: Required<SocketOptions> = {
   maxReconnectAttempts: 5,
   reconnectInterval: 1000,
+  maxReconnectDelay: 30000, // 최대 30초
   debug: process.env.NODE_ENV === "development",
 };
 
@@ -100,7 +102,10 @@ class SessionSocket {
     this.reconnectAttempts++;
     this.status = "reconnecting";
 
-    const delay = this.options.reconnectInterval * this.reconnectAttempts;
+    // 지수백오프 알고리즘: 1초 -> 2초 -> 4초 -> 8초 -> 16초 -> 최대 30초
+    const exponentialDelay =
+      this.options.reconnectInterval * Math.pow(2, this.reconnectAttempts - 1);
+    const delay = Math.min(exponentialDelay, this.options.maxReconnectDelay);
     this.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
 
     setTimeout(() => {
