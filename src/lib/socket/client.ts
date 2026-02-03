@@ -32,15 +32,19 @@ class SessionSocket {
   private options: Required<SocketOptions>;
   private sessionId: string | null = null;
   private token: string | null = null;
-  private subscriptionId: string | null = null;
+  private intentionalDisconnect = false;
 
-  public status: ConnectionStatus = "idle";
+  private _status: ConnectionStatus = "idle";
+
+  get status(): ConnectionStatus {
+    return this._status;
+  }
 
   constructor(options?: SocketOptions) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
   }
 
-  private buildBrokerURL(token: string): string {
+  private buildBrokerURL(): string {
     const baseUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080";
 
     if (!process.env.NEXT_PUBLIC_WS_URL) {
@@ -74,7 +78,7 @@ class SessionSocket {
       return;
     }
 
-    const brokerURL = this.buildBrokerURL(this.token);
+    const brokerURL = this.buildBrokerURL();
 
     this.client = new Client({
       brokerURL,
@@ -91,27 +95,22 @@ class SessionSocket {
 
       onConnect: () => {
         this.log("Connected");
-        this.status = "connected";
+        this._status = "connected";
         this.reconnectAttempts = 0;
 
         // 세션 토픽 구독
         if (this.client && this.sessionId) {
-          const subscription = this.client.subscribe(
-            `/topic/session/${this.sessionId}`,
-            (message: IMessage) => {
-              try {
-                const event: SessionEvent = JSON.parse(message.body);
-                this.log(`Received ${event.type}`);
-                this.emit(event.type, event.data);
-              } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : "Unknown error";
-                this.log(errorMessage, "error");
-                this.log(`Failed to parse message: ${message.body}`, "error");
-              }
+          this.client.subscribe(`/topic/session/${this.sessionId}`, (message: IMessage) => {
+            try {
+              const event: SessionEvent = JSON.parse(message.body);
+              this.log(`Received ${event.type}`);
+              this.emit(event.type, event.data);
+            } catch (error) {
+              const errorMessage = error instanceof Error ? error.message : "Unknown error";
+              this.log(errorMessage, "error");
+              this.log(`Failed to parse message: ${message.body}`, "error");
             }
-          );
-
-          this.subscriptionId = subscription.id;
+          });
         }
       },
 
@@ -125,8 +124,10 @@ class SessionSocket {
       },
 
       onWebSocketClose: () => {
+        if (this.intentionalDisconnect) return;
+
         this.log("WebSocket closed");
-        this.status = "disconnected";
+        this._status = "disconnected";
         this.emit("disconnected", { code: 1006, reason: "Connection lost" });
         this.tryReconnect();
       },
@@ -149,7 +150,7 @@ class SessionSocket {
     }
 
     this.reconnectAttempts++;
-    this.status = "reconnecting";
+    this._status = "reconnecting";
 
     // 지수백오프 알고리즘: 1초 -> 2초 -> 4초 -> 8초 -> 16초 -> 최대 30초
     const exponentialDelay =
@@ -165,15 +166,18 @@ class SessionSocket {
   }
 
   private cleanup(): void {
+    this.intentionalDisconnect = true;
+
     if (this.client) {
       this.client.deactivate();
     }
+
     this.client = null;
-    this.subscriptionId = null;
     this.sessionId = null;
     this.token = null;
-    this.status = "idle";
+    this._status = "idle";
     this.reconnectAttempts = 0;
+    this.intentionalDisconnect = false;
     this.removeAllListeners();
   }
 
@@ -185,13 +189,15 @@ class SessionSocket {
 
     // 기존 클라이언트 정리
     if (this.client) {
+      this.intentionalDisconnect = true;
       this.client.deactivate();
+      this.intentionalDisconnect = false;
       this.client = null;
     }
 
     this.sessionId = sessionId;
     this.token = token;
-    this.status = "connecting";
+    this._status = "connecting";
 
     this.log(`Connecting to session: ${sessionId}`);
 
