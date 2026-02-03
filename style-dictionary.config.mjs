@@ -103,6 +103,7 @@ await buildTokens({
   formatOptions: {
     useThemeAtRule: false,
     selector: ".dark",
-    tokenFilter: (token) => token.$extensions?.dnd?.set === "dark",
+    tokenFilter: (token) =>
+      token.$extensions?.dnd?.set === "dark" && token.path?.[0] === "color",
   },
 });
