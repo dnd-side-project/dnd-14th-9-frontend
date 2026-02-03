@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   SessionEvent,
   SessionCommand,
@@ -19,3 +20,18 @@ const DEFAULT_OPTIONS: Required<SocketOptions> = {
   reconnectInterval: 1000,
   debug: process.env.NODE_ENV === "development",
 };
+
+class SessionSocket {
+  private ws: WebSocket | null = null;
+  private listeners = new Map<string, Set<EventCallback<any>>>();
+  private reconnectAttempts = 0;
+  private options: Required<SocketOptions>;
+  private sessionId: string | null = null;
+  private token: string | null = null;
+
+  public status: ConnectionStatus = "idle";
+
+  constructor(options?: SocketOptions) {
+    this.options = { ...DEFAULT_OPTIONS, ...options };
+  }
+}
