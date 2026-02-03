@@ -39,7 +39,12 @@ class SessionSocket {
   }
 
   private buildUrl(sessionId: string, token: string): string {
-    const baseUrl = process.env.NEXT_PUBLIC_WS_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080";
+
+    if (!process.env.NEXT_PUBLIC_WS_URL) {
+      this.log(`NEXT_PUBLIC_WS_URL not defined, using fallback: ${baseUrl}`, "warn");
+    }
+
     return `${baseUrl}/session/${sessionId}?token=${token}`; // TODO(장근호): url 수정 가능
   }
 
