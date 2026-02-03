@@ -132,4 +132,11 @@ class SessionSocket {
     this.ws = new WebSocket(url);
     this.setupEventHandlers();
   }
+
+  disconnect(): void {
+    this.log("Disconnecting");
+    this.reconnectAttempts = this.options.maxReconnectAttempts; // 재연결 방지
+    this.ws?.close();
+    this.cleanup();
+  }
 }
