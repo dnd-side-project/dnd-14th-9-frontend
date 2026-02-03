@@ -112,10 +112,6 @@ class SessionSocket {
     this.removeAllListeners();
   }
 
-  removeAllListeners(): void {
-    this.listeners.clear();
-  }
-
   connect(sessionId: string, token: string): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.log("Already connected");
@@ -158,5 +154,17 @@ class SessionSocket {
     this.listeners.get(event)!.add(callback);
 
     return () => this.listeners.get(event)?.delete(callback);
+  }
+
+  off<T extends SessionEventType>(event: T, callback?: EventCallback<T>): void {
+    if (callback) {
+      this.listeners.get(event)?.delete(callback);
+    } else {
+      this.listeners.delete(event);
+    }
+  }
+
+  removeAllListeners(): void {
+    this.listeners.clear();
   }
 }
