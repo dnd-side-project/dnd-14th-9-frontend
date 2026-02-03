@@ -78,6 +78,13 @@ class SessionSocket {
         this.log(`Failed to parse message: ${event.data}`, "error");
       }
     };
+
+    this.ws.onclose = (event) => {
+      this.log(`Disconnected (code: ${event.code}, reason: ${event.reason})`);
+      this.status = "disconnected";
+      this.emit("disconnected", { code: event.code, reason: event.reason });
+      this.tryReconnect();
+    };
   }
 
   private tryReconnect(): void {
@@ -176,3 +183,26 @@ export const sessionSocket = new SessionSocket();
 export function createSessionSocket(options?: SocketOptions): SessionSocket {
   return new SessionSocket(options);
 }
+
+// 사용 예시
+/**
+ * import { sessionSocket } from '@/lib/socket/client';
+
+// 연결
+sessionSocket.connect(sessionId, token);
+
+// 이벤트 리스닝
+const unsubscribe = sessionSocket.on('participant:join', (participant) => {
+  console.log('New participant:', participant);
+});
+
+// 커맨드 전송
+sessionSocket.send({ type: 'ready' });
+sessionSocket.send({ type: 'goal:set', data: { goal: '오늘의 목표' } });
+
+// 연결 해제
+sessionSocket.disconnect();
+
+// 리스너 정리
+unsubscribe();
+ */
