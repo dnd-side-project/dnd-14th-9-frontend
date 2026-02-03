@@ -1,0 +1,194 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Design Tokens/Typography" />
+
+# 타이포그래피 토큰 (Typography Tokens)
+
+폰트와 관련된 토큰입니다.
+
+---
+
+## Font Family
+
+<div
+  style={{
+    padding: "24px",
+    backgroundColor: "#f5f7fa",
+    borderRadius: "8px",
+    marginBottom: "24px",
+  }}
+>
+  <p
+    style={{
+      fontFamily: "Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+      fontSize: "32px",
+      fontWeight: 600,
+      marginBottom: "8px",
+    }}
+  >
+    Pretendard
+  </p>
+  <p
+    style={{
+      fontFamily: "Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+      fontSize: "16px",
+      color: "#6d7882",
+    }}
+  >
+    가나다라마바사 ABCDEFG abcdefg 0123456789
+  </p>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>토큰</th>
+      <th>값</th>
+      <th>Tailwind 클래스</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>pretendard</code>
+      </td>
+      <td>Pretendard</td>
+      <td>
+        <code>font-pretendard</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## Font Weight
+
+<div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "24px" }}>
+  <div
+    style={{
+      padding: "16px 24px",
+      backgroundColor: "#f5f7fa",
+      borderRadius: "8px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+    }}
+  >
+    <span
+      style={{
+        fontFamily: "Pretendard",
+        fontSize: "24px",
+        fontWeight: 400,
+      }}
+    >
+      Regular 가나다 ABC abc 123
+    </span>
+    <code>400</code>
+  </div>
+  <div
+    style={{
+      padding: "16px 24px",
+      backgroundColor: "#f5f7fa",
+      borderRadius: "8px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+    }}
+  >
+    <span
+      style={{
+        fontFamily: "Pretendard",
+        fontSize: "24px",
+        fontWeight: 600,
+      }}
+    >
+      Semibold 가나다 ABC abc 123
+    </span>
+    <code>600</code>
+  </div>
+  <div
+    style={{
+      padding: "16px 24px",
+      backgroundColor: "#f5f7fa",
+      borderRadius: "8px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+    }}
+  >
+    <span
+      style={{
+        fontFamily: "Pretendard",
+        fontSize: "24px",
+        fontWeight: 700,
+      }}
+    >
+      Bold 가나다 ABC abc 123
+    </span>
+    <code>700</code>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>토큰</th>
+      <th>값</th>
+      <th>Tailwind 클래스</th>
+      <th>용도</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>regular</code>
+      </td>
+      <td>400</td>
+      <td>
+        <code>font-regular</code>
+      </td>
+      <td>본문 텍스트</td>
+    </tr>
+    <tr>
+      <td>
+        <code>semibold</code>
+      </td>
+      <td>600</td>
+      <td>
+        <code>font-semibold</code>
+      </td>
+      <td>소제목, 강조</td>
+    </tr>
+    <tr>
+      <td>
+        <code>bold</code>
+      </td>
+      <td>700</td>
+      <td>
+        <code>font-bold</code>
+      </td>
+      <td>제목, 중요 강조</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 사용 가이드라인
+
+### 제목 (Headings)
+
+- **H1**: `font-bold` + 큰 사이즈
+- **H2, H3**: `font-semibold` + 중간 사이즈
+- **H4 이하**: `font-semibold` + 작은 사이즈
+
+### 본문 (Body)
+
+- **일반 텍스트**: `font-regular`
+- **강조 텍스트**: `font-semibold`
+
+### 버튼 & 라벨
+
+- **버튼 텍스트**: `font-semibold`
+- **라벨**: `font-regular` 또는 `font-semibold`

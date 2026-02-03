@@ -1,0 +1,334 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Design Tokens/Spacing" />
+
+# 간격 토큰 (Spacing Tokens)
+
+일관된 간격 시스템입니다. 여백(padding, margin)과 갭(gap)에 사용됩니다.
+
+---
+
+## Spacing Scale
+
+패딩과 마진에 사용되는 간격입니다.
+
+<table>
+  <thead>
+    <tr>
+      <th>토큰</th>
+      <th>값</th>
+      <th>Tailwind 클래스</th>
+      <th>용도</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>none</code>
+      </td>
+      <td>0px</td>
+      <td>
+        <code>p-none</code>, <code>m-none</code>
+      </td>
+      <td>간격 없음</td>
+    </tr>
+    <tr>
+      <td>
+        <code>3xs</code>
+      </td>
+      <td>2px</td>
+      <td>
+        <code>p-3xs</code>, <code>m-3xs</code>
+      </td>
+      <td>아주 작은 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>2xs</code>
+      </td>
+      <td>4px</td>
+      <td>
+        <code>p-2xs</code>, <code>m-2xs</code>
+      </td>
+      <td>매우 작은 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>xs</code>
+      </td>
+      <td>8px</td>
+      <td>
+        <code>p-xs</code>, <code>m-xs</code>
+      </td>
+      <td>작은 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>sm</code>
+      </td>
+      <td>12px</td>
+      <td>
+        <code>p-sm</code>, <code>m-sm</code>
+      </td>
+      <td>약간 작은 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>md</code>
+      </td>
+      <td>16px</td>
+      <td>
+        <code>p-md</code>, <code>m-md</code>
+      </td>
+      <td>기본 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>lg</code>
+      </td>
+      <td>20px</td>
+      <td>
+        <code>p-lg</code>, <code>m-lg</code>
+      </td>
+      <td>약간 큰 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>xl</code>
+      </td>
+      <td>24px</td>
+      <td>
+        <code>p-xl</code>, <code>m-xl</code>
+      </td>
+      <td>큰 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>2xl</code>
+      </td>
+      <td>32px</td>
+      <td>
+        <code>p-2xl</code>, <code>m-2xl</code>
+      </td>
+      <td>매우 큰 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>3xl</code>
+      </td>
+      <td>40px</td>
+      <td>
+        <code>p-3xl</code>, <code>m-3xl</code>
+      </td>
+      <td>아주 큰 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>4xl</code>
+      </td>
+      <td>64px</td>
+      <td>
+        <code>p-4xl</code>, <code>m-4xl</code>
+      </td>
+      <td>최대 간격</td>
+    </tr>
+  </tbody>
+</table>
+
+<div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "24px" }}>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>none</code>
+    <div style={{ width: "0px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>0px</span>
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>3xs</code>
+    <div style={{ width: "2px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>2px</span>
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>2xs</code>
+    <div style={{ width: "4px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>4px</span>
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>xs</code>
+    <div style={{ width: "8px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>8px</span>
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>sm</code>
+    <div style={{ width: "12px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>12px</span>
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>md</code>
+    <div style={{ width: "16px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>16px</span>
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>lg</code>
+    <div style={{ width: "20px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>20px</span>
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>xl</code>
+    <div style={{ width: "24px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>24px</span>
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>2xl</code>
+    <div style={{ width: "32px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>32px</span>
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>3xl</code>
+    <div style={{ width: "40px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>40px</span>
+  </div>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <code style={{ width: "60px" }}>4xl</code>
+    <div style={{ width: "64px", height: "24px", backgroundColor: "#27ea67" }} />
+    <span style={{ color: "#6d7882" }}>64px</span>
+  </div>
+</div>
+
+---
+
+## Gap Scale
+
+Flexbox/Grid 레이아웃의 gap에 사용되는 간격입니다.
+
+<table>
+  <thead>
+    <tr>
+      <th>토큰</th>
+      <th>값</th>
+      <th>Tailwind 클래스</th>
+      <th>용도</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>none</code>
+      </td>
+      <td>0px</td>
+      <td>
+        <code>gap-none</code>
+      </td>
+      <td>간격 없음</td>
+    </tr>
+    <tr>
+      <td>
+        <code>3xs</code>
+      </td>
+      <td>2px</td>
+      <td>
+        <code>gap-3xs</code>
+      </td>
+      <td>아주 작은 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>2xs</code>
+      </td>
+      <td>4px</td>
+      <td>
+        <code>gap-2xs</code>
+      </td>
+      <td>매우 작은 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>xs</code>
+      </td>
+      <td>8px</td>
+      <td>
+        <code>gap-xs</code>
+      </td>
+      <td>작은 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>sm</code>
+      </td>
+      <td>12px</td>
+      <td>
+        <code>gap-sm</code>
+      </td>
+      <td>약간 작은 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>md</code>
+      </td>
+      <td>16px</td>
+      <td>
+        <code>gap-md</code>
+      </td>
+      <td>기본 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>lg</code>
+      </td>
+      <td>20px</td>
+      <td>
+        <code>gap-lg</code>
+      </td>
+      <td>약간 큰 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>xl</code>
+      </td>
+      <td>24px</td>
+      <td>
+        <code>gap-xl</code>
+      </td>
+      <td>큰 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>2xl</code>
+      </td>
+      <td>32px</td>
+      <td>
+        <code>gap-2xl</code>
+      </td>
+      <td>매우 큰 간격</td>
+    </tr>
+    <tr>
+      <td>
+        <code>3xl</code>
+      </td>
+      <td>40px</td>
+      <td>
+        <code>gap-3xl</code>
+      </td>
+      <td>아주 큰 간격</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 사용 가이드라인
+
+### 컴포넌트 내부 여백
+
+- 버튼 패딩: `p-sm` ~ `p-md`
+- 카드 패딩: `p-lg` ~ `p-xl`
+- 모달 패딩: `p-xl` ~ `p-2xl`
+
+### 컴포넌트 간 간격
+
+- 인라인 요소: `gap-xs` ~ `gap-sm`
+- 폼 필드: `gap-md`
+- 섹션 간: `gap-xl` ~ `gap-2xl`
+
+### 레이아웃 간격
+
+- 페이지 여백: `p-lg` ~ `p-2xl`
+- 섹션 간격: `gap-2xl` ~ `gap-3xl`
