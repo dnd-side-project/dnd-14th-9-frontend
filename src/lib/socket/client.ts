@@ -86,6 +86,45 @@ class SessionSocket {
       }
     };
 
+    /**
+     * 주요 Close Code 예시
+      재연결하지 말아야 할 경우:
+
+      1000: 정상 종료 (사용자가 명시적으로 disconnect 호출)
+      1008: 정책 위반 (예: 잘못된 메시지 형식)
+      4001: 인증 만료 (서버 정의, 재로그인 필요)
+      4003: 권한 없음 (서버 정의)
+      재연결을 시도해야 할 경우:
+
+      1006: 비정상 종료 (네트워크 끊김)
+      1011: 서버 내부 오류
+      1001: 서버 재시작 중
+      구현 예시
+      서버에서 close code를 정의하면, 다음과 같이 분기 처리를 추가할 수 있습니다:
+
+      this.ws.onclose = (event) => {
+        this.log(`Disconnected (code: ${event.code}, reason: ${event.reason})`);
+        this.status = "disconnected";
+        this.emit("disconnected", { code: event.code, reason: event.reason });
+        
+        // close code에 따라 재연결 여부 결정
+        const shouldReconnect = this.shouldReconnect(event.code);
+        if (shouldReconnect) {
+          this.tryReconnect();
+        }
+      };
+
+      private shouldReconnect(code: number): boolean {
+        // 정상 종료나 명시적 종료는 재연결 안함
+        if (code === 1000 || code === 1001) return false;
+        
+        // 인증/권한 문제는 재연결 안함 (4xxx 커스텀 코드)
+        if (code === 4001 || code === 4003) return false;
+        
+        // 그 외는 재연결 시도
+        return true;
+      }
+     */
     this.ws.onclose = (event) => {
       this.log(`Disconnected (code: ${event.code}, reason: ${event.reason})`);
       this.status = "disconnected";
