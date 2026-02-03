@@ -41,3 +41,21 @@ export type SessionEvent = // 연결
 
   // 타이머
   | { type: "timer:update"; data: TimerState };
+
+/**
+ * ========================================
+ * 클라이언트 → 서버 커맨드
+ * ========================================
+ */
+export type SessionCommand =
+  // 대기방
+  | { type: "ready" }
+  | { type: "unready" }
+  | { type: "goal:set"; data: { goal: string } }
+
+  // 호스트 전용
+  | { type: "session:start" }
+  | { type: "session:end" }
+
+  // 진행 중
+  | { type: "status:update"; data: { status: "working" | "break" } };
