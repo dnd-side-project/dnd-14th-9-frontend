@@ -149,4 +149,14 @@ class SessionSocket {
     this.log(`Sending: ${command.type}`);
     this.ws.send(JSON.stringify(command));
   }
+
+  on<T extends SessionEventType>(event: T, callback: EventCallback<T>): () => void {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, new Set());
+    }
+
+    this.listeners.get(event)!.add(callback);
+
+    return () => this.listeners.get(event)?.delete(callback);
+  }
 }
