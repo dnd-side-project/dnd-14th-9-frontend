@@ -145,8 +145,12 @@ class SessionSocket {
 
   disconnect(): void {
     this.log("Disconnecting");
-    this.reconnectAttempts = this.options.maxReconnectAttempts; // 재연결 방지
-    this.ws?.close();
+
+    if (this.ws) {
+      this.ws.onclose = null; // onclose 트리거 방지
+      this.ws.close();
+    }
+
     this.cleanup();
   }
 
