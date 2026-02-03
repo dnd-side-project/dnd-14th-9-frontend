@@ -125,6 +125,13 @@ class SessionSocket {
       return;
     }
 
+    // 기존 WebSocket이 CONNECTING 등 상태로 남아있으면 정리
+    if (this.ws) {
+      this.ws.onclose = null;
+      this.ws.close();
+      this.ws = null;
+    }
+
     this.sessionId = sessionId;
     this.token = token;
     this.status = "connecting";
