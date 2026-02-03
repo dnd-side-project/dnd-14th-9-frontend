@@ -139,4 +139,14 @@ class SessionSocket {
     this.ws?.close();
     this.cleanup();
   }
+
+  send(command: SessionCommand): void {
+    if (this.ws?.readyState !== WebSocket.OPEN) {
+      this.log("Cannot send: WebSocket not open", "warn");
+      return;
+    }
+
+    this.log(`Sending: ${command.type}`);
+    this.ws.send(JSON.stringify(command));
+  }
 }
