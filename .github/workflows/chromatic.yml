@@ -3,10 +3,24 @@ name: "Storybook Chromatic Deployment"
 
 # Event for the workflow
 on:
+  pull_request:
+    paths:
+      - "src/**/*.stories.tsx"
+      - "src/**/*.stories.ts"
+      - "src/stories/**"
+      - ".storybook/**"
+      - "src/styles/**"
+      - "tokens/**"
   push:
     branches:
       - main
-  pull_request:
+    paths:
+      - "src/**/*.stories.tsx"
+      - "src/**/*.stories.ts"
+      - "src/stories/**"
+      - ".storybook/**"
+      - "src/styles/**"
+      - "tokens/**"
 
 # List of jobs
 jobs:
