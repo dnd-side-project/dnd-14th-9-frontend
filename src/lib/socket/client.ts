@@ -168,3 +168,11 @@ class SessionSocket {
     this.listeners.clear();
   }
 }
+
+// 싱글톤 인스턴스
+export const sessionSocket = new SessionSocket();
+
+// 새 인스턴스 생성용 (테스트 등)
+export function createSessionSocket(options?: SocketOptions): SessionSocket {
+  return new SessionSocket(options);
+}
