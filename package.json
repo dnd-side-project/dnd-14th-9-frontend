@@ -5,7 +5,7 @@
   "packageManager": "pnpm@10.27.0",
   "scripts": {
     "tokens": "node style-dictionary.config.mjs",
-    "tokens:watch": "chokidar \"token/**/*.json\" -c \"pnpm tokens\"",
+    "tokens:watch": "node -e \"const fs=require('fs');const {execSync}=require('child_process');const missing=!fs.existsSync('src/styles/tokens/theme.css')||!fs.existsSync('src/styles/tokens/theme-dark.css');if(missing)execSync('pnpm tokens',{stdio:'inherit'});\" && chokidar \"tokens/**/*.json\" -c \"pnpm tokens\"",
     "dev": "concurrently -k \"pnpm tokens:watch\" \"next dev\"",
     "build": "pnpm tokens && next build",
     "start": "next start",
