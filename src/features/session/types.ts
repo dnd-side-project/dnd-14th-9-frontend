@@ -22,3 +22,22 @@ export interface Participant {
   //   joinedAt: string;
   //   readyAt?: string; // 호스트는 joinedAt과 동일
 }
+
+export type SessionStatus = "waiting" | "active" | "ended";
+
+export interface Session {
+  session_room_id: string;
+  category: string; // union 변경 필요.
+  title: string;
+  summary: string;
+  notice: string;
+  thumbnail_image_url?: string;
+  max_capacity: number;
+  status: SessionStatus;
+  scheduledStartAt: string; // 필수 - 예정 시작 시간
+  start_time: string; // 실제 시작 시간
+  duration_minutes: number;
+  member_id: string;
+  created_at: string;
+  updated_at: string;
+}
