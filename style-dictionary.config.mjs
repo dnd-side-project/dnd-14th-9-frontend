@@ -10,7 +10,7 @@ StyleDictionary.registerFormat(tailwindV4Format);
 
 // Style Dictionary 설정
 const sd = new StyleDictionary({
-  source: ["token/**/*.json"],
+  source: ["tokens/**/*.json"],
   preprocessors: ["tokens-studio"], // Tokens Studio 전처리기
 
   platforms: {
