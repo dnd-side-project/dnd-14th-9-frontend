@@ -34,10 +34,9 @@ export interface Session {
   thumbnail_image_url?: string;
   max_capacity: number;
   status: SessionStatus;
-  scheduledStartAt: string; // 필수 - 예정 시작 시간
   start_time: string; // 실제 시작 시간
   duration_minutes: number;
-  member_id: string;
+  member_id: string; // member_id 참조하여 참여인원 정보 가져옴.
   created_at: string;
   updated_at: string;
 }
