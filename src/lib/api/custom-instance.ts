@@ -42,9 +42,8 @@ const customInstance = async <T>({
   const retryConfig = buildRetryConfig(retry);
 
   let attempt = 0;
-  let lastError: unknown;
 
-  while (attempt <= retryConfig.maxRetries) {
+  while (true) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -114,7 +113,6 @@ const customInstance = async <T>({
         const delay = retryConfig.retryDelay * Math.pow(2, attempt - 1);
         log("error", `Retry ${attempt}/${retryConfig.maxRetries} after ${delay}ms`, networkError);
         await sleep(delay);
-        lastError = networkError;
         continue;
       }
 
@@ -122,8 +120,6 @@ const customInstance = async <T>({
       throw networkError;
     }
   }
-
-  throw lastError;
 };
 
 export default customInstance;
