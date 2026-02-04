@@ -4,6 +4,7 @@
 
 /* Tailwind v4 Design Tokens - Style Dictionary가 자동 생성 */
 @import "../styles/tokens/theme.css";
+@import "../styles/tokens/theme-dark.css";
 
 /* 다크 모드 variant */
 @custom-variant dark (&:is(.dark *));

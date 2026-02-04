@@ -40,7 +40,7 @@ function SectionBlock({ title, children }: SectionProps) {
 export function SectionGroup({ title, children }: SectionProps) {
   return (
     <div className="gap-xl flex flex-col">
-      <h2 className="border-border-gray-light pb-sm border-b text-2xl font-bold">{title}</h2>
+      <h2 className="border-border-gray-default pb-sm border-b text-2xl font-bold">{title}</h2>
       {children}
     </div>
   );
@@ -56,7 +56,7 @@ export function ColorSection({ title, items, columns = 6 }: ColorSectionProps) {
           item.bgClassName ? (
             <div
               key={item.label}
-              className={`border-border-gray-light overflow-hidden rounded-md border ${item.bgClassName}`}
+              className={`border-border-gray-default overflow-hidden rounded-md border ${item.bgClassName}`}
             >
               <div
                 className={`p-2xs flex h-16 items-center justify-center text-center text-xs font-medium ${item.className}`}
@@ -67,7 +67,7 @@ export function ColorSection({ title, items, columns = 6 }: ColorSectionProps) {
           ) : (
             <div
               key={item.label}
-              className={`border-border-gray-light p-2xs flex h-16 items-center justify-center rounded-md border text-center text-xs font-medium ${item.className}`}
+              className={`border-border-gray-default p-2xs flex h-16 items-center justify-center rounded-md border text-center text-xs font-medium ${item.className}`}
             >
               {item.label}
             </div>
@@ -88,7 +88,7 @@ export function DividerSection({ title, items }: TokenSectionProps) {
             className={`gap-sm p-sm flex items-center rounded-md ${item.bgClassName || ""}`}
           >
             <div className={`border-t-md h-px flex-1 ${item.className}`} />
-            <span className={`text-xs ${item.bgClassName ? "text-light-gray-0" : ""}`}>
+            <span className={`text-xs ${item.bgClassName ? "text-common-white" : ""}`}>
               {item.label}
             </span>
           </div>
@@ -105,9 +105,9 @@ export function BorderSection({ title, items }: TokenSectionProps) {
         {items.map((item) => (
           <div
             key={item.label}
-            className={`border-md bg-surface-white flex h-16 items-center justify-center rounded-md text-xs font-medium ${item.className}`}
+            className={`border-md flex h-16 items-center justify-center rounded-md text-xs font-medium ${item.bgClassName || "bg-surface-default"} ${item.className}`}
           >
-            {item.label}
+            <span className={item.bgClassName ? "text-common-white" : ""}>{item.label}</span>
           </div>
         ))}
       </div>
@@ -120,9 +120,9 @@ export function SpacingSection({ title, items }: TokenSectionProps) {
     <SectionBlock title={title}>
       <div className="gap-md grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
         {items.map((item) => (
-          <div key={item.label} className="border-border-gray-light rounded-md border">
-            <div className={`bg-surface-gray-subtle ${item.className}`}>
-              <div className="bg-background-white px-sm py-2xs rounded-sm text-xs font-medium">
+          <div key={item.label} className="border-border-gray-default rounded-md border">
+            <div className={`bg-surface-subtle ${item.className}`}>
+              <div className="bg-background-default px-sm py-2xs rounded-sm text-xs font-medium">
                 p-{item.label}
               </div>
             </div>
@@ -138,11 +138,11 @@ export function GapSection({ title, items }: TokenSectionProps) {
     <SectionBlock title={title}>
       <div className="gap-md grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {items.map((item) => (
-          <div key={item.label} className="border-border-gray-light p-sm rounded-md border">
+          <div key={item.label} className="border-border-gray-default p-sm rounded-md border">
             <div className={`flex ${item.className}`}>
-              <div className="bg-primary-50 h-8 flex-1 rounded-xs" />
-              <div className="bg-primary-50 h-8 flex-1 rounded-xs" />
-              <div className="bg-primary-50 h-8 flex-1 rounded-xs" />
+              <div className="h-8 flex-1 rounded-xs bg-green-500" />
+              <div className="h-8 flex-1 rounded-xs bg-green-500" />
+              <div className="h-8 flex-1 rounded-xs bg-green-500" />
             </div>
             <p className="mt-2xs text-center text-xs font-medium">gap-{item.label}</p>
           </div>
@@ -159,7 +159,7 @@ export function RadiusSection({ title, items }: TokenSectionProps) {
         {items.map((item) => (
           <div
             key={item.label}
-            className={`border-md border-border-gray-light bg-surface-white flex h-20 items-center justify-center text-xs font-medium ${item.className}`}
+            className={`border-md border-border-gray-default bg-surface-default flex h-20 items-center justify-center text-xs font-medium ${item.className}`}
           >
             rounded-{item.label}
           </div>
@@ -176,7 +176,7 @@ export function BorderWidthSection({ title, items }: TokenSectionProps) {
         {items.map((item) => (
           <div
             key={item.label}
-            className={`border-border-gray-dark bg-surface-white flex h-16 items-center justify-center rounded-md text-xs font-medium ${item.className}`}
+            className={`border-border-gray-strong bg-surface-default flex h-16 items-center justify-center rounded-md text-xs font-medium ${item.className}`}
           >
             border-{item.label}
           </div>
@@ -193,7 +193,24 @@ export function TypographySection({ title, items }: TokenSectionProps) {
         {items.map((item) => (
           <div
             key={item.label}
-            className={`border-border-gray-light bg-surface-white flex h-16 items-center justify-center rounded-md border ${item.className}`}
+            className={`border-border-gray-default bg-surface-default flex h-16 items-center justify-center rounded-md border ${item.className}`}
+          >
+            {item.label}
+          </div>
+        ))}
+      </div>
+    </SectionBlock>
+  );
+}
+
+export function TextColorSection({ title, items }: TokenSectionProps) {
+  return (
+    <SectionBlock title={title}>
+      <div className="gap-md grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+        {items.map((item) => (
+          <div
+            key={item.label}
+            className={`border-border-gray-default p-sm flex h-16 items-center justify-center rounded-md border text-sm font-medium ${item.bgClassName || ""} ${item.className}`}
           >
             {item.label}
           </div>
