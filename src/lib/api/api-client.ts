@@ -10,7 +10,7 @@ type RequestMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 type RequestConfig = {
   url: string;
   method: RequestMethod;
-  params?: Record<string, string>;
+  params?: Record<string, string | number | boolean | null | undefined>;
   data?: unknown;
   headers?: HeadersInit;
   signal?: AbortSignal;
@@ -21,7 +21,7 @@ type RequestConfig = {
 // 직접 사용용 타입
 interface RequestOptions {
   headers?: Record<string, string>;
-  params?: Record<string, string>;
+  params?: Record<string, string | number | boolean | null | undefined> | string;
   timeout?: number;
   retry?: RetryOptions;
   signal?: AbortSignal;
@@ -107,7 +107,14 @@ export const customInstance = async <T>({
 }: RequestConfig): Promise<T> => {
   const baseURL = API_URL!;
 
-  const searchParams = new URLSearchParams(params);
+  const searchParams = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        searchParams.set(key, String(value));
+      }
+    });
+  }
   const queryString = searchParams.toString();
   const fullUrl = queryString ? `${baseURL}${url}?${queryString}` : `${baseURL}${url}`;
 
@@ -224,9 +231,20 @@ async function request<T>(
   const url = new URL(`${baseUrl}${endpoint}`, isServer ? undefined : window.location.origin);
 
   if (options?.params) {
-    Object.entries(options.params).forEach(([key, value]) => {
-      url.searchParams.append(key, value);
-    });
+    if (typeof options.params === "string") {
+      // 이미 쿼리 스트링인 경우
+      const queryString = options.params;
+      if (queryString) {
+        url.search = queryString.startsWith("?") ? queryString : `?${queryString}`;
+      }
+    } else {
+      // 객체인 경우
+      Object.entries(options.params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          url.searchParams.append(key, String(value));
+        }
+      });
+    }
   }
 
   const headers: Record<string, string> = {
