@@ -122,12 +122,7 @@ function wrapOutput(sections, { selector, useThemeAtRule }) {
 export const tailwindV4Format = {
   name: "css/tailwind-theme",
   format({ dictionary, options = {} }) {
-    const {
-      outputReferences = true,
-      selector,
-      useThemeAtRule = true,
-      tokenFilter,
-    } = options;
+    const { outputReferences = true, selector, useThemeAtRule = true, tokenFilter } = options;
 
     // 토큰을 카테고리별로 그룹화
     const tokensByCategory = {
