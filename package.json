@@ -5,7 +5,7 @@
   "packageManager": "pnpm@10.27.0",
   "scripts": {
     "tokens": "node style-dictionary.config.mjs",
-    "tokens:watch": "chokidar \"token/**/*.json\" -c \"pnpm tokens\"",
+    "tokens:watch": "node -e \"const fs=require('fs');const {execSync}=require('child_process');const missing=!fs.existsSync('src/styles/tokens/theme.css')||!fs.existsSync('src/styles/tokens/theme-dark.css');if(missing)execSync('pnpm tokens',{stdio:'inherit'});\" && chokidar \"tokens/**/*.json\" -c \"pnpm tokens\"",
     "dev": "concurrently -k \"pnpm tokens:watch\" \"next dev\"",
     "build": "pnpm tokens && next build",
     "start": "next start",
@@ -66,6 +66,7 @@
     "@vitest/browser-playwright": "^4.0.17",
     "@vitest/coverage-v8": "^4.0.17",
     "chokidar-cli": "^3.0.0",
+    "chromatic": "^15.0.0",
     "concurrently": "^9.2.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",

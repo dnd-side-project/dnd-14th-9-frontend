@@ -1,0 +1,155 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Design Tokens/Overview" />
+
+# 디자인 토큰 (Design Tokens)
+
+이 프로젝트의 디자인 토큰은 **Figma Tokens Studio**에서 관리되고, **Style Dictionary**를 통해 Tailwind CSS v4 형식으로 자동 변환됩니다.
+
+---
+
+## 토큰 카테고리
+
+<table>
+  <thead>
+    <tr>
+      <th>카테고리</th>
+      <th>설명</th>
+      <th>문서</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <strong>Colors</strong>
+      </td>
+      <td>Primitive 색상 팔레트 (Gray, Green, Teal, Red, Yellow, Cyan)</td>
+      <td>
+        <a href="?path=/docs/design-tokens-colors--docs">Colors</a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Semantic Colors</strong>
+      </td>
+      <td>용도별 색상 (Background, Surface, Border, Text 등)</td>
+      <td>
+        <a href="?path=/docs/design-tokens-semantic-colors--docs">Semantic Colors</a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Spacing</strong>
+      </td>
+      <td>여백과 간격 (padding, margin, gap)</td>
+      <td>
+        <a href="?path=/docs/design-tokens-spacing--docs">Spacing</a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Shape</strong>
+      </td>
+      <td>Border Radius, Border Width</td>
+      <td>
+        <a href="?path=/docs/design-tokens-shape--docs">Shape</a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <strong>Typography</strong>
+      </td>
+      <td>Font Family, Font Weight</td>
+      <td>
+        <a href="?path=/docs/design-tokens-typography--docs">Typography</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 토큰 구조
+
+```
+tokens/
+├── default-token.json    # Figma Tokens Studio 출력
+└── ...
+
+src/styles/tokens/
+├── theme.css             # Style Dictionary 변환 결과 (Tailwind v4)
+└── variables.css         # CSS 변수
+```
+
+---
+
+## 사용 방법
+
+### Tailwind 클래스로 사용
+
+```tsx
+// 색상
+<div className="bg-background-default text-text-primary" />
+<div className="bg-green-500 text-common-white" />
+
+// 간격
+<div className="p-md gap-sm" />
+
+// 형태
+<div className="rounded-lg border-sm border-border-gray-default" />
+
+// 타이포그래피
+<h1 className="font-pretendard font-bold" />
+```
+
+### CSS 변수로 사용
+
+```css
+.custom-element {
+  background-color: var(--color-green-500);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+}
+```
+
+---
+
+## 토큰 업데이트 워크플로우
+
+1. **Figma**에서 디자인 토큰 수정
+2. **Tokens Studio**로 JSON 내보내기
+3. `tokens/` 폴더에 JSON 파일 업데이트
+4. `pnpm tokens` 실행 (Style Dictionary 변환)
+5. `src/styles/tokens/theme.css` 자동 생성
+
+---
+
+## 개발 명령어
+
+```bash
+# 토큰 변환 (1회)
+pnpm tokens
+
+# 토큰 변환 (watch 모드, dev 서버와 함께 실행됨)
+pnpm tokens:watch
+
+# 개발 서버 (토큰 watch 포함)
+pnpm dev
+```
+
+---
+
+## 네이밍 규칙
+
+### Primitive Colors
+
+- `{color}-{scale}`: `gray-500`, `green-300`, `red-700`
+
+### Semantic Colors
+
+- `{category}-{variant}`: `background-default`, `surface-primary-subtle`
+- `{category}-{state}-{variant}`: `text-status-negative-default`
+
+### Spacing & Shape
+
+- `{size}`: `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`

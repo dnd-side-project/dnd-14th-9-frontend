@@ -1,0 +1,246 @@
+import { Meta, ColorPalette, ColorItem } from "@storybook/addon-docs/blocks";
+
+<Meta title="Design Tokens/Semantic Colors" />
+
+# 시맨틱 색상 토큰 (Semantic Color Tokens)
+
+용도에 따라 정의된 색상입니다. UI 컴포넌트에서는 이 색상들을 사용하세요.
+
+---
+
+## Background
+
+페이지 또는 섹션의 배경색입니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Background"
+    subtitle="배경 색상"
+    colors={{
+      default: "#ffffff",
+      subtle: "#f5f7fa",
+      subtler: "#e6e8ea",
+      inverse: "#0b0f0e",
+    }}
+  />
+</ColorPalette>
+
+<table>
+  <thead>
+    <tr>
+      <th>토큰</th>
+      <th>용도</th>
+      <th>Tailwind 클래스</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>default</code>
+      </td>
+      <td>기본 배경</td>
+      <td>
+        <code>bg-background-default</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>subtle</code>
+      </td>
+      <td>섹션 구분 배경</td>
+      <td>
+        <code>bg-background-subtle</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>subtler</code>
+      </td>
+      <td>더 연한 배경</td>
+      <td>
+        <code>bg-background-subtler</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>inverse</code>
+      </td>
+      <td>다크 배경</td>
+      <td>
+        <code>bg-background-inverse</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## Surface
+
+카드, 모달 등 컴포넌트의 표면 색상입니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Surface - Base"
+    subtitle="기본 표면"
+    colors={{
+      default: "#f5f7fa",
+      subtle: "#cdd1d5",
+      subtler: "#b1b8be",
+      strong: "#e6e8ea",
+      inverse: "#0b0f0e",
+      disabled: "#6d7882",
+    }}
+  />
+  <ColorItem
+    title="Surface - Primary"
+    subtitle="Primary 표면"
+    colors={{
+      subtler: "#e9fdf0",
+      subtle: "#7feea0",
+      default: "#27ea67",
+    }}
+  />
+  <ColorItem
+    title="Surface - Secondary"
+    subtitle="Secondary 표면"
+    colors={{
+      subtler: "#f0fdfa",
+      subtle: "#46ecd5",
+      default: "#00bba7",
+    }}
+  />
+  <ColorItem
+    title="Surface - Status"
+    subtitle="상태 표면"
+    colors={{
+      "danger-subtler": "#ffe8ec",
+      "warning-subtler": "#fefce8",
+      "success-subtler": "#ecfeff",
+    }}
+  />
+</ColorPalette>
+
+---
+
+## Border
+
+테두리 색상입니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Border - Base"
+    subtitle="기본 테두리"
+    colors={{
+      default: "rgba(255, 255, 255, 0.16)",
+      subtle: "rgba(255, 255, 255, 0.08)",
+      strong: "rgba(255, 255, 255, 0.48)",
+      stronger: "rgba(255, 255, 255, 0.8)",
+      inverse: "#464c53",
+      disabled: "#6d7882",
+    }}
+  />
+  <ColorItem
+    title="Border - Gray"
+    subtitle="Gray 테두리"
+    colors={{
+      default: "#464c53",
+      strong: "#33363d",
+      stronger: "#1e2124",
+    }}
+  />
+  <ColorItem
+    title="Border - Semantic"
+    subtitle="시맨틱 테두리"
+    colors={{
+      "primary-subtler": "#cff9db",
+      "primary-default": "#27ea67",
+      "secondary-subtler": "#cbfbf1",
+      "secondary-default": "#00786f",
+      "error-subtler": "#ffd0d8",
+      "error-default": "#ff1744",
+      "warning-subtler": "#fef9c2",
+      "warning-default": "#f0b100",
+      "success-subtler": "#cefafe",
+      "success-default": "#00b8db",
+    }}
+  />
+</ColorPalette>
+
+---
+
+## Divider
+
+구분선 색상입니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Divider"
+    subtitle="구분선"
+    colors={{
+      default: "#464c53",
+      subtle: "#33363d",
+      inverse: "#8a949e",
+    }}
+  />
+</ColorPalette>
+
+---
+
+## Text
+
+텍스트 색상입니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Text - Base"
+    subtitle="기본 텍스트"
+    colors={{
+      primary: "#1e2124",
+      secondary: "#33363d",
+      tertiary: "#464c53",
+      muted: "#58616a",
+      disabled: "#6d7882",
+      inverse: "#0b0f0e",
+    }}
+  />
+  <ColorItem
+    title="Text - Brand"
+    subtitle="브랜드 텍스트"
+    colors={{
+      default: "#27ea67",
+      subtle: "#7feea0",
+      link: "#1cb44f",
+    }}
+  />
+  <ColorItem
+    title="Text - Status"
+    subtitle="상태 텍스트"
+    colors={{
+      "negative-default": "#ff1744",
+      "negative-subtle": "#ffb3c1",
+      "warning-default": "#f0b100",
+      "warning-subtle": "#fff085",
+      "positive-default": "#00b8db",
+      "positive-subtle": "#a2f4fd",
+    }}
+  />
+</ColorPalette>
+
+---
+
+## Overlay
+
+모달, 팝오버 등의 오버레이 배경입니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Overlay"
+    subtitle="오버레이"
+    colors={{
+      subtle: "rgba(0, 0, 0, 0.16)",
+      default: "rgba(0, 0, 0, 0.32)",
+      strong: "rgba(0, 0, 0, 0.64)",
+    }}
+  />
+</ColorPalette>
