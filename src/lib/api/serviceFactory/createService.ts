@@ -13,7 +13,6 @@
  *   PatchSessionRequest
  * >({
  *   basePath: "/api/sessions",
- *   cachedMethods: ["getOne"],
  * });
  *
  * // 사용
