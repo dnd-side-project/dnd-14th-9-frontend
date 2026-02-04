@@ -50,9 +50,6 @@ export interface ApiSuccessResponse<TData> {
 /**
  * 페이지네이션 포함 API 성공 응답
  */
-export interface ApiPaginatedResponse<TData> {
-  isSuccess: boolean;
-  result: TData[];
+export interface ApiPaginatedResponse<TData> extends ApiSuccessResponse<TData[]> {
   paginationMeta: PaginationMeta;
-  message: string;
 }
