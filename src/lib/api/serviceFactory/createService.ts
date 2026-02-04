@@ -22,7 +22,7 @@
  * ```
  */
 
-import { api } from "@/lib/api/api-client";
+import { api } from "@/lib/api/api";
 import { buildQueryString } from "@/lib/utils/url";
 import type { ApiSuccessResponse, ApiPaginatedResponse } from "@/types/shared/types";
 import { DeleteResponse, ServiceConfig } from "./types";
