@@ -20,7 +20,7 @@ export default defineConfig({
       client: "react-query",
       override: {
         mutator: {
-          path: "./src/lib/api-client.ts",
+          path: "./src/lib/api/custom-instance.ts",
           name: "customInstance",
         },
         query: {
