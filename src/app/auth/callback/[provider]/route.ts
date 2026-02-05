@@ -10,7 +10,7 @@ export async function GET(
 
   // OAuth 에러 처리 (사용자가 인증 취소 등)
   if (error) {
-    return NextResponse.redirect(new URL(`/login?error=${error}`, request.url));
+    return NextResponse.redirect(new URL(`/?showLogin=true&error=${error}`, request.url));
   }
 
   // 쿠키 검증 - 백엔드가 이미 쿠키를 설정했는지 확인
@@ -19,9 +19,15 @@ export async function GET(
 
   if (!accessToken) {
     console.error("OAuth callback: No access token in cookies");
-    return NextResponse.redirect(new URL("/login?error=no_token", request.url));
+    return NextResponse.redirect(new URL("/?showLogin=true&error=no_token", request.url));
   }
 
-  // 인증 성공 - 메인 페이지로 리다이렉트
-  return NextResponse.redirect(new URL("/", request.url));
+  // 원래 접근하려던 경로로 리다이렉트
+  const redirectPath = cookieStore.get("redirectAfterLogin")?.value || "/";
+
+  // 사용 후 쿠키 삭제
+  cookieStore.delete("redirectAfterLogin");
+
+  // 인증 성공 - 저장된 경로 또는 홈으로 리다이렉트
+  return NextResponse.redirect(new URL(redirectPath, request.url));
 }
