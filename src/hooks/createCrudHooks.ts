@@ -79,3 +79,85 @@ type CrudHooksReturn<TListParams, TListResponse, TCreateData, TUpdateData, TResp
       >;
       useDelete: () => UseMutationResult<ApiSuccessResponse<null>, unknown, string>;
     });
+
+export function createCrudHooks<
+  TListParams,
+  TListResponse,
+  TCreateData,
+  TUpdateData = never,
+  TResponseData = unknown,
+>(
+  config: CrudHooksConfig<TListParams, TListResponse, TCreateData, TUpdateData, TResponseData>
+): CrudHooksReturn<TListParams, TListResponse, TCreateData, TUpdateData, TResponseData> {
+  const keys = {
+    all: [config.queryKey] as const,
+    lists: () => [config.queryKey, "list"] as const,
+    list: (params: TListParams) => [config.queryKey, "list", params] as const,
+  };
+
+  function useList(params: TListParams) {
+    return useQuery({
+      queryKey: keys.list(params),
+      queryFn: () => config.getList(params),
+      staleTime: config.staleTime,
+    });
+  }
+
+  function useCreate() {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationFn: (data: TCreateData) => config.create(data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: keys.lists() });
+      },
+    });
+  }
+
+  async function prefetch(params: TListParams) {
+    const queryClient = new QueryClient();
+    await queryClient.prefetchQuery({
+      queryKey: keys.list(params),
+      queryFn: () => config.getList(params),
+    });
+
+    return dehydrate(queryClient);
+  }
+
+  if (config.update && config.remove) {
+    const update = config.update;
+    const remove = config.remove;
+
+    function useUpdate() {
+      const queryClient = new QueryClient();
+      return useMutation({
+        mutationFn: ({ id, data }: { id: string; data: Partial<TUpdateData> }) =>
+          update(id, data as TUpdateData),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.lists() }),
+      });
+    }
+
+    function useDelete() {
+      const queryClient = new QueryClient();
+      return useMutation({
+        mutationFn: (id: string) => remove(id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.lists() }),
+      });
+    }
+
+    return {
+      keys,
+      useList,
+      useCreate,
+      useUpdate,
+      useDelete,
+      prefetch,
+    } as CrudHooksReturn<TListParams, TListResponse, TCreateData, TUpdateData, TResponseData>;
+  }
+
+  return {
+    keys,
+    useList,
+    useCreate,
+    prefetch,
+  } as CrudHooksReturn<TListParams, TListResponse, TCreateData, TUpdateData, TResponseData>;
+}
