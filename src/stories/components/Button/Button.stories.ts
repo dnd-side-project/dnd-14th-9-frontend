@@ -11,6 +11,12 @@ const meta = {
   tags: ["autodocs"],
   parameters: {
     layout: "centered",
+    docs: {
+      description: {
+        component:
+          "다양한 상황에서 사용할 수 있는 반응형 버튼 컴포넌트입니다. 4가지 variant(primary, secondary, tertiary, text)와 5가지 size(xlarge, large, medium, small, xsmall)를 지원합니다.",
+      },
+    },
   },
   argTypes: {
     variant: {
