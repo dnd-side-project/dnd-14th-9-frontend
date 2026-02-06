@@ -1,7 +1,11 @@
 "use client";
 
 import { LoginModal } from "@/components/LoginModal/LoginModal";
+import { authApi } from "@/features/auth/api";
 import { useLoginModal } from "@/hooks/useLoginModal";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 /**
  * Header - 공통 헤더/네비게이션
@@ -12,7 +16,33 @@ import { useLoginModal } from "@/hooks/useLoginModal";
  * - 로그인/로그아웃 버튼
  */
 export function Header() {
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const setAuth = useAuthStore((state) => state.setAuth);
   const { isOpen, openModal, closeModal, handleLogin, from, error } = useLoginModal();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+
+    try {
+      setIsLoggingOut(true);
+      const response = await authApi.logout();
+
+      if (response.isSuccess) {
+        // Zustand 상태 업데이트
+        setAuth(false);
+
+        // 홈으로 리다이렉트
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("로그아웃 실패:", error);
+      alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <>
@@ -20,13 +50,23 @@ export function Header() {
         <div className="flex items-center justify-between">
           <div>Header placeholder</div>
 
-          {/* 로그인 버튼 */}
-          <button
-            onClick={openModal}
-            className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-          >
-            로그인
-          </button>
+          {/* 로그인/로그아웃 버튼 */}
+          {isAuthenticated ? (
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600 disabled:bg-gray-400"
+            >
+              {isLoggingOut ? "로그아웃 중..." : "로그아웃"}
+            </button>
+          ) : (
+            <button
+              onClick={openModal}
+              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            >
+              로그인
+            </button>
+          )}
         </div>
 
         {/* 에러 표시 */}
