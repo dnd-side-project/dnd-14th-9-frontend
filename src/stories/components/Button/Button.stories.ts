@@ -33,6 +33,14 @@ const meta = {
     disabled: {
       control: "boolean",
     },
+    leftIcon: {
+      control: false,
+      description: "버튼 왼쪽에 표시될 아이콘",
+    },
+    rightIcon: {
+      control: false,
+      description: "버튼 오른쪽에 표시될 아이콘",
+    },
   },
 } satisfies Meta<typeof Button>;
 
@@ -125,7 +133,7 @@ export const TertiaryDisabled: Story = {
 export const IconOnly: Story = {
   args: {
     iconOnly: true,
-    icon: createElement(PlusIcon, { size: "medium" }),
+    leftIcon: createElement(PlusIcon, { size: "medium" }),
     size: "medium",
   },
 };
@@ -133,7 +141,7 @@ export const IconOnly: Story = {
 export const IconOnlySmall: Story = {
   args: {
     iconOnly: true,
-    icon: createElement(Heart, { size: 20 }),
+    leftIcon: createElement(Heart, { size: 20 }),
     size: "small",
   },
 };
@@ -141,7 +149,7 @@ export const IconOnlySmall: Story = {
 export const IconOnlyXLarge: Story = {
   args: {
     iconOnly: true,
-    icon: createElement(Settings, { size: 32 }),
+    leftIcon: createElement(Settings, { size: 32 }),
     size: "xlarge",
   },
 };
@@ -150,7 +158,7 @@ export const IconOnlyXLarge: Story = {
 export const IconOnlySecondary: Story = {
   args: {
     iconOnly: true,
-    icon: createElement(Search, { size: 24 }),
+    leftIcon: createElement(Search, { size: 24 }),
     size: "medium",
     variant: "secondary",
   },
@@ -159,7 +167,7 @@ export const IconOnlySecondary: Story = {
 export const IconOnlyTertiary: Story = {
   args: {
     iconOnly: true,
-    icon: createElement(X, { size: 24 }),
+    leftIcon: createElement(X, { size: 24 }),
     size: "medium",
     variant: "tertiary",
   },
@@ -168,8 +176,31 @@ export const IconOnlyTertiary: Story = {
 export const IconOnlyDisabled: Story = {
   args: {
     iconOnly: true,
-    icon: createElement(PlusIcon, { size: "medium" }),
+    leftIcon: createElement(PlusIcon, { size: "medium" }),
     size: "medium",
     disabled: true,
+  },
+};
+
+// Icon + Text Stories
+export const WithLeftIcon: Story = {
+  args: {
+    leftIcon: createElement(Heart, { size: 20 }),
+    children: "좋아요",
+  },
+};
+
+export const WithRightIcon: Story = {
+  args: {
+    rightIcon: createElement(Search, { size: 20 }),
+    children: "검색",
+  },
+};
+
+export const WithBothIcons: Story = {
+  args: {
+    leftIcon: createElement(Settings, { size: 20 }),
+    rightIcon: createElement(X, { size: 20 }),
+    children: "설정",
   },
 };

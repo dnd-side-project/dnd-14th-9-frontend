@@ -4,7 +4,7 @@ import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/lib/utils/utils";
 
 const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center rounded-md font-pretendard transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-surface-disabled disabled:text-text-disabled",
+  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md font-pretendard transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-surface-disabled disabled:text-text-disabled",
   {
     variants: {
       variant: {
@@ -43,11 +43,15 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
-  icon?: ReactNode;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, iconOnly, icon, children, disabled, ...props }, ref) => {
+  (
+    { className, variant, size, iconOnly, leftIcon, rightIcon, children, disabled, ...props },
+    ref
+  ) => {
     return (
       <button
         ref={ref}
@@ -56,7 +60,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         aria-disabled={disabled}
         {...props}
       >
-        {iconOnly ? icon : children}
+        {iconOnly ? (
+          (leftIcon ?? rightIcon)
+        ) : (
+          <>
+            {leftIcon}
+            {children}
+            {rightIcon}
+          </>
+        )}
       </button>
     );
   }
