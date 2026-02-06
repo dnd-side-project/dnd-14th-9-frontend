@@ -43,7 +43,7 @@ export function useLoginModal() {
     document.cookie = `redirectAfterLogin=${encodeURIComponent(fromPath)}; path=/; max-age=300`;
 
     // OAuth 시작
-    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/oauth2/authorization/${provider}`;
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/oauth2/authorization/${provider}`;
   };
 
   return {
