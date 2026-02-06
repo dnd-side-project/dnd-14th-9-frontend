@@ -62,7 +62,7 @@ interface CrudHooksConfig<
   getList: (params: TListParams) => Promise<TListResponse>;
   getDetail?: (id: string) => Promise<TDetailResponse>;
   create: (data: TCreateData) => Promise<ApiSuccessResponse<TResponseData>>;
-  update?: (id: string, data: TUpdateData) => Promise<ApiSuccessResponse<TResponseData>>;
+  update?: (id: string, data: Partial<TUpdateData>) => Promise<ApiSuccessResponse<TResponseData>>;
   remove?: (id: string) => Promise<ApiSuccessResponse<null>>;
   staleTime?: number;
 }
@@ -179,8 +179,7 @@ export function createCrudHooks<
     result.useUpdate = function useUpdate() {
       const queryClient = useQueryClient();
       return useMutation({
-        mutationFn: ({ id, data }: { id: string; data: Partial<TUpdateData> }) =>
-          update(id, data as TUpdateData),
+        mutationFn: ({ id, data }: { id: string; data: Partial<TUpdateData> }) => update(id, data),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.lists() }),
       });
     };
