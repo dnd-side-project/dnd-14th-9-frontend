@@ -4,8 +4,8 @@
  * 반복적인 React Query CRUD 훅 패턴을 팩토리로 통합합니다.
  * 목록 조회, 상세 조회, 생성, 수정, 삭제, prefetch를 자동 생성합니다.
  *
- * getDetail / update / remove를 전달하지 않으면 해당 훅이 각각 생성되지 않습니다.
- * 각 옵션은 독립적으로 설정할 수 있습니다.
+ * getList만 필수이며, 나머지(getDetail / create / update / remove)는 선택적입니다.
+ * 전달하지 않은 옵션에 해당하는 훅은 생성되지 않습니다.
  *
  * @example
  * // 전체 CRUD 포함
@@ -36,6 +36,17 @@
  * export const useStudents = studentCrud.useList;
  * export const useStudent = studentCrud.useDetail;
  * export const useCreateStudent = studentCrud.useCreate;
+ *
+ * @example
+ * // 조회 전용 (생성/수정/삭제 없음)
+ * const noticeCrud = createCrudHooks({
+ *   queryKey: "notices",
+ *   getList: getNotices,
+ *   getDetail: getNotice,
+ * });
+ *
+ * export const useNotices = noticeCrud.useList;
+ * export const useNotice = noticeCrud.useDetail;
  */
 
 import {
@@ -61,13 +72,13 @@ interface CrudHooksConfig<
   queryKey: string;
   getList: (params: TListParams) => Promise<TListResponse>;
   getDetail?: (id: string) => Promise<TDetailResponse>;
-  create: (data: TCreateData) => Promise<ApiSuccessResponse<TResponseData>>;
+  create?: (data: TCreateData) => Promise<ApiSuccessResponse<TResponseData>>;
   update?: (id: string, data: Partial<TUpdateData>) => Promise<ApiSuccessResponse<TResponseData>>;
   remove?: (id: string) => Promise<ApiSuccessResponse<null>>;
   staleTime?: number;
 }
 
-type BaseReturn<TListParams, TListResponse, TCreateData, TResponseData> = {
+type BaseReturn<TListParams, TListResponse> = {
   keys: {
     all: readonly [string];
     lists: () => readonly [string, "list"];
@@ -75,8 +86,11 @@ type BaseReturn<TListParams, TListResponse, TCreateData, TResponseData> = {
     detail: (id: string) => readonly [string, "detail", string];
   };
   useList: (params: TListParams) => UseQueryResult<TListResponse>;
-  useCreate: () => UseMutationResult<ApiSuccessResponse<TResponseData>, unknown, TCreateData>;
   prefetch: (params: TListParams) => Promise<DehydratedState>;
+};
+
+type WithCreate<TCreateData, TResponseData> = {
+  useCreate: () => UseMutationResult<ApiSuccessResponse<TResponseData>, unknown, TCreateData>;
 };
 
 type WithDetail<TDetailResponse> = {
@@ -112,7 +126,8 @@ export function createCrudHooks<
     TUpdateData,
     TResponseData
   >
-): BaseReturn<TListParams, TListResponse, TCreateData, TResponseData> &
+): BaseReturn<TListParams, TListResponse> &
+  Partial<WithCreate<TCreateData, TResponseData>> &
   Partial<WithDetail<TDetailResponse>> &
   Partial<WithUpdate<TUpdateData, TResponseData>> &
   Partial<WithDelete> {
@@ -131,16 +146,6 @@ export function createCrudHooks<
     });
   }
 
-  function useCreate() {
-    const queryClient = useQueryClient();
-    return useMutation({
-      mutationFn: (data: TCreateData) => config.create(data),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: keys.lists() });
-      },
-    });
-  }
-
   async function prefetch(params: TListParams) {
     const queryClient = new QueryClient();
     await queryClient.prefetchQuery({
@@ -151,15 +156,29 @@ export function createCrudHooks<
     return dehydrate(queryClient);
   }
 
-  const result: BaseReturn<TListParams, TListResponse, TCreateData, TResponseData> &
+  const result: BaseReturn<TListParams, TListResponse> &
+    Partial<WithCreate<TCreateData, TResponseData>> &
     Partial<WithDetail<TDetailResponse>> &
     Partial<WithUpdate<TUpdateData, TResponseData>> &
     Partial<WithDelete> = {
     keys,
     useList,
-    useCreate,
     prefetch,
   };
+
+  // create가 있으면 useCreate 추가
+  if (config.create) {
+    const create = config.create;
+    result.useCreate = function useCreate() {
+      const queryClient = useQueryClient();
+      return useMutation({
+        mutationFn: (data: TCreateData) => create(data),
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: keys.lists() });
+        },
+      });
+    };
+  }
 
   // getDetail이 있으면 useDetail 추가
   if (config.getDetail) {
