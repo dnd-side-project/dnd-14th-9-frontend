@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { forwardRef, type SVGProps } from "react";
+import { forwardRef, type ComponentPropsWithoutRef } from "react";
 
 import { cn } from "@/lib/utils/utils";
 
@@ -19,18 +19,14 @@ const iconVariants = cva("inline-block shrink-0", {
 });
 
 export interface IconProps
-  extends Omit<SVGProps<SVGSVGElement>, "children">, VariantProps<typeof iconVariants> {
+  extends Omit<ComponentPropsWithoutRef<"span">, "children">, VariantProps<typeof iconVariants> {
   svg: React.ReactNode;
 }
 
-export const Icon = forwardRef<SVGSVGElement, IconProps>(
+export const Icon = forwardRef<HTMLSpanElement, IconProps>(
   ({ className, size, svg, ...props }, ref) => {
     return (
-      <span
-        ref={ref as React.Ref<HTMLSpanElement>}
-        className={cn(iconVariants({ size, className }))}
-        {...(props as React.HTMLAttributes<HTMLSpanElement>)}
-      >
+      <span ref={ref} className={cn(iconVariants({ size, className }))} {...props}>
         {svg}
       </span>
     );
