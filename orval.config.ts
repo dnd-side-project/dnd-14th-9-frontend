@@ -5,7 +5,7 @@ import { defineConfig } from "orval";
 const SWAGGER_FILE_PATH = "./swagger.json";
 
 // Fallback URL
-const FALLBACK_OPENAPI_URL = "https://example.com/openapi.json";
+const FALLBACK_OPENAPI_URL = "https://api.gak.today/swagger-ui/index.html";
 
 export default defineConfig({
   api: {
@@ -17,15 +17,11 @@ export default defineConfig({
       mode: "tags-split",
       target: "./src/api/generated",
       schemas: "./src/api/generated/models",
-      client: "react-query",
+      client: "fetch",
       override: {
         mutator: {
           path: "./src/lib/api/custom-instance.ts",
           name: "customInstance",
-        },
-        query: {
-          useQuery: true,
-          useMutation: true,
         },
       },
     },

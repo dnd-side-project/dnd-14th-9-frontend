@@ -12,7 +12,7 @@ type RequestConfig = {
   retry?: RetryOptions;
 };
 
-const customInstance = async <T>({
+const apiRequest = async <T>({
   url,
   method,
   params,
@@ -46,4 +46,15 @@ const customInstance = async <T>({
   );
 };
 
-export default customInstance;
+// orval용 어댑터 - (url, options) 시그니처를 기존 apiRequest로 변환
+export const customInstance = async <T>(url: string, options?: RequestInit): Promise<T> => {
+  return apiRequest<T>({
+    url,
+    method: (options?.method ?? "GET") as RequestMethod,
+    data: options?.body ? JSON.parse(options.body as string) : undefined,
+    headers: options?.headers as HeadersInit,
+    signal: options?.signal ?? undefined,
+  });
+};
+
+export { apiRequest };
