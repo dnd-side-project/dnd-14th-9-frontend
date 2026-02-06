@@ -180,7 +180,10 @@ export function createCrudHooks<
       const queryClient = useQueryClient();
       return useMutation({
         mutationFn: ({ id, data }: { id: string; data: Partial<TUpdateData> }) => update(id, data),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.lists() }),
+        onSuccess: (_, variables) => {
+          queryClient.invalidateQueries({ queryKey: keys.lists() });
+          queryClient.invalidateQueries({ queryKey: keys.detail(variables.id) });
+        },
       });
     };
   }
@@ -192,7 +195,10 @@ export function createCrudHooks<
       const queryClient = useQueryClient();
       return useMutation({
         mutationFn: (id: string) => remove(id),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.lists() }),
+        onSuccess: (_, id) => {
+          queryClient.invalidateQueries({ queryKey: keys.lists() });
+          queryClient.invalidateQueries({ queryKey: keys.detail(id) });
+        },
       });
     };
   }
