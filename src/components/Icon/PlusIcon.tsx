@@ -19,7 +19,7 @@ const PlusSvg = (
 
 export type PlusIconProps = Omit<IconProps, "svg">;
 
-export const PlusIcon = forwardRef<SVGSVGElement, PlusIconProps>((props, ref) => {
+export const PlusIcon = forwardRef<HTMLSpanElement, PlusIconProps>((props, ref) => {
   return <Icon ref={ref} svg={PlusSvg} {...props} />;
 });
 
