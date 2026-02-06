@@ -26,16 +26,16 @@
  *
  * @example
  * // 목록/상세 조회 + 생성만 (수정/삭제 없음)
- * const studentCrud = createCrudHooks({
- *   queryKey: "students",
- *   getList: getStudents,
- *   getDetail: getStudent,
- *   create: postStudent,
+ * const sessionCrud = createCrudHooks({
+ *   queryKey: "sessions",
+ *   getList: getSessions,
+ *   getDetail: getSession,
+ *   create: postSession,
  * });
  *
- * export const useStudents = studentCrud.useList;
- * export const useStudent = studentCrud.useDetail;
- * export const useCreateStudent = studentCrud.useCreate;
+ * export const useSessions = sessionCrud.useList;
+ * export const useSession = sessionCrud.useDetail;
+ * export const useCreateSession = sessionCrud.useCreate;
  *
  * @example
  * // 조회 전용 (생성/수정/삭제 없음)
@@ -47,6 +47,28 @@
  *
  * export const useNotices = noticeCrud.useList;
  * export const useNotice = noticeCrud.useDetail;
+ */
+
+/**
+ * Query Key Factory 구조
+ *
+ * React Query는 키 배열의 앞부분이 일치하면 함께 무효화됩니다.
+ * 이 계층 구조를 활용해 세밀한 캐시 제어가 가능합니다.
+ *
+ * @example queryKey: "sessions"인 경우
+ * ```
+ * keys.all           → ["sessions"]                        // 전체 무효화
+ * keys.lists()       → ["sessions", "list"]                // 모든 목록 무효화
+ * keys.list(params)  → ["sessions", "list", { page: 1 }]   // 특정 조건의 목록
+ * keys.detail(id)    → ["sessions", "detail", "abc123"]    // 특정 상세
+ * ```
+ *
+ * @example 무효화 범위
+ * ```
+ * invalidateQueries({ queryKey: keys.all })     // sessions 관련 전체
+ * invalidateQueries({ queryKey: keys.lists() }) // 목록만 (detail 유지)
+ * invalidateQueries({ queryKey: keys.detail(id) }) // 특정 상세만
+ * ```
  */
 
 import {
@@ -80,9 +102,13 @@ interface CrudHooksConfig<
 
 type BaseReturn<TListParams, TListResponse> = {
   keys: {
+    /** ["queryKey"] - 해당 리소스의 모든 쿼리 무효화 시 사용 */
     all: readonly [string];
+    /** ["queryKey", "list"] - 모든 목록 쿼리 무효화 시 사용 */
     lists: () => readonly [string, "list"];
+    /** ["queryKey", "list", params] - 특정 파라미터의 목록 쿼리 */
     list: (params: TListParams) => readonly [string, "list", TListParams];
+    /** ["queryKey", "detail", id] - 특정 ID의 상세 쿼리 */
     detail: (id: string) => readonly [string, "detail", string];
   };
   useList: (params: TListParams) => UseQueryResult<TListResponse>;
