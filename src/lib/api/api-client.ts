@@ -1,44 +1,178 @@
-// Orval이 생성하는 API 호출에서 사용할 커스텀 fetch 인스턴스
+/* eslint-disable no-console */
+import type { ApiErrorResponse } from "@/types/shared/types";
 
-type RequestConfig = {
-  url: string;
-  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-  params?: Record<string, string>;
-  data?: unknown;
-  headers?: HeadersInit;
+export interface ExecuteFetchOptions {
+  timeout?: number;
+  retry?: RetryOptions;
   signal?: AbortSignal;
-};
+}
 
-export const customInstance = async <T>({
-  url,
-  method,
-  params,
-  data,
-  headers,
-  signal,
-}: RequestConfig): Promise<T> => {
-  const baseURL = process.env.NEXT_PUBLIC_API_URL!;
+export const isDev = process.env.NODE_ENV === "development";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  // URL 파라미터 처리
-  const searchParams = new URLSearchParams(params);
-  const queryString = searchParams.toString();
-  const fullUrl = queryString ? `${baseURL}${url}?${queryString}` : `${baseURL}${url}`;
+export type RequestMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
-  const response = await fetch(fullUrl, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-    body: data ? JSON.stringify(data) : undefined,
-    signal,
-  });
+export interface RetryOptions {
+  maxRetries?: number;
+  retryDelay?: number;
+  retryableStatuses?: number[];
+}
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+// ===== 에러 클래스 =====
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+    public data?: ApiErrorResponse | null
+  ) {
+    super(message);
+    this.name = "ApiError";
   }
+}
 
-  return response.json();
-};
+export class NetworkError extends Error {
+  constructor(
+    message: string,
+    public originalError?: unknown
+  ) {
+    super(message);
+    this.name = "NetworkError";
+  }
+}
 
-export default customInstance;
+export class TimeoutError extends Error {
+  constructor(message: string = "Request timeout") {
+    super(message);
+    this.name = "TimeoutError";
+  }
+}
+
+// ===== 유틸리티 함수 =====
+
+export function log(type: "request" | "response" | "error", ...args: unknown[]) {
+  if (!isDev) return;
+  const prefix = {
+    request: "🔵 [API Request]",
+    response: "🟢 [API Response]",
+    error: "🔴 [API Error]",
+  };
+  console.log(prefix[type], ...args);
+}
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function shouldRetry(
+  error: unknown,
+  attempt: number,
+  maxRetries: number,
+  retryableStatuses: number[]
+): boolean {
+  if (attempt >= maxRetries) return false;
+  if (error instanceof NetworkError) return true;
+  if (error instanceof ApiError && retryableStatuses.includes(error.status)) {
+    return true;
+  }
+  return false;
+}
+
+export function buildRetryConfig(retry?: RetryOptions) {
+  return {
+    maxRetries: retry?.maxRetries ?? 3,
+    retryDelay: retry?.retryDelay ?? 1000,
+    retryableStatuses: retry?.retryableStatuses ?? [408, 429, 500, 502, 503, 504],
+  };
+}
+
+// ===== 공통 fetch 실행 =====
+
+export async function executeFetch<T>(
+  method: RequestMethod,
+  url: string,
+  init: RequestInit,
+  options?: ExecuteFetchOptions
+): Promise<T> {
+  const retryConfig = buildRetryConfig(options?.retry);
+  const timeout = options?.timeout ?? 30000;
+  let attempt = 0;
+
+  while (true) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      log("request", method, url, init.body);
+
+      const response = await fetch(url, {
+        ...init,
+        signal: options?.signal || controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        let errorData: ApiErrorResponse | null = null;
+        try {
+          errorData = await response.json();
+        } catch {
+          // JSON 파싱 실패 시 무시
+        }
+
+        const error = new ApiError(
+          errorData?.error.message ?? `HTTP error! status: ${response.status}`,
+          response.status,
+          errorData
+        );
+
+        if (shouldRetry(error, attempt, retryConfig.maxRetries, retryConfig.retryableStatuses)) {
+          attempt++;
+          const delay = retryConfig.retryDelay * Math.pow(2, attempt - 1);
+          log("error", `Retry ${attempt}/${retryConfig.maxRetries} after ${delay}ms`, error);
+          await sleep(delay);
+          continue;
+        }
+
+        log("error", response.status, errorData);
+        throw error;
+      }
+
+      if (response.status === 204) {
+        log("response", response.status, "No Content");
+        return null as T;
+      }
+
+      const responseData = await response.json();
+      log("response", response.status, responseData);
+      return responseData;
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error instanceof Error && error.name === "AbortError") {
+        const timeoutError = new TimeoutError("Request timeout or cancelled");
+        log("error", timeoutError);
+        throw timeoutError;
+      }
+
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      const networkError = new NetworkError("Network request failed", error);
+
+      if (
+        shouldRetry(networkError, attempt, retryConfig.maxRetries, retryConfig.retryableStatuses)
+      ) {
+        attempt++;
+        const delay = retryConfig.retryDelay * Math.pow(2, attempt - 1);
+        log("error", `Retry ${attempt}/${retryConfig.maxRetries} after ${delay}ms`, networkError);
+        await sleep(delay);
+        continue;
+      }
+
+      log("error", networkError);
+      throw networkError;
+    }
+  }
+}
