@@ -8,6 +8,9 @@ import prettierPlugin from "eslint-plugin-prettier";
 import { defineConfig } from "eslint/config";
 
 const eslintConfig = defineConfig([
+  {
+    ignores: ["**/node_modules/**", ".next/**", "src/api/generated/**", "storybook-static/**"],
+  },
   ...nextVitals,
   ...nextTs,
   ...storybook.configs["flat/recommended"],
@@ -23,9 +26,6 @@ const eslintConfig = defineConfig([
     },
   },
   prettierConfig,
-  {
-    ignores: [".next/*", "node_modules/*"],
-  },
 ]);
 
 export default eslintConfig;
