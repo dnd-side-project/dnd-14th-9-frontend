@@ -6,7 +6,6 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLogin: (provider: "google" | "kakao") => void;
-  from: string | null;
 }
 
 export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {

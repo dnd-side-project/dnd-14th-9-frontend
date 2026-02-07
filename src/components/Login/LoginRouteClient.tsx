@@ -62,9 +62,7 @@ export function LoginRouteClient({ variant }: LoginRouteClientProps) {
   };
 
   if (variant === "modal") {
-    return (
-      <LoginModal isOpen={true} onClose={handleClose} onLogin={handleLogin} from={safeNextPath} />
-    );
+    return <LoginModal isOpen={true} onClose={handleClose} onLogin={handleLogin} />;
   }
 
   return <LoginPage reasonMessage={reasonMessage} onLogin={handleLogin} />;
