@@ -1,5 +1,5 @@
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LOGIN_ERROR_COOKIE,
   LOGIN_REQUIRED_COOKIE,
@@ -36,6 +36,25 @@ function normalizeInternalPath(path: string | null | undefined): string {
   return path;
 }
 
+interface LoginSignalState {
+  shouldOpen: boolean;
+  from: string;
+  error: string | null;
+  key: string;
+}
+
+function readLoginSignal(pathname: string | null): LoginSignalState {
+  const shouldOpen = getCookie(LOGIN_REQUIRED_COOKIE) === "1";
+  const from = normalizeInternalPath(getCookie(REDIRECT_AFTER_LOGIN_COOKIE) ?? pathname ?? "/");
+  const error = getCookie(LOGIN_ERROR_COOKIE);
+  return {
+    shouldOpen,
+    from,
+    error,
+    key: `${from}|${error ?? ""}`,
+  };
+}
+
 /**
  * 로그인 모달 상태 및 OAuth 로직을 관리하는 훅
  */
@@ -44,30 +63,17 @@ export function useLoginModal() {
 
   const [manualFrom, setManualFrom] = useState<string | null>(null);
   const [isManualOpen, setIsManualOpen] = useState(false);
-  const prevModalSignalRef = useRef(false);
+  const [dismissedSignalKey, setDismissedSignalKey] = useState<string | null>(null);
 
-  const modalSignal = useMemo(() => {
-    const shouldOpen = getCookie(LOGIN_REQUIRED_COOKIE) === "1";
-    const cookieFrom = getCookie(REDIRECT_AFTER_LOGIN_COOKIE);
-    const cookieError = getCookie(LOGIN_ERROR_COOKIE);
+  const signalState = useMemo(() => readLoginSignal(pathname), [pathname]);
 
-    return {
-      shouldOpen,
-      from: normalizeInternalPath(cookieFrom ?? pathname ?? "/"),
-      error: cookieError,
-    };
-  }, [pathname]);
+  const isSignalOpen = signalState.shouldOpen && dismissedSignalKey !== signalState.key;
 
   useEffect(() => {
-    if (modalSignal.shouldOpen && !prevModalSignalRef.current) {
-      // eslint-disable-next-line no-console
-      console.log("Login required. From:", modalSignal.from, "Error:", modalSignal.error);
-    }
-
+    if (!signalState.shouldOpen) return;
     clearCookie(LOGIN_REQUIRED_COOKIE);
     clearCookie(LOGIN_ERROR_COOKIE);
-    prevModalSignalRef.current = modalSignal.shouldOpen;
-  }, [modalSignal]);
+  }, [signalState.shouldOpen]);
 
   const openModal = () => {
     setManualFrom(normalizeInternalPath(pathname));
@@ -76,6 +82,7 @@ export function useLoginModal() {
 
   const closeModal = () => {
     setIsManualOpen(false);
+    setDismissedSignalKey(signalState.key);
     clearCookie(LOGIN_REQUIRED_COOKIE);
     clearCookie(LOGIN_ERROR_COOKIE);
   };
@@ -84,7 +91,7 @@ export function useLoginModal() {
     // 리다이렉트 경로를 쿠키에 저장
     setCookie(
       REDIRECT_AFTER_LOGIN_COOKIE,
-      normalizeInternalPath((modalSignal.shouldOpen ? modalSignal.from : manualFrom) ?? pathname),
+      normalizeInternalPath((isSignalOpen ? signalState.from : manualFrom) ?? pathname),
       REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS
     );
 
@@ -92,9 +99,9 @@ export function useLoginModal() {
     window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/oauth2/authorization/${provider}`;
   };
 
-  const isOpen = isManualOpen || modalSignal.shouldOpen;
-  const from = isOpen ? (modalSignal.shouldOpen ? modalSignal.from : manualFrom) : null;
-  const error = modalSignal.shouldOpen ? modalSignal.error : null;
+  const isOpen = isManualOpen || isSignalOpen;
+  const from = isOpen ? (isSignalOpen ? signalState.from : manualFrom) : null;
+  const error = isSignalOpen ? signalState.error : null;
 
   return {
     isOpen,

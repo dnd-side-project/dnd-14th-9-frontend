@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import {
   REDIRECT_AFTER_LOGIN_COOKIE,
+  clearLoginSignalCookies,
   setAuthCookies,
   setLoginSignalCookies,
 } from "@/lib/auth/cookies";
@@ -47,6 +48,7 @@ export async function GET(request: NextRequest) {
   const redirectPath = normalizeInternalPath(cookieStore.get(REDIRECT_AFTER_LOGIN_COOKIE)?.value);
 
   // 사용 후 쿠키 삭제
+  clearLoginSignalCookies(cookieStore);
   cookieStore.delete(REDIRECT_AFTER_LOGIN_COOKIE);
 
   // 인증 성공 - 저장된 경로 또는 홈으로 리다이렉트
