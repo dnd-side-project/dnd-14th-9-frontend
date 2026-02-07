@@ -1,6 +1,12 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { clearAuthCookies, setAuthCookies, setLoginSignalCookies } from "@/lib/auth/cookies";
+import {
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+  clearAuthCookies,
+  setAuthCookies,
+  setLoginSignalCookies,
+} from "@/lib/auth/cookies";
 
 // 공개 라우트 (인증 불필요)
 const PUBLIC_ROUTES = ["/"];
@@ -30,8 +36,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const accessToken = request.cookies.get("accessToken")?.value;
-  const refreshToken = request.cookies.get("refreshToken")?.value;
+  const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
+  const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
 
   // 토큰 없으면 홈으로 리다이렉트 + 로그인 모달 표시
   if (!accessToken) {
@@ -116,7 +122,7 @@ async function tryRefreshToken(request: NextRequest, refreshToken: string): Prom
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Cookie: `refreshToken=${refreshToken}`,
+        Cookie: `${REFRESH_TOKEN_COOKIE}=${refreshToken}`,
       },
       credentials: "include",
     });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { api } from "./api";
+import { clearAuthCookies } from "@/lib/auth/cookies";
 
 export type ForwardMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -51,8 +52,7 @@ export async function forwardToBackend(options: ForwardToBackendOptions) {
       const noContentResponse = new NextResponse(null, { status: 204 });
 
       if (options.clearAuthCookiesOnSuccess) {
-        noContentResponse.cookies.delete("accessToken");
-        noContentResponse.cookies.delete("refreshToken");
+        clearAuthCookies(noContentResponse.cookies);
       }
 
       return noContentResponse;
@@ -75,8 +75,7 @@ export async function forwardToBackend(options: ForwardToBackendOptions) {
     );
 
     if (options.clearAuthCookiesOnSuccess && response.ok) {
-      nextResponse.cookies.delete("accessToken");
-      nextResponse.cookies.delete("refreshToken");
+      clearAuthCookies(nextResponse.cookies);
     }
 
     return nextResponse;

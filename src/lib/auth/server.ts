@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookies";
 
 /**
  * 서버 사이드에서 쿠키를 읽어 인증 상태 확인
@@ -7,6 +8,6 @@ import { cookies } from "next/headers";
  */
 export async function getServerAuthState(): Promise<boolean> {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
+  const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
   return !!accessToken;
 }

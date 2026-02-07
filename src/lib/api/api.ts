@@ -5,6 +5,7 @@ import {
   type RequestMethod,
   executeFetch,
 } from "./api-client";
+import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookies";
 
 interface RequestOptions {
   headers?: Record<string, string>;
@@ -82,7 +83,7 @@ async function buildHeaders(
   if (isServer && !options?.skipAuth) {
     const cookies = await getCookiesFn();
     const cookieStore = await cookies();
-    const token = cookieStore.get("accessToken")?.value;
+    const token = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
