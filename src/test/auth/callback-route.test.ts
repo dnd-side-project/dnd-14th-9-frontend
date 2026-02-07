@@ -11,6 +11,14 @@ jest.mock("next/headers", () => ({
   cookies: jest.fn(),
 }));
 
+function setNodeEnv(value: string | undefined) {
+  Object.defineProperty(process.env, "NODE_ENV", {
+    value,
+    configurable: true,
+    writable: true,
+  });
+}
+
 describe("OAuth Callback Route Handler", () => {
   let mockCookieStore: {
     set: jest.Mock;
@@ -39,10 +47,9 @@ describe("OAuth Callback Route Handler", () => {
       const url =
         "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
       // When: 핸들러 실행
-      const response = await GET(request, { params });
+      const response = await GET(request);
 
       // Then: 쿠키 저장 확인
       expect(mockCookieStore.set).toHaveBeenCalledTimes(2);
@@ -81,10 +88,9 @@ describe("OAuth Callback Route Handler", () => {
       const url =
         "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
       // When
-      const response = await GET(request, { params });
+      const response = await GET(request);
 
       // Then: 저장된 경로로 리다이렉트
       expect(response.headers.get("location")).toBe("http://localhost:3000/dashboard");
@@ -100,10 +106,9 @@ describe("OAuth Callback Route Handler", () => {
       const url =
         "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
       // When
-      const response = await GET(request, { params });
+      const response = await GET(request);
 
       // Then: 기본값인 홈으로 리다이렉트
       expect(response.headers.get("location")).toBe("http://localhost:3000/");
@@ -115,10 +120,9 @@ describe("OAuth Callback Route Handler", () => {
       // Given: error 파라미터가 있는 요청
       const url = "http://localhost:3000/auth/callback/google?error=access_denied";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
       // When
-      const response = await GET(request, { params });
+      const response = await GET(request);
 
       // Then: 에러 파라미터와 함께 리다이렉트
       expect(response.status).toBe(307);
@@ -134,10 +138,9 @@ describe("OAuth Callback Route Handler", () => {
       // Given: accessToken 없이 refreshToken만 있는 요청
       const url = "http://localhost:3000/auth/callback/google?refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
       // When
-      const response = await GET(request, { params });
+      const response = await GET(request);
 
       // Then
       const location = response.headers.get("location");
@@ -150,10 +153,9 @@ describe("OAuth Callback Route Handler", () => {
       // Given: refreshToken 없이 accessToken만 있는 요청
       const url = "http://localhost:3000/auth/callback/google?accessToken=access123";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
       // When
-      const response = await GET(request, { params });
+      const response = await GET(request);
 
       // Then
       const location = response.headers.get("location");
@@ -165,10 +167,9 @@ describe("OAuth Callback Route Handler", () => {
       // Given: 토큰이 전혀 없는 요청
       const url = "http://localhost:3000/auth/callback/google";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
       // When
-      const response = await GET(request, { params });
+      const response = await GET(request);
 
       // Then
       expect(response.status).toBe(307);
@@ -188,24 +189,19 @@ describe("OAuth Callback Route Handler", () => {
 
     afterEach(() => {
       // 환경 변수 복원
-      if (originalEnv !== undefined) {
-        process.env.NODE_ENV = originalEnv;
-      } else {
-        delete process.env.NODE_ENV;
-      }
+      setNodeEnv(originalEnv);
     });
 
     it("production 환경에서는 secure와 sameSite none을 설정해야 함", async () => {
       // Given: production 환경
-      process.env.NODE_ENV = "production";
+      setNodeEnv("production");
 
       const url =
         "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
       // When
-      await GET(request, { params });
+      await GET(request);
 
       // Then: production 설정 확인
       expect(mockCookieStore.set).toHaveBeenCalledWith(
@@ -229,15 +225,14 @@ describe("OAuth Callback Route Handler", () => {
 
     it("development 환경에서는 secure false와 sameSite lax를 설정해야 함", async () => {
       // Given: development 환경
-      process.env.NODE_ENV = "development";
+      setNodeEnv("development");
 
       const url =
         "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
       // When
-      await GET(request, { params });
+      await GET(request);
 
       // Then: development 설정 확인
       expect(mockCookieStore.set).toHaveBeenCalledWith(
@@ -261,15 +256,14 @@ describe("OAuth Callback Route Handler", () => {
 
     it("test 환경에서는 development와 동일하게 설정해야 함", async () => {
       // Given: test 환경 (NODE_ENV가 'test'일 때)
-      process.env.NODE_ENV = "test";
+      setNodeEnv("test");
 
       const url =
         "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
       // When
-      await GET(request, { params });
+      await GET(request);
 
       // Then: production이 아니므로 secure: false, sameSite: lax
       expect(mockCookieStore.set).toHaveBeenCalledWith(
@@ -288,9 +282,8 @@ describe("OAuth Callback Route Handler", () => {
       const url =
         "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
-      const response = await GET(request, { params });
+      const response = await GET(request);
 
       expect(response.status).toBe(307);
       expect(mockCookieStore.set).toHaveBeenCalledTimes(2);
@@ -300,9 +293,8 @@ describe("OAuth Callback Route Handler", () => {
       const url =
         "http://localhost:3000/auth/callback/kakao?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "kakao" });
 
-      const response = await GET(request, { params });
+      const response = await GET(request);
 
       expect(response.status).toBe(307);
       expect(mockCookieStore.set).toHaveBeenCalledTimes(2);
@@ -312,9 +304,8 @@ describe("OAuth Callback Route Handler", () => {
       const url =
         "http://localhost:3000/auth/callback/naver?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "naver" });
 
-      const response = await GET(request, { params });
+      const response = await GET(request);
 
       expect(response.status).toBe(307);
       expect(mockCookieStore.set).toHaveBeenCalledTimes(2);
@@ -326,9 +317,8 @@ describe("OAuth Callback Route Handler", () => {
       const url =
         "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
-      await GET(request, { params });
+      await GET(request);
 
       expect(mockCookieStore.set).toHaveBeenCalledWith(
         "accessToken",
@@ -343,9 +333,8 @@ describe("OAuth Callback Route Handler", () => {
       const url =
         "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
-      const params = Promise.resolve({ provider: "google" });
 
-      await GET(request, { params });
+      await GET(request);
 
       expect(mockCookieStore.set).toHaveBeenCalledWith(
         "refreshToken",
