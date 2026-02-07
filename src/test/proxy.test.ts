@@ -63,6 +63,17 @@ describe("Proxy Middleware", () => {
     return response.headers.getSetCookie().some(matcher);
   }
 
+  function expectLoginRedirect(response: Response, next: string, reason: string) {
+    expect(response.status).toBe(307);
+    const location = response.headers.get("location");
+    expect(location).toBeTruthy();
+
+    const url = new URL(location!);
+    expect(url.pathname).toBe("/login");
+    expect(url.searchParams.get("next")).toBe(next);
+    expect(url.searchParams.get("reason")).toBe(reason);
+  }
+
   describe("공개 라우트", () => {
     it("홈(/) 경로는 인증 없이 통과해야 함", async () => {
       // Given
@@ -100,6 +111,7 @@ describe("Proxy Middleware", () => {
     it("인증 없이 접근 가능한 경로들은 토큰 검증을 하지 않아야 함", async () => {
       const publicPaths = [
         "/",
+        "/login",
         "/auth/login",
         "/auth/callback/google",
         "/api/health",
@@ -119,26 +131,17 @@ describe("Proxy Middleware", () => {
   });
 
   describe("보호된 라우트 - 토큰 없음", () => {
-    it("accessToken과 refreshToken이 모두 없으면 로그인 모달로 리다이렉트해야 함", async () => {
+    it("accessToken과 refreshToken이 모두 없으면 로그인 라우트로 리다이렉트해야 함", async () => {
       // Given: 토큰 없는 요청
       const request = new NextRequest("http://localhost:3000/dashboard");
 
       // When
       const response = await proxy(request);
 
-      // Then: 홈으로 리다이렉트 + 로그인 모달 시그널 쿠키
-      expect(response.status).toBe(307);
-      const location = response.headers.get("location");
-      expect(location).toBe("http://localhost:3000/");
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
-      expect(
-        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=auth_required"))
-      ).toBe(true);
-      expect(
-        hasSetCookie(response, (cookie) =>
-          decodeURIComponent(cookie).startsWith("redirectAfterLogin=/dashboard")
-        )
-      ).toBe(true);
+      // Then: 로그인 라우트로 리다이렉트
+      expectLoginRedirect(response, "/dashboard", "auth_required");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
 
     it("다른 보호된 경로도 동일하게 리다이렉트해야 함", async () => {
@@ -150,14 +153,7 @@ describe("Proxy Middleware", () => {
         const request = new NextRequest(`http://localhost:3000${path}`);
         const response = await proxy(request);
 
-        expect(response.status).toBe(307);
-        const location = response.headers.get("location");
-        expect(location).toBe("http://localhost:3000/");
-        expect(
-          hasSetCookie(response, (cookie) =>
-            decodeURIComponent(cookie).startsWith(`redirectAfterLogin=${path}`)
-          )
-        ).toBe(true);
+        expectLoginRedirect(response, path, "auth_required");
       }
     });
   });
@@ -325,7 +321,7 @@ describe("Proxy Middleware", () => {
       expect(setCookies[1]).toContain(newRefreshToken);
     });
 
-    it("재발급 API가 실패하면 로그인 모달로 리다이렉트해야 함", async () => {
+    it("재발급 API가 실패하면 로그인 라우트로 리다이렉트해야 함", async () => {
       // Given: refreshToken만 있음
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const request = new NextRequest("http://localhost:3000/dashboard", {
@@ -343,21 +339,13 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: 로그인 모달로 리다이렉트 + 세션 만료 시그널
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
-      expect(
-        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=session_expired"))
-      ).toBe(true);
-      expect(
-        hasSetCookie(response, (cookie) =>
-          decodeURIComponent(cookie).startsWith("redirectAfterLogin=/dashboard")
-        )
-      ).toBe(true);
+      // Then: 로그인 라우트로 리다이렉트 + 세션 쿠키 정리
+      expectLoginRedirect(response, "/dashboard", "session_expired");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
 
-    it("재발급 API 호출 중 네트워크 에러가 발생하면 로그인 모달로 리다이렉트해야 함", async () => {
+    it("재발급 API 호출 중 네트워크 에러가 발생하면 로그인 라우트로 리다이렉트해야 함", async () => {
       // Given
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const request = new NextRequest("http://localhost:3000/dashboard", {
@@ -372,16 +360,13 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: 네트워크 에러 시 로그인 모달 유도
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
-      expect(
-        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=network_error"))
-      ).toBe(true);
+      // Then: 네트워크 에러 시 로그인 라우트 유도
+      expectLoginRedirect(response, "/dashboard", "network_error");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
 
-    it("BACKEND_API_BASE가 설정되지 않으면 로그인 모달로 리다이렉트해야 함", async () => {
+    it("BACKEND_API_BASE가 설정되지 않으면 로그인 라우트로 리다이렉트해야 함", async () => {
       // Given: BACKEND_API_BASE 제거
       delete process.env.BACKEND_API_BASE;
 
@@ -396,18 +381,15 @@ describe("Proxy Middleware", () => {
       const response = await proxy(request);
 
       // Then
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginError=config_error"))).toBe(
-        true
-      );
+      expectLoginRedirect(response, "/dashboard", "config_error");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
       expect(mockFetch).not.toHaveBeenCalled(); // API 호출 안함
     });
   });
 
   describe("토큰 만료 임박 시 refreshToken 없음", () => {
-    it("토큰이 만료 임박했는데 refreshToken이 없으면 로그인 모달로 리다이렉트해야 함", async () => {
+    it("토큰이 만료 임박했는데 refreshToken이 없으면 로그인 라우트로 리다이렉트해야 함", async () => {
       // Given: 만료 임박한 accessToken만 있고 refreshToken 없음
       const accessToken = createMockToken(2 * 60); // 2분
 
@@ -420,13 +402,8 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: refreshToken 없으므로 재발급 불가 → 로그인 모달
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
-      expect(
-        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=refresh_token_missing"))
-      ).toBe(true);
+      // Then: refreshToken 없으므로 재발급 불가 → 로그인 라우트
+      expectLoginRedirect(response, "/dashboard", "refresh_token_missing");
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
       expect(mockFetch).not.toHaveBeenCalled();
@@ -474,7 +451,7 @@ describe("Proxy Middleware", () => {
       expect(response.status).toBe(200);
     });
 
-    it("만료된 토큰 → 재발급 실패 → 로그인 모달", async () => {
+    it("만료된 토큰 → 재발급 실패 → 로그인 라우트", async () => {
       // Given: 만료된 토큰
       const expiredToken = createMockToken(-60);
       const expiredRefreshToken = createMockToken(-60);
@@ -494,13 +471,8 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: 로그인 모달로 리다이렉트
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
-      expect(
-        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=session_expired"))
-      ).toBe(true);
+      // Then: 로그인 라우트로 리다이렉트
+      expectLoginRedirect(response, "/dashboard", "session_expired");
     });
   });
 });

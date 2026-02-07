@@ -1,11 +1,6 @@
 import {
   ACCESS_TOKEN_COOKIE,
   ACCESS_TOKEN_MAX_AGE_SECONDS,
-  LOGIN_ERROR_COOKIE,
-  LOGIN_REQUIRED_COOKIE,
-  LOGIN_SIGNAL_MAX_AGE_SECONDS,
-  REDIRECT_AFTER_LOGIN_COOKIE,
-  REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
   REFRESH_TOKEN_COOKIE,
   REFRESH_TOKEN_MAX_AGE_SECONDS,
 } from "./cookie-constants";
@@ -28,11 +23,6 @@ interface CookieWriter {
 interface AuthTokens {
   accessToken: string;
   refreshToken: string;
-}
-
-interface LoginSignalOptions {
-  error?: string;
-  redirectPath?: string;
 }
 
 function getBaseCookieOptions(isProduction: boolean): Omit<CookieOptions, "maxAge"> {
@@ -65,41 +55,4 @@ export function setAuthCookies(
 export function clearAuthCookies(writer: CookieWriter) {
   writer.delete(ACCESS_TOKEN_COOKIE);
   writer.delete(REFRESH_TOKEN_COOKIE);
-}
-
-export function setLoginSignalCookies(
-  writer: CookieWriter,
-  options: LoginSignalOptions,
-  isProduction: boolean = process.env.NODE_ENV === "production"
-) {
-  const baseOptions = {
-    httpOnly: false,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
-    path: "/",
-  } as const;
-
-  writer.set(LOGIN_REQUIRED_COOKIE, "1", {
-    ...baseOptions,
-    maxAge: LOGIN_SIGNAL_MAX_AGE_SECONDS,
-  });
-
-  if (options.error) {
-    writer.set(LOGIN_ERROR_COOKIE, options.error, {
-      ...baseOptions,
-      maxAge: LOGIN_SIGNAL_MAX_AGE_SECONDS,
-    });
-  }
-
-  if (options.redirectPath) {
-    writer.set(REDIRECT_AFTER_LOGIN_COOKIE, options.redirectPath, {
-      ...baseOptions,
-      maxAge: REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
-    });
-  }
-}
-
-export function clearLoginSignalCookies(writer: CookieWriter) {
-  writer.delete(LOGIN_REQUIRED_COOKIE);
-  writer.delete(LOGIN_ERROR_COOKIE);
 }

@@ -1,10 +1,8 @@
 "use client";
 
-import { LoginModal } from "@/components/LoginModal/LoginModal";
 import { authApi } from "@/features/auth/api";
-import { useLoginModal } from "@/hooks/useLoginModal";
 import { useAuthStore } from "@/stores/authStore";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 /**
@@ -17,10 +15,18 @@ import { useState } from "react";
  */
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const setAuth = useAuthStore((state) => state.setAuth);
-  const { isOpen, openModal, closeModal, handleLogin, from, error } = useLoginModal();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const openLogin = () => {
+    const query = searchParams.toString();
+    const nextPath = `${pathname}${query ? `?${query}` : ""}`;
+    const loginUrl = `/login?next=${encodeURIComponent(nextPath)}`;
+    router.push(loginUrl);
+  };
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -61,20 +67,14 @@ export function Header() {
             </button>
           ) : (
             <button
-              onClick={openModal}
+              onClick={openLogin}
               className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >
               로그인
             </button>
           )}
         </div>
-
-        {/* 에러 표시 */}
-        {error && <div className="mt-2 rounded bg-red-100 p-2 text-red-700"></div>}
       </header>
-
-      {/* 로그인 모달 */}
-      <LoginModal isOpen={isOpen} onClose={closeModal} onLogin={handleLogin} from={from} />
     </>
   );
 }

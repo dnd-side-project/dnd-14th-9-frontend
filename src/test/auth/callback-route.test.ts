@@ -11,8 +11,15 @@ jest.mock("next/headers", () => ({
   cookies: jest.fn(),
 }));
 
-function hasSetCookie(response: Response, matcher: (cookie: string) => boolean): boolean {
-  return response.headers.getSetCookie().some(matcher);
+function expectLoginRedirect(response: Response, reason: string, next: string) {
+  expect(response.status).toBe(307);
+  const location = response.headers.get("location");
+  expect(location).toBeTruthy();
+
+  const url = new URL(location!);
+  expect(url.pathname).toBe("/login");
+  expect(url.searchParams.get("reason")).toBe(reason);
+  expect(url.searchParams.get("next")).toBe(next);
 }
 
 function setNodeEnv(value: string | undefined) {
@@ -153,7 +160,7 @@ describe("OAuth Callback Route Handler", () => {
   });
 
   describe("에러 케이스", () => {
-    it("error 파라미터가 있으면 에러와 함께 홈으로 리다이렉트해야 함", async () => {
+    it("error 파라미터가 있으면 reason/next와 함께 로그인으로 리다이렉트해야 함", async () => {
       // Given: error 파라미터가 있는 요청
       const url = "http://localhost:3000/auth/callback/google?error=access_denied";
       const request = new NextRequest(url);
@@ -161,16 +168,12 @@ describe("OAuth Callback Route Handler", () => {
       // When
       const response = await GET(request);
 
-      // Then: 에러 파라미터와 함께 리다이렉트
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
-      expect(
-        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=access_denied"))
-      ).toBe(true);
+      // Then
+      expectLoginRedirect(response, "access_denied", "/");
+      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
     });
 
-    it("error 분기에서 redirectAfterLogin 쿠키 값이 외부 URL이면 / 로 정규화해야 함", async () => {
+    it("error 분기에서 redirectAfterLogin 쿠키 값이 외부 URL이면 next를 / 로 정규화해야 함", async () => {
       // Given
       mockCookieStore.get.mockReturnValue({ value: "https://evil.com/phishing" });
       const url = "http://localhost:3000/auth/callback/google?error=access_denied";
@@ -180,11 +183,7 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      expect(
-        hasSetCookie(response, (cookie) =>
-          decodeURIComponent(cookie).startsWith("redirectAfterLogin=/")
-        )
-      ).toBe(true);
+      expectLoginRedirect(response, "access_denied", "/");
     });
 
     it("accessToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -196,11 +195,8 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginError=no_token"))).toBe(
-        true
-      );
+      expectLoginRedirect(response, "no_token", "/");
+      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
     });
 
     it("refreshToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -212,11 +208,8 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginError=no_token"))).toBe(
-        true
-      );
+      expectLoginRedirect(response, "no_token", "/");
+      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
     });
 
     it("토큰이 모두 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -228,12 +221,8 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginError=no_token"))).toBe(
-        true
-      );
+      expectLoginRedirect(response, "no_token", "/");
+      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
     });
   });
 

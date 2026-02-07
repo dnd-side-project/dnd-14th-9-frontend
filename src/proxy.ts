@@ -1,10 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
-import { clearAuthCookies, setAuthCookies, setLoginSignalCookies } from "@/lib/auth/cookies";
+import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 
 // 공개 라우트 (인증 불필요)
-const PUBLIC_ROUTES = ["/"];
+const PUBLIC_ROUTES = ["/", "/login"];
 
 // 토큰 갱신 임계값 (5분)
 const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
@@ -34,10 +34,10 @@ export async function proxy(request: NextRequest) {
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
 
-  // 토큰 없으면 홈으로 리다이렉트 + 로그인 모달 표시
+  // 토큰 없으면 로그인 라우트로 리다이렉트
   if (!accessToken) {
     if (!refreshToken) {
-      return redirectToLoginModal(request, { clearAuth: true, error: "auth_required" });
+      return redirectToLoginRoute(request, { clearAuth: true, reason: "auth_required" });
     }
     // accessToken 없고 refreshToken만 있으면 갱신 시도
     return await tryRefreshToken(request, refreshToken);
@@ -48,15 +48,15 @@ export async function proxy(request: NextRequest) {
     if (refreshToken) {
       return await tryRefreshToken(request, refreshToken);
     }
-    // refreshToken 없으면 홈으로 리다이렉트 + 로그인 모달 표시
-    return redirectToLoginModal(request, { clearAuth: true, error: "refresh_token_missing" });
+    // refreshToken 없으면 로그인 라우트로 리다이렉트
+    return redirectToLoginRoute(request, { clearAuth: true, reason: "refresh_token_missing" });
   }
 
   return NextResponse.next();
 }
 
 /**
- * 홈으로 리다이렉트하면서 로그인 모달 표시 파라미터 추가
+ * 로그인 라우트로 리다이렉트하면서 다음 경로/실패 원인을 전달
  */
 function getSafeReturnPath(request: NextRequest): string {
   const returnPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
@@ -66,18 +66,20 @@ function getSafeReturnPath(request: NextRequest): string {
   return returnPath;
 }
 
-function redirectToLoginModal(
+function redirectToLoginRoute(
   request: NextRequest,
   options?: {
     clearAuth?: boolean;
-    error?: string;
+    reason?: string;
   }
 ): NextResponse {
-  const response = NextResponse.redirect(new URL("/", request.url));
-  setLoginSignalCookies(response.cookies, {
-    error: options?.error,
-    redirectPath: getSafeReturnPath(request),
-  });
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("next", getSafeReturnPath(request));
+  if (options?.reason) {
+    loginUrl.searchParams.set("reason", options.reason);
+  }
+
+  const response = NextResponse.redirect(loginUrl);
 
   if (options?.clearAuth) {
     clearAuthCookies(response.cookies);
@@ -110,7 +112,7 @@ async function tryRefreshToken(request: NextRequest, refreshToken: string): Prom
 
     if (!backendUrl) {
       console.error("Proxy: BACKEND_API_BASE is not configured");
-      return redirectToLoginModal(request, { clearAuth: true, error: "config_error" });
+      return redirectToLoginRoute(request, { clearAuth: true, reason: "config_error" });
     }
 
     const reissueResponse = await fetch(`${backendUrl}/auth/refresh`, {
@@ -124,7 +126,7 @@ async function tryRefreshToken(request: NextRequest, refreshToken: string): Prom
 
     if (!reissueResponse.ok) {
       console.error("Proxy: Token refresh failed:", reissueResponse.status);
-      return redirectToLoginModal(request, { clearAuth: true, error: "session_expired" });
+      return redirectToLoginRoute(request, { clearAuth: true, reason: "session_expired" });
     }
 
     const response = NextResponse.next();
@@ -138,7 +140,7 @@ async function tryRefreshToken(request: NextRequest, refreshToken: string): Prom
     return response;
   } catch (error) {
     console.error("Proxy: Token refresh error:", error);
-    return redirectToLoginModal(request, { clearAuth: true, error: "network_error" });
+    return redirectToLoginRoute(request, { clearAuth: true, reason: "network_error" });
   }
 }
 

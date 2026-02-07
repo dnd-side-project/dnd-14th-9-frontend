@@ -12,8 +12,10 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   // TODO(이경환): /members/me 서버 prefetch + hydrate 전환 후 제거 검토.
   // 현재는 새로고침 시 로그인/로그아웃 UI 깜빡임을 줄이기 위한 임시 초기 auth 힌트다.
@@ -26,7 +28,10 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${pretendard.variable} font-sans antialiased`}
       >
         <AuthStoreProvider initialAuth={initialAuth}>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            {children}
+            {modal}
+          </QueryProvider>
         </AuthStoreProvider>
       </body>
     </html>
