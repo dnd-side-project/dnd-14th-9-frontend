@@ -10,15 +10,30 @@ const mockFetch = jest.fn();
 global.fetch = mockFetch as unknown as typeof fetch;
 
 describe("Proxy Middleware", () => {
+  function createRefreshSuccessResponse(
+    accessToken: string = "new_access",
+    refreshToken: string = "new_refresh"
+  ) {
+    return {
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        result: {
+          accessToken,
+          refreshToken,
+        },
+      }),
+    };
+  }
+
   beforeEach(() => {
     jest.clearAllMocks();
     // 환경 변수 설정
-    process.env.BACKEND_URL = "http://localhost:8080";
+    process.env.BACKEND_API_BASE = "http://localhost:8080";
   });
 
   afterEach(() => {
     // 환경 변수 정리
-    delete process.env.BACKEND_URL;
+    delete process.env.BACKEND_API_BASE;
   });
 
   /**
@@ -163,22 +178,16 @@ describe("Proxy Middleware", () => {
 
       // Mock: 재발급 API 성공 응답
       const newAccessToken = createMockToken(60 * 60); // 1시간
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        headers: {
-          getSetCookie: () => [
-            `accessToken=${newAccessToken}; Path=/; HttpOnly; Max-Age=3600`,
-            `refreshToken=new_refresh_token; Path=/; HttpOnly; Max-Age=2592000`,
-          ],
-        },
-      });
+      mockFetch.mockResolvedValueOnce(
+        createRefreshSuccessResponse(newAccessToken, "new_refresh_token")
+      );
 
       // When
       const response = await proxy(request);
 
       // Then: 재발급 API 호출 확인
       expect(mockFetch).toHaveBeenCalledWith(
-        "http://localhost:8080/auth/reissue",
+        "http://localhost:8080/auth/refresh",
         expect.objectContaining({
           method: "POST",
           headers: expect.objectContaining({
@@ -192,9 +201,7 @@ describe("Proxy Middleware", () => {
       // 새 쿠키가 응답에 포함되었는지 확인
       expect(response.status).toBe(200);
       const setCookieHeaders = response.headers.getSetCookie();
-      expect(setCookieHeaders).toContain(
-        `accessToken=${newAccessToken}; Path=/; HttpOnly; Max-Age=3600`
-      );
+      expect(setCookieHeaders.some((cookie) => cookie.includes("accessToken="))).toBe(true);
     });
 
     it("토큰이 이미 만료되었으면 재발급을 시도해야 함", async () => {
@@ -209,22 +216,14 @@ describe("Proxy Middleware", () => {
       });
 
       // Mock: 재발급 성공
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        headers: {
-          getSetCookie: () => [
-            `accessToken=new_token; Path=/; HttpOnly`,
-            `refreshToken=new_refresh; Path=/; HttpOnly`,
-          ],
-        },
-      });
+      mockFetch.mockResolvedValueOnce(createRefreshSuccessResponse("new_token", "new_refresh"));
 
       // When
       const response = await proxy(request);
 
       // Then: 재발급 시도
       expect(mockFetch).toHaveBeenCalledWith(
-        "http://localhost:8080/auth/reissue",
+        "http://localhost:8080/auth/refresh",
         expect.anything()
       );
       expect(response.status).toBe(200);
@@ -242,12 +241,7 @@ describe("Proxy Middleware", () => {
       });
 
       // Mock: 재발급 성공
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        headers: {
-          getSetCookie: () => [`accessToken=new_token; Path=/`],
-        },
-      });
+      mockFetch.mockResolvedValueOnce(createRefreshSuccessResponse("new_token", "new_refresh"));
 
       // When
       const response = await proxy(request);
@@ -269,22 +263,14 @@ describe("Proxy Middleware", () => {
       });
 
       // Mock: 재발급 성공
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        headers: {
-          getSetCookie: () => [
-            "accessToken=new_access; Path=/; HttpOnly",
-            "refreshToken=new_refresh; Path=/; HttpOnly",
-          ],
-        },
-      });
+      mockFetch.mockResolvedValueOnce(createRefreshSuccessResponse("new_access", "new_refresh"));
 
       // When
       const response = await proxy(request);
 
       // Then
       expect(mockFetch).toHaveBeenCalledWith(
-        "http://localhost:8080/auth/reissue",
+        "http://localhost:8080/auth/refresh",
         expect.objectContaining({
           method: "POST",
           headers: expect.objectContaining({
@@ -308,15 +294,9 @@ describe("Proxy Middleware", () => {
       const newRefreshToken = "new_refresh_token_67890";
 
       // Mock: 재발급 API 응답
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        headers: {
-          getSetCookie: () => [
-            `accessToken=${newAccessToken}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=3600`,
-            `refreshToken=${newRefreshToken}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=2592000`,
-          ],
-        },
-      });
+      mockFetch.mockResolvedValueOnce(
+        createRefreshSuccessResponse(newAccessToken, newRefreshToken)
+      );
 
       // When
       const response = await proxy(request);
@@ -373,9 +353,9 @@ describe("Proxy Middleware", () => {
       expect(response.headers.get("location")).toContain("showLogin=true");
     });
 
-    it("BACKEND_URL이 설정되지 않으면 로그인 모달로 리다이렉트해야 함", async () => {
-      // Given: BACKEND_URL 제거
-      delete process.env.BACKEND_URL;
+    it("BACKEND_API_BASE가 설정되지 않으면 로그인 모달로 리다이렉트해야 함", async () => {
+      // Given: BACKEND_API_BASE 제거
+      delete process.env.BACKEND_API_BASE;
 
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const request = new NextRequest("http://localhost:3000/dashboard", {
@@ -446,12 +426,7 @@ describe("Proxy Middleware", () => {
       });
 
       // Mock: 재발급 성공
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        headers: {
-          getSetCookie: () => ["accessToken=new_token; Path=/", "refreshToken=new_refresh; Path=/"],
-        },
-      });
+      mockFetch.mockResolvedValueOnce(createRefreshSuccessResponse("new_token", "new_refresh"));
 
       // When
       const response = await proxy(request);
