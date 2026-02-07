@@ -1,6 +1,6 @@
 "use client";
 
-import { OAuthLoginButtons } from "@/components/Login/OAuthLoginButtons";
+import { OAuthLoginButtons } from "@/features/auth/components/OAuthLoginButtons";
 
 interface LoginCardProps {
   reasonMessage?: string | null;

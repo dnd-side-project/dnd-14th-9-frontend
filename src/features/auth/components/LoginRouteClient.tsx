@@ -1,7 +1,7 @@
 "use client";
 
-import { LoginPage } from "@/components/Login/LoginPage";
-import { LoginModal } from "@/components/LoginModal/LoginModal";
+import { LoginModal } from "@/features/auth/components/LoginModal";
+import { LoginPage } from "@/features/auth/components/LoginPage";
 import {
   REDIRECT_AFTER_LOGIN_COOKIE,
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,

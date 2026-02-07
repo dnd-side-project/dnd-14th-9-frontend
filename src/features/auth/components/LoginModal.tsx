@@ -1,6 +1,6 @@
 "use client";
 
-import { LoginCard } from "@/components/Login/LoginCard";
+import { LoginCard } from "@/features/auth/components/LoginCard";
 
 interface LoginModalProps {
   isOpen: boolean;
