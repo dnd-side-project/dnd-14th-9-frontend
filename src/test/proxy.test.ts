@@ -427,6 +427,8 @@ describe("Proxy Middleware", () => {
       expect(
         hasSetCookie(response, (cookie) => cookie.startsWith("loginError=refresh_token_missing"))
       ).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
       expect(mockFetch).not.toHaveBeenCalled();
     });
   });

@@ -48,7 +48,7 @@ export async function proxy(request: NextRequest) {
       return await tryRefreshToken(request, refreshToken);
     }
     // refreshToken 없으면 홈으로 리다이렉트 + 로그인 모달 표시
-    return redirectToLoginModal(request, { error: "refresh_token_missing" });
+    return redirectToLoginModal(request, { clearAuth: true, error: "refresh_token_missing" });
   }
 
   return NextResponse.next();
