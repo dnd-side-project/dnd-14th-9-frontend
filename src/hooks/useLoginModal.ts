@@ -5,7 +5,7 @@ import {
   LOGIN_REQUIRED_COOKIE,
   REDIRECT_AFTER_LOGIN_COOKIE,
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
-} from "@/lib/auth/cookies";
+} from "@/lib/auth/cookie-constants";
 
 function getCookie(name: string): string | null {
   const cookie = document.cookie

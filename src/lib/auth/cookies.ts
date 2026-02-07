@@ -1,13 +1,14 @@
-export const ACCESS_TOKEN_COOKIE = "accessToken";
-export const REFRESH_TOKEN_COOKIE = "refreshToken";
-export const REDIRECT_AFTER_LOGIN_COOKIE = "redirectAfterLogin";
-export const LOGIN_REQUIRED_COOKIE = "loginRequired";
-export const LOGIN_ERROR_COOKIE = "loginError";
-export const LOGIN_SIGNAL_MAX_AGE_SECONDS = 60;
-
-const ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 60;
-const REFRESH_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
-export const REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS = 60 * 5;
+import {
+  ACCESS_TOKEN_COOKIE,
+  ACCESS_TOKEN_MAX_AGE_SECONDS,
+  LOGIN_ERROR_COOKIE,
+  LOGIN_REQUIRED_COOKIE,
+  LOGIN_SIGNAL_MAX_AGE_SECONDS,
+  REDIRECT_AFTER_LOGIN_COOKIE,
+  REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
+  REFRESH_TOKEN_COOKIE,
+  REFRESH_TOKEN_MAX_AGE_SECONDS,
+} from "./cookie-constants";
 
 type SameSite = "strict" | "lax" | "none";
 

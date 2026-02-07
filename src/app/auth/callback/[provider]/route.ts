@@ -1,11 +1,7 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import {
-  REDIRECT_AFTER_LOGIN_COOKIE,
-  clearLoginSignalCookies,
-  setAuthCookies,
-  setLoginSignalCookies,
-} from "@/lib/auth/cookies";
+import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
+import { clearLoginSignalCookies, setAuthCookies, setLoginSignalCookies } from "@/lib/auth/cookies";
 
 function normalizeInternalPath(path: string | null | undefined): string {
   if (!path) return "/";

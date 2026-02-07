@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookies";
+import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 
 /**
  * 서버 사이드에서 쿠키를 읽어 인증 상태 확인

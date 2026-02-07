@@ -5,7 +5,7 @@ import {
   type RequestMethod,
   executeFetch,
 } from "./api-client";
-import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookies";
+import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 
 interface RequestOptions {
   headers?: Record<string, string>;
