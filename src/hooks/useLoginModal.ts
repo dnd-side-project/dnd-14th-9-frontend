@@ -1,4 +1,4 @@
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   LOGIN_ERROR_COOKIE,
@@ -40,32 +40,23 @@ function normalizeInternalPath(path: string | null | undefined): string {
  * 로그인 모달 상태 및 OAuth 로직을 관리하는 훅
  */
 export function useLoginModal() {
-  const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  // TODO(auth): proxy/callback의 쿼리 의존 제거가 완료되면 fallback 분기를 정리한다.
-  const queryFrom = searchParams.get("from");
-  const queryError = searchParams.get("error");
-  const queryShowLogin = searchParams.get("showLogin") === "true";
 
   const [manualFrom, setManualFrom] = useState<string | null>(null);
   const [isManualOpen, setIsManualOpen] = useState(false);
   const prevModalSignalRef = useRef(false);
 
   const modalSignal = useMemo(() => {
-    const shouldOpenByCookie = getCookie(LOGIN_REQUIRED_COOKIE) === "1";
-    const shouldOpenByQuery = queryShowLogin;
-    const shouldOpen = shouldOpenByCookie || shouldOpenByQuery;
+    const shouldOpen = getCookie(LOGIN_REQUIRED_COOKIE) === "1";
     const cookieFrom = getCookie(REDIRECT_AFTER_LOGIN_COOKIE);
     const cookieError = getCookie(LOGIN_ERROR_COOKIE);
 
     return {
       shouldOpen,
-      from: normalizeInternalPath(cookieFrom ?? queryFrom ?? pathname ?? "/"),
-      error: cookieError ?? queryError,
+      from: normalizeInternalPath(cookieFrom ?? pathname ?? "/"),
+      error: cookieError,
     };
-  }, [pathname, queryShowLogin, queryFrom, queryError]);
+  }, [pathname]);
 
   useEffect(() => {
     if (modalSignal.shouldOpen && !prevModalSignalRef.current) {
@@ -85,14 +76,8 @@ export function useLoginModal() {
 
   const closeModal = () => {
     setIsManualOpen(false);
-
-    if (!queryShowLogin) return;
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("showLogin");
-    params.delete("from");
-    params.delete("error");
-    const queryString = params.toString();
-    router.replace(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false });
+    clearCookie(LOGIN_REQUIRED_COOKIE);
+    clearCookie(LOGIN_ERROR_COOKIE);
   };
 
   const handleLogin = (provider: "google" | "kakao") => {

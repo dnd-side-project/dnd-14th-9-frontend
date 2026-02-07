@@ -11,6 +11,10 @@ jest.mock("next/headers", () => ({
   cookies: jest.fn(),
 }));
 
+function hasSetCookie(response: Response, matcher: (cookie: string) => boolean): boolean {
+  return response.headers.getSetCookie().some(matcher);
+}
+
 function setNodeEnv(value: string | undefined) {
   Object.defineProperty(process.env, "NODE_ENV", {
     value,
@@ -126,12 +130,11 @@ describe("OAuth Callback Route Handler", () => {
 
       // Then: 에러 파라미터와 함께 리다이렉트
       expect(response.status).toBe(307);
-      const location = response.headers.get("location");
-      expect(location).toContain("showLogin=true");
-      expect(location).toContain("error=access_denied");
-
-      // 쿠키는 저장하지 않음
-      expect(mockCookieStore.set).not.toHaveBeenCalled();
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
+      expect(
+        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=access_denied"))
+      ).toBe(true);
     });
 
     it("accessToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -143,10 +146,11 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      const location = response.headers.get("location");
-      expect(location).toContain("showLogin=true");
-      expect(location).toContain("error=no_token");
-      expect(mockCookieStore.set).not.toHaveBeenCalled();
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginError=no_token"))).toBe(
+        true
+      );
     });
 
     it("refreshToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -158,9 +162,11 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      const location = response.headers.get("location");
-      expect(location).toContain("error=no_token");
-      expect(mockCookieStore.set).not.toHaveBeenCalled();
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginError=no_token"))).toBe(
+        true
+      );
     });
 
     it("토큰이 모두 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -173,10 +179,11 @@ describe("OAuth Callback Route Handler", () => {
 
       // Then
       expect(response.status).toBe(307);
-      const location = response.headers.get("location");
-      expect(location).toContain("showLogin=true");
-      expect(location).toContain("error=no_token");
-      expect(mockCookieStore.set).not.toHaveBeenCalled();
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginError=no_token"))).toBe(
+        true
+      );
     });
   });
 

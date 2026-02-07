@@ -55,6 +55,10 @@ describe("Proxy Middleware", () => {
     return `${header}.${body}.${signature}`;
   }
 
+  function hasSetCookie(response: Response, matcher: (cookie: string) => boolean): boolean {
+    return response.headers.getSetCookie().some(matcher);
+  }
+
   describe("공개 라우트", () => {
     it("홈(/) 경로는 인증 없이 통과해야 함", async () => {
       // Given
@@ -118,12 +122,19 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: 홈으로 리다이렉트 + 로그인 모달 파라미터
+      // Then: 홈으로 리다이렉트 + 로그인 모달 시그널 쿠키
       expect(response.status).toBe(307);
       const location = response.headers.get("location");
-      expect(location).toContain("/?");
-      expect(location).toContain("from=%2Fdashboard"); // URL 인코딩됨
-      expect(location).toContain("showLogin=true");
+      expect(location).toBe("http://localhost:3000/");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
+      expect(
+        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=auth_required"))
+      ).toBe(true);
+      expect(
+        hasSetCookie(response, (cookie) =>
+          decodeURIComponent(cookie).startsWith("redirectAfterLogin=/dashboard")
+        )
+      ).toBe(true);
     });
 
     it("다른 보호된 경로도 동일하게 리다이렉트해야 함", async () => {
@@ -137,10 +148,12 @@ describe("Proxy Middleware", () => {
 
         expect(response.status).toBe(307);
         const location = response.headers.get("location");
-        // URL 인코딩된 경로 확인 (/ → %2F)
-        const encodedPath = encodeURIComponent(path);
-        expect(location).toContain(`from=${encodedPath}`);
-        expect(location).toContain("showLogin=true");
+        expect(location).toBe("http://localhost:3000/");
+        expect(
+          hasSetCookie(response, (cookie) =>
+            decodeURIComponent(cookie).startsWith(`redirectAfterLogin=${path}`)
+          )
+        ).toBe(true);
       }
     });
   });
@@ -326,11 +339,18 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: 로그인 모달로 리다이렉트
+      // Then: 로그인 모달로 리다이렉트 + 세션 만료 시그널
       expect(response.status).toBe(307);
-      const location = response.headers.get("location");
-      expect(location).toContain("showLogin=true");
-      expect(location).toContain("from=%2Fdashboard"); // URL 인코딩됨
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
+      expect(
+        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=session_expired"))
+      ).toBe(true);
+      expect(
+        hasSetCookie(response, (cookie) =>
+          decodeURIComponent(cookie).startsWith("redirectAfterLogin=/dashboard")
+        )
+      ).toBe(true);
     });
 
     it("재발급 API 호출 중 네트워크 에러가 발생하면 로그인 모달로 리다이렉트해야 함", async () => {
@@ -348,9 +368,13 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: Graceful degradation
+      // Then: 네트워크 에러 시 로그인 모달 유도
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toContain("showLogin=true");
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
+      expect(
+        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=network_error"))
+      ).toBe(true);
     });
 
     it("BACKEND_API_BASE가 설정되지 않으면 로그인 모달로 리다이렉트해야 함", async () => {
@@ -369,7 +393,11 @@ describe("Proxy Middleware", () => {
 
       // Then
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toContain("showLogin=true");
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginError=config_error"))).toBe(
+        true
+      );
       expect(mockFetch).not.toHaveBeenCalled(); // API 호출 안함
     });
   });
@@ -390,7 +418,11 @@ describe("Proxy Middleware", () => {
 
       // Then: refreshToken 없으므로 재발급 불가 → 로그인 모달
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toContain("showLogin=true");
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
+      expect(
+        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=refresh_token_missing"))
+      ).toBe(true);
       expect(mockFetch).not.toHaveBeenCalled();
     });
   });
@@ -458,7 +490,11 @@ describe("Proxy Middleware", () => {
 
       // Then: 로그인 모달로 리다이렉트
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toContain("showLogin=true");
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
+      expect(
+        hasSetCookie(response, (cookie) => cookie.startsWith("loginError=session_expired"))
+      ).toBe(true);
     });
   });
 });
