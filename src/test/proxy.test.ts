@@ -10,6 +10,8 @@ const mockFetch = jest.fn();
 global.fetch = mockFetch as unknown as typeof fetch;
 
 describe("Proxy Middleware", () => {
+  let consoleErrorSpy: jest.SpyInstance;
+
   function createRefreshSuccessResponse(
     accessToken: string = "new_access",
     refreshToken: string = "new_refresh"
@@ -27,11 +29,13 @@ describe("Proxy Middleware", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     // 환경 변수 설정
     process.env.BACKEND_API_BASE = "http://localhost:8080";
   });
 
   afterEach(() => {
+    consoleErrorSpy.mockRestore();
     // 환경 변수 정리
     delete process.env.BACKEND_API_BASE;
   });

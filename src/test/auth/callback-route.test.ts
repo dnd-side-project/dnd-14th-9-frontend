@@ -29,6 +29,7 @@ describe("OAuth Callback Route Handler", () => {
     get: jest.Mock;
     delete: jest.Mock;
   };
+  let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
     // 매 테스트마다 새로운 mock 객체 생성
@@ -39,9 +40,11 @@ describe("OAuth Callback Route Handler", () => {
     };
 
     (cookies as jest.Mock).mockResolvedValue(mockCookieStore);
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {
+    consoleErrorSpy.mockRestore();
     jest.clearAllMocks();
   });
 
