@@ -1,11 +1,21 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { setAuthCookies } from "@/lib/auth/cookies";
 
 // 공개 라우트 (인증 불필요)
 const PUBLIC_ROUTES = ["/"];
 
 // 토큰 갱신 임계값 (5분)
 const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
+
+interface RefreshTokenPair {
+  accessToken: string;
+  refreshToken: string;
+}
+
+interface RefreshResponseBody {
+  result: RefreshTokenPair;
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -14,7 +24,8 @@ export async function proxy(request: NextRequest) {
   if (
     PUBLIC_ROUTES.includes(pathname) ||
     pathname.startsWith("/auth") ||
-    pathname.startsWith("/api")
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/.well-known")
   ) {
     return NextResponse.next();
   }
@@ -73,14 +84,14 @@ function isTokenExpiringSoon(token: string): boolean {
  */
 async function tryRefreshToken(request: NextRequest, refreshToken: string): Promise<NextResponse> {
   try {
-    const backendUrl = process.env.BACKEND_URL;
+    const backendUrl = process.env.BACKEND_API_BASE;
 
     if (!backendUrl) {
-      console.error("Proxy: BACKEND_URL is not configured");
+      console.error("Proxy: BACKEND_API_BASE is not configured");
       return redirectToLoginModal(request);
     }
 
-    const reissueResponse = await fetch(`${backendUrl}/auth/reissue`, {
+    const reissueResponse = await fetch(`${backendUrl}/auth/refresh`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,12 +105,12 @@ async function tryRefreshToken(request: NextRequest, refreshToken: string): Prom
       return redirectToLoginModal(request);
     }
 
-    // 백엔드가 Set-Cookie로 응답한 쿠키를 브라우저로 전달
     const response = NextResponse.next();
-    const setCookies = reissueResponse.headers.getSetCookie();
-
-    setCookies.forEach((cookie) => {
-      response.headers.append("Set-Cookie", cookie);
+    const payload = (await reissueResponse.json()) as RefreshResponseBody;
+    // 재발급 응답 스키마는 고정 계약으로 가정하고 body 토큰을 바로 쿠키에 저장한다.
+    setAuthCookies(response.cookies, {
+      accessToken: payload.result.accessToken,
+      refreshToken: payload.result.refreshToken,
     });
 
     return response;
