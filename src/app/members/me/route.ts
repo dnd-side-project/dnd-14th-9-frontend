@@ -1,10 +1,12 @@
 import { NextRequest } from "next/server";
-import { forwardToBackend } from "../_shared";
+import { forwardToBackend } from "@/lib/api/bff-proxy";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   return forwardToBackend({
+    request,
     method: "GET",
     pathWithQuery: "/members/me",
+    forwardRequestCookies: true,
   });
 }
 
@@ -14,13 +16,16 @@ export async function PATCH(request: NextRequest) {
     method: "PATCH",
     pathWithQuery: "/members/me",
     includeRequestBody: true,
+    forwardRequestCookies: true,
   });
 }
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   return forwardToBackend({
+    request,
     method: "DELETE",
     pathWithQuery: "/members/me",
     clearAuthCookiesOnSuccess: true,
+    forwardRequestCookies: true,
   });
 }
