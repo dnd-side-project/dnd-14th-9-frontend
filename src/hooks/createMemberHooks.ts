@@ -56,7 +56,6 @@ type BaseMemberHooksReturn<
   ) => UseQueryResult<ApiSuccessResponse<TNicknameExistsResponse>>;
   useDeleteMe: () => UseMutationResult<ApiSuccessResponse<null>, unknown, void>;
 }>;
-ㅍ;
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
