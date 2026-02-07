@@ -120,6 +120,36 @@ describe("OAuth Callback Route Handler", () => {
       // Then: 기본값인 홈으로 리다이렉트
       expect(response.headers.get("location")).toBe("http://localhost:3000/");
     });
+
+    it("redirectAfterLogin 쿠키가 외부 URL이면 홈으로 폴백해야 함", async () => {
+      // Given: 외부 URL 주입 시도
+      mockCookieStore.get.mockReturnValue({ value: "https://evil.com/phishing" });
+
+      const url =
+        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+      const request = new NextRequest(url);
+
+      // When
+      const response = await GET(request);
+
+      // Then
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+    });
+
+    it("redirectAfterLogin 쿠키가 //로 시작하면 홈으로 폴백해야 함", async () => {
+      // Given: protocol-relative URL 주입 시도
+      mockCookieStore.get.mockReturnValue({ value: "//evil.com" });
+
+      const url =
+        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+      const request = new NextRequest(url);
+
+      // When
+      const response = await GET(request);
+
+      // Then
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+    });
   });
 
   describe("에러 케이스", () => {
@@ -137,6 +167,23 @@ describe("OAuth Callback Route Handler", () => {
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("loginRequired=1"))).toBe(true);
       expect(
         hasSetCookie(response, (cookie) => cookie.startsWith("loginError=access_denied"))
+      ).toBe(true);
+    });
+
+    it("error 분기에서 redirectAfterLogin 쿠키 값이 외부 URL이면 / 로 정규화해야 함", async () => {
+      // Given
+      mockCookieStore.get.mockReturnValue({ value: "https://evil.com/phishing" });
+      const url = "http://localhost:3000/auth/callback/google?error=access_denied";
+      const request = new NextRequest(url);
+
+      // When
+      const response = await GET(request);
+
+      // Then
+      expect(
+        hasSetCookie(response, (cookie) =>
+          decodeURIComponent(cookie).startsWith("redirectAfterLogin=/")
+        )
       ).toBe(true);
     });
 
