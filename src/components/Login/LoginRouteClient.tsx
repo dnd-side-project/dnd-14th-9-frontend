@@ -1,5 +1,6 @@
 "use client";
 
+import { LoginPage } from "@/components/Login/LoginPage";
 import { LoginModal } from "@/components/LoginModal/LoginModal";
 import {
   REDIRECT_AFTER_LOGIN_COOKIE,
@@ -66,27 +67,5 @@ export function LoginRouteClient({ variant }: LoginRouteClientProps) {
     );
   }
 
-  return (
-    <main className="flex min-h-[70vh] items-center justify-center px-4">
-      <section className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h1 className="mb-2 text-xl font-bold">로그인</h1>
-        {reasonMessage ? <p className="mb-4 text-sm text-red-600">{reasonMessage}</p> : null}
-
-        <div className="flex flex-col gap-3">
-          <button
-            onClick={() => handleLogin("google")}
-            className="w-full rounded border border-gray-300 bg-white px-4 py-3 text-center hover:bg-gray-50"
-          >
-            구글로 로그인
-          </button>
-          <button
-            onClick={() => handleLogin("kakao")}
-            className="w-full rounded bg-yellow-400 px-4 py-3 text-center hover:bg-yellow-500"
-          >
-            카카오로 로그인
-          </button>
-        </div>
-      </section>
-    </main>
-  );
+  return <LoginPage reasonMessage={reasonMessage} onLogin={handleLogin} />;
 }
