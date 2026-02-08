@@ -11,7 +11,7 @@ jest.mock("next/headers", () => ({
   cookies: jest.fn(),
 }));
 
-function expectLoginRedirect(response: Response, reason: string, next: string) {
+function expectLoginRedirect(response: Response, reason: string) {
   expect(response.status).toBe(307);
   const location = response.headers.get("location");
   expect(location).toBeTruthy();
@@ -19,7 +19,7 @@ function expectLoginRedirect(response: Response, reason: string, next: string) {
   const url = new URL(location!);
   expect(url.pathname).toBe("/login");
   expect(url.searchParams.get("reason")).toBe(reason);
-  expect(url.searchParams.get("next")).toBe(next);
+  expect(url.searchParams.get("next")).toBeNull();
 }
 
 function setNodeEnv(value: string | undefined) {
@@ -163,7 +163,7 @@ describe("OAuth Callback Route Handler", () => {
   });
 
   describe("에러 케이스", () => {
-    it("error 파라미터가 있으면 reason/next와 함께 로그인으로 리다이렉트해야 함", async () => {
+    it("error 파라미터가 있으면 reason만 포함해 로그인으로 리다이렉트해야 함", async () => {
       // Given: error 파라미터가 있는 요청
       const url = "http://localhost:3000/api/auth/callback/google?error=access_denied";
       const request = new NextRequest(url);
@@ -172,12 +172,11 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      expectLoginRedirect(response, "access_denied", "/");
-      expect(mockCookieStore.delete).toHaveBeenCalledTimes(1);
-      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
+      expectLoginRedirect(response, "access_denied");
+      expect(mockCookieStore.delete).not.toHaveBeenCalled();
     });
 
-    it("error 분기에서 redirectAfterLogin 쿠키 값이 외부 URL이면 next를 / 로 정규화해야 함", async () => {
+    it("error 분기에서 redirectAfterLogin 쿠키 값이 외부 URL이어도 로그인 리다이렉트 쿼리에 노출하지 않아야 함", async () => {
       // Given
       mockCookieStore.get.mockReturnValue({ value: "https://evil.com/phishing" });
       const url = "http://localhost:3000/api/auth/callback/google?error=access_denied";
@@ -187,7 +186,7 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      expectLoginRedirect(response, "access_denied", "/");
+      expectLoginRedirect(response, "access_denied");
     });
 
     it("accessToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -199,8 +198,8 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      expectLoginRedirect(response, "no_token", "/");
-      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
+      expectLoginRedirect(response, "no_token");
+      expect(mockCookieStore.delete).not.toHaveBeenCalled();
     });
 
     it("refreshToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -212,8 +211,8 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      expectLoginRedirect(response, "no_token", "/");
-      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
+      expectLoginRedirect(response, "no_token");
+      expect(mockCookieStore.delete).not.toHaveBeenCalled();
     });
 
     it("토큰이 모두 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -225,8 +224,8 @@ describe("OAuth Callback Route Handler", () => {
       const response = await GET(request);
 
       // Then
-      expectLoginRedirect(response, "no_token", "/");
-      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
+      expectLoginRedirect(response, "no_token");
+      expect(mockCookieStore.delete).not.toHaveBeenCalled();
     });
   });
 

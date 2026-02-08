@@ -63,15 +63,27 @@ describe("Proxy Middleware", () => {
     return response.headers.getSetCookie().some(matcher);
   }
 
-  function expectLoginRedirect(response: Response, next: string, reason: string) {
+  function expectLoginRedirect(response: Response, reason: string) {
     expect(response.status).toBe(307);
     const location = response.headers.get("location");
     expect(location).toBeTruthy();
 
     const url = new URL(location!);
     expect(url.pathname).toBe("/login");
-    expect(url.searchParams.get("next")).toBe(next);
     expect(url.searchParams.get("reason")).toBe(reason);
+    expect(url.searchParams.get("next")).toBeNull();
+  }
+
+  function expectRedirectAfterLoginCookie(response: Response, returnPath: string) {
+    const encodedPath = encodeURIComponent(returnPath);
+    expect(
+      hasSetCookie(
+        response,
+        (cookie) =>
+          cookie.startsWith(`redirectAfterLogin=${encodedPath}`) ||
+          cookie.startsWith(`redirectAfterLogin=${returnPath}`)
+      )
+    ).toBe(true);
   }
 
   describe("공개 라우트", () => {
@@ -140,7 +152,8 @@ describe("Proxy Middleware", () => {
       const response = await proxy(request);
 
       // Then: 로그인 라우트로 리다이렉트
-      expectLoginRedirect(response, "/dashboard", "auth_required");
+      expectLoginRedirect(response, "auth_required");
+      expectRedirectAfterLoginCookie(response, "/dashboard");
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
@@ -154,7 +167,8 @@ describe("Proxy Middleware", () => {
         const request = new NextRequest(`http://localhost:3000${path}`);
         const response = await proxy(request);
 
-        expectLoginRedirect(response, path, "auth_required");
+        expectLoginRedirect(response, "auth_required");
+        expectRedirectAfterLoginCookie(response, path);
       }
     });
   });
@@ -341,7 +355,8 @@ describe("Proxy Middleware", () => {
       const response = await proxy(request);
 
       // Then: 로그인 라우트로 리다이렉트 + 세션 쿠키 정리
-      expectLoginRedirect(response, "/dashboard", "session_expired");
+      expectLoginRedirect(response, "session_expired");
+      expectRedirectAfterLoginCookie(response, "/dashboard");
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
@@ -362,7 +377,8 @@ describe("Proxy Middleware", () => {
       const response = await proxy(request);
 
       // Then: 네트워크 에러 시 로그인 라우트 유도
-      expectLoginRedirect(response, "/dashboard", "network_error");
+      expectLoginRedirect(response, "network_error");
+      expectRedirectAfterLoginCookie(response, "/dashboard");
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
@@ -382,7 +398,8 @@ describe("Proxy Middleware", () => {
       const response = await proxy(request);
 
       // Then
-      expectLoginRedirect(response, "/dashboard", "config_error");
+      expectLoginRedirect(response, "config_error");
+      expectRedirectAfterLoginCookie(response, "/dashboard");
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
       expect(mockFetch).not.toHaveBeenCalled(); // API 호출 안함
@@ -404,7 +421,8 @@ describe("Proxy Middleware", () => {
       const response = await proxy(request);
 
       // Then: refreshToken 없으므로 재발급 불가 → 로그인 라우트
-      expectLoginRedirect(response, "/dashboard", "refresh_token_missing");
+      expectLoginRedirect(response, "refresh_token_missing");
+      expectRedirectAfterLoginCookie(response, "/dashboard");
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
       expect(mockFetch).not.toHaveBeenCalled();
@@ -473,7 +491,8 @@ describe("Proxy Middleware", () => {
       const response = await proxy(request);
 
       // Then: 로그인 라우트로 리다이렉트
-      expectLoginRedirect(response, "/dashboard", "session_expired");
+      expectLoginRedirect(response, "session_expired");
+      expectRedirectAfterLoginCookie(response, "/dashboard");
     });
   });
 });

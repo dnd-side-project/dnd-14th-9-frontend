@@ -6,7 +6,7 @@ import {
   REDIRECT_AFTER_LOGIN_COOKIE,
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
 } from "@/lib/auth/cookie-constants";
-import { setCookie } from "@/lib/auth/client-cookies";
+import { getCookie, setCookie } from "@/lib/auth/client-cookies";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
@@ -40,8 +40,8 @@ export function LoginRouteClient({ variant }: LoginRouteClientProps) {
   const searchParams = useSearchParams();
 
   const safeNextPath = useMemo(
-    () => normalizeInternalPath(searchParams.get("next")),
-    [searchParams]
+    () => normalizeInternalPath(getCookie(REDIRECT_AFTER_LOGIN_COOKIE)),
+    []
   );
 
   const reason = searchParams.get("reason");

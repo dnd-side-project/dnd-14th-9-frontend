@@ -1,6 +1,11 @@
 "use client";
 
 import { Button } from "@/components/Button/Button";
+import {
+  REDIRECT_AFTER_LOGIN_COOKIE,
+  REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
+} from "@/lib/auth/cookie-constants";
+import { setCookie } from "@/lib/auth/client-cookies";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function RedirectTestPage() {
@@ -10,9 +15,14 @@ export default function RedirectTestPage() {
 
   const query = searchParams.toString();
   const currentPathWithQuery = `${pathname}${query ? `?${query}` : ""}`;
-  const loginPath = `/login?next=${encodeURIComponent(currentPathWithQuery)}`;
+  const loginPath = "/login";
 
   const openLogin = () => {
+    setCookie(
+      REDIRECT_AFTER_LOGIN_COOKIE,
+      currentPathWithQuery,
+      REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS
+    );
     router.push(loginPath);
   };
 
@@ -25,8 +35,9 @@ export default function RedirectTestPage() {
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
         <h1 className="text-2xl font-bold tracking-tight">로그인 복귀 테스트 페이지 (임시)</h1>
         <p className="mt-3 text-sm leading-6 text-gray-700">
-          현재 위치를 <code className="rounded bg-gray-100 px-1 py-0.5">{`next`}</code> 파라미터로
-          넘겨 로그인 후 동일 위치로 복귀되는지 확인하는 용도입니다.
+          현재 위치를{" "}
+          <code className="rounded bg-gray-100 px-1 py-0.5">{`redirectAfterLogin`}</code> 쿠키로
+          저장해 로그인 후 동일 위치로 복귀되는지 확인하는 용도입니다.
         </p>
 
         <div className="mt-6 space-y-3 rounded-lg bg-gray-50 p-4 text-sm text-gray-800">

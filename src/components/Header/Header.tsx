@@ -2,6 +2,11 @@
 
 import { authApi } from "@/features/auth/api";
 import { useAuthStore } from "@/stores/authStore";
+import {
+  REDIRECT_AFTER_LOGIN_COOKIE,
+  REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
+} from "@/lib/auth/cookie-constants";
+import { setCookie } from "@/lib/auth/client-cookies";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -23,9 +28,9 @@ export function Header() {
 
   const openLogin = () => {
     const query = searchParams.toString();
-    const nextPath = `${pathname}${query ? `?${query}` : ""}`;
-    const loginUrl = `/login?next=${encodeURIComponent(nextPath)}`;
-    router.push(loginUrl);
+    const returnPath = `${pathname}${query ? `?${query}` : ""}`;
+    setCookie(REDIRECT_AFTER_LOGIN_COOKIE, returnPath, REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS);
+    router.push("/login");
   };
 
   const handleLogout = async () => {

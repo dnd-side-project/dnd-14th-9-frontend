@@ -1,6 +1,11 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+import {
+  ACCESS_TOKEN_COOKIE,
+  REDIRECT_AFTER_LOGIN_COOKIE,
+  REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
+  REFRESH_TOKEN_COOKIE,
+} from "@/lib/auth/cookie-constants";
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 
 // 공개 라우트 (인증 불필요)
@@ -56,7 +61,7 @@ export async function proxy(request: NextRequest) {
 }
 
 /**
- * 로그인 라우트로 리다이렉트하면서 다음 경로/실패 원인을 전달
+ * 로그인 라우트로 리다이렉트하면서 복귀 경로/실패 원인을 전달
  */
 function getSafeReturnPath(request: NextRequest): string {
   const returnPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
@@ -74,12 +79,17 @@ function redirectToLoginRoute(
   }
 ): NextResponse {
   const loginUrl = new URL("/login", request.url);
-  loginUrl.searchParams.set("next", getSafeReturnPath(request));
   if (options?.reason) {
     loginUrl.searchParams.set("reason", options.reason);
   }
 
   const response = NextResponse.redirect(loginUrl);
+  response.cookies.set(REDIRECT_AFTER_LOGIN_COOKIE, getSafeReturnPath(request), {
+    path: "/",
+    maxAge: REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
 
   if (options?.clearAuth) {
     clearAuthCookies(response.cookies);
