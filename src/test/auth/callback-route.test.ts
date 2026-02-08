@@ -64,15 +64,11 @@ describe("OAuth Callback Route Handler", () => {
 
       const response = await GET(request);
 
-      // setAuthCookies 호출 확인
-      expect(mockSetAuthCookies).toHaveBeenCalledWith(
-        mockCookieStore,
-        {
-          accessToken: "access123",
-          refreshToken: "refresh456",
-        },
-        expect.any(Boolean)
-      );
+      // setAuthCookies 호출 확인 (기본값 사용)
+      expect(mockSetAuthCookies).toHaveBeenCalledWith(mockCookieStore, {
+        accessToken: "access123",
+        refreshToken: "refresh456",
+      });
 
       // redirectAfterLogin 쿠키 삭제 확인
       expect(mockCookieStore.delete).toHaveBeenCalledWith(REDIRECT_AFTER_LOGIN_COOKIE);
