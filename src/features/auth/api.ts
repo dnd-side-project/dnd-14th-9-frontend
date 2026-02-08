@@ -11,6 +11,6 @@ export const authApi = {
    * - 클라이언트는 응답 성공 후 상태 정리 및 리다이렉트 처리
    */
   logout: async (): Promise<LogoutResponse> => {
-    return api.post<LogoutResponse>("/auth/logout");
+    return api.post<LogoutResponse>("/api/auth/logout");
   },
 };

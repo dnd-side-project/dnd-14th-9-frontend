@@ -21,10 +21,9 @@ interface RefreshResponseBody {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 공개 라우트 또는 인증 관련 경로는 패스
+  // 공개 라우트 또는 API 관련 경로는 패스
   if (
     PUBLIC_ROUTES.includes(pathname) ||
-    pathname.startsWith("/auth") ||
     pathname.startsWith("/api") ||
     pathname.startsWith("/.well-known")
   ) {

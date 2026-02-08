@@ -86,9 +86,9 @@ describe("Proxy Middleware", () => {
       expect(response.status).toBe(200);
     });
 
-    it("/auth 경로는 인증 없이 통과해야 함", async () => {
+    it("/api/auth 경로는 인증 없이 통과해야 함", async () => {
       // Given
-      const request = new NextRequest("http://localhost:3000/auth/callback/google");
+      const request = new NextRequest("http://localhost:3000/api/auth/callback/google");
 
       // When
       const response = await proxy(request);
@@ -112,8 +112,8 @@ describe("Proxy Middleware", () => {
       const publicPaths = [
         "/",
         "/login",
-        "/auth/login",
-        "/auth/callback/google",
+        "/api/auth/callback/google",
+        "/api/auth/logout",
         "/api/health",
         "/api/posts",
       ];

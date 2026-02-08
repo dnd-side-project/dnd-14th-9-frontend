@@ -2,7 +2,7 @@
  * @jest-environment @edge-runtime/jest-environment
  */
 
-import { GET } from "@/app/auth/callback/[provider]/route";
+import { GET } from "@/app/api/auth/callback/[provider]/route";
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
@@ -59,7 +59,7 @@ describe("OAuth Callback Route Handler", () => {
     it("토큰이 있으면 쿠키에 저장하고 홈으로 리다이렉트해야 함", async () => {
       // Given: 토큰이 포함된 요청
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       // When: 핸들러 실행
@@ -102,7 +102,7 @@ describe("OAuth Callback Route Handler", () => {
       mockCookieStore.get.mockReturnValue({ value: "/dashboard" });
 
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       // When
@@ -121,7 +121,7 @@ describe("OAuth Callback Route Handler", () => {
       mockCookieStore.get.mockReturnValue(undefined);
 
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       // When
@@ -136,7 +136,7 @@ describe("OAuth Callback Route Handler", () => {
       mockCookieStore.get.mockReturnValue({ value: "https://evil.com/phishing" });
 
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       // When
@@ -151,7 +151,7 @@ describe("OAuth Callback Route Handler", () => {
       mockCookieStore.get.mockReturnValue({ value: "//evil.com" });
 
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       // When
@@ -165,7 +165,7 @@ describe("OAuth Callback Route Handler", () => {
   describe("에러 케이스", () => {
     it("error 파라미터가 있으면 reason/next와 함께 로그인으로 리다이렉트해야 함", async () => {
       // Given: error 파라미터가 있는 요청
-      const url = "http://localhost:3000/auth/callback/google?error=access_denied";
+      const url = "http://localhost:3000/api/auth/callback/google?error=access_denied";
       const request = new NextRequest(url);
 
       // When
@@ -180,7 +180,7 @@ describe("OAuth Callback Route Handler", () => {
     it("error 분기에서 redirectAfterLogin 쿠키 값이 외부 URL이면 next를 / 로 정규화해야 함", async () => {
       // Given
       mockCookieStore.get.mockReturnValue({ value: "https://evil.com/phishing" });
-      const url = "http://localhost:3000/auth/callback/google?error=access_denied";
+      const url = "http://localhost:3000/api/auth/callback/google?error=access_denied";
       const request = new NextRequest(url);
 
       // When
@@ -192,7 +192,7 @@ describe("OAuth Callback Route Handler", () => {
 
     it("accessToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
       // Given: accessToken 없이 refreshToken만 있는 요청
-      const url = "http://localhost:3000/auth/callback/google?refreshToken=refresh456";
+      const url = "http://localhost:3000/api/auth/callback/google?refreshToken=refresh456";
       const request = new NextRequest(url);
 
       // When
@@ -205,7 +205,7 @@ describe("OAuth Callback Route Handler", () => {
 
     it("refreshToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
       // Given: refreshToken 없이 accessToken만 있는 요청
-      const url = "http://localhost:3000/auth/callback/google?accessToken=access123";
+      const url = "http://localhost:3000/api/auth/callback/google?accessToken=access123";
       const request = new NextRequest(url);
 
       // When
@@ -218,7 +218,7 @@ describe("OAuth Callback Route Handler", () => {
 
     it("토큰이 모두 없으면 에러와 함께 리다이렉트해야 함", async () => {
       // Given: 토큰이 전혀 없는 요청
-      const url = "http://localhost:3000/auth/callback/google";
+      const url = "http://localhost:3000/api/auth/callback/google";
       const request = new NextRequest(url);
 
       // When
@@ -247,7 +247,7 @@ describe("OAuth Callback Route Handler", () => {
       setNodeEnv("production");
 
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       // When
@@ -278,7 +278,7 @@ describe("OAuth Callback Route Handler", () => {
       setNodeEnv("development");
 
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       // When
@@ -309,7 +309,7 @@ describe("OAuth Callback Route Handler", () => {
       setNodeEnv("test");
 
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       // When
@@ -330,7 +330,7 @@ describe("OAuth Callback Route Handler", () => {
   describe("다양한 Provider", () => {
     it("Google provider로 로그인해도 정상 동작해야 함", async () => {
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       const response = await GET(request);
@@ -341,7 +341,7 @@ describe("OAuth Callback Route Handler", () => {
 
     it("Kakao provider로 로그인해도 정상 동작해야 함", async () => {
       const url =
-        "http://localhost:3000/auth/callback/kakao?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/kakao?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       const response = await GET(request);
@@ -352,7 +352,7 @@ describe("OAuth Callback Route Handler", () => {
 
     it("Naver provider로 로그인해도 정상 동작해야 함", async () => {
       const url =
-        "http://localhost:3000/auth/callback/naver?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/naver?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       const response = await GET(request);
@@ -365,7 +365,7 @@ describe("OAuth Callback Route Handler", () => {
   describe("쿠키 만료 시간", () => {
     it("accessToken은 1시간(3600초) 만료 시간을 가져야 함", async () => {
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       await GET(request);
@@ -381,7 +381,7 @@ describe("OAuth Callback Route Handler", () => {
 
     it("refreshToken은 30일(2592000초) 만료 시간을 가져야 함", async () => {
       const url =
-        "http://localhost:3000/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       await GET(request);
