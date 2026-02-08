@@ -14,14 +14,14 @@ import { ClearIcon } from "../Icon/ClearIcon";
 const inputVariants = cva(
   [
     "w-full",
-    "max-w-90",
+    "max-w-95",
     "h-14",
     "px-md",
     "rounded-sm",
     "border",
     "text-base",
     "font-pretendard",
-    "transition-colors",
+    "transition-all",
     "outline-none",
     "placeholder:text-text-muted",
   ].join(" "),
@@ -30,21 +30,21 @@ const inputVariants = cva(
       state: {
         default: [
           "border-border-subtle",
-          "bg-gray-900",
-          "text-text-primary",
+          "bg-transparent",
+          "text-text-tertiary",
           "focus:border-text-brand-default",
-          "focus:text-text-tertiary",
+          "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
         ].join(" "),
         filled: [
           "border-border-strong",
-          "bg-gray-900",
-          "text-text-primary",
+          "bg-transparent",
+          "text-text-tertiary",
           "focus:border-text-brand-default",
-          "focus:text-text-tertiary",
+          "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
         ].join(" "),
         error: [
           "border-border-error-default",
-          "bg-gray-900",
+          "bg-transparent",
           "text-text-status-negative-default",
         ].join(" "),
         disabled: [
@@ -137,8 +137,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const showClearButton = hasValue && !disabled && !error;
 
     return (
-      <div className={cn("flex w-full max-w-90 flex-col gap-2", containerClassName)}>
-        {label && <label className="text-text-primary text-base">{label}</label>}
+      <div className={cn("flex w-full max-w-95 flex-col gap-2", containerClassName)}>
+        {label && <label className="text-text-secondary text-base">{label}</label>}
 
         <div className="relative">
           <input
@@ -161,7 +161,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {showClearButton && (
             <button
               type="button"
-              className="right-md absolute top-1/2 -translate-y-1/2 cursor-pointer"
+              className="right-md absolute top-1/2 flex -translate-y-1/2 cursor-pointer items-center justify-center"
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleClear}
               tabIndex={-1}

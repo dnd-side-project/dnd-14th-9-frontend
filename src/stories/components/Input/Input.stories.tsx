@@ -44,10 +44,14 @@ const meta = {
       action: "cleared",
       description: "Clear 버튼 클릭 시 호출되는 콜백",
     },
+    maxLength: {
+      control: "number",
+      description: "입력 가능한 최대 글자 수",
+    },
   },
   decorators: [
     (Story) => (
-      <div className="dark" style={{ padding: "20px", background: "#0b0f0e" }}>
+      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "420px" }}>
         <Story />
       </div>
     ),
@@ -125,6 +129,21 @@ export const DisabledWithValue: Story = {
     label: "비활성화됨",
     defaultValue: "비활성화된 입력값",
     disabled: true,
+  },
+};
+
+export const WithMaxLength: Story = {
+  args: {
+    label: "닉네임",
+    placeholder: "닉네임을 입력하세요",
+    maxLength: 10,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "최대 글자 수가 제한된 Input입니다. (최대 10자)",
+      },
+    },
   },
 };
 
