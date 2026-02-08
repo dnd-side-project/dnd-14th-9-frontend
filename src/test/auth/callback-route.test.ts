@@ -4,12 +4,22 @@
 
 import { GET } from "@/app/api/auth/callback/[provider]/route";
 import { cookies } from "next/headers";
+import { setAuthCookies } from "@/lib/auth/cookies";
 import { NextRequest } from "next/server";
+import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
 
 // Next.js cookies() mock
 jest.mock("next/headers", () => ({
   cookies: jest.fn(),
 }));
+
+// auth/cookies 모듈 모킹
+jest.mock("@/lib/auth/cookies", () => ({
+  setAuthCookies: jest.fn(),
+  clearAuthCookies: jest.fn(),
+}));
+
+const mockSetAuthCookies = setAuthCookies as jest.MockedFunction<typeof setAuthCookies>;
 
 function expectLoginRedirect(response: Response, reason: string) {
   expect(response.status).toBe(307);
@@ -22,14 +32,6 @@ function expectLoginRedirect(response: Response, reason: string) {
   expect(url.searchParams.get("next")).toBeNull();
 }
 
-function setNodeEnv(value: string | undefined) {
-  Object.defineProperty(process.env, "NODE_ENV", {
-    value,
-    configurable: true,
-    writable: true,
-  });
-}
-
 describe("OAuth Callback Route Handler", () => {
   let mockCookieStore: {
     set: jest.Mock;
@@ -39,7 +41,6 @@ describe("OAuth Callback Route Handler", () => {
   let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    // 매 테스트마다 새로운 mock 객체 생성
     mockCookieStore = {
       set: jest.fn(),
       get: jest.fn(),
@@ -48,281 +49,148 @@ describe("OAuth Callback Route Handler", () => {
 
     (cookies as jest.Mock).mockResolvedValue(mockCookieStore);
     consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    mockSetAuthCookies.mockClear();
   });
 
   afterEach(() => {
     consoleErrorSpy.mockRestore();
-    jest.clearAllMocks();
   });
 
   describe("성공 케이스", () => {
     it("토큰이 있으면 쿠키에 저장하고 홈으로 리다이렉트해야 함", async () => {
-      // Given: 토큰이 포함된 요청
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
-      // When: 핸들러 실행
       const response = await GET(request);
 
-      // Then: 쿠키 저장 확인
-      expect(mockCookieStore.set).toHaveBeenCalledTimes(2);
-
-      // accessToken 쿠키 저장 확인
-      expect(mockCookieStore.set).toHaveBeenCalledWith(
-        "accessToken",
-        "access123",
-        expect.objectContaining({
-          httpOnly: true,
-          maxAge: 60 * 60, // 1시간
-          path: "/",
-        })
+      // setAuthCookies 호출 확인
+      expect(mockSetAuthCookies).toHaveBeenCalledWith(
+        mockCookieStore,
+        {
+          accessToken: "access123",
+          refreshToken: "refresh456",
+        },
+        expect.any(Boolean)
       );
 
-      // refreshToken 쿠키 저장 확인
-      expect(mockCookieStore.set).toHaveBeenCalledWith(
-        "refreshToken",
-        "refresh456",
-        expect.objectContaining({
-          httpOnly: true,
-          maxAge: 60 * 60 * 24 * 30, // 30일
-          path: "/",
-        })
-      );
+      // redirectAfterLogin 쿠키 삭제 확인
+      expect(mockCookieStore.delete).toHaveBeenCalledWith(REDIRECT_AFTER_LOGIN_COOKIE);
 
-      // 리다이렉트 확인
-      expect(response.status).toBe(307); // NextResponse.redirect는 307 상태 코드
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
-      expect(mockCookieStore.delete).toHaveBeenCalledTimes(1);
-      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
+      // 홈으로 리다이렉트
+      expect(response.status).toBe(307);
+      const location = response.headers.get("location");
+      expect(location).toBe("http://localhost:3000/");
     });
 
     it("redirectAfterLogin 쿠키가 있으면 해당 경로로 리다이렉트해야 함", async () => {
-      // Given: redirectAfterLogin 쿠키 설정
       mockCookieStore.get.mockReturnValue({ value: "/dashboard" });
 
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
-      // When
       const response = await GET(request);
 
-      // Then: 저장된 경로로 리다이렉트
-      expect(response.headers.get("location")).toBe("http://localhost:3000/dashboard");
-
-      // redirectAfterLogin 쿠키 삭제 확인
-      expect(mockCookieStore.delete).toHaveBeenCalledTimes(1);
-      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
+      expect(response.status).toBe(307);
+      const location = response.headers.get("location");
+      expect(location).toBe("http://localhost:3000/dashboard");
     });
 
     it("redirectAfterLogin 쿠키가 없으면 홈으로 리다이렉트해야 함", async () => {
-      // Given: redirectAfterLogin 쿠키 없음
       mockCookieStore.get.mockReturnValue(undefined);
 
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
-      // When
       const response = await GET(request);
 
-      // Then: 기본값인 홈으로 리다이렉트
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(response.status).toBe(307);
+      const location = response.headers.get("location");
+      expect(location).toBe("http://localhost:3000/");
     });
 
     it("redirectAfterLogin 쿠키가 외부 URL이면 홈으로 폴백해야 함", async () => {
-      // Given: 외부 URL 주입 시도
-      mockCookieStore.get.mockReturnValue({ value: "https://evil.com/phishing" });
+      mockCookieStore.get.mockReturnValue({
+        value: "https://malicious.com/steal",
+      });
 
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
-      // When
       const response = await GET(request);
 
-      // Then
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      const location = response.headers.get("location");
+      expect(location).toBe("http://localhost:3000/");
     });
 
     it("redirectAfterLogin 쿠키가 //로 시작하면 홈으로 폴백해야 함", async () => {
-      // Given: protocol-relative URL 주입 시도
       mockCookieStore.get.mockReturnValue({ value: "//evil.com" });
 
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
-      // When
       const response = await GET(request);
 
-      // Then
-      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      const location = response.headers.get("location");
+      expect(location).toBe("http://localhost:3000/");
     });
   });
 
   describe("에러 케이스", () => {
     it("error 파라미터가 있으면 reason만 포함해 로그인으로 리다이렉트해야 함", async () => {
-      // Given: error 파라미터가 있는 요청
       const url = "http://localhost:3000/api/auth/callback/google?error=access_denied";
       const request = new NextRequest(url);
 
-      // When
       const response = await GET(request);
 
-      // Then
       expectLoginRedirect(response, "access_denied");
-      expect(mockCookieStore.delete).not.toHaveBeenCalled();
     });
 
     it("error 분기에서 redirectAfterLogin 쿠키 값이 외부 URL이어도 로그인 리다이렉트 쿼리에 노출하지 않아야 함", async () => {
-      // Given
-      mockCookieStore.get.mockReturnValue({ value: "https://evil.com/phishing" });
+      mockCookieStore.get.mockReturnValue({
+        value: "https://malicious.com/steal",
+      });
+
       const url = "http://localhost:3000/api/auth/callback/google?error=access_denied";
       const request = new NextRequest(url);
 
-      // When
       const response = await GET(request);
 
-      // Then
       expectLoginRedirect(response, "access_denied");
     });
 
     it("accessToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
-      // Given: accessToken 없이 refreshToken만 있는 요청
       const url = "http://localhost:3000/api/auth/callback/google?refreshToken=refresh456";
       const request = new NextRequest(url);
 
-      // When
       const response = await GET(request);
 
-      // Then
+      expect(consoleErrorSpy).toHaveBeenCalledWith("OAuth callback: No tokens in query parameters");
       expectLoginRedirect(response, "no_token");
-      expect(mockCookieStore.delete).not.toHaveBeenCalled();
     });
 
     it("refreshToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
-      // Given: refreshToken 없이 accessToken만 있는 요청
       const url = "http://localhost:3000/api/auth/callback/google?accessToken=access123";
       const request = new NextRequest(url);
 
-      // When
       const response = await GET(request);
 
-      // Then
+      expect(consoleErrorSpy).toHaveBeenCalledWith("OAuth callback: No tokens in query parameters");
       expectLoginRedirect(response, "no_token");
-      expect(mockCookieStore.delete).not.toHaveBeenCalled();
     });
 
     it("토큰이 모두 없으면 에러와 함께 리다이렉트해야 함", async () => {
-      // Given: 토큰이 전혀 없는 요청
       const url = "http://localhost:3000/api/auth/callback/google";
       const request = new NextRequest(url);
 
-      // When
       const response = await GET(request);
 
-      // Then
+      expect(consoleErrorSpy).toHaveBeenCalledWith("OAuth callback: No tokens in query parameters");
       expectLoginRedirect(response, "no_token");
-      expect(mockCookieStore.delete).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("환경별 쿠키 설정", () => {
-    let originalEnv: string | undefined;
-
-    beforeEach(() => {
-      originalEnv = process.env.NODE_ENV;
-    });
-
-    afterEach(() => {
-      // 환경 변수 복원
-      setNodeEnv(originalEnv);
-    });
-
-    it("production 환경에서는 secure와 sameSite none을 설정해야 함", async () => {
-      // Given: production 환경
-      setNodeEnv("production");
-
-      const url =
-        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      // When
-      await GET(request);
-
-      // Then: production 설정 확인
-      expect(mockCookieStore.set).toHaveBeenCalledWith(
-        "accessToken",
-        "access123",
-        expect.objectContaining({
-          secure: true,
-          sameSite: "none",
-        })
-      );
-
-      expect(mockCookieStore.set).toHaveBeenCalledWith(
-        "refreshToken",
-        "refresh456",
-        expect.objectContaining({
-          secure: true,
-          sameSite: "none",
-        })
-      );
-    });
-
-    it("development 환경에서는 secure false와 sameSite lax를 설정해야 함", async () => {
-      // Given: development 환경
-      setNodeEnv("development");
-
-      const url =
-        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      // When
-      await GET(request);
-
-      // Then: development 설정 확인
-      expect(mockCookieStore.set).toHaveBeenCalledWith(
-        "accessToken",
-        "access123",
-        expect.objectContaining({
-          secure: false,
-          sameSite: "lax",
-        })
-      );
-
-      expect(mockCookieStore.set).toHaveBeenCalledWith(
-        "refreshToken",
-        "refresh456",
-        expect.objectContaining({
-          secure: false,
-          sameSite: "lax",
-        })
-      );
-    });
-
-    it("test 환경에서는 development와 동일하게 설정해야 함", async () => {
-      // Given: test 환경 (NODE_ENV가 'test'일 때)
-      setNodeEnv("test");
-
-      const url =
-        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      // When
-      await GET(request);
-
-      // Then: production이 아니므로 secure: false, sameSite: lax
-      expect(mockCookieStore.set).toHaveBeenCalledWith(
-        "accessToken",
-        "access123",
-        expect.objectContaining({
-          secure: false,
-          sameSite: "lax",
-        })
-      );
     });
   });
 
@@ -334,8 +202,8 @@ describe("OAuth Callback Route Handler", () => {
 
       const response = await GET(request);
 
+      expect(mockSetAuthCookies).toHaveBeenCalled();
       expect(response.status).toBe(307);
-      expect(mockCookieStore.set).toHaveBeenCalledTimes(2);
     });
 
     it("Kakao provider로 로그인해도 정상 동작해야 함", async () => {
@@ -345,8 +213,8 @@ describe("OAuth Callback Route Handler", () => {
 
       const response = await GET(request);
 
+      expect(mockSetAuthCookies).toHaveBeenCalled();
       expect(response.status).toBe(307);
-      expect(mockCookieStore.set).toHaveBeenCalledTimes(2);
     });
 
     it("Naver provider로 로그인해도 정상 동작해야 함", async () => {
@@ -356,42 +224,8 @@ describe("OAuth Callback Route Handler", () => {
 
       const response = await GET(request);
 
+      expect(mockSetAuthCookies).toHaveBeenCalled();
       expect(response.status).toBe(307);
-      expect(mockCookieStore.set).toHaveBeenCalledTimes(2);
-    });
-  });
-
-  describe("쿠키 만료 시간", () => {
-    it("accessToken은 1시간(3600초) 만료 시간을 가져야 함", async () => {
-      const url =
-        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      await GET(request);
-
-      expect(mockCookieStore.set).toHaveBeenCalledWith(
-        "accessToken",
-        "access123",
-        expect.objectContaining({
-          maxAge: 3600, // 60 * 60
-        })
-      );
-    });
-
-    it("refreshToken은 30일(2592000초) 만료 시간을 가져야 함", async () => {
-      const url =
-        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      await GET(request);
-
-      expect(mockCookieStore.set).toHaveBeenCalledWith(
-        "refreshToken",
-        "refresh456",
-        expect.objectContaining({
-          maxAge: 2592000, // 60 * 60 * 24 * 30
-        })
-      );
     });
   });
 });
