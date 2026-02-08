@@ -21,7 +21,7 @@ export default function RedirectTestPage() {
   };
 
   return (
-    <section className="mx-auto w-full max-w-2xl px-4 py-12 [text-orientation:mixed] [writing-mode:horizontal-tb]">
+    <section className="mx-auto w-full max-w-[42rem] px-4 py-12 [text-orientation:mixed] [writing-mode:horizontal-tb]">
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
         <h1 className="text-2xl font-bold tracking-tight">로그인 복귀 테스트 페이지 (임시)</h1>
         <p className="mt-3 text-sm leading-6 text-gray-700">
