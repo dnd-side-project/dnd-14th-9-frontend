@@ -1,8 +1,11 @@
+"use client";
+
 import { cva, type VariantProps } from "class-variance-authority";
 import {
   forwardRef,
   useState,
   useCallback,
+  useId,
   type InputHTMLAttributes,
   type FocusEvent,
   type ChangeEvent,
@@ -24,7 +27,7 @@ const inputVariants = cva(
     "transition-all",
     "outline-none",
     "placeholder:text-text-muted",
-  ].join(" "),
+  ],
   {
     variants: {
       state: {
@@ -34,26 +37,26 @@ const inputVariants = cva(
           "text-text-tertiary",
           "focus:border-text-brand-default",
           "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
-        ].join(" "),
+        ],
         filled: [
           "border-border-strong",
           "bg-transparent",
           "text-text-tertiary",
           "focus:border-text-brand-default",
           "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
-        ].join(" "),
+        ],
         error: [
           "border-border-error-default",
           "bg-transparent",
           "text-text-status-negative-default",
-        ].join(" "),
+        ],
         disabled: [
           "border-border-subtle",
           "bg-surface-disabled",
           "text-text-disabled",
           "placeholder:text-text-disabled",
           "cursor-not-allowed",
-        ].join(" "),
+        ],
       },
     },
     defaultVariants: {
@@ -86,10 +89,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       onFocus,
       onBlur,
       onChange,
+      id,
       ...props
     },
     ref
   ) => {
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
+    const errorMessageId = `${inputId}-error`;
+
     const [internalValue, setInternalValue] = useState(defaultValue ?? "");
 
     const isControlled = value !== undefined;
@@ -138,11 +146,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className={cn("flex w-full max-w-95 flex-col gap-2", containerClassName)}>
-        {label && <label className="text-text-secondary text-base">{label}</label>}
+        {label && (
+          <label htmlFor={inputId} className="text-text-secondary text-base">
+            {label}
+          </label>
+        )}
 
         <div className="relative">
           <input
             ref={ref}
+            id={inputId}
             className={cn(
               inputVariants({ state: getState() }),
               showClearButton && "pr-12",
@@ -154,7 +167,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             onBlur={handleBlur}
             onChange={handleChange}
             aria-invalid={error}
-            aria-describedby={error && errorMessage ? "error-message" : undefined}
+            aria-describedby={error && errorMessage ? errorMessageId : undefined}
             {...props}
           />
 
@@ -173,7 +186,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         </div>
 
         {error && errorMessage && (
-          <span id="error-message" className="text-text-status-negative-default text-sm">
+          <span id={errorMessageId} className="text-text-status-negative-default text-sm">
             {errorMessage}
           </span>
         )}
