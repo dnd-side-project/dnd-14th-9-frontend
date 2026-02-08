@@ -112,6 +112,7 @@ describe("Proxy Middleware", () => {
       const publicPaths = [
         "/",
         "/login",
+        "/redirect-test",
         "/api/auth/callback/google",
         "/api/auth/logout",
         "/api/health",

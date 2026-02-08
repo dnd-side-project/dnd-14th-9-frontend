@@ -4,7 +4,8 @@ import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-con
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 
 // 공개 라우트 (인증 불필요)
-const PUBLIC_ROUTES = ["/", "/login"];
+// TEMP: 로그인 복귀 동작 수동 확인을 위한 테스트 페이지
+const PUBLIC_ROUTES = ["/", "/login", "/redirect-test"];
 
 // 토큰 갱신 임계값 (5분)
 const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
