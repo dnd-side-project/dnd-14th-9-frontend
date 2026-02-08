@@ -20,11 +20,13 @@ export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
   const searchParams = request.nextUrl.searchParams;
   const error = searchParams.get("error");
+  const redirectPath = normalizeInternalPath(cookieStore.get(REDIRECT_AFTER_LOGIN_COOKIE)?.value);
+
+  // redirectAfterLogin은 1회성 쿠키로 항상 소비 후 제거
+  cookieStore.delete(REDIRECT_AFTER_LOGIN_COOKIE);
 
   // OAuth 에러 처리 (사용자가 인증 취소 등)
   if (error) {
-    const redirectPath = normalizeInternalPath(cookieStore.get(REDIRECT_AFTER_LOGIN_COOKIE)?.value);
-    cookieStore.delete(REDIRECT_AFTER_LOGIN_COOKIE);
     return NextResponse.redirect(buildLoginRedirectUrl(request, error, redirectPath));
   }
 
@@ -34,18 +36,10 @@ export async function GET(request: NextRequest) {
 
   if (!accessToken || !refreshToken) {
     console.error("OAuth callback: No tokens in query parameters");
-    const redirectPath = normalizeInternalPath(cookieStore.get(REDIRECT_AFTER_LOGIN_COOKIE)?.value);
-    cookieStore.delete(REDIRECT_AFTER_LOGIN_COOKIE);
     return NextResponse.redirect(buildLoginRedirectUrl(request, "no_token", redirectPath));
   }
 
   setAuthCookies(cookieStore, { accessToken, refreshToken });
-
-  // 원래 접근하려던 경로로 리다이렉트
-  const redirectPath = normalizeInternalPath(cookieStore.get(REDIRECT_AFTER_LOGIN_COOKIE)?.value);
-
-  // 사용 후 쿠키 삭제
-  cookieStore.delete(REDIRECT_AFTER_LOGIN_COOKIE);
 
   // 인증 성공 - 저장된 경로 또는 홈으로 리다이렉트
   return NextResponse.redirect(new URL(redirectPath, request.url));

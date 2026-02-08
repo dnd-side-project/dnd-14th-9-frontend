@@ -93,6 +93,8 @@ describe("OAuth Callback Route Handler", () => {
       // 리다이렉트 확인
       expect(response.status).toBe(307); // NextResponse.redirect는 307 상태 코드
       expect(response.headers.get("location")).toBe("http://localhost:3000/");
+      expect(mockCookieStore.delete).toHaveBeenCalledTimes(1);
+      expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
     });
 
     it("redirectAfterLogin 쿠키가 있으면 해당 경로로 리다이렉트해야 함", async () => {
@@ -110,6 +112,7 @@ describe("OAuth Callback Route Handler", () => {
       expect(response.headers.get("location")).toBe("http://localhost:3000/dashboard");
 
       // redirectAfterLogin 쿠키 삭제 확인
+      expect(mockCookieStore.delete).toHaveBeenCalledTimes(1);
       expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
     });
 
@@ -170,6 +173,7 @@ describe("OAuth Callback Route Handler", () => {
 
       // Then
       expectLoginRedirect(response, "access_denied", "/");
+      expect(mockCookieStore.delete).toHaveBeenCalledTimes(1);
       expect(mockCookieStore.delete).toHaveBeenCalledWith("redirectAfterLogin");
     });
 
