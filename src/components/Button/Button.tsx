@@ -8,11 +8,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-surface-primary-default text-text-inverse hover:bg-surface-primary-subtle",
-        secondary:
-          "bg-surface-secondary-default text-text-inverse hover:bg-surface-secondary-subtle",
-        tertiary: "bg-background-default text-text-secondary hover:bg-surface-subtle",
-        text: "bg-transparent text-text-primary hover:bg-surface-subtler",
+        solid: "",
+        outlined: "bg-transparent border",
+        ghost: "bg-transparent",
+      },
+      colorScheme: {
+        primary: "",
+        secondary: "",
+        tertiary: "",
       },
       size: {
         xlarge: "h-16 min-w-[106px] px-xl py-md",
@@ -27,6 +30,50 @@ const buttonVariants = cva(
       },
     },
     compoundVariants: [
+      // SOLID
+      {
+        variant: "solid",
+        colorScheme: "primary",
+        class:
+          "bg-surface-primary-default text-text-inverse hover:bg-surface-primary-subtle active:bg-green-700",
+      },
+      {
+        variant: "solid",
+        colorScheme: "secondary",
+        class: "bg-[#27EA6714] text-text-brand-default hover:bg-[#27EA6729] active:bg-[#27EA673D]",
+      },
+      {
+        variant: "solid",
+        colorScheme: "tertiary",
+        class:
+          "bg-surface-strong text-text-muted hover:bg-surface-subtle active:bg-surface-subtler active:text-text-secondary",
+      },
+      // OUTLINED
+      {
+        variant: "outlined",
+        colorScheme: "primary",
+        class:
+          "border-green-800 text-text-brand-subtle hover:border-border-primary-default hover:text-text-brand-default",
+      },
+      {
+        variant: "outlined",
+        colorScheme: "secondary",
+        class:
+          "border-border-default text-text-tertiary hover:text-text-secondary active:border-border-strong active:text-text-primary",
+      },
+      // GHOST
+      {
+        variant: "ghost",
+        colorScheme: "primary",
+        class:
+          "text-surface-primary-default hover:text-surface-primary-subtle active:text-green-700",
+      },
+      {
+        variant: "ghost",
+        colorScheme: "secondary",
+        class: "text-text-muted hover:text-text-secondary active:text-text-primary",
+      },
+      // iconOnly
       { iconOnly: true, size: "xlarge", class: "min-w-0 w-16 px-0" },
       { iconOnly: true, size: "large", class: "min-w-0 w-14 px-0" },
       { iconOnly: true, size: "medium", class: "min-w-0 w-12 px-0" },
@@ -34,28 +81,58 @@ const buttonVariants = cva(
       { iconOnly: true, size: "xsmall", class: "min-w-0 w-8 px-0" },
     ],
     defaultVariants: {
-      variant: "primary",
+      variant: "solid",
+      colorScheme: "primary",
       size: "medium",
       iconOnly: false,
     },
   }
 );
 
-export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
-}
+type SolidButtonProps = {
+  variant?: "solid";
+  colorScheme?: "primary" | "secondary" | "tertiary";
+};
+
+type OutlinedButtonProps = {
+  variant: "outlined";
+  colorScheme?: "primary" | "secondary";
+};
+
+type GhostButtonProps = {
+  variant: "ghost";
+  colorScheme?: "primary" | "secondary";
+};
+
+type ButtonVariantProps = SolidButtonProps | OutlinedButtonProps | GhostButtonProps;
+
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  Omit<VariantProps<typeof buttonVariants>, "variant" | "colorScheme"> &
+  ButtonVariantProps & {
+    leftIcon?: ReactNode;
+    rightIcon?: ReactNode;
+  };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant, size, iconOnly, leftIcon, rightIcon, children, disabled, ...props },
+    {
+      className,
+      variant,
+      colorScheme,
+      size,
+      iconOnly,
+      leftIcon,
+      rightIcon,
+      children,
+      disabled,
+      ...props
+    },
     ref
   ) => {
     return (
       <button
         ref={ref}
-        className={cn(buttonVariants({ variant, size, iconOnly, className }))}
+        className={cn(buttonVariants({ variant, colorScheme, size, iconOnly, className }))}
         disabled={disabled}
         aria-disabled={disabled}
         {...props}
