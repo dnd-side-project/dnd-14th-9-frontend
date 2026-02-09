@@ -12,7 +12,7 @@ const filterVariants = cva(
     "justify-between",
     "font-pretendard",
     "font-semibold",
-    "text-text-secondary",
+    "text-gray-200",
     "transition-all",
     "focus-visible:outline-none",
   ],
@@ -34,7 +34,7 @@ const filterVariants = cva(
     defaultVariants: {
       size: "large",
       radius: "max",
-      bordered: false,
+      bordered: true,
     },
   }
 );
