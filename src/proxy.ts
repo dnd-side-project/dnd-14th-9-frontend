@@ -9,11 +9,13 @@ import {
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 
 // 공개 라우트 (인증 불필요)
-// TEMP: 로그인 복귀 동작 수동 확인을 위한 테스트 페이지
-const PUBLIC_ROUTES = ["/", "/login", "/redirect-test"];
+const PUBLIC_ROUTES = ["/", "/login"];
 
 // 토큰 갱신 임계값 (5분)
 const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
+
+// 토큰 갱신 API 타임아웃 (10초)
+const REFRESH_TIMEOUT_MS = 10000;
 
 interface RefreshTokenPair {
   accessToken: string;
@@ -25,7 +27,6 @@ interface RefreshResponseBody {
 }
 
 interface TryRefreshTokenOptions {
-  // 공개 라우트에서는 갱신 실패 시 로그인으로 보내지 않고 요청을 그대로 통과시킨다.
   allowPassThroughOnFailure?: boolean;
 }
 
@@ -59,7 +60,6 @@ export async function proxy(request: NextRequest) {
     if (!refreshToken) {
       return redirectToLoginRoute(request, { clearAuth: true, reason: "auth_required" });
     }
-    // accessToken 없고 refreshToken만 있으면 갱신 시도
     return await tryRefreshToken(request, refreshToken);
   }
 
@@ -68,22 +68,10 @@ export async function proxy(request: NextRequest) {
     if (refreshToken) {
       return await tryRefreshToken(request, refreshToken);
     }
-    // refreshToken 없으면 로그인 라우트로 리다이렉트
     return redirectToLoginRoute(request, { clearAuth: true, reason: "refresh_token_missing" });
   }
 
   return NextResponse.next();
-}
-
-/**
- * 로그인 라우트로 리다이렉트하면서 복귀 경로/실패 원인을 전달
- */
-function getSafeReturnPath(request: NextRequest): string {
-  const returnPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
-  if (!returnPath.startsWith("/") || returnPath.startsWith("//")) {
-    return "/";
-  }
-  return returnPath;
 }
 
 function redirectToLoginRoute(
@@ -99,7 +87,13 @@ function redirectToLoginRoute(
   }
 
   const response = NextResponse.redirect(loginUrl);
-  response.cookies.set(REDIRECT_AFTER_LOGIN_COOKIE, getSafeReturnPath(request), {
+
+  // 로그인 후 복귀할 경로 저장 (Open Redirect 방지)
+  const returnPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
+  const safeReturnPath =
+    returnPath.startsWith("/") && !returnPath.startsWith("//") ? returnPath : "/";
+
+  response.cookies.set(REDIRECT_AFTER_LOGIN_COOKIE, safeReturnPath, {
     path: "/",
     maxAge: REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
     sameSite: "lax",
@@ -114,16 +108,27 @@ function redirectToLoginRoute(
 }
 
 /**
- * JWT 토큰 만료 임박 여부 확인 (Base64 디코딩만, 서명 검증 X)
+ * JWT 토큰 만료 임박 여부 확인
+ * 주의: Base64 디코딩만 수행하며 서명 검증은 백엔드에서 수행됨
  */
 function isTokenExpiringSoon(token: string): boolean {
   try {
-    const [, payloadBase64] = token.split(".");
-    const payload = JSON.parse(atob(payloadBase64));
+    // JWT 형식 검증 (필수 버그 픽스)
+    const parts = token.split(".");
+    if (parts.length !== 3 || !parts[1]) {
+      return true;
+    }
+
+    const payload = JSON.parse(atob(parts[1]));
+
+    // payload.exp 검증 (필수 버그 픽스)
+    if (!payload?.exp || typeof payload.exp !== "number") {
+      return true;
+    }
+
     const expiresAt = payload.exp * 1000;
     return expiresAt - Date.now() < REFRESH_THRESHOLD_MS;
   } catch {
-    // 디코딩 실패 시 갱신 시도
     return true;
   }
 }
@@ -149,20 +154,29 @@ async function tryRefreshToken(
       return redirectToLoginRoute(request, { clearAuth: true, reason: "config_error" });
     }
 
-    const reissueResponse = await fetch(`${backendUrl}/auth/refresh`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: `${REFRESH_TOKEN_COOKIE}=${refreshToken}`,
-      },
-      credentials: "include",
-    });
+    // fetch 타임아웃 설정 (필수 버그 픽스)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REFRESH_TIMEOUT_MS);
+
+    let reissueResponse: Response;
+    try {
+      reissueResponse = await fetch(`${backendUrl}/auth/refresh`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `${REFRESH_TOKEN_COOKIE}=${refreshToken}`,
+        },
+        credentials: "include",
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!reissueResponse.ok) {
       console.error("Proxy: Token refresh failed:", reissueResponse.status);
       if (allowPassThroughOnFailure) {
         const response = NextResponse.next();
-        // refreshToken 자체가 무효한 상태면 인증 쿠키를 정리해 다음 요청의 분기/상태를 명확히 한다.
         if (reissueResponse.status === 401 || reissueResponse.status === 403) {
           clearAuthCookies(response.cookies);
         }
@@ -171,13 +185,32 @@ async function tryRefreshToken(
       return redirectToLoginRoute(request, { clearAuth: true, reason: "session_expired" });
     }
 
+    const data: unknown = await reissueResponse.json();
+
+    // API 응답 검증 (필수 버그 픽스)
+    if (
+      !data ||
+      typeof data !== "object" ||
+      !("result" in data) ||
+      !data.result ||
+      typeof data.result !== "object" ||
+      !("accessToken" in data.result) ||
+      !("refreshToken" in data.result)
+    ) {
+      console.error("Proxy: Invalid refresh response format");
+      if (allowPassThroughOnFailure) {
+        return NextResponse.next();
+      }
+      return redirectToLoginRoute(request, { clearAuth: true, reason: "invalid_response" });
+    }
+
     const response = NextResponse.next();
-    const payload = (await reissueResponse.json()) as RefreshResponseBody;
-    // 재발급 응답 스키마는 고정 계약으로 가정하고 body 토큰을 바로 쿠키에 저장한다.
+    const payload = data as RefreshResponseBody;
     setAuthCookies(response.cookies, {
       accessToken: payload.result.accessToken,
       refreshToken: payload.result.refreshToken,
     });
+
     if (process.env.NODE_ENV !== "production") {
       console.warn("Proxy: Token refresh succeeded", {
         status: reissueResponse.status,
@@ -187,7 +220,9 @@ async function tryRefreshToken(
 
     return response;
   } catch (error) {
-    console.error("Proxy: Token refresh error:", error);
+    const isTimeout = error instanceof Error && error.name === "AbortError";
+    console.error(`Proxy: Token refresh ${isTimeout ? "timeout" : "network error"}`, error);
+
     if (allowPassThroughOnFailure) {
       return NextResponse.next();
     }
