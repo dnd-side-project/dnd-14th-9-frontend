@@ -146,6 +146,12 @@ async function tryRefreshToken(request: NextRequest, refreshToken: string): Prom
       accessToken: payload.result.accessToken,
       refreshToken: payload.result.refreshToken,
     });
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("Proxy: Token refresh succeeded", {
+        status: reissueResponse.status,
+        path: request.nextUrl.pathname,
+      });
+    }
 
     return response;
   } catch (error) {
