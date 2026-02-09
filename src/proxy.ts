@@ -24,20 +24,35 @@ interface RefreshResponseBody {
   result: RefreshTokenPair;
 }
 
+interface TryRefreshTokenOptions {
+  // 공개 라우트에서는 갱신 실패 시 로그인으로 보내지 않고 요청을 그대로 통과시킨다.
+  allowPassThroughOnFailure?: boolean;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
-  // 공개 라우트 또는 API 관련 경로는 패스
-  if (
-    PUBLIC_ROUTES.includes(pathname) ||
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/.well-known")
-  ) {
+  // API 관련 경로는 패스
+  if (pathname.startsWith("/api") || pathname.startsWith("/.well-known")) {
     return NextResponse.next();
   }
 
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
+
+  // 공개 라우트에서는 세션 복구가 가능한 경우에만 소프트하게 갱신 시도
+  if (isPublicRoute) {
+    if (!refreshToken) {
+      return NextResponse.next();
+    }
+
+    if (!accessToken || isTokenExpiringSoon(accessToken)) {
+      return await tryRefreshToken(request, refreshToken, { allowPassThroughOnFailure: true });
+    }
+
+    return NextResponse.next();
+  }
 
   // 토큰 없으면 로그인 라우트로 리다이렉트
   if (!accessToken) {
@@ -116,12 +131,21 @@ function isTokenExpiringSoon(token: string): boolean {
 /**
  * 백엔드에 토큰 갱신 요청
  */
-async function tryRefreshToken(request: NextRequest, refreshToken: string): Promise<NextResponse> {
+async function tryRefreshToken(
+  request: NextRequest,
+  refreshToken: string,
+  options?: TryRefreshTokenOptions
+): Promise<NextResponse> {
+  const allowPassThroughOnFailure = options?.allowPassThroughOnFailure ?? false;
+
   try {
     const backendUrl = process.env.BACKEND_API_BASE;
 
     if (!backendUrl) {
       console.error("Proxy: BACKEND_API_BASE is not configured");
+      if (allowPassThroughOnFailure) {
+        return NextResponse.next();
+      }
       return redirectToLoginRoute(request, { clearAuth: true, reason: "config_error" });
     }
 
@@ -136,6 +160,14 @@ async function tryRefreshToken(request: NextRequest, refreshToken: string): Prom
 
     if (!reissueResponse.ok) {
       console.error("Proxy: Token refresh failed:", reissueResponse.status);
+      if (allowPassThroughOnFailure) {
+        const response = NextResponse.next();
+        // refreshToken 자체가 무효한 상태면 인증 쿠키를 정리해 다음 요청의 분기/상태를 명확히 한다.
+        if (reissueResponse.status === 401 || reissueResponse.status === 403) {
+          clearAuthCookies(response.cookies);
+        }
+        return response;
+      }
       return redirectToLoginRoute(request, { clearAuth: true, reason: "session_expired" });
     }
 
@@ -156,6 +188,9 @@ async function tryRefreshToken(request: NextRequest, refreshToken: string): Prom
     return response;
   } catch (error) {
     console.error("Proxy: Token refresh error:", error);
+    if (allowPassThroughOnFailure) {
+      return NextResponse.next();
+    }
     return redirectToLoginRoute(request, { clearAuth: true, reason: "network_error" });
   }
 }

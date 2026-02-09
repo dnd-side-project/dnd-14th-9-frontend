@@ -141,6 +141,91 @@ describe("Proxy Middleware", () => {
       // fetch가 호출되지 않았는지 확인 (재발급 시도 없음)
       expect(mockFetch).not.toHaveBeenCalled();
     });
+
+    it("공개 라우트에서 accessToken이 없고 refreshToken이 있으면 재발급을 시도해야 함", async () => {
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/", {
+        headers: {
+          cookie: `refreshToken=${refreshToken}`,
+        },
+      });
+
+      mockFetch.mockResolvedValueOnce(createRefreshSuccessResponse("new_access", "new_refresh"));
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(mockFetch).toHaveBeenCalledWith(
+        "http://localhost:8080/auth/refresh",
+        expect.objectContaining({
+          method: "POST",
+          headers: expect.objectContaining({
+            Cookie: `refreshToken=${refreshToken}`,
+          }),
+        })
+      );
+      expect(hasSetCookie(response, (cookie) => cookie.includes("accessToken="))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.includes("refreshToken="))).toBe(true);
+    });
+
+    it("공개 라우트에서 재발급이 401/403이면 리다이렉트 없이 인증 쿠키를 정리해야 함", async () => {
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/login", {
+        headers: {
+          cookie: `refreshToken=${refreshToken}`,
+        },
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+      });
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
+    });
+
+    it("공개 라우트에서 재발급이 5xx로 실패하면 리다이렉트 없이 통과해야 함", async () => {
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/redirect-test", {
+        headers: {
+          cookie: `refreshToken=${refreshToken}`,
+        },
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+      });
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
+    });
+
+    it("공개 라우트에서 재발급 네트워크 에러가 나도 리다이렉트 없이 통과해야 함", async () => {
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/", {
+        headers: {
+          cookie: `refreshToken=${refreshToken}`,
+        },
+      });
+
+      mockFetch.mockRejectedValueOnce(new Error("Network error"));
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+    });
   });
 
   describe("보호된 라우트 - 토큰 없음", () => {
