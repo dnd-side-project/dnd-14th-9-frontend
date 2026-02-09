@@ -104,6 +104,9 @@ export const RadiusXs: Story = {
 };
 
 export const AllStatuses: Story = {
+  args: {
+    children: "모집중",
+  },
   render: () => (
     <div className="flex flex-wrap gap-4">
       <Badge status="recruiting">모집중</Badge>
@@ -122,6 +125,9 @@ export const AllStatuses: Story = {
 };
 
 export const AllRadii: Story = {
+  args: {
+    children: "Badge",
+  },
   render: () => (
     <div className="flex flex-wrap gap-4">
       <Badge radius="max">Pill (max)</Badge>
