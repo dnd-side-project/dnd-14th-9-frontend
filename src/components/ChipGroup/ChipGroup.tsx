@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { Children, forwardRef, type HTMLAttributes } from "react";
+import { forwardRef, type HTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils/utils";
 
@@ -12,11 +12,9 @@ export interface ChipGroupProps
 
 export const ChipGroup = forwardRef<HTMLDivElement, ChipGroupProps>(
   ({ className, children, ...props }, ref) => {
-    const chips = Children.toArray(children).slice(0, 4);
-
     return (
       <div ref={ref} className={cn(CHIPGROUP_VARIANTS({ className }))} role="group" {...props}>
-        {chips}
+        {children}
       </div>
     );
   }

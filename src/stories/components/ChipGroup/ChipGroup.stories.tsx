@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "여러 개의 Chip(Badge)을 가로로 정렬하고 레이아웃을 관리하는 컨테이너 컴포넌트입니다. 최대 4개까지 정렬 가능합니다.",
+          "여러 개의 Chip(Badge)을 가로로 정렬하고 레이아웃을 관리하는 컨테이너 컴포넌트입니다. 4개를 초과하면 자동으로 줄바꿈됩니다.",
       },
     },
     backgrounds: {
@@ -71,7 +71,7 @@ export const AllStatuses: Story = {
   },
 };
 
-export const MaxFourChips: Story = {
+export const ManyChips: Story = {
   args: {
     children: null,
   },
@@ -81,14 +81,15 @@ export const MaxFourChips: Story = {
       <Badge status="closing">2번</Badge>
       <Badge status="inProgress">3번</Badge>
       <Badge status="closed">4번</Badge>
-      <Badge status="recruiting">5번 (표시 안됨)</Badge>
-      <Badge status="recruiting">6번 (표시 안됨)</Badge>
+      <Badge status="recruiting">5번</Badge>
+      <Badge status="recruiting">6번</Badge>
     </ChipGroup>
   ),
   parameters: {
     docs: {
       description: {
-        story: "6개의 Badge를 전달해도 최대 4개만 렌더링됩니다.",
+        story:
+          "여러 개의 Chip을 포함한 ChipGroup입니다. 컨테이너 너비에 따라 자동으로 줄바꿈됩니다.",
       },
     },
   },
