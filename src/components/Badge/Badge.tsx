@@ -19,13 +19,14 @@ const badgeVariants = cva(
   {
     variants: {
       status: {
-        recruiting: ["bg-alpha-white-8", "text-text-secondary", "border-alpha-white-16"],
-        closing: [
-          "bg-[#FF174429]",
-          "text-text-status-negative-default",
-          "border-border-error-subtler",
+        recruiting: [
+          "bg-alpha-white-8",
+          "text-text-secondary",
+          "dark:text-gray-200",
+          "border-alpha-white-16",
         ],
-        inProgress: ["bg-gray-700", "text-text-brand-default", "border-border-primary-subtler"],
+        closing: ["bg-[#FF174429]", "text-text-status-negative-default", "border-[#66091B]"],
+        inProgress: ["bg-gray-700", "text-text-brand-default", "border-[#178A42]"],
         closed: ["bg-alpha-white-16", "text-text-disabled", "border-border-subtle"],
       },
       radius: {
