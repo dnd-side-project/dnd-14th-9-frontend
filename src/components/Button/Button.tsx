@@ -89,11 +89,29 @@ const buttonVariants = cva(
   }
 );
 
-export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
-}
+type SolidButtonProps = {
+  variant?: "solid";
+  colorScheme?: "primary" | "secondary" | "tertiary";
+};
+
+type OutlinedButtonProps = {
+  variant: "outlined";
+  colorScheme?: "primary" | "secondary";
+};
+
+type GhostButtonProps = {
+  variant: "ghost";
+  colorScheme?: "primary" | "secondary";
+};
+
+type ButtonVariantProps = SolidButtonProps | OutlinedButtonProps | GhostButtonProps;
+
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  Omit<VariantProps<typeof buttonVariants>, "variant" | "colorScheme"> &
+  ButtonVariantProps & {
+    leftIcon?: ReactNode;
+    rightIcon?: ReactNode;
+  };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
