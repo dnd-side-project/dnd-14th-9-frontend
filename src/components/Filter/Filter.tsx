@@ -4,7 +4,7 @@ import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils/utils";
 import { ChevronDownIcon } from "../Icon/ChevronDownIcon";
 
-const filterVariants = cva(
+const FILTER_VARIANTS = cva(
   [
     "inline-flex",
     "cursor-pointer",
@@ -40,7 +40,7 @@ const filterVariants = cva(
 );
 
 export interface FilterProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof filterVariants> {
+  extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof FILTER_VARIANTS> {
   isOpen?: boolean;
 }
 
@@ -52,7 +52,7 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>(
       <button
         ref={ref}
         type="button"
-        className={cn(filterVariants({ size, radius, bordered, className }))}
+        className={cn(FILTER_VARIANTS({ size, radius, bordered, className }))}
         aria-expanded={isOpen}
         {...props}
       >
@@ -68,4 +68,4 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>(
 
 Filter.displayName = "Filter";
 
-export { filterVariants };
+export { FILTER_VARIANTS };

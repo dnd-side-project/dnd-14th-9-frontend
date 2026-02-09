@@ -115,7 +115,7 @@ export const InteractiveWithDropdown: Story = {
   render: (args) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    const dropdownItems = ["최신순", "인기순", "가격순"];
+    const DROPDOWN_ITEMS = ["최신순", "인기순", "가격순"];
 
     return (
       <div className="relative">
@@ -124,7 +124,7 @@ export const InteractiveWithDropdown: Story = {
         </Filter>
         {isOpen && (
           <div className="border-border-default absolute top-full left-0 mt-2 w-[120px] rounded-sm border bg-gray-900 py-2">
-            {dropdownItems.map((item) => (
+            {DROPDOWN_ITEMS.map((item) => (
               <button
                 key={item}
                 type="button"
