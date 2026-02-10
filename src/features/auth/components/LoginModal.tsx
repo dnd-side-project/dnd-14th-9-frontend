@@ -28,7 +28,8 @@ export function LoginModal({ nextPath }: LoginModalProps) {
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-gray-600"
+          className="absolute top-4 right-4 z-20 text-2xl text-gray-400 hover:text-gray-600"
+          aria-label="로그인 모달 닫기"
         >
           ✕
         </button>
