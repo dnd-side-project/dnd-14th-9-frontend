@@ -1,3 +1,5 @@
+import { LoginRouteClient } from "@/features/auth/components/LoginRouteClient";
+
 export default function Page() {
-  return <h1>Login</h1>;
+  return <LoginRouteClient variant="page" />;
 }

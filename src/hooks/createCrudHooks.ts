@@ -24,29 +24,7 @@
  * export const useUpdateSession = sessionCrud.useUpdate;
  * export const useDeleteSession = sessionCrud.useDelete;
  *
- * @example
- * // 목록/상세 조회 + 생성만 (수정/삭제 없음)
- * const sessionCrud = createCrudHooks({
- *   queryKey: "sessions",
- *   getList: getSessions,
- *   getDetail: getSession,
- *   create: postSession,
- * });
- *
- * export const useSessions = sessionCrud.useList;
- * export const useSession = sessionCrud.useDetail;
- * export const useCreateSession = sessionCrud.useCreate;
- *
- * @example
- * // 조회 전용 (생성/수정/삭제 없음)
- * const noticeCrud = createCrudHooks({
- *   queryKey: "notices",
- *   getList: getNotices,
- *   getDetail: getNotice,
- * });
- *
- * export const useNotices = noticeCrud.useList;
- * export const useNotice = noticeCrud.useDetail;
+ * @see createSingletonHooks - /me와 같은 단일 리소스용 훅 팩토리
  */
 
 /**
