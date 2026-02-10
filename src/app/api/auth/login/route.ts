@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isLoginProvider, normalizeInternalPath } from "@/features/auth/lib/login-flow";
+import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-flow";
 import {
   REDIRECT_AFTER_LOGIN_COOKIE,
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
