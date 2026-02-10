@@ -36,3 +36,12 @@ export function isUrgent(seconds: number): boolean {
 export function formatParticipantCount(current: number, max: number): string {
   return `${current}/${max}명`;
 }
+
+export function formatSessionDuration(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  if (hours > 0 && mins > 0) return `${hours}시간 ${mins}분`;
+  if (hours > 0) return `${hours}시간`;
+  return `${mins}분`;
+}
