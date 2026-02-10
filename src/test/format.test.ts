@@ -147,27 +147,27 @@ describe("isUrgent", () => {
 });
 
 describe("formatParticipantCount", () => {
-  it("참가자 수를 'current/max명' 형식으로 포맷해야 합니다", () => {
-    expect(formatParticipantCount(5, 10)).toBe("5/10명");
+  it("참가자 수를 'current / max명' 형식으로 포맷해야 합니다", () => {
+    expect(formatParticipantCount(5, 10)).toBe("5 / 10명");
   });
 
   it("0명도 올바르게 포맷해야 합니다", () => {
-    expect(formatParticipantCount(0, 10)).toBe("0/10명");
+    expect(formatParticipantCount(0, 10)).toBe("0 / 10명");
   });
 
   it("최대 인원에 도달했을 때도 올바르게 포맷해야 합니다", () => {
-    expect(formatParticipantCount(10, 10)).toBe("10/10명");
+    expect(formatParticipantCount(10, 10)).toBe("10 / 10명");
   });
 
   it("한 자리 숫자를 올바르게 포맷해야 합니다", () => {
-    expect(formatParticipantCount(1, 5)).toBe("1/5명");
+    expect(formatParticipantCount(1, 5)).toBe("1 / 5명");
   });
 
   it("두 자리 이상 숫자를 올바르게 포맷해야 합니다", () => {
-    expect(formatParticipantCount(25, 100)).toBe("25/100명");
+    expect(formatParticipantCount(25, 100)).toBe("25 / 100명");
   });
 
   it("큰 숫자도 올바르게 포맷해야 합니다", () => {
-    expect(formatParticipantCount(999, 1000)).toBe("999/1000명");
+    expect(formatParticipantCount(999, 1000)).toBe("999 / 1000명");
   });
 });
