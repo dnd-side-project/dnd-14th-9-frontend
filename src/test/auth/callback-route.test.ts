@@ -184,9 +184,7 @@ describe("OAuth Callback Route Handler", () => {
 
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       const location = response.headers.get("location");
       expect(location).toBe("http://localhost:3000/");
