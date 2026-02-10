@@ -50,7 +50,7 @@ const meta = {
       control: "number",
       description: "세션 소요시간 (분)",
     },
-    sessionDate: {
+    SESSION_DATE: {
       control: "date",
       description: "세션 일시",
     },
@@ -67,23 +67,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const now = new Date();
-const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
-const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000);
-const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
-const sessionDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+const NOW = new Date();
+const THREE_DAYS_AGO = new Date(NOW.getTime() - 3 * 24 * 60 * 60 * 1000);
+const FIVE_HOURS_AGO = new Date(NOW.getTime() - 5 * 60 * 60 * 1000);
+const THIRTY_MINUTES_AGO = new Date(NOW.getTime() - 30 * 60 * 1000);
+const SESSION_DATE = new Date(NOW.getTime() + 7 * 24 * 60 * 60 * 1000);
 
 export const Default: Story = {
   args: {
     thumbnailSrc: "https://picsum.photos/276/146",
     category: "개발",
-    createdAt: threeDaysAgo,
+    createdAt: THREE_DAYS_AGO,
     title: "React 스터디 모집합니다",
     nickname: "김개발",
     currentParticipants: 3,
     maxParticipants: 6,
     durationMinutes: 90,
-    sessionDate: sessionDate,
+    SESSION_DATE: SESSION_DATE,
   },
 };
 
@@ -91,13 +91,13 @@ export const Urgent: Story = {
   args: {
     thumbnailSrc: "https://picsum.photos/276/146?1",
     category: "디자인",
-    createdAt: thirtyMinutesAgo,
+    createdAt: THIRTY_MINUTES_AGO,
     title: "Figma 협업 스터디",
     nickname: "박디자인",
     currentParticipants: 5,
     maxParticipants: 6,
     durationMinutes: 60,
-    sessionDate: sessionDate,
+    SESSION_DATE: SESSION_DATE,
   },
   parameters: {
     docs: {
@@ -112,13 +112,13 @@ export const RecentlyCreated: Story = {
   args: {
     thumbnailSrc: "https://picsum.photos/276/146?2",
     category: "언어",
-    createdAt: fiveHoursAgo,
+    createdAt: FIVE_HOURS_AGO,
     title: "영어 회화 스터디",
     nickname: "이영어",
     currentParticipants: 2,
     maxParticipants: 4,
     durationMinutes: 120,
-    sessionDate: sessionDate,
+    SESSION_DATE: SESSION_DATE,
   },
   parameters: {
     docs: {
@@ -133,13 +133,13 @@ export const LongTitle: Story = {
   args: {
     thumbnailSrc: "https://picsum.photos/276/146?3",
     category: "개발",
-    createdAt: threeDaysAgo,
+    createdAt: THREE_DAYS_AGO,
     title: "주니어 개발자를 위한 알고리즘 스터디 모집합니다 함께 성장해요",
     nickname: "알고리즘마스터",
     currentParticipants: 4,
     maxParticipants: 8,
     durationMinutes: 180,
-    sessionDate: sessionDate,
+    SESSION_DATE: SESSION_DATE,
   },
   parameters: {
     docs: {
@@ -154,13 +154,13 @@ export const NoThumbnail: Story = {
   args: {
     thumbnailSrc: null,
     category: "취미",
-    createdAt: threeDaysAgo,
+    createdAt: THREE_DAYS_AGO,
     title: "독서 모임",
     nickname: "책벌레",
     currentParticipants: 2,
     maxParticipants: 5,
     durationMinutes: 60,
-    sessionDate: sessionDate,
+    SESSION_DATE: SESSION_DATE,
   },
   parameters: {
     docs: {
@@ -175,48 +175,48 @@ export const CardList: Story = {
   args: {
     thumbnailSrc: "https://picsum.photos/276/146",
     category: "개발",
-    createdAt: threeDaysAgo,
+    createdAt: THREE_DAYS_AGO,
     title: "React 스터디",
     nickname: "김개발",
     currentParticipants: 3,
     maxParticipants: 6,
     durationMinutes: 90,
-    sessionDate: sessionDate,
+    SESSION_DATE: SESSION_DATE,
   },
   render: () => (
     <div className="flex flex-col gap-6">
       <Card
         thumbnailSrc="https://picsum.photos/276/146?10"
         category="개발"
-        createdAt={threeDaysAgo}
+        createdAt={THREE_DAYS_AGO}
         title="React 스터디 모집합니다"
         nickname="김개발"
         currentParticipants={3}
         maxParticipants={6}
         durationMinutes={90}
-        sessionDate={sessionDate}
+        SESSION_DATE={SESSION_DATE}
       />
       <Card
         thumbnailSrc="https://picsum.photos/276/146?11"
         category="디자인"
-        createdAt={fiveHoursAgo}
+        createdAt={FIVE_HOURS_AGO}
         title="Figma 협업 스터디"
         nickname="박디자인"
         currentParticipants={5}
         maxParticipants={6}
         durationMinutes={60}
-        sessionDate={sessionDate}
+        SESSION_DATE={SESSION_DATE}
       />
       <Card
         thumbnailSrc="https://picsum.photos/276/146?12"
         category="언어"
-        createdAt={thirtyMinutesAgo}
+        createdAt={THIRTY_MINUTES_AGO}
         title="영어 회화 스터디"
         nickname="이영어"
         currentParticipants={2}
         maxParticipants={4}
         durationMinutes={120}
-        sessionDate={sessionDate}
+        SESSION_DATE={SESSION_DATE}
       />
     </div>
   ),
