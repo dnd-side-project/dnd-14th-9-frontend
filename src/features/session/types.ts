@@ -58,3 +58,70 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+
+// ============================================
+// 세션 목록 조회 API 관련 타입
+// ============================================
+
+// Enum 타입들 (변경 가능성 있음)
+export type SessionCategory =
+  | "ALL"
+  | "DEVELOPMENT"
+  | "DESIGN"
+  | "PLAN&PM"
+  | "CAREER"
+  | "STUDY"
+  | "CREATIVE"
+  | "TEAMPROJECT"
+  | "FREE";
+
+export type SessionSort = "POPULAR" | "LATEST";
+
+export type TimeSlot = "MORNING" | "AFTERNOON" | "EVENING";
+
+export type DurationRange =
+  | "HALF_TO_ONE_HOUR"
+  | "TWO_TO_FOUR_HOURS"
+  | "FIVE_TO_EIGHT_HOURS"
+  | "TEN_PLUS_HOURS";
+
+export type SessionListStatus = "대기" | "진행중";
+
+// 목록 조회 파라미터
+export interface SessionListParams {
+  keyword?: string;
+  category?: SessionCategory;
+  sort?: SessionSort;
+  startDate?: string;
+  endDate?: string;
+  timeSlots?: TimeSlot[];
+  durationRange?: DurationRange;
+  participants?: number;
+  requiredFocusRate?: number;
+  requiredAchievementRate?: number;
+  page?: number;
+  size?: number;
+}
+
+// 목록 아이템
+export interface SessionListItem {
+  category: string;
+  title: string;
+  hostNickname: string;
+  status: SessionListStatus;
+  currentParticipants: number;
+  maxParticipants: number;
+  sessionDurationMinutes: number;
+  startTime: string;
+  imageUrl: string;
+}
+
+// 목록 응답
+export interface SessionListResponse {
+  listSize: number;
+  totalPage: number;
+  totalElements: number;
+  isFirst: boolean;
+  isLast: boolean;
+  sessions: SessionListItem[];
+}
