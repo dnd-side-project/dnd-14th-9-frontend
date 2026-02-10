@@ -16,7 +16,16 @@ export function LoginModal({ isOpen, onClose, nextPath }: LoginModalProps) {
       {/* 오버레이 */}
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
 
-      <LoginCard onClose={onClose} nextPath={nextPath} />
+      <div className="relative z-10">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-gray-600"
+        >
+          ✕
+        </button>
+        <LoginCard nextPath={nextPath} />
+      </div>
     </div>
   );
 }
