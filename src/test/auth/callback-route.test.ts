@@ -32,6 +32,20 @@ function expectLoginRedirect(response: Response, reason: string) {
   expect(url.searchParams.get("next")).toBeNull();
 }
 
+function getProviderFromUrl(url: string): string {
+  const provider = new URL(url).pathname.split("/").at(-1);
+  return provider ?? "";
+}
+
+async function executeCallbackRoute(url: string): Promise<Response> {
+  const request = new NextRequest(url);
+  return GET(request, {
+    params: Promise.resolve({
+      provider: getProviderFromUrl(url),
+    }),
+  });
+}
+
 describe("OAuth Callback Route Handler", () => {
   let mockCookieStore: {
     set: jest.Mock;
@@ -60,9 +74,7 @@ describe("OAuth Callback Route Handler", () => {
     it("토큰이 있으면 쿠키에 저장하고 홈으로 리다이렉트해야 함", async () => {
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       // setAuthCookies 호출 확인 (기본값 사용)
       expect(mockSetAuthCookies).toHaveBeenCalledWith(mockCookieStore, {
@@ -84,9 +96,7 @@ describe("OAuth Callback Route Handler", () => {
 
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       expect(response.status).toBe(307);
       const location = response.headers.get("location");
@@ -98,9 +108,7 @@ describe("OAuth Callback Route Handler", () => {
 
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       expect(response.status).toBe(307);
       const location = response.headers.get("location");
@@ -114,9 +122,7 @@ describe("OAuth Callback Route Handler", () => {
 
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       const location = response.headers.get("location");
       expect(location).toBe("http://localhost:3000/");
@@ -127,9 +133,7 @@ describe("OAuth Callback Route Handler", () => {
 
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       const location = response.headers.get("location");
       expect(location).toBe("http://localhost:3000/");
@@ -140,9 +144,7 @@ describe("OAuth Callback Route Handler", () => {
 
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       const location = response.headers.get("location");
       expect(location).toBe("http://localhost:3000/");
@@ -152,9 +154,7 @@ describe("OAuth Callback Route Handler", () => {
   describe("에러 케이스", () => {
     it("error 파라미터가 있으면 reason만 포함해 로그인으로 리다이렉트해야 함", async () => {
       const url = "http://localhost:3000/api/auth/callback/google?error=access_denied";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       expectLoginRedirect(response, "access_denied");
     });
@@ -165,18 +165,14 @@ describe("OAuth Callback Route Handler", () => {
       });
 
       const url = "http://localhost:3000/api/auth/callback/google?error=access_denied";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       expectLoginRedirect(response, "access_denied");
     });
 
     it("accessToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
       const url = "http://localhost:3000/api/auth/callback/google?refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith("OAuth callback: No tokens in query parameters");
       expectLoginRedirect(response, "no_token");
@@ -184,9 +180,7 @@ describe("OAuth Callback Route Handler", () => {
 
     it("refreshToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
       const url = "http://localhost:3000/api/auth/callback/google?accessToken=access123";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith("OAuth callback: No tokens in query parameters");
       expectLoginRedirect(response, "no_token");
@@ -194,9 +188,7 @@ describe("OAuth Callback Route Handler", () => {
 
     it("토큰이 모두 없으면 에러와 함께 리다이렉트해야 함", async () => {
       const url = "http://localhost:3000/api/auth/callback/google";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith("OAuth callback: No tokens in query parameters");
       expectLoginRedirect(response, "no_token");
@@ -207,9 +199,7 @@ describe("OAuth Callback Route Handler", () => {
     it("Google provider로 로그인해도 정상 동작해야 함", async () => {
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       expect(mockSetAuthCookies).toHaveBeenCalled();
       expect(response.status).toBe(307);
@@ -218,9 +208,7 @@ describe("OAuth Callback Route Handler", () => {
     it("Kakao provider로 로그인해도 정상 동작해야 함", async () => {
       const url =
         "http://localhost:3000/api/auth/callback/kakao?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       expect(mockSetAuthCookies).toHaveBeenCalled();
       expect(response.status).toBe(307);
@@ -229,9 +217,7 @@ describe("OAuth Callback Route Handler", () => {
     it("허용되지 않은 provider면 로그인 페이지(access_denied)로 리다이렉트해야 함", async () => {
       const url =
         "http://localhost:3000/api/auth/callback/naver?accessToken=access123&refreshToken=refresh456";
-      const request = new NextRequest(url);
-
-      const response = await GET(request);
+      const response = await executeCallbackRoute(url);
 
       expect(mockSetAuthCookies).not.toHaveBeenCalled();
       expectLoginRedirect(response, "access_denied");

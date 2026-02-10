@@ -10,8 +10,14 @@ function buildLoginRedirectUrl(request: NextRequest, reason: string): URL {
   return url;
 }
 
-export async function GET(request: NextRequest) {
-  const provider = request.nextUrl.pathname.split("/").at(-1);
+interface CallbackRouteContext {
+  params: Promise<{
+    provider: string;
+  }>;
+}
+
+export async function GET(request: NextRequest, context: CallbackRouteContext) {
+  const { provider } = await context.params;
 
   if (!isLoginProvider(provider)) {
     return NextResponse.redirect(buildLoginRedirectUrl(request, "access_denied"));
