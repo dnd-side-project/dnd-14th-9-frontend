@@ -1,13 +1,8 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { normalizeInternalPath } from "@/features/auth/lib/login-flow";
 import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
 import { setAuthCookies } from "@/lib/auth/cookies";
-
-function normalizeInternalPath(path: string | null | undefined): string {
-  if (!path) return "/";
-  if (!path.startsWith("/") || path.startsWith("//")) return "/";
-  return path;
-}
 
 function buildLoginRedirectUrl(request: NextRequest, reason: string): URL {
   const url = new URL("/login", request.url);

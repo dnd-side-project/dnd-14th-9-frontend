@@ -2,6 +2,7 @@
 
 import { LoginModal } from "@/features/auth/components/LoginModal";
 import { LoginPage } from "@/features/auth/components/LoginPage";
+import { normalizeInternalPath } from "@/features/auth/lib/login-flow";
 import {
   REDIRECT_AFTER_LOGIN_COOKIE,
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
@@ -27,13 +28,6 @@ const REASON_MESSAGES: Record<string, string> = {
   no_token: "로그인 처리가 완료되지 않았습니다. 다시 시도해 주세요.",
   access_denied: "로그인이 취소되었습니다.",
 };
-
-function normalizeInternalPath(path: string | null | undefined): string {
-  if (!path) return "/";
-  if (!path.startsWith("/") || path.startsWith("//")) return "/";
-  if (path === "/login" || path.startsWith("/login?")) return "/";
-  return path;
-}
 
 export function LoginRouteClient({ variant }: LoginRouteClientProps) {
   const router = useRouter();
