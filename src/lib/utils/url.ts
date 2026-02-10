@@ -5,13 +5,23 @@ export function getSessionShareUrl(sessionId: string): string {
   return `${baseUrl}/session/${sessionId}`;
 }
 
-export function buildQueryString(
-  params: Record<string, string | number | boolean | undefined | null>
-): string {
+type QueryParamValue = string | number | boolean | undefined | null;
+export type QueryParams = Record<string, QueryParamValue | QueryParamValue[]>;
+
+export function buildQueryString(params: QueryParams): string {
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
+    if (value === undefined || value === null || value === "") {
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      const filtered = value.filter((v) => v !== undefined && v !== null && v !== "");
+      if (filtered.length > 0) {
+        searchParams.set(key, filtered.map(String).join(","));
+      }
+    } else {
       searchParams.set(key, String(value));
     }
   });

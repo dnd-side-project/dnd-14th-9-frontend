@@ -70,6 +70,58 @@ describe("buildQueryString", () => {
     };
     expect(buildQueryString(params)).toBe("name=test&age=25&active=true");
   });
+
+  it("배열 값을 콤마로 구분된 문자열로 변환해야 합니다", () => {
+    const params = { timeSlots: ["MORNING", "AFTERNOON", "EVENING"] };
+    expect(buildQueryString(params)).toBe("timeSlots=MORNING%2CAFTERNOON%2CEVENING");
+  });
+
+  it("배열에서 undefined, null, 빈 문자열을 제외해야 합니다", () => {
+    const params = { items: ["a", undefined, "b", null, "", "c"] };
+    expect(buildQueryString(params)).toBe("items=a%2Cb%2Cc");
+  });
+
+  it("빈 배열은 파라미터에서 제외해야 합니다", () => {
+    const params = { name: "test", items: [] };
+    expect(buildQueryString(params)).toBe("name=test");
+  });
+
+  it("필터링 후 빈 배열은 파라미터에서 제외해야 합니다", () => {
+    const params = { name: "test", items: [undefined, null, ""] };
+    expect(buildQueryString(params)).toBe("name=test");
+  });
+
+  it("SessionListParams 형태의 파라미터를 처리해야 합니다", () => {
+    const params = {
+      requiredFocusRate: 80,
+      requiredAchievementRate: 90,
+      sort: "LATEST",
+      page: 2,
+      size: 5,
+    };
+    const result = buildQueryString(params);
+    expect(result).toBe(
+      "requiredFocusRate=80&requiredAchievementRate=90&sort=LATEST&page=2&size=5"
+    );
+  });
+
+  it("배열과 일반 파라미터를 함께 처리해야 합니다", () => {
+    const params = {
+      keyword: "스터디",
+      category: "DEVELOPMENT",
+      sort: "POPULAR",
+      timeSlots: ["MORNING", "EVENING"],
+      page: 1,
+      size: 10,
+    };
+    const result = buildQueryString(params);
+    expect(result).toContain("keyword=%EC%8A%A4%ED%84%B0%EB%94%94");
+    expect(result).toContain("category=DEVELOPMENT");
+    expect(result).toContain("sort=POPULAR");
+    expect(result).toContain("timeSlots=MORNING%2CEVENING");
+    expect(result).toContain("page=1");
+    expect(result).toContain("size=10");
+  });
 });
 
 describe("parseQueryString", () => {
