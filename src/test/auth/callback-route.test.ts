@@ -182,8 +182,10 @@ describe("OAuth Callback Route Handler", () => {
     it("redirectAfterLogin 쿠키가 /login이면 홈으로 폴백해야 함", async () => {
       mockCookieStore.get.mockReturnValue({ value: "/login" });
 
-      const url =
-        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+      const url = buildCallbackUrl(googleProvider, {
+        [ACCESS_TOKEN_COOKIE]: "access123",
+        [REFRESH_TOKEN_COOKIE]: "refresh456",
+      });
       const response = await executeCallbackRoute(url);
 
       const location = response.headers.get("location");
