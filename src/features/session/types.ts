@@ -132,3 +132,36 @@ export interface SessionListResponse {
 
 // TODO(장근호): 서버 응답 확정 후 수정 필요
 export type SessionDetailResponse = SessionListItem;
+
+// ============================================
+// 세션 리포트 조회 API 관련 타입
+// ============================================
+
+// 리포트 내 Todo 아이템
+export interface ReportTodoItem {
+  todoId: string;
+  content: string;
+  isCompleted: boolean;
+}
+
+// 리포트 내 참여자 정보
+export interface ReportParticipant {
+  memberId: string;
+  nickname: string;
+  profileImageUrl?: string;
+  focusTimeMinutes: number;
+  achievementRate: number;
+}
+
+// 리포트 응답
+// TODO(장근호): 서버 응답 확정 후 수정 필요
+export interface SessionReportResponse {
+  sessionId: string;
+  totalDurationMinutes: number; // 총 세션 시간
+  focusTimeMinutes: number; // 집중 시간
+  focusRate: number; // 집중률 (0-100)
+  goal: string; // 목표
+  todoList: ReportTodoItem[]; // todo 목록
+  todoAchievementRate: number; // todo 달성률 (0-100)
+  participants: ReportParticipant[]; // 참여자 정보
+}
