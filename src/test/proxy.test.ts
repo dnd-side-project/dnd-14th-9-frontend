@@ -229,6 +229,32 @@ describe("Proxy Middleware", () => {
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
     });
 
+    it("공개 라우트에서 재발급 응답 형식이 비정상이면 리다이렉트 없이 통과해야 함", async () => {
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/login", {
+        headers: {
+          cookie: `refreshToken=${refreshToken}`,
+        },
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValue({
+          result: {
+            accessToken: "new_access",
+            refreshToken: null,
+          },
+        }),
+      });
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
+    });
+
     it("공개 라우트에서 재발급 네트워크 에러가 나도 리다이렉트 없이 통과해야 함", async () => {
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const request = new NextRequest("http://localhost:3000/", {
@@ -456,6 +482,36 @@ describe("Proxy Middleware", () => {
       expect(setCookies).toHaveLength(2);
       expect(setCookies[0]).toContain(newAccessToken);
       expect(setCookies[1]).toContain(newRefreshToken);
+    });
+
+    it("보호된 라우트에서 재발급 응답 형식이 비정상이면 로그인 라우트로 리다이렉트해야 함", async () => {
+      // Given
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/dashboard", {
+        headers: {
+          cookie: `refreshToken=${refreshToken}`,
+        },
+      });
+
+      // Mock: accessToken 타입이 문자열이 아님
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValue({
+          result: {
+            accessToken: 12345,
+            refreshToken: "new_refresh",
+          },
+        }),
+      });
+
+      // When
+      const response = await proxy(request);
+
+      // Then
+      expectLoginRedirect(response, "invalid_response");
+      expectRedirectAfterLoginCookie(response, "/dashboard");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
 
     it("재발급 API가 실패하면 로그인 라우트로 리다이렉트해야 함", async () => {
