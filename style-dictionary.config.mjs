@@ -91,18 +91,20 @@ const buildTokens = async ({ tokens, destination, formatOptions }) => {
   await sd.buildAllPlatforms();
 };
 
+// 다크 테마를 기본값으로 생성
 await buildTokens({
-  tokens: mergeDeep(primitiveTokens, lightTokens),
+  tokens: mergeDeep(primitiveTokens, darkTokens),
   destination: "theme.css",
   formatOptions: { useThemeAtRule: true },
 });
 
+// 라이트 테마 오버라이드
 await buildTokens({
-  tokens: mergeDeep(tagTokens(primitiveTokens, "primitive"), tagTokens(darkTokens, "dark")),
-  destination: "theme-dark.css",
+  tokens: mergeDeep(tagTokens(primitiveTokens, "primitive"), tagTokens(lightTokens, "light")),
+  destination: "theme-light.css",
   formatOptions: {
     useThemeAtRule: false,
-    selector: ".dark",
-    tokenFilter: (token) => token.$extensions?.dnd?.set === "dark" && token.path?.[0] === "color",
+    selector: ".light",
+    tokenFilter: (token) => token.$extensions?.dnd?.set === "light" && token.path?.[0] === "color",
   },
 });
