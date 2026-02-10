@@ -203,7 +203,7 @@ describe("OAuth Callback Route Handler", () => {
     });
   });
 
-  describe("다양한 Provider", () => {
+  describe("Provider 정책", () => {
     it("Google provider로 로그인해도 정상 동작해야 함", async () => {
       const url =
         "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
@@ -226,15 +226,15 @@ describe("OAuth Callback Route Handler", () => {
       expect(response.status).toBe(307);
     });
 
-    it("Naver provider로 로그인해도 정상 동작해야 함", async () => {
+    it("허용되지 않은 provider면 로그인 페이지(access_denied)로 리다이렉트해야 함", async () => {
       const url =
         "http://localhost:3000/api/auth/callback/naver?accessToken=access123&refreshToken=refresh456";
       const request = new NextRequest(url);
 
       const response = await GET(request);
 
-      expect(mockSetAuthCookies).toHaveBeenCalled();
-      expect(response.status).toBe(307);
+      expect(mockSetAuthCookies).not.toHaveBeenCalled();
+      expectLoginRedirect(response, "access_denied");
     });
   });
 });
