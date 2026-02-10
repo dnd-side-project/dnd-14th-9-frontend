@@ -3,14 +3,13 @@
 import { useState } from "react";
 
 import { OAuthProviderButton } from "@/features/auth/components/OAuthProviderButton";
-import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
+import { LOGIN_PROVIDERS, type LoginProvider } from "@/lib/auth/auth-constants";
 
 interface OAuthLoginFormProps {
   nextPath: string;
 }
 
 export function OAuthLoginForm({ nextPath }: OAuthLoginFormProps) {
-  type LoginProvider = (typeof LOGIN_PROVIDERS)[number];
   const [googleProvider, kakaoProvider] = LOGIN_PROVIDERS;
   const [loadingProvider, setLoadingProvider] = useState<LoginProvider | null>(null);
 
