@@ -34,7 +34,7 @@ export function isUrgent(seconds: number): boolean {
 }
 
 export function formatParticipantCount(current: number, max: number): string {
-  return `${current}/${max}명`;
+  return `${current} / ${max}명`;
 }
 
 export function formatSessionDuration(minutes: number): string {

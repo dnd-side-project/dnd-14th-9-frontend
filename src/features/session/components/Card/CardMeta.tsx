@@ -21,7 +21,12 @@ export function CardMeta({
   sessionDate,
 }: CardMetaProps) {
   return (
-    <div className={cn("text-text-tertiary flex items-center gap-3 text-xs", className)}>
+    <div
+      className={cn(
+        "text-text-disabled flex items-center gap-4 text-[11px] leading-none",
+        className
+      )}
+    >
       <span className="flex items-center gap-1">
         <UsersIcon size="xsmall" />
         <span>{formatParticipantCount(currentParticipants, maxParticipants)}</span>

@@ -33,7 +33,7 @@ export function Card({
   sessionDate,
 }: CardProps) {
   return (
-    <div className={cn("flex w-full flex-col gap-3", className)}>
+    <div className={cn("flex w-full max-w-69 flex-col gap-4", className)}>
       <Thumbnail src={thumbnailSrc} alt={title} />
 
       <div className="flex flex-col gap-2">
@@ -42,9 +42,9 @@ export function Card({
           <Badge radius="max">{formatRelativeTime(createdAt)}</Badge>
         </div>
 
-        <h3 className="text-text-primary truncate text-base font-semibold">{title}</h3>
+        <h3 className="text-text-primary truncate text-lg font-bold">{title}</h3>
 
-        <span className="text-text-secondary text-sm">{nickname}</span>
+        <span className="text-text-muted text-xs font-semibold">{nickname}</span>
 
         <CardMeta
           currentParticipants={currentParticipants}
