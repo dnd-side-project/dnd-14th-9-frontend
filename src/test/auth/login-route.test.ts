@@ -4,6 +4,7 @@
 
 import { GET } from "@/app/api/auth/login/route";
 import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
+import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
 import { NextRequest } from "next/server";
 
 function hasSetCookie(response: Response, matcher: (cookie: string) => boolean): boolean {
@@ -22,6 +23,8 @@ function expectLoginRedirect(response: Response, reason: string) {
 }
 
 describe("OAuth Login Route Handler", () => {
+  const [googleProvider, kakaoProvider] = LOGIN_PROVIDERS;
+
   beforeEach(() => {
     process.env.BACKEND_ORIGIN = "https://api.gak.today";
   });
@@ -35,14 +38,14 @@ describe("OAuth Login Route Handler", () => {
 
   it("유효한 provider/next를 받으면 백엔드 OAuth 엔드포인트로 리다이렉트해야 함", async () => {
     const request = new NextRequest(
-      "http://localhost:3000/api/auth/login?provider=google&next=/dashboard?tab=all"
+      `http://localhost:3000/api/auth/login?provider=${googleProvider}&next=/dashboard?tab=all`
     );
 
     const response = await GET(request);
 
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(
-      "https://api.gak.today/oauth2/authorization/google"
+      `https://api.gak.today/oauth2/authorization/${googleProvider}`
     );
     expect(
       hasSetCookie(response, (cookie) => cookie.startsWith(`${REDIRECT_AFTER_LOGIN_COOKIE}=`))
@@ -59,14 +62,14 @@ describe("OAuth Login Route Handler", () => {
 
   it("next가 외부 URL이면 redirectAfterLogin 쿠키를 루트(/)로 저장해야 함", async () => {
     const request = new NextRequest(
-      "http://localhost:3000/api/auth/login?provider=kakao&next=https://malicious.com/steal"
+      `http://localhost:3000/api/auth/login?provider=${kakaoProvider}&next=https://malicious.com/steal`
     );
 
     const response = await GET(request);
 
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(
-      "https://api.gak.today/oauth2/authorization/kakao"
+      `https://api.gak.today/oauth2/authorization/${kakaoProvider}`
     );
     expect(
       hasSetCookie(
@@ -95,7 +98,7 @@ describe("OAuth Login Route Handler", () => {
     delete process.env.BACKEND_ORIGIN;
 
     const request = new NextRequest(
-      "http://localhost:3000/api/auth/login?provider=google&next=/dashboard"
+      `http://localhost:3000/api/auth/login?provider=${googleProvider}&next=/dashboard`
     );
 
     const response = await GET(request);

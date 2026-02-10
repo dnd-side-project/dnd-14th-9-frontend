@@ -1,7 +1,11 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-policy";
-import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
+import {
+  ACCESS_TOKEN_COOKIE,
+  REDIRECT_AFTER_LOGIN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "@/lib/auth/cookie-constants";
 import { setAuthCookies } from "@/lib/auth/auth-cookies";
 
 function buildLoginRedirectUrl(request: NextRequest, reason: string): URL {
@@ -34,8 +38,8 @@ export async function GET(request: NextRequest, context: CallbackRouteContext) {
   }
 
   // Query parameter에서 토큰 추출
-  const accessToken = searchParams.get("accessToken");
-  const refreshToken = searchParams.get("refreshToken");
+  const accessToken = searchParams.get(ACCESS_TOKEN_COOKIE);
+  const refreshToken = searchParams.get(REFRESH_TOKEN_COOKIE);
 
   if (!accessToken || !refreshToken) {
     console.error("OAuth callback: No tokens in query parameters");

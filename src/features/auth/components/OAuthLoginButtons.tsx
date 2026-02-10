@@ -1,12 +1,16 @@
+import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
+
 interface OAuthLoginButtonsProps {
   nextPath: string;
 }
 
 export function OAuthLoginButtons({ nextPath }: OAuthLoginButtonsProps) {
+  const [googleProvider, kakaoProvider] = LOGIN_PROVIDERS;
+
   return (
     <div className="flex flex-col gap-3">
       <form action="/api/auth/login" method="get">
-        <input type="hidden" name="provider" value="google" />
+        <input type="hidden" name="provider" value={googleProvider} />
         <input type="hidden" name="next" value={nextPath} />
         <button
           type="submit"
@@ -17,7 +21,7 @@ export function OAuthLoginButtons({ nextPath }: OAuthLoginButtonsProps) {
       </form>
 
       <form action="/api/auth/login" method="get">
-        <input type="hidden" name="provider" value="kakao" />
+        <input type="hidden" name="provider" value={kakaoProvider} />
         <input type="hidden" name="next" value={nextPath} />
         <button
           type="submit"

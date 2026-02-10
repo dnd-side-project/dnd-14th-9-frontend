@@ -1,10 +1,13 @@
 import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-policy";
+import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
 
 describe("login-policy", () => {
   describe("isLoginProvider", () => {
+    const [googleProvider, kakaoProvider] = LOGIN_PROVIDERS;
+
     it("google과 kakao만 유효한 provider로 허용해야 함", () => {
-      expect(isLoginProvider("google")).toBe(true);
-      expect(isLoginProvider("kakao")).toBe(true);
+      expect(isLoginProvider(googleProvider)).toBe(true);
+      expect(isLoginProvider(kakaoProvider)).toBe(true);
       expect(isLoginProvider("naver")).toBe(false);
       expect(isLoginProvider("")).toBe(false);
       expect(isLoginProvider(null)).toBe(false);
