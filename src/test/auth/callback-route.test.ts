@@ -4,7 +4,7 @@
 
 import { GET } from "@/app/api/auth/callback/[provider]/route";
 import { cookies } from "next/headers";
-import { setAuthCookies } from "@/lib/auth/cookies";
+import { setAuthCookies } from "@/lib/auth/auth-cookies";
 import { NextRequest } from "next/server";
 import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
 
@@ -14,7 +14,7 @@ jest.mock("next/headers", () => ({
 }));
 
 // auth/cookies 모듈 모킹
-jest.mock("@/lib/auth/cookies", () => ({
+jest.mock("@/lib/auth/auth-cookies", () => ({
   setAuthCookies: jest.fn(),
   clearAuthCookies: jest.fn(),
 }));

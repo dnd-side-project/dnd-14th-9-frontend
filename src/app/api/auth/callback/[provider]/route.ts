@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-policy";
 import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
-import { setAuthCookies } from "@/lib/auth/cookies";
+import { setAuthCookies } from "@/lib/auth/auth-cookies";
 
 function buildLoginRedirectUrl(request: NextRequest, reason: string): URL {
   const url = new URL("/login", request.url);
