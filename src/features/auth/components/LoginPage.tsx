@@ -1,5 +1,3 @@
-"use client";
-
 import { LoginCard } from "@/features/auth/components/LoginCard";
 
 interface LoginPageProps {
