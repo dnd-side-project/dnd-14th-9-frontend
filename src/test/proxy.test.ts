@@ -59,6 +59,25 @@ describe("Proxy Middleware", () => {
     return `${header}.${body}.${signature}`;
   }
 
+  function toBase64Url(base64: string): string {
+    return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  }
+
+  function createBase64UrlMockToken(expiresInSeconds: number): string {
+    const now = Math.floor(Date.now() / 1000);
+    const payload = {
+      exp: now + expiresInSeconds,
+      // `?`는 base64 결과에 `/`가 포함될 확률을 높여 base64url 변환 케이스를 강제한다.
+      userId: "???",
+    };
+
+    const header = toBase64Url(btoa(JSON.stringify({ alg: "HS256", typ: "JWT" })));
+    const body = toBase64Url(btoa(JSON.stringify(payload)));
+    const signature = toBase64Url(btoa("mock_signature"));
+
+    return `${header}.${body}.${signature}`;
+  }
+
   function hasSetCookie(response: Response, matcher: (cookie: string) => boolean): boolean {
     return response.headers.getSetCookie().some(matcher);
   }
@@ -210,6 +229,32 @@ describe("Proxy Middleware", () => {
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
     });
 
+    it("공개 라우트에서 재발급 응답 형식이 비정상이면 리다이렉트 없이 통과해야 함", async () => {
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/login", {
+        headers: {
+          cookie: `refreshToken=${refreshToken}`,
+        },
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValue({
+          result: {
+            accessToken: "new_access",
+            refreshToken: null,
+          },
+        }),
+      });
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
+    });
+
     it("공개 라우트에서 재발급 네트워크 에러가 나도 리다이렉트 없이 통과해야 함", async () => {
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const request = new NextRequest("http://localhost:3000/", {
@@ -275,6 +320,25 @@ describe("Proxy Middleware", () => {
       // Then: 그대로 통과
       expect(response.status).toBe(200);
       expect(mockFetch).not.toHaveBeenCalled(); // 재발급 호출 안함
+    });
+
+    it("base64url 형식 토큰도 만료 시간을 정상 판별해야 함", async () => {
+      // Given: base64url 형식 + 10분 후 만료
+      const accessToken = createBase64UrlMockToken(10 * 60);
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+
+      const request = new NextRequest("http://localhost:3000/dashboard", {
+        headers: {
+          cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}`,
+        },
+      });
+
+      // When
+      const response = await proxy(request);
+
+      // Then: 디코딩 실패 없이 통과 (불필요한 재발급 호출 없음)
+      expect(response.status).toBe(200);
+      expect(mockFetch).not.toHaveBeenCalled();
     });
 
     it("토큰이 5분 이내로 남았으면 재발급을 시도해야 함", async () => {
@@ -418,6 +482,36 @@ describe("Proxy Middleware", () => {
       expect(setCookies).toHaveLength(2);
       expect(setCookies[0]).toContain(newAccessToken);
       expect(setCookies[1]).toContain(newRefreshToken);
+    });
+
+    it("보호된 라우트에서 재발급 응답 형식이 비정상이면 로그인 라우트로 리다이렉트해야 함", async () => {
+      // Given
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/dashboard", {
+        headers: {
+          cookie: `refreshToken=${refreshToken}`,
+        },
+      });
+
+      // Mock: accessToken 타입이 문자열이 아님
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValue({
+          result: {
+            accessToken: 12345,
+            refreshToken: "new_refresh",
+          },
+        }),
+      });
+
+      // When
+      const response = await proxy(request);
+
+      // Then
+      expectLoginRedirect(response, "invalid_response");
+      expectRedirectAfterLoginCookie(response, "/dashboard");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
 
     it("재발급 API가 실패하면 로그인 라우트로 리다이렉트해야 함", async () => {
