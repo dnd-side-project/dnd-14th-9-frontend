@@ -125,3 +125,10 @@ export interface SessionListResponse {
   isLast: boolean;
   sessions: SessionListItem[];
 }
+
+// ============================================
+// 세션 상세 조회 API 관련 타입
+// ============================================
+
+// TODO(장근호): 서버 응답 확정 후 수정 필요
+export type SessionDetailResponse = SessionListItem;
