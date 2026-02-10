@@ -23,7 +23,7 @@ export default async function RootLayout({
   const initialAuth = await getServerAuthState();
 
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${pretendard.variable} font-sans antialiased`}
       >
