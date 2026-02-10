@@ -127,6 +127,87 @@ export interface SessionListResponse {
 }
 
 // ============================================
+// 세션 생성 API 관련 타입
+// ============================================
+
+// 세션 생성 요청
+// TODO(장근호): 서버 스펙 확정 후 수정 필요
+export interface CreateSessionRequest {
+  title: string; // 제목
+  startTime: string; // 시작 시간 (ISO 8601 형식)
+  durationMinutes: number; // 세션 진행 시간 (분)
+  maxParticipants: number; // 참여 인원
+  category: SessionCategory; // 카테고리
+  summary: string; // 한줄소개
+  notice?: string; // 공지사항 (선택)
+}
+
+// 세션 생성 응답
+// TODO(장근호): 서버 응답 확정 후 수정 필요
+export interface CreateSessionResponse {
+  sessionId: string;
+}
+
+// ============================================
+// 세션 참여 토글 API 관련 타입
+// ============================================
+
+// 세션 참여 토글 요청
+// TODO(장근호): 서버 스펙 확정 후 수정 필요
+export interface JoinSessionRequest {
+  memberId?: string; // 유저 ID (인증 토큰에서 추출 시 불필요)
+}
+
+// 세션 참여 토글 응답
+// TODO(장근호): 서버 응답 확정 후 수정 필요
+export interface JoinSessionResponse {
+  joined: boolean; // 참여 상태 (true: 참여함, false: 참여 취소됨)
+}
+
+// ============================================
+// 세션 목표 설정 API 관련 타입
+// ============================================
+
+// 세션 목표 설정 요청
+// TODO(장근호): 서버 스펙 확정 후 수정 필요
+export interface SetGoalRequest {
+  goal: string; // 목표 (필수)
+}
+
+// 세션 목표 설정 응답
+// TODO(장근호): 서버 응답 확정 후 수정 필요
+export interface SetGoalResponse {
+  goal: string; // 설정된 목표
+}
+
+// ============================================
+// 세션 Todo 추가 API 관련 타입
+// ============================================
+
+// 세션 Todo 추가 요청
+// TODO(장근호): 서버 스펙 확정 후 수정 필요
+export interface AddTodosRequest {
+  todos: string[]; // Todo 내용 목록 (필수)
+}
+
+// 세션 Todo 추가 응답
+// TODO(장근호): 서버 응답 확정 후 수정 필요
+export interface AddTodosResponse {
+  todos: ReportTodoItem[]; // 추가된 Todo 목록
+}
+
+// ============================================
+// 세션 Todo 완료 토글 API 관련 타입
+// ============================================
+
+// 세션 Todo 완료 토글 응답
+// TODO(장근호): 서버 응답 확정 후 수정 필요
+export interface ToggleTodoResponse {
+  todoId: string;
+  isCompleted: boolean; // 토글 후 완료 상태
+}
+
+// ============================================
 // 세션 상세 조회 API 관련 타입
 // ============================================
 
