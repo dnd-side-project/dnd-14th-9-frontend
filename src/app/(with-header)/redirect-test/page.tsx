@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@/components/Button/Button";
+import { setCookie } from "@/lib/auth/client-cookies";
 import {
   REDIRECT_AFTER_LOGIN_COOKIE,
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
 } from "@/lib/auth/cookie-constants";
-import { setCookie } from "@/lib/auth/client-cookies";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function RedirectTestPage() {
@@ -53,7 +53,7 @@ export default function RedirectTestPage() {
 
         <div className="mt-6 flex flex-wrap gap-3">
           <Button onClick={openLogin}>현재 경로로 로그인 테스트</Button>
-          <Button variant="secondary" onClick={openQueryCase}>
+          <Button variant="outlined" onClick={openQueryCase}>
             쿼리 포함 케이스 열기
           </Button>
         </div>
