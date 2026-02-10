@@ -50,7 +50,7 @@ const meta = {
       control: "number",
       description: "세션 소요시간 (분)",
     },
-    SESSION_DATE: {
+    sessionDate: {
       control: "date",
       description: "세션 일시",
     },
@@ -83,7 +83,7 @@ export const Default: Story = {
     currentParticipants: 3,
     maxParticipants: 6,
     durationMinutes: 90,
-    SESSION_DATE: SESSION_DATE,
+    sessionDate: SESSION_DATE,
   },
 };
 
@@ -97,7 +97,7 @@ export const Urgent: Story = {
     currentParticipants: 5,
     maxParticipants: 6,
     durationMinutes: 60,
-    SESSION_DATE: SESSION_DATE,
+    sessionDate: SESSION_DATE,
   },
   parameters: {
     docs: {
@@ -118,7 +118,7 @@ export const RecentlyCreated: Story = {
     currentParticipants: 2,
     maxParticipants: 4,
     durationMinutes: 120,
-    SESSION_DATE: SESSION_DATE,
+    sessionDate: SESSION_DATE,
   },
   parameters: {
     docs: {
@@ -139,7 +139,7 @@ export const LongTitle: Story = {
     currentParticipants: 4,
     maxParticipants: 8,
     durationMinutes: 180,
-    SESSION_DATE: SESSION_DATE,
+    sessionDate: SESSION_DATE,
   },
   parameters: {
     docs: {
@@ -160,7 +160,7 @@ export const NoThumbnail: Story = {
     currentParticipants: 2,
     maxParticipants: 5,
     durationMinutes: 60,
-    SESSION_DATE: SESSION_DATE,
+    sessionDate: SESSION_DATE,
   },
   parameters: {
     docs: {
@@ -181,7 +181,7 @@ export const CardList: Story = {
     currentParticipants: 3,
     maxParticipants: 6,
     durationMinutes: 90,
-    SESSION_DATE: SESSION_DATE,
+    sessionDate: SESSION_DATE,
   },
   render: () => (
     <div className="flex flex-col gap-6">
@@ -194,7 +194,7 @@ export const CardList: Story = {
         currentParticipants={3}
         maxParticipants={6}
         durationMinutes={90}
-        SESSION_DATE={SESSION_DATE}
+        sessionDate={SESSION_DATE}
       />
       <Card
         thumbnailSrc="https://picsum.photos/276/146?11"
@@ -205,7 +205,7 @@ export const CardList: Story = {
         currentParticipants={5}
         maxParticipants={6}
         durationMinutes={60}
-        SESSION_DATE={SESSION_DATE}
+        sessionDate={SESSION_DATE}
       />
       <Card
         thumbnailSrc="https://picsum.photos/276/146?12"
@@ -216,7 +216,7 @@ export const CardList: Story = {
         currentParticipants={2}
         maxParticipants={4}
         durationMinutes={120}
-        SESSION_DATE={SESSION_DATE}
+        sessionDate={SESSION_DATE}
       />
     </div>
   ),
