@@ -41,24 +41,6 @@ export interface Session {
   updated_at: string;
 }
 
-// TODO(장근호) - 검색 조건, response type 수정 예정.
-export interface SessionFilter {
-  keyword?: string;
-  status?: SessionStatus;
-  fromDate?: string;
-  toDate?: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
 // ============================================
 // 세션 목록 조회 API 관련 타입
 // ============================================
