@@ -178,6 +178,19 @@ describe("OAuth Callback Route Handler", () => {
       const location = response.headers.get("location");
       expect(location).toBe("http://localhost:3000/");
     });
+
+    it("redirectAfterLogin 쿠키가 /login이면 홈으로 폴백해야 함", async () => {
+      mockCookieStore.get.mockReturnValue({ value: "/login" });
+
+      const url =
+        "http://localhost:3000/api/auth/callback/google?accessToken=access123&refreshToken=refresh456";
+      const request = new NextRequest(url);
+
+      const response = await GET(request);
+
+      const location = response.headers.get("location");
+      expect(location).toBe("http://localhost:3000/");
+    });
   });
 
   describe("에러 케이스", () => {
