@@ -1,5 +1,5 @@
 import { LoginRouteClient } from "@/features/auth/components/LoginRouteClient";
 
 export default function Page() {
-  return <LoginRouteClient variant="page" />;
+  return <LoginRouteClient variant="modal" />;
 }

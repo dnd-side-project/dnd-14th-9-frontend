@@ -18,17 +18,18 @@
  * export const useDeleteMe = memberHooks.useDelete;
  */
 
+import type { ApiSuccessResponse } from "@/types/shared/types";
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
   QueryClient,
   dehydrate,
-  type UseQueryResult,
-  type UseMutationResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryClient as QueryClientType,
   type DehydratedState,
+  type UseMutationResult,
+  type UseQueryResult,
 } from "@tanstack/react-query";
-import { ApiSuccessResponse } from "@/types/shared/types";
 
 interface SingletonHooksConfig<TResponse, TUpdateData, TResponseData> {
   queryKey: string;
@@ -37,6 +38,7 @@ interface SingletonHooksConfig<TResponse, TUpdateData, TResponseData> {
   remove?: () => Promise<ApiSuccessResponse<null>>;
   optimisticUpdate?: boolean;
   staleTime?: number;
+  onUpdateSuccess?: (queryClient: QueryClientType) => void;
 }
 
 type SingletonBaseReturn<TResponse> = {
@@ -142,6 +144,7 @@ export function createSingletonHooks<
           : undefined,
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: keys.data() });
+          config.onUpdateSuccess?.(queryClient);
         },
       });
     };
