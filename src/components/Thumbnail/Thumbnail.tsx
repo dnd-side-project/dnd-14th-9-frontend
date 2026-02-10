@@ -35,17 +35,14 @@ export interface ThumbnailProps
   fallbackSrc?: string;
 }
 
-const ThumbnailImage = ({
-  src,
-  alt,
-  fallbackSrc,
-  onLoadingChange,
-}: {
+interface ThumbnailImageProps {
   src: string;
   alt: string;
   fallbackSrc: string;
   onLoadingChange: (loading: boolean) => void;
-}) => {
+}
+
+const ThumbnailImage = ({ src, alt, fallbackSrc, onLoadingChange }: ThumbnailImageProps) => {
   const [imgSrc, setImgSrc] = useState(src);
   const [hasError, setHasError] = useState(false);
 
