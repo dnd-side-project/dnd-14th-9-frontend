@@ -106,30 +106,20 @@ export const SolidColorSchemes: Story = {
   },
 };
 
+const sizes = ["small", "medium", "large"] as const;
+
 export const DifferentSizes: Story = {
   render: () => (
     <div className="flex flex-col gap-8">
-      <div>
-        <p className="text-text-secondary mb-2 text-sm">Small</p>
-        <ButtonGroup>
-          <Button size="small">Small 1</Button>
-          <Button size="small">Small 2</Button>
-        </ButtonGroup>
-      </div>
-      <div>
-        <p className="text-text-secondary mb-2 text-sm">Medium</p>
-        <ButtonGroup>
-          <Button size="medium">Medium 1</Button>
-          <Button size="medium">Medium 2</Button>
-        </ButtonGroup>
-      </div>
-      <div>
-        <p className="text-text-secondary mb-2 text-sm">Large</p>
-        <ButtonGroup>
-          <Button size="large">Large 1</Button>
-          <Button size="large">Large 2</Button>
-        </ButtonGroup>
-      </div>
+      {sizes.map((size) => (
+        <div key={size}>
+          <p className="text-text-secondary mb-2 text-sm capitalize">{size}</p>
+          <ButtonGroup>
+            <Button size={size}>{size} 1</Button>
+            <Button size={size}>{size} 2</Button>
+          </ButtonGroup>
+        </div>
+      ))}
     </div>
   ),
 };
