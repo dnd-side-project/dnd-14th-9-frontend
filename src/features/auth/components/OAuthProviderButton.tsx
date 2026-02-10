@@ -38,36 +38,50 @@ const oauthProviderButtonConfigs: Record<
 
 interface OAuthProviderButtonProps {
   provider: LoginProvider;
+  nextPath: string;
   loadingProvider: LoginProvider | null;
+  onSubmit: (provider: LoginProvider) => void;
 }
 
-export function OAuthProviderButton({ provider, loadingProvider }: OAuthProviderButtonProps) {
+export function OAuthProviderButton({
+  provider,
+  nextPath,
+  loadingProvider,
+  onSubmit,
+}: OAuthProviderButtonProps) {
   const config = oauthProviderButtonConfigs[provider];
   const isLoading = loadingProvider === provider;
   const isDisabled = loadingProvider !== null;
 
   return (
-    <Button
-      type="submit"
-      name="provider"
-      value={provider}
-      variant="solid"
-      className={config.buttonClassName}
-      disabled={isDisabled}
-      aria-busy={isLoading}
-      leftIcon={isLoading ? undefined : config.icon}
+    <form
+      action="/api/auth/login"
+      method="get"
+      className="w-[360px]"
+      onSubmit={() => onSubmit(provider)}
     >
-      {isLoading ? (
-        <span className="flex w-full items-center justify-center">
-          <LoadingSpinner size={20} className={config.spinnerClassName} />
-        </span>
-      ) : (
-        <span
-          className={`font-pretendard px-lg flex flex-[1_0_0] items-center justify-center text-center text-lg leading-[140%] font-semibold ${config.labelClassName}`}
-        >
-          {config.label}
-        </span>
-      )}
-    </Button>
+      <input type="hidden" name="provider" value={provider} />
+      <input type="hidden" name="next" value={nextPath} />
+      <Button
+        type="submit"
+        variant="solid"
+        className={config.buttonClassName}
+        disabled={isDisabled}
+        aria-busy={isLoading}
+        leftIcon={isLoading ? undefined : config.icon}
+      >
+        {isLoading ? (
+          <span className="flex w-full items-center justify-center">
+            <LoadingSpinner size={20} className={config.spinnerClassName} />
+          </span>
+        ) : (
+          <span
+            className={`font-pretendard px-lg flex flex-[1_0_0] items-center justify-center text-center text-lg leading-[140%] font-semibold ${config.labelClassName}`}
+          >
+            {config.label}
+          </span>
+        )}
+      </Button>
+    </form>
   );
 }
