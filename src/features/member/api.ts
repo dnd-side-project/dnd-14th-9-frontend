@@ -1,6 +1,5 @@
 import { api } from "@/lib/api/api";
 import type {
-  CheckNicknameExistsResponse,
   DeleteMeResponse,
   GetMeResponse,
   GetMyReportResponse,
@@ -28,11 +27,5 @@ export const memberApi = {
 
   deleteMe: async (): Promise<DeleteMeResponse> => {
     return api.delete<DeleteMeResponse>("/api/members/me");
-  },
-
-  checkNicknameExists: async (nickname: string): Promise<CheckNicknameExistsResponse> => {
-    return api.get<CheckNicknameExistsResponse>("/api/members/nickname/exists", {
-      params: { nickname },
-    });
   },
 };
