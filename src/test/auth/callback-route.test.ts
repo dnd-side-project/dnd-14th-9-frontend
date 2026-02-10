@@ -3,15 +3,15 @@
  */
 
 import { GET } from "@/app/api/auth/callback/[provider]/route";
-import { cookies } from "next/headers";
-import { setAuthCookies } from "@/lib/auth/auth-cookies";
-import { NextRequest } from "next/server";
 import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
+import { setAuthCookies } from "@/lib/auth/auth-cookies";
 import {
   ACCESS_TOKEN_COOKIE,
   REDIRECT_AFTER_LOGIN_COOKIE,
   REFRESH_TOKEN_COOKIE,
 } from "@/lib/auth/cookie-constants";
+import { cookies } from "next/headers";
+import { NextRequest } from "next/server";
 
 // Next.js cookies() mock
 jest.mock("next/headers", () => ({
