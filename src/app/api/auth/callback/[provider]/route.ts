@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-flow";
+import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-policy";
 import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
 import { setAuthCookies } from "@/lib/auth/cookies";
 

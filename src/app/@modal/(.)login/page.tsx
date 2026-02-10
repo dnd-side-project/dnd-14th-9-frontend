@@ -1,6 +1,6 @@
 import { LoginModal } from "@/features/auth/components/LoginModal";
 import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
-import { normalizeInternalPath } from "@/lib/auth/login-flow";
+import { normalizeInternalPath } from "@/lib/auth/login-policy";
 import { cookies } from "next/headers";
 
 export default async function Page() {

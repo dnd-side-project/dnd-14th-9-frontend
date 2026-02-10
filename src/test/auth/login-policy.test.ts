@@ -1,6 +1,6 @@
-import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-flow";
+import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-policy";
 
-describe("login-flow policy", () => {
+describe("login-policy", () => {
   describe("isLoginProvider", () => {
     it("google과 kakao만 유효한 provider로 허용해야 함", () => {
       expect(isLoginProvider("google")).toBe(true);
