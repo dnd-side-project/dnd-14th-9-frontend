@@ -38,7 +38,9 @@ export function Card({
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <Badge radius="xs">{category}</Badge>
+          <Badge radius="xs" className="border-0">
+            {category}
+          </Badge>
           <Badge radius="max">{formatRelativeTime(createdAt)}</Badge>
         </div>
 
