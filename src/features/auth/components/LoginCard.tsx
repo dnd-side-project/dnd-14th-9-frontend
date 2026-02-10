@@ -1,5 +1,5 @@
 import { CloseIcon } from "@/components/Icon/CloseIcon";
-import { OAuthLoginButtons } from "@/features/auth/components/OAuthLoginButtons";
+import { OAuthLoginForm } from "@/features/auth/components/OAuthLoginForm";
 
 interface LoginCardProps {
   reasonMessage?: string | null;
@@ -39,7 +39,7 @@ export function LoginCard({ reasonMessage, nextPath, onClose }: LoginCardProps) 
       </div>
 
       <div className="w-full">
-        <OAuthLoginButtons nextPath={nextPath} />
+        <OAuthLoginForm nextPath={nextPath} />
       </div>
     </div>
   );
