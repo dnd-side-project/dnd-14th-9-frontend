@@ -1,5 +1,3 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 import {
   ACCESS_TOKEN_COOKIE,
   REDIRECT_AFTER_LOGIN_COOKIE,
@@ -7,6 +5,8 @@ import {
   REFRESH_TOKEN_COOKIE,
 } from "@/lib/auth/cookie-constants";
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 // 공개 라우트 (인증 불필요)
 const PUBLIC_ROUTES = ["/", "/login"];
@@ -28,6 +28,20 @@ interface RefreshResponseBody {
 
 interface TryRefreshTokenOptions {
   allowPassThroughOnFailure?: boolean;
+}
+
+function isRefreshResponseBody(data: unknown): data is RefreshResponseBody {
+  if (!data || typeof data !== "object" || !("result" in data)) {
+    return false;
+  }
+
+  const result = (data as { result?: unknown }).result;
+  if (!result || typeof result !== "object") {
+    return false;
+  }
+
+  const tokenPair = result as Record<string, unknown>;
+  return typeof tokenPair.accessToken === "string" && typeof tokenPair.refreshToken === "string";
 }
 
 export async function proxy(request: NextRequest) {
@@ -108,6 +122,16 @@ function redirectToLoginRoute(
 }
 
 /**
+ * JWT payload는 base64url 인코딩(-, _)과 padding 생략을 사용한다.
+ * atob 디코딩 전 표준 base64(+ , /) 및 padding으로 정규화한다.
+ */
+function decodeBase64Url(value: string): string {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const paddingLength = (4 - (normalized.length % 4)) % 4;
+  return atob(normalized + "=".repeat(paddingLength));
+}
+
+/**
  * JWT 토큰 만료 임박 여부 확인
  * 주의: Base64 디코딩만 수행하며 서명 검증은 백엔드에서 수행됨
  */
@@ -119,7 +143,7 @@ function isTokenExpiringSoon(token: string): boolean {
       return true;
     }
 
-    const payload = JSON.parse(atob(parts[1]));
+    const payload = JSON.parse(decodeBase64Url(parts[1]));
 
     // payload.exp 검증 (필수 버그 픽스)
     if (!payload?.exp || typeof payload.exp !== "number") {
@@ -188,15 +212,7 @@ async function tryRefreshToken(
     const data: unknown = await reissueResponse.json();
 
     // API 응답 검증 (필수 버그 픽스)
-    if (
-      !data ||
-      typeof data !== "object" ||
-      !("result" in data) ||
-      !data.result ||
-      typeof data.result !== "object" ||
-      !("accessToken" in data.result) ||
-      !("refreshToken" in data.result)
-    ) {
+    if (!isRefreshResponseBody(data)) {
       console.error("Proxy: Invalid refresh response format");
       if (allowPassThroughOnFailure) {
         return NextResponse.next();
@@ -205,10 +221,9 @@ async function tryRefreshToken(
     }
 
     const response = NextResponse.next();
-    const payload = data as RefreshResponseBody;
     setAuthCookies(response.cookies, {
-      accessToken: payload.result.accessToken,
-      refreshToken: payload.result.refreshToken,
+      accessToken: data.result.accessToken,
+      refreshToken: data.result.refreshToken,
     });
 
     if (process.env.NODE_ENV !== "production") {
