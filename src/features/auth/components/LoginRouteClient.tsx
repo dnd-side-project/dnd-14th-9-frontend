@@ -3,15 +3,10 @@
 import { LoginModal } from "@/features/auth/components/LoginModal";
 import { LoginPage } from "@/features/auth/components/LoginPage";
 import { normalizeInternalPath } from "@/lib/auth/login-flow";
-import {
-  REDIRECT_AFTER_LOGIN_COOKIE,
-  REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
-} from "@/lib/auth/cookie-constants";
-import { getCookie, setCookie } from "@/lib/auth/client-cookies";
+import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
+import { getCookie } from "@/lib/auth/client-cookies";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
-
-type LoginProvider = "google" | "kakao";
 
 type LoginRouteVariant = "modal" | "page";
 
@@ -41,11 +36,6 @@ export function LoginRouteClient({ variant }: LoginRouteClientProps) {
   const reason = searchParams.get("reason");
   const reasonMessage = reason ? (REASON_MESSAGES[reason] ?? null) : null;
 
-  const handleLogin = (provider: LoginProvider) => {
-    setCookie(REDIRECT_AFTER_LOGIN_COOKIE, safeNextPath, REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS);
-    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/oauth2/authorization/${provider}`;
-  };
-
   const handleClose = () => {
     if (window.history.length > 1) {
       router.back();
@@ -56,8 +46,8 @@ export function LoginRouteClient({ variant }: LoginRouteClientProps) {
   };
 
   if (variant === "modal") {
-    return <LoginModal isOpen={true} onClose={handleClose} onLogin={handleLogin} />;
+    return <LoginModal isOpen={true} onClose={handleClose} nextPath={safeNextPath} />;
   }
 
-  return <LoginPage reasonMessage={reasonMessage} onLogin={handleLogin} />;
+  return <LoginPage reasonMessage={reasonMessage} nextPath={safeNextPath} />;
 }

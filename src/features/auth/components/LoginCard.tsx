@@ -4,11 +4,11 @@ import { OAuthLoginButtons } from "@/features/auth/components/OAuthLoginButtons"
 
 interface LoginCardProps {
   reasonMessage?: string | null;
-  onLogin: (provider: "google" | "kakao") => void;
+  nextPath: string;
   onClose?: () => void;
 }
 
-export function LoginCard({ reasonMessage, onLogin, onClose }: LoginCardProps) {
+export function LoginCard({ reasonMessage, nextPath, onClose }: LoginCardProps) {
   return (
     <div className="relative z-10 min-h-[300px] w-[90vw] max-w-[400px] rounded-lg bg-white p-6 shadow-xl">
       {onClose ? (
@@ -24,7 +24,7 @@ export function LoginCard({ reasonMessage, onLogin, onClose }: LoginCardProps) {
       {reasonMessage ? (
         <p className="mb-4 text-center text-sm text-red-600">{reasonMessage}</p>
       ) : null}
-      <OAuthLoginButtons onLogin={onLogin} />
+      <OAuthLoginButtons nextPath={nextPath} />
     </div>
   );
 }

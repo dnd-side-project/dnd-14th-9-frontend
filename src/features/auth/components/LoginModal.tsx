@@ -5,10 +5,10 @@ import { LoginCard } from "@/features/auth/components/LoginCard";
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (provider: "google" | "kakao") => void;
+  nextPath: string;
 }
 
-export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
+export function LoginModal({ isOpen, onClose, nextPath }: LoginModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -16,7 +16,7 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
       {/* 오버레이 */}
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
 
-      <LoginCard onClose={onClose} onLogin={onLogin} />
+      <LoginCard onClose={onClose} nextPath={nextPath} />
     </div>
   );
 }
