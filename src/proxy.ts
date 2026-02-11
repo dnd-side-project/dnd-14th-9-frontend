@@ -4,7 +4,7 @@ import {
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
   REFRESH_TOKEN_COOKIE,
 } from "@/lib/auth/cookie-constants";
-import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
+import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
