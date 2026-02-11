@@ -23,8 +23,8 @@ export const ProgressRing = forwardRef<HTMLDivElement, ProgressRingProps>(
   (
     {
       progress,
-      size = 80,
-      strokeWidth = 8,
+      size = 42,
+      strokeWidth = 4,
       trackClassName = "stroke-gray-700",
       progressClassName = "stroke-green-600",
       showPercent = true,
@@ -77,7 +77,7 @@ export const ProgressRing = forwardRef<HTMLDivElement, ProgressRingProps>(
         </svg>
         {/* 중앙 퍼센트 텍스트 */}
         {showPercent && (
-          <span className="text-text-primary absolute text-lg font-semibold">
+          <span className="absolute text-[10px] font-semibold text-gray-300">
             {Math.round(clampedProgress)}%
           </span>
         )}

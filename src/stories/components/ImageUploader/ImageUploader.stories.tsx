@@ -78,7 +78,7 @@ export const Wide: Story = {
     (Story) => (
       <div
         className="dark"
-        style={{ padding: "20px", background: "#0b0f0e", width: "1088px", maxWidth: "100%" }}
+        style={{ padding: "20px", background: "#0b0f0e", width: "1088px", minWidth: "1088px" }}
       >
         <Story />
       </div>
@@ -86,6 +86,9 @@ export const Wide: Story = {
   ],
   parameters: {
     layout: "fullscreen",
+    viewport: {
+      defaultViewport: "desktop",
+    },
     docs: {
       description: {
         story: "1088px 너비의 이미지 업로더입니다.",
