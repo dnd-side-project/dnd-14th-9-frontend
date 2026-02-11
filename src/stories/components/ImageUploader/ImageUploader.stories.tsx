@@ -72,6 +72,28 @@ export const Default: Story = {
   },
 };
 
+export const Wide: Story = {
+  args: {},
+  decorators: [
+    (Story) => (
+      <div
+        className="dark"
+        style={{ padding: "20px", background: "#0b0f0e", width: "1088px", maxWidth: "100%" }}
+      >
+        <Story />
+      </div>
+    ),
+  ],
+  parameters: {
+    layout: "fullscreen",
+    docs: {
+      description: {
+        story: "1088px 너비의 이미지 업로더입니다.",
+      },
+    },
+  },
+};
+
 export const CustomHint: Story = {
   args: {
     hintText: "PNG, JPG, GIF (최대 10MB)",

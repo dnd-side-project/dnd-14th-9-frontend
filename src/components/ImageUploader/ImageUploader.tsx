@@ -5,6 +5,7 @@ import { forwardRef, useState, useRef, useCallback, useId, type InputHTMLAttribu
 
 import { cn } from "@/lib/utils/utils";
 import { CloudUploadIcon } from "../Icon/CloudUploadIcon";
+import { FileIcon } from "../Icon/FileIcon";
 import { ProgressRing } from "../ProgressRing/ProgressRing";
 
 const DEFAULT_MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -15,10 +16,10 @@ const imageUploaderVariants = cva(
     "flex",
     "flex-col",
     "items-center",
-    "justify-center",
-    "gap-4",
+    "justify-between",
     "w-full",
     "min-h-[144px]",
+    "py-6",
     "rounded-lg",
     "border-2",
     "cursor-pointer",
@@ -33,7 +34,7 @@ const imageUploaderVariants = cva(
   {
     variants: {
       state: {
-        default: ["border-dashed", "border-green-600", "bg-transparent", "hover:bg-green-950/30"],
+        default: ["border-dashed", "border-green-600", "bg-transparent", "hover:bg-green-950"],
         dragging: ["border-solid", "border-green-600", "bg-green-950"],
         uploading: ["border-solid", "border-green-600", "bg-transparent", "cursor-default"],
       },
@@ -96,9 +97,12 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
     const generatedId = useId();
     const inputId = id ?? generatedId;
     const internalInputRef = useRef<HTMLInputElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const dragCounter = useRef(0);
 
     const [isDragging, setIsDragging] = useState(false);
+    const [dragFileName, setDragFileName] = useState<string | null>(null);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     const getState = useCallback((): UploadState => {
       if (uploadProgress !== undefined && uploadProgress >= 0 && uploadProgress < 100) {
@@ -112,6 +116,31 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
 
     const state = getState();
     const isUploading = state === "uploading";
+
+    const extractFileName = useCallback((e: React.DragEvent<HTMLDivElement>): string | null => {
+      // Try to get filename from files (works on drop)
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        return e.dataTransfer.files[0].name;
+      }
+
+      // Try to get filename from items
+      if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+        const item = e.dataTransfer.items[0];
+        if (item.kind === "file") {
+          const file = item.getAsFile();
+          if (file?.name) {
+            return file.name;
+          }
+        }
+      }
+
+      // Fallback: check if files are being dragged
+      if (e.dataTransfer.types.includes("Files")) {
+        return "파일";
+      }
+
+      return null;
+    }, []);
 
     const handleFileSelection = useCallback(
       (file: File | null) => {
@@ -139,9 +168,13 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
         dragCounter.current++;
         if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
           setIsDragging(true);
+          const fileName = extractFileName(e);
+          if (fileName) {
+            setDragFileName(fileName);
+          }
         }
       },
-      [disabled, isUploading]
+      [disabled, isUploading, extractFileName]
     );
 
     const handleDragLeave = useCallback(
@@ -153,21 +186,44 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
         dragCounter.current--;
         if (dragCounter.current === 0) {
           setIsDragging(false);
+          setDragFileName(null);
         }
       },
       [disabled, isUploading]
     );
 
-    const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-    }, []);
+    const handleDragOver = useCallback(
+      (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          setMousePosition({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+          });
+        }
+
+        // Try to get filename if not already set
+        if (!dragFileName || dragFileName === "파일") {
+          const fileName = extractFileName(e);
+          if (fileName && fileName !== "파일") {
+            setDragFileName(fileName);
+          } else if (!dragFileName && fileName) {
+            setDragFileName(fileName);
+          }
+        }
+      },
+      [dragFileName, extractFileName]
+    );
 
     const handleDrop = useCallback(
       (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(false);
+        setDragFileName(null);
         dragCounter.current = 0;
 
         if (disabled || isUploading) return;
@@ -207,6 +263,7 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
     return (
       <div className={cn("w-full", containerClassName)}>
         <div
+          ref={containerRef}
           className={cn(imageUploaderVariants({ state, disabled, className }))}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
@@ -239,26 +296,32 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
             {...props}
           />
 
+          {/* 드래그 중 파일명 툴팁 - OS 프리뷰 위에 표시되도록 위쪽에 배치 */}
+          {isDragging && dragFileName && (
+            <div
+              className="pointer-events-none absolute z-50 flex items-center gap-1.5 rounded bg-green-600 px-2 py-1 shadow-lg"
+              style={{
+                left: mousePosition.x + 16,
+                top: mousePosition.y - 36,
+              }}
+            >
+              <FileIcon size="xsmall" className="text-white" />
+              <span className="text-xs font-medium text-gray-800">{dragFileName}</span>
+            </div>
+          )}
+
           {/* 상태별 콘텐츠 렌더링 */}
           {isUploading ? (
             <>
               <ProgressRing progress={uploadProgress!} />
-              <span
-                id={`${inputId}-hint`}
-                className="text-text-secondary text-sm leading-[1.43]"
-                style={{ fontSize: "14px" }}
-              >
+              <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
                 {uploadingText}
               </span>
             </>
           ) : (
             <>
               <CloudUploadIcon size="xlarge" className="text-green-600" />
-              <span
-                id={`${inputId}-hint`}
-                className="text-text-secondary text-sm leading-[1.43]"
-                style={{ fontSize: "14px" }}
-              >
+              <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
                 {hintText}
               </span>
             </>
