@@ -1,7 +1,8 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
 import { Input } from "@/components/Input/Input";
+
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
   title: "Components/Input",

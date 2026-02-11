@@ -1,3 +1,5 @@
+import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+
 import {
   API_URL,
   SERVER_API_URL,
@@ -5,7 +7,6 @@ import {
   type RequestMethod,
   executeFetch,
 } from "./api-client";
-import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 
 interface RequestOptions {
   headers?: Record<string, string>;

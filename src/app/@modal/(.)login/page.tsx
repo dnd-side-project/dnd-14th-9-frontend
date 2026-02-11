@@ -1,5 +1,12 @@
-import { LoginRouteClient } from "@/features/auth/components/LoginRouteClient";
+import { cookies } from "next/headers";
 
-export default function Page() {
-  return <LoginRouteClient variant="modal" />;
+import { LoginModal } from "@/features/auth/components/LoginModal";
+import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
+import { normalizeInternalPath } from "@/lib/auth/login-policy";
+
+export default async function Page() {
+  const cookieStore = await cookies();
+  const safeNextPath = normalizeInternalPath(cookieStore.get(REDIRECT_AFTER_LOGIN_COOKIE)?.value);
+
+  return <LoginModal nextPath={safeNextPath} />;
 }

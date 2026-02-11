@@ -1,30 +1,46 @@
-"use client";
-
-import { OAuthLoginButtons } from "@/features/auth/components/OAuthLoginButtons";
+import { CloseIcon } from "@/components/Icon/CloseIcon";
+import { OAuthLoginForm } from "@/features/auth/components/OAuthLoginForm";
 
 interface LoginCardProps {
   reasonMessage?: string | null;
-  onLogin: (provider: "google" | "kakao") => void;
-  onClose?: () => void;
+  nextPath: string;
+  onClose?: () => void; // Added purely for potential usage, optional
 }
 
-export function LoginCard({ reasonMessage, onLogin, onClose }: LoginCardProps) {
+export function LoginCard({ reasonMessage, nextPath, onClose }: LoginCardProps) {
   return (
-    <div className="relative z-10 min-h-[300px] w-[90vw] max-w-[400px] rounded-lg bg-white p-6 shadow-xl">
+    <div className="border-sm border-border-gray-stronger bg-surface-default p-3xl relative flex min-h-[360px] w-[440px] max-w-full flex-col items-start justify-between rounded-lg shadow-[0_0_80px_0_var(--color-alpha-black-32)]">
       {onClose ? (
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-gray-600"
+          className="text-text-muted hover:text-text-primary focus-visible:ring-text-muted p-xs top-lg right-lg gap-none absolute flex cursor-pointer items-center rounded-sm focus-visible:ring-2"
+          aria-label="닫기"
         >
-          ✕
+          <CloseIcon />
         </button>
       ) : null}
 
-      <h2 className="mb-6 text-center text-xl font-bold">로그인</h2>
-      {reasonMessage ? (
-        <p className="mb-4 text-center text-sm text-red-600">{reasonMessage}</p>
-      ) : null}
-      <OAuthLoginButtons onLogin={onLogin} />
+      <div className="w-full">
+        <div className="mb-lg gap-2xs flex flex-col text-left">
+          <h2 className="font-pretendard text-text-primary text-2xl leading-[140%] font-semibold">
+            회원가입 / 로그인
+          </h2>
+          <p className="font-pretendard text-text-secondary text-base leading-[140%] font-normal">
+            쉽게 가입하고 간편하게 로그인하세요!
+          </p>
+        </div>
+
+        {reasonMessage ? (
+          <p className="font-pretendard text-text-status-negative-default text-left text-sm">
+            {reasonMessage}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="w-full">
+        <OAuthLoginForm nextPath={nextPath} />
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { DEFAULT_API_ERROR_MESSAGE, getApiErrorMessageByCode } from "@/lib/api/api-error-messages";
 import type { ApiErrorResponse } from "@/types/shared/types";
 
 export interface ExecuteFetchOptions {
@@ -90,6 +91,35 @@ export function buildRetryConfig(retry?: RetryOptions) {
   };
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
+  if (!isRecord(value)) return false;
+  return (
+    value.isSuccess === false && typeof value.code === "string" && typeof value.message === "string"
+  );
+}
+
+function getApiErrorMessage(value: unknown, status: number): string {
+  if (isApiErrorResponse(value)) {
+    return getApiErrorMessageByCode(value.code) ?? value.message;
+  }
+
+  if (isRecord(value) && typeof value.code === "string") {
+    const mappedMessage = getApiErrorMessageByCode(value.code);
+    if (mappedMessage) return mappedMessage;
+  }
+
+  // 백엔드 스펙 전환 전 응답 포맷 호환 (success/error.message)
+  if (isRecord(value) && isRecord(value.error) && typeof value.error.message === "string") {
+    return value.error.message;
+  }
+
+  return status >= 500 ? DEFAULT_API_ERROR_MESSAGE : `HTTP error! status: ${status}`;
+}
+
 // ===== 공통 fetch 실행 =====
 
 type ExecuteFetchResult<
@@ -152,15 +182,19 @@ export async function executeFetch<
         }
 
         if (throwOnHttpError) {
+          let errorPayload: unknown = null;
           let errorData: ApiErrorResponse | null = null;
           try {
-            errorData = await response.json();
+            errorPayload = await response.json();
+            if (isApiErrorResponse(errorPayload)) {
+              errorData = errorPayload;
+            }
           } catch {
             // JSON 파싱 실패 시 무시
           }
 
           const error = new ApiError(
-            errorData?.error.message ?? `HTTP error! status: ${response.status}`,
+            getApiErrorMessage(errorPayload, response.status),
             response.status,
             errorData
           );

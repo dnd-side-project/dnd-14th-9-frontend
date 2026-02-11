@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+
+import { clearAuthCookies } from "@/lib/auth/auth-cookies";
+
 import { api } from "./api";
-import { clearAuthCookies } from "@/lib/auth/cookies";
 
 export type ForwardMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 

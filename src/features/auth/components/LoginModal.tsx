@@ -1,22 +1,33 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { LoginCard } from "@/features/auth/components/LoginCard";
 
 interface LoginModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onLogin: (provider: "google" | "kakao") => void;
+  nextPath: string;
 }
 
-export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
-  if (!isOpen) return null;
+export function LoginModal({ nextPath }: LoginModalProps) {
+  const router = useRouter();
+
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.replace(nextPath);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="p-2xs fixed inset-0 z-50 flex items-center justify-center">
       {/* 오버레이 */}
-      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+      <div className="bg-overlay-default fixed inset-0" />
 
-      <LoginCard onClose={onClose} onLogin={onLogin} />
+      <div className="relative z-10 w-full max-w-[360px] md:max-w-[400px] lg:max-w-[440px]">
+        <LoginCard nextPath={nextPath} onClose={handleClose} />
+      </div>
     </div>
   );
 }

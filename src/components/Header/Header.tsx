@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
+
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 import { authApi } from "@/features/auth/api";
-import { useAuthStore } from "@/stores/authStore";
+import { setCookie } from "@/lib/auth/client-cookies";
 import {
   REDIRECT_AFTER_LOGIN_COOKIE,
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
 } from "@/lib/auth/cookie-constants";
-import { setCookie } from "@/lib/auth/client-cookies";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useAuthStore } from "@/stores/authStore";
 
 /**
  * Header - 공통 헤더/네비게이션

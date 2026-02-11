@@ -2,8 +2,9 @@
  * @jest-environment @edge-runtime/jest-environment
  */
 
-import { proxy } from "@/proxy";
 import { NextRequest } from "next/server";
+
+import { proxy } from "@/proxy";
 
 // Global fetch mock
 const mockFetch = jest.fn();

@@ -1,8 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { Plus, Heart, Settings, Search, X, Star, User, Home } from "lucide-react";
 import { createElement } from "react";
 
+import { Plus, Heart, Settings, Search, X, Star, User, Home } from "lucide-react";
+
 import { Icon } from "@/components/Icon/Icon";
+
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
   title: "Components/Icon",

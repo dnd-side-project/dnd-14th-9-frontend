@@ -1,4 +1,3 @@
-import { cva, type VariantProps } from "class-variance-authority";
 import {
   forwardRef,
   useState,
@@ -9,7 +8,10 @@ import {
   type ChangeEvent,
 } from "react";
 
+import { cva, type VariantProps } from "class-variance-authority";
+
 import { cn } from "@/lib/utils/utils";
+
 import { ClearIcon } from "../Icon/ClearIcon";
 
 const inputVariants = cva(

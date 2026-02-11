@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
+
 import { register } from "@tokens-studio/sd-transforms";
 import StyleDictionary from "style-dictionary";
+
 import { tailwindV4Format } from "./style-dictionary/formats/tailwind-v4.mjs";
 
 // Tokens Studio transforms 등록

@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Client, type IFrame, type IMessage } from "@stomp/stompjs";
+
 import type {
   SessionEvent,
   SessionCommand,

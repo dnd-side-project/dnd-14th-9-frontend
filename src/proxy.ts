@@ -1,12 +1,13 @@
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+
+import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
 import {
   ACCESS_TOKEN_COOKIE,
   REDIRECT_AFTER_LOGIN_COOKIE,
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
   REFRESH_TOKEN_COOKIE,
 } from "@/lib/auth/cookie-constants";
-import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 
 // 공개 라우트 (인증 불필요)
 const PUBLIC_ROUTES = ["/", "/login"];
