@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { OAuthProviderButton } from "@/features/auth/components/OAuthProviderButton";
+import { SocialLoginButton } from "@/features/auth/components/SocialLoginButton";
 import { LOGIN_PROVIDERS, type LoginProvider } from "@/lib/auth/auth-constants";
 
 interface OAuthLoginFormProps {
@@ -28,18 +28,37 @@ export function OAuthLoginForm({ nextPath }: OAuthLoginFormProps) {
       </p>
 
       <div className="gap-sm flex flex-col">
-        <OAuthProviderButton
-          provider={kakaoProvider}
-          nextPath={nextPath}
-          loadingProvider={loadingProvider}
-          onSubmit={handleSubmit}
-        />
-        <OAuthProviderButton
-          provider={googleProvider}
-          nextPath={nextPath}
-          loadingProvider={loadingProvider}
-          onSubmit={handleSubmit}
-        />
+        <form
+          action="/api/auth/login"
+          method="get"
+          className="w-[360px]"
+          onSubmit={() => handleSubmit(kakaoProvider)}
+        >
+          <input type="hidden" name="provider" value={kakaoProvider} />
+          <input type="hidden" name="next" value={nextPath} />
+          <SocialLoginButton
+            provider={kakaoProvider}
+            type="submit"
+            isLoading={loadingProvider === kakaoProvider}
+            disabled={loadingProvider !== null}
+          />
+        </form>
+
+        <form
+          action="/api/auth/login"
+          method="get"
+          className="w-[360px]"
+          onSubmit={() => handleSubmit(googleProvider)}
+        >
+          <input type="hidden" name="provider" value={googleProvider} />
+          <input type="hidden" name="next" value={nextPath} />
+          <SocialLoginButton
+            provider={googleProvider}
+            type="submit"
+            isLoading={loadingProvider === googleProvider}
+            disabled={loadingProvider !== null}
+          />
+        </form>
       </div>
     </div>
   );

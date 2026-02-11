@@ -5,7 +5,7 @@ import type { ApiSuccessResponse } from "@/types/shared/types";
  */
 export type LogoutResponse = ApiSuccessResponse<null>;
 
-export interface OAuthProviderButtonConfig {
+export interface SocialLoginButtonConfig {
   buttonClassName: string;
   label: string;
   labelClassName: string;

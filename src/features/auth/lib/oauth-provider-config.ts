@@ -1,7 +1,7 @@
 import type { LoginProvider } from "@/lib/auth/auth-constants";
-import type { OAuthProviderButtonConfig } from "@/features/auth/types";
+import type { SocialLoginButtonConfig } from "@/features/auth/types";
 
-export const OAUTH_PROVIDER_BUTTON_CONFIGS: Record<LoginProvider, OAuthProviderButtonConfig> = {
+export const SOCIAL_LOGIN_BUTTON_CONFIGS: Record<LoginProvider, SocialLoginButtonConfig> = {
   kakao: {
     label: "카카오 계정으로 로그인",
     buttonClassName:
