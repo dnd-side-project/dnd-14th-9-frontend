@@ -24,7 +24,7 @@ export const sessionApi = {
   },
 
   getDetail: async (sessionId: string): Promise<ApiSuccessResponse<SessionDetailResponse>> => {
-    return api.get<ApiSuccessResponse<SessionDetailResponse>>(`/api/session/${sessionId}`);
+    return api.get<ApiSuccessResponse<SessionDetailResponse>>(`/api/sessions/${sessionId}`);
   },
 
   getReport: async (sessionId: string): Promise<ApiSuccessResponse<SessionReportResponse>> => {
