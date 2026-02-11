@@ -1,5 +1,5 @@
-import type { LoginProvider } from "@/lib/auth/auth-constants";
 import type { SocialLoginButtonConfig } from "@/features/auth/types";
+import type { LoginProvider } from "@/lib/auth/auth-constants";
 
 export const SOCIAL_LOGIN_BUTTON_CONFIGS: Record<LoginProvider, SocialLoginButtonConfig> = {
   kakao: {

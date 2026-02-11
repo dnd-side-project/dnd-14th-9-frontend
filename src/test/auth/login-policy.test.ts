@@ -1,5 +1,5 @@
-import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-policy";
 import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
+import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-policy";
 
 describe("login-policy", () => {
   describe("isLoginProvider", () => {

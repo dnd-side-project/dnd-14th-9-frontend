@@ -1,7 +1,8 @@
 "use client";
 
-import { LoginCard } from "@/features/auth/components/LoginCard";
 import { useRouter } from "next/navigation";
+
+import { LoginCard } from "@/features/auth/components/LoginCard";
 
 interface LoginModalProps {
   nextPath: string;

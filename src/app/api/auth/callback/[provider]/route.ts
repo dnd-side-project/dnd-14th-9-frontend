@@ -1,3 +1,6 @@
+import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+
 import { setAuthCookies } from "@/lib/auth/auth-cookies";
 import {
   consumeRedirectAfterLoginCookie,
@@ -6,8 +9,6 @@ import {
   redirectToLogin,
 } from "@/lib/auth/auth-route-utils";
 import { isLoginProvider } from "@/lib/auth/login-policy";
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
 
 interface CallbackRouteContext {
   params: Promise<{

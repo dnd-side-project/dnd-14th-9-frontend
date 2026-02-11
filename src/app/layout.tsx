@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
+
 import { getServerAuthState } from "@/lib/auth/server";
 import { AuthStoreProvider } from "@/providers/AuthStoreProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
-import type { Metadata } from "next";
+
 import { geistMono, geistSans, pretendard } from "./fonts";
 import "./globals.css";
 

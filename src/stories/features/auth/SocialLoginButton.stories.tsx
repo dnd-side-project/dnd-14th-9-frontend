@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-
-import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
 import { SocialLoginButton } from "@/features/auth/components/SocialLoginButton";
+import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
+
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
   title: "Features/Auth/SocialLoginButton",

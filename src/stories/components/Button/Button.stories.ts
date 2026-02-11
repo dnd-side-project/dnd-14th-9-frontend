@@ -1,9 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { Heart, Settings, Search, X } from "lucide-react";
 import { createElement } from "react";
+
+import { Heart, Settings, Search, X } from "lucide-react";
 
 import { Button } from "@/components/Button/Button";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
+
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
   title: "Components/Button",

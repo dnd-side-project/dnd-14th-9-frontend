@@ -3,8 +3,8 @@ import { GoogleIcon } from "@/components/Icon/GoogleIcon";
 import { KakaoIcon } from "@/components/Icon/KakaoIcon";
 import { LoadingSpinner } from "@/components/LoadingSpinner/LoadingSpinner";
 import { SOCIAL_LOGIN_BUTTON_CONFIGS } from "@/features/auth/lib/oauth-provider-config";
-import { cn } from "@/lib/utils/utils";
 import type { LoginProvider } from "@/lib/auth/auth-constants";
+import { cn } from "@/lib/utils/utils";
 
 export interface SocialLoginButtonProps extends Omit<
   ButtonProps,

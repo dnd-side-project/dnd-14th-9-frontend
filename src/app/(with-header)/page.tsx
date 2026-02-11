@@ -1,5 +1,6 @@
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { Suspense } from "react";
+
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 
 import { Banner } from "@/features/home/components/Banner/Banner";
 import { RecommendedSection } from "@/features/home/components/RecommendedSection/RecommendedSection";
