@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { SocialLoginButton } from "@/features/auth/components/SocialLoginButton";
+import { saveLastLoginProvider } from "@/features/auth/lib/last-login-provider";
 import { LOGIN_PROVIDERS, type LoginProvider } from "@/lib/auth/auth-constants";
 
 interface OAuthLoginFormProps {
@@ -14,6 +15,7 @@ export function OAuthLoginForm({ nextPath }: OAuthLoginFormProps) {
   const [loadingProvider, setLoadingProvider] = useState<LoginProvider | null>(null);
 
   const handleSubmit = (provider: LoginProvider) => {
+    saveLastLoginProvider(provider);
     setLoadingProvider(provider);
   };
 
