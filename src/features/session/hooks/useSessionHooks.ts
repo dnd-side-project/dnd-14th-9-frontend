@@ -7,8 +7,12 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { createCrudHooks } from "@/hooks/createCrudHooks";
+import type { ApiSuccessResponse } from "@/types/shared/types";
+
 import { sessionApi } from "../api";
+
 import type {
   SessionListParams,
   SessionListResponse,
@@ -24,7 +28,6 @@ import type {
   AddTodosResponse,
   ToggleTodoResponse,
 } from "../types";
-import type { ApiSuccessResponse } from "@/types/shared/types";
 
 const sessionCrud = createCrudHooks<
   SessionListParams,
