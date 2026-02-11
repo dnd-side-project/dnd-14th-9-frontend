@@ -12,12 +12,12 @@ export function buildQueryString(params: QueryParams): string {
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
-    if (value === undefined || value === null || value === "") {
+    if (value == null || value === "") {
       return;
     }
 
     if (Array.isArray(value)) {
-      const filtered = value.filter((v) => v !== undefined && v !== null && v !== "");
+      const filtered = value.filter((v) => v != null && v !== "");
       if (filtered.length > 0) {
         searchParams.set(key, filtered.map(String).join(","));
       }
