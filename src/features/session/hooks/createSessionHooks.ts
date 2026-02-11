@@ -6,14 +6,18 @@
  * 추가 query/mutation(report, join, setGoal, addTodos, toggleTodo)은 별도 구현합니다.
  */
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createCrudHooks } from "@/hooks/createCrudHooks";
 import { sessionApi } from "../api";
 import type {
   SessionListParams,
   SessionListResponse,
   SessionDetailResponse,
+  SessionReportResponse,
   CreateSessionRequest,
   CreateSessionResponse,
+  JoinSessionRequest,
+  JoinSessionResponse,
 } from "../types";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
@@ -31,9 +35,34 @@ const sessionCrud = createCrudHooks<
   create: sessionApi.createSession,
 });
 
-export const sessionKeys = sessionCrud.keys;
+export const sessionKeys = {
+  ...sessionCrud.keys,
+  report: (id: string) => ["session", "report", id] as const,
+};
 
 export const useSessionList = sessionCrud.useList;
 export const useSessionDetail = sessionCrud.useDetail!;
 export const useCreateSession = sessionCrud.useCreate!;
 export const prefetchSessionList = sessionCrud.prefetch;
+
+export function useSessionReport(sessionId: string) {
+  return useQuery<ApiSuccessResponse<SessionReportResponse>>({
+    queryKey: sessionKeys.report(sessionId),
+    queryFn: () => sessionApi.getReport(sessionId),
+  });
+}
+
+export function useJoinSession() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    ApiSuccessResponse<JoinSessionResponse>,
+    unknown,
+    { sessionRoomId: string; body: JoinSessionRequest }
+  >({
+    mutationFn: ({ sessionRoomId, body }) => sessionApi.join(sessionRoomId, body),
+    onSuccess: (_, { sessionRoomId }) => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
+    },
+  });
+}
