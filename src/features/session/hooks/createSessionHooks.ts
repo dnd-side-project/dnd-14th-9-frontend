@@ -22,6 +22,7 @@ import type {
   SetGoalResponse,
   AddTodosRequest,
   AddTodosResponse,
+  ToggleTodoResponse,
 } from "../types";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
@@ -98,6 +99,21 @@ export function useAddTodos() {
     mutationFn: ({ sessionRoomId, body }) => sessionApi.addTodos(sessionRoomId, body),
     onSuccess: (_, { sessionRoomId }) => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.report(sessionRoomId) });
+    },
+  });
+}
+
+export function useToggleTodo() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    ApiSuccessResponse<ToggleTodoResponse>,
+    unknown,
+    { sessionRoomId: string; todoId: string }
+  >({
+    mutationFn: ({ sessionRoomId, todoId }) => sessionApi.toggleTodo(sessionRoomId, todoId),
+    onSuccess: (_, { sessionRoomId }) => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.report(sessionRoomId) });
     },
   });
