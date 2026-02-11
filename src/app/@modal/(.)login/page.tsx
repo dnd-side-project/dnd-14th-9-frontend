@@ -1,20 +1,12 @@
 import { cookies } from "next/headers";
 
 import { LoginModal } from "@/features/auth/components/LoginModal";
-import { getLoginPageProps } from "@/lib/auth/auth-route-utils";
+import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
+import { normalizeInternalPath } from "@/lib/auth/login-policy";
 
-interface LoginModalPageProps {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}
-
-export default async function Page({ searchParams }: LoginModalPageProps) {
-  const params = await searchParams;
+export default async function Page() {
   const cookieStore = await cookies();
+  const safeNextPath = normalizeInternalPath(cookieStore.get(REDIRECT_AFTER_LOGIN_COOKIE)?.value);
 
-  const { reasonMessage, nextPath } = getLoginPageProps({
-    searchParams: params,
-    cookieStore,
-  });
-
-  return <LoginModal reasonMessage={reasonMessage} nextPath={nextPath} />;
+  return <LoginModal nextPath={safeNextPath} />;
 }
