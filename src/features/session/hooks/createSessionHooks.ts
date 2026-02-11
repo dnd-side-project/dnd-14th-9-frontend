@@ -20,6 +20,8 @@ import type {
   JoinSessionResponse,
   SetGoalRequest,
   SetGoalResponse,
+  AddTodosRequest,
+  AddTodosResponse,
 } from "../types";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
@@ -78,6 +80,22 @@ export function useSetGoal() {
     { sessionRoomId: string; body: SetGoalRequest }
   >({
     mutationFn: ({ sessionRoomId, body }) => sessionApi.setGoal(sessionRoomId, body),
+    onSuccess: (_, { sessionRoomId }) => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.report(sessionRoomId) });
+    },
+  });
+}
+
+export function useAddTodos() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    ApiSuccessResponse<AddTodosResponse>,
+    unknown,
+    { sessionRoomId: string; body: AddTodosRequest }
+  >({
+    mutationFn: ({ sessionRoomId, body }) => sessionApi.addTodos(sessionRoomId, body),
     onSuccess: (_, { sessionRoomId }) => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
       queryClient.invalidateQueries({ queryKey: sessionKeys.report(sessionRoomId) });
