@@ -41,12 +41,12 @@ export function useDragAndDrop({
   const dragCounter = useRef(0);
 
   const extractFileName = useCallback((e: React.DragEvent<HTMLElement>): string | null => {
-    // Try to get filename from files (works on drop)
+    // files에서 파일명 추출 시도 (드롭 시 동작)
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       return e.dataTransfer.files[0].name;
     }
 
-    // Try to get filename from items
+    // items에서 파일명 추출 시도
     if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
       const item = e.dataTransfer.items[0];
       if (item.kind === "file") {
@@ -57,7 +57,7 @@ export function useDragAndDrop({
       }
     }
 
-    // Fallback: check if files are being dragged
+    // 대체: 파일이 드래그 중인지 확인
     if (e.dataTransfer.types.includes("Files")) {
       return "파일";
     }
@@ -117,7 +117,7 @@ export function useDragAndDrop({
         });
       }
 
-      // Try to get filename if not already set
+      // 파일명이 아직 설정되지 않은 경우 추출 시도
       if (!dragFileName || dragFileName === "파일") {
         const fileName = extractFileName(e);
         if (fileName && fileName !== "파일") {
