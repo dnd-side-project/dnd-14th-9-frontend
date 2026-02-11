@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import type { ApiErrorResponse } from "@/types/shared/types";
 import { DEFAULT_API_ERROR_MESSAGE, getApiErrorMessageByCode } from "@/lib/api/api-error-messages";
+import type { ApiErrorResponse } from "@/types/shared/types";
 
 export interface ExecuteFetchOptions {
   timeout?: number;

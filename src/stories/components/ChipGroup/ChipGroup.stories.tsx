@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-
 import { Badge } from "@/components/Badge/Badge";
 import { ChipGroup } from "@/components/ChipGroup/ChipGroup";
+
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
   title: "Components/ChipGroup",

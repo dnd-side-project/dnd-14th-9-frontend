@@ -1,16 +1,4 @@
 import {
-  BorderSection,
-  BorderWidthSection,
-  ColorSection,
-  DividerSection,
-  GapSection,
-  RadiusSection,
-  SectionGroup,
-  SpacingSection,
-  TextColorSection,
-  TypographySection,
-} from "./TokenSections";
-import {
   ALPHA_BLACK_COLORS,
   ALPHA_WHITE_COLORS,
   BORDER_SAMPLES,
@@ -32,6 +20,18 @@ import {
   TYPOGRAPHY_SAMPLES,
   YELLOW_SCALE,
 } from "./tokensData";
+import {
+  BorderSection,
+  BorderWidthSection,
+  ColorSection,
+  DividerSection,
+  GapSection,
+  RadiusSection,
+  SectionGroup,
+  SpacingSection,
+  TextColorSection,
+  TypographySection,
+} from "./TokenSections";
 
 export default function TokensTestPage() {
   const borderWidthLabels = BORDER_WIDTH_SAMPLES.map((item) => item.label).join(", ");

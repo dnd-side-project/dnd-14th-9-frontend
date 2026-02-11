@@ -2,11 +2,12 @@
  * @jest-environment @edge-runtime/jest-environment
  */
 
-import { GET } from "@/app/api/auth/callback/[provider]/route";
 import { cookies } from "next/headers";
-import { setAuthCookies } from "@/lib/auth/auth-cookies";
 import { NextRequest } from "next/server";
+
+import { GET } from "@/app/api/auth/callback/[provider]/route";
 import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
+import { setAuthCookies } from "@/lib/auth/auth-cookies";
 import {
   ACCESS_TOKEN_COOKIE,
   REDIRECT_AFTER_LOGIN_COOKIE,
@@ -155,6 +156,19 @@ describe("OAuth Callback Route Handler", () => {
 
     it("redirectAfterLogin 쿠키가 //로 시작하면 홈으로 폴백해야 함", async () => {
       mockCookieStore.get.mockReturnValue({ value: "//evil.com" });
+
+      const url = buildCallbackUrl(googleProvider, {
+        [ACCESS_TOKEN_COOKIE]: "access123",
+        [REFRESH_TOKEN_COOKIE]: "refresh456",
+      });
+      const response = await executeCallbackRoute(url);
+
+      const location = response.headers.get("location");
+      expect(location).toBe("http://localhost:3000/");
+    });
+
+    it("redirectAfterLogin 쿠키가 /login이면 홈으로 폴백해야 함", async () => {
+      mockCookieStore.get.mockReturnValue({ value: "/login" });
 
       const url = buildCallbackUrl(googleProvider, {
         [ACCESS_TOKEN_COOKIE]: "access123",

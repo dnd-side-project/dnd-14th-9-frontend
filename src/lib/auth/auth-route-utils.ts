@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+
 import {
   ACCESS_TOKEN_COOKIE,
   REDIRECT_AFTER_LOGIN_COOKIE,

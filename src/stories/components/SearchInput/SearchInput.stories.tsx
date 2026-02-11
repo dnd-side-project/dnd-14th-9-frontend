@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-
 import { SearchInput } from "@/components/SearchInput/SearchInput";
+
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
   title: "Components/SearchInput",

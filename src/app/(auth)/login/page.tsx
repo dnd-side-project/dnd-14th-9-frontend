@@ -1,7 +1,8 @@
+import { cookies } from "next/headers";
+
 import { LoginPage } from "@/features/auth/components/LoginPage";
 import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
 import { getLoginReasonMessage, normalizeInternalPath } from "@/lib/auth/login-policy";
-import { cookies } from "next/headers";
 
 interface LoginPageRouteProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

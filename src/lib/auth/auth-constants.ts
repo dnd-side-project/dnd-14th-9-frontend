@@ -1,4 +1,5 @@
 export const LOGIN_PROVIDERS = ["google", "kakao"] as const;
+export type LoginProvider = (typeof LOGIN_PROVIDERS)[number];
 
 export const LOGIN_REASON_MESSAGES = {
   auth_required: "로그인이 필요합니다.",

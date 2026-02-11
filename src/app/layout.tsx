@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
+
 import { getServerAuthState } from "@/lib/auth/server";
 import { AuthStoreProvider } from "@/providers/AuthStoreProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
-import type { Metadata } from "next";
+
 import { geistMono, geistSans, pretendard } from "./fonts";
 import "./globals.css";
 
@@ -23,7 +25,7 @@ export default async function RootLayout({
   const initialAuth = await getServerAuthState();
 
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${pretendard.variable} font-sans antialiased`}
       >

@@ -1,7 +1,8 @@
 "use client";
 
-import { LoginCard } from "@/features/auth/components/LoginCard";
 import { useRouter } from "next/navigation";
+
+import { LoginCard } from "@/features/auth/components/LoginCard";
 
 interface LoginModalProps {
   nextPath: string;
@@ -20,20 +21,12 @@ export function LoginModal({ nextPath }: LoginModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="p-2xs fixed inset-0 z-50 flex items-center justify-center">
       {/* 오버레이 */}
-      <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
+      <div className="bg-overlay-default fixed inset-0" />
 
-      <div className="relative z-10">
-        <button
-          type="button"
-          onClick={handleClose}
-          className="absolute top-4 right-4 z-20 text-2xl text-gray-400 hover:text-gray-600"
-          aria-label="로그인 모달 닫기"
-        >
-          ✕
-        </button>
-        <LoginCard nextPath={nextPath} />
+      <div className="relative z-10 w-full max-w-[360px] md:max-w-[400px] lg:max-w-[440px]">
+        <LoginCard nextPath={nextPath} onClose={handleClose} />
       </div>
     </div>
   );

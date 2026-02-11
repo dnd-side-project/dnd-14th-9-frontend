@@ -1,5 +1,6 @@
-import { cva, type VariantProps } from "class-variance-authority";
 import { forwardRef, type InputHTMLAttributes } from "react";
+
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { SearchIcon } from "@/components/Icon/SearchIcon";
 import { cn } from "@/lib/utils/utils";

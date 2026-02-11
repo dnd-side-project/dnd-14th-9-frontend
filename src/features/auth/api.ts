@@ -1,4 +1,5 @@
 import { api } from "@/lib/api/api";
+
 import type { LogoutResponse } from "./types";
 
 /**

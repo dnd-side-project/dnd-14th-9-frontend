@@ -18,7 +18,6 @@
  * export const useDeleteMe = memberHooks.useDelete;
  */
 
-import type { ApiSuccessResponse } from "@/types/shared/types";
 import {
   QueryClient,
   dehydrate,
@@ -30,6 +29,8 @@ import {
   type UseMutationResult,
   type UseQueryResult,
 } from "@tanstack/react-query";
+
+import type { ApiSuccessResponse } from "@/types/shared/types";
 
 interface SingletonHooksConfig<TResponse, TUpdateData, TResponseData> {
   queryKey: string;

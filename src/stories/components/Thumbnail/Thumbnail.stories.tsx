@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-
 import { Thumbnail } from "@/components/Thumbnail/Thumbnail";
+
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
   title: "Components/Thumbnail",

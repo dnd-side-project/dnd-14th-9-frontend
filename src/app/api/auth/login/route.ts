@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isLoginProvider } from "@/lib/auth/login-policy";
+
 import {
   buildProviderAuthorizationUrl,
   redirectToLogin,
   resolveBackendOrigin,
   setRedirectAfterLoginCookie,
 } from "@/lib/auth/auth-route-utils";
+import { isLoginProvider } from "@/lib/auth/login-policy";
 
 export async function GET(request: NextRequest) {
   const provider = request.nextUrl.searchParams.get("provider");
