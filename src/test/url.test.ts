@@ -22,27 +22,27 @@ describe("getSessionShareUrl", () => {
 describe("buildQueryString", () => {
   it("기본 파라미터를 query string으로 변환해야 합니다", () => {
     const params = { name: "test", age: 25 };
-    expect(buildQueryString(params)).toBe("name=test&age=25");
+    expect(buildQueryString(params)).toBe("?name=test&age=25");
   });
 
   it("boolean 값을 문자열로 변환해야 합니다", () => {
     const params = { active: true, disabled: false };
-    expect(buildQueryString(params)).toBe("active=true&disabled=false");
+    expect(buildQueryString(params)).toBe("?active=true&disabled=false");
   });
 
   it("undefined 값을 제외해야 합니다", () => {
     const params = { name: "test", value: undefined };
-    expect(buildQueryString(params)).toBe("name=test");
+    expect(buildQueryString(params)).toBe("?name=test");
   });
 
   it("null 값을 제외해야 합니다", () => {
     const params = { name: "test", value: null };
-    expect(buildQueryString(params)).toBe("name=test");
+    expect(buildQueryString(params)).toBe("?name=test");
   });
 
   it("빈 문자열을 제외해야 합니다", () => {
     const params = { name: "test", empty: "" };
-    expect(buildQueryString(params)).toBe("name=test");
+    expect(buildQueryString(params)).toBe("?name=test");
   });
 
   it("모든 값이 제외되면 빈 문자열을 반환해야 합니다", () => {
@@ -56,7 +56,7 @@ describe("buildQueryString", () => {
 
   it("숫자 0을 포함해야 합니다", () => {
     const params = { count: 0 };
-    expect(buildQueryString(params)).toBe("count=0");
+    expect(buildQueryString(params)).toBe("?count=0");
   });
 
   it("복합 파라미터를 처리해야 합니다", () => {
@@ -68,27 +68,27 @@ describe("buildQueryString", () => {
       value: null,
       empty: "",
     };
-    expect(buildQueryString(params)).toBe("name=test&age=25&active=true");
+    expect(buildQueryString(params)).toBe("?name=test&age=25&active=true");
   });
 
   it("배열 값을 콤마로 구분된 문자열로 변환해야 합니다", () => {
     const params = { timeSlots: ["MORNING", "AFTERNOON", "EVENING"] };
-    expect(buildQueryString(params)).toBe("timeSlots=MORNING%2CAFTERNOON%2CEVENING");
+    expect(buildQueryString(params)).toBe("?timeSlots=MORNING%2CAFTERNOON%2CEVENING");
   });
 
   it("배열에서 undefined, null, 빈 문자열을 제외해야 합니다", () => {
     const params = { items: ["a", undefined, "b", null, "", "c"] };
-    expect(buildQueryString(params)).toBe("items=a%2Cb%2Cc");
+    expect(buildQueryString(params)).toBe("?items=a%2Cb%2Cc");
   });
 
   it("빈 배열은 파라미터에서 제외해야 합니다", () => {
     const params = { name: "test", items: [] };
-    expect(buildQueryString(params)).toBe("name=test");
+    expect(buildQueryString(params)).toBe("?name=test");
   });
 
   it("필터링 후 빈 배열은 파라미터에서 제외해야 합니다", () => {
     const params = { name: "test", items: [undefined, null, ""] };
-    expect(buildQueryString(params)).toBe("name=test");
+    expect(buildQueryString(params)).toBe("?name=test");
   });
 
   it("SessionListParams 형태의 파라미터를 처리해야 합니다", () => {
@@ -101,7 +101,7 @@ describe("buildQueryString", () => {
     };
     const result = buildQueryString(params);
     expect(result).toBe(
-      "requiredFocusRate=80&requiredAchievementRate=90&sort=LATEST&page=2&size=5"
+      "?requiredFocusRate=80&requiredAchievementRate=90&sort=LATEST&page=2&size=5"
     );
   });
 
