@@ -18,6 +18,8 @@ import type {
   CreateSessionResponse,
   JoinSessionRequest,
   JoinSessionResponse,
+  SetGoalRequest,
+  SetGoalResponse,
 } from "../types";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
@@ -63,6 +65,22 @@ export function useJoinSession() {
     mutationFn: ({ sessionRoomId, body }) => sessionApi.join(sessionRoomId, body),
     onSuccess: (_, { sessionRoomId }) => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
+    },
+  });
+}
+
+export function useSetGoal() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    ApiSuccessResponse<SetGoalResponse>,
+    unknown,
+    { sessionRoomId: string; body: SetGoalRequest }
+  >({
+    mutationFn: ({ sessionRoomId, body }) => sessionApi.setGoal(sessionRoomId, body),
+    onSuccess: (_, { sessionRoomId }) => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.report(sessionRoomId) });
     },
   });
 }
