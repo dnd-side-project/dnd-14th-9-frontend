@@ -1,8 +1,9 @@
 "use client";
 
 import { cva, type VariantProps } from "class-variance-authority";
-import { forwardRef, useState, useRef, useCallback, useId, type InputHTMLAttributes } from "react";
+import { forwardRef, useRef, useCallback, useId, type InputHTMLAttributes } from "react";
 
+import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { cn } from "@/lib/utils/utils";
 import { CloudUploadIcon } from "../Icon/CloudUploadIcon";
 import { FileIcon } from "../Icon/FileIcon";
@@ -98,49 +99,8 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
     const inputId = id ?? generatedId;
     const internalInputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const dragCounter = useRef(0);
 
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragFileName, setDragFileName] = useState<string | null>(null);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-    const getState = useCallback((): UploadState => {
-      if (uploadProgress !== undefined && uploadProgress >= 0 && uploadProgress < 100) {
-        return "uploading";
-      }
-      if (isDragging) {
-        return "dragging";
-      }
-      return "default";
-    }, [uploadProgress, isDragging]);
-
-    const state = getState();
-    const isUploading = state === "uploading";
-
-    const extractFileName = useCallback((e: React.DragEvent<HTMLDivElement>): string | null => {
-      // Try to get filename from files (works on drop)
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        return e.dataTransfer.files[0].name;
-      }
-
-      // Try to get filename from items
-      if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-        const item = e.dataTransfer.items[0];
-        if (item.kind === "file") {
-          const file = item.getAsFile();
-          if (file?.name) {
-            return file.name;
-          }
-        }
-      }
-
-      // Fallback: check if files are being dragged
-      if (e.dataTransfer.types.includes("Files")) {
-        return "파일";
-      }
-
-      return null;
-    }, []);
+    const isUploading = uploadProgress !== undefined && uploadProgress >= 0 && uploadProgress < 100;
 
     const handleFileSelection = useCallback(
       (file: File | null) => {
@@ -159,82 +119,13 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
       [maxFileSize, onFileSelect, onFileSizeError]
     );
 
-    const handleDragEnter = useCallback(
-      (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (disabled || isUploading) return;
+    const { isDragging, dragFileName, mousePosition, dragHandlers } = useDragAndDrop({
+      disabled: disabled || isUploading,
+      onFileDrop: handleFileSelection,
+      containerRef,
+    });
 
-        dragCounter.current++;
-        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-          setIsDragging(true);
-          const fileName = extractFileName(e);
-          if (fileName) {
-            setDragFileName(fileName);
-          }
-        }
-      },
-      [disabled, isUploading, extractFileName]
-    );
-
-    const handleDragLeave = useCallback(
-      (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (disabled || isUploading) return;
-
-        dragCounter.current--;
-        if (dragCounter.current === 0) {
-          setIsDragging(false);
-          setDragFileName(null);
-        }
-      },
-      [disabled, isUploading]
-    );
-
-    const handleDragOver = useCallback(
-      (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (containerRef.current) {
-          const rect = containerRef.current.getBoundingClientRect();
-          setMousePosition({
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-          });
-        }
-
-        // Try to get filename if not already set
-        if (!dragFileName || dragFileName === "파일") {
-          const fileName = extractFileName(e);
-          if (fileName && fileName !== "파일") {
-            setDragFileName(fileName);
-          } else if (!dragFileName && fileName) {
-            setDragFileName(fileName);
-          }
-        }
-      },
-      [dragFileName, extractFileName]
-    );
-
-    const handleDrop = useCallback(
-      (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDragging(false);
-        setDragFileName(null);
-        dragCounter.current = 0;
-
-        if (disabled || isUploading) return;
-
-        const files = e.dataTransfer.files;
-        if (files && files.length > 0) {
-          handleFileSelection(files[0]);
-        }
-      },
-      [disabled, isUploading, handleFileSelection]
-    );
+    const state: UploadState = isUploading ? "uploading" : isDragging ? "dragging" : "default";
 
     const handleClick = useCallback(() => {
       if (disabled || isUploading) return;
@@ -265,10 +156,10 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
         <div
           ref={containerRef}
           className={cn(imageUploaderVariants({ state, disabled, className }))}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
+          onDragEnter={dragHandlers.onDragEnter}
+          onDragLeave={dragHandlers.onDragLeave}
+          onDragOver={dragHandlers.onDragOver}
+          onDrop={dragHandlers.onDrop}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
           role="button"
