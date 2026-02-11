@@ -83,7 +83,6 @@ export function useSetGoal() {
     mutationFn: ({ sessionRoomId, body }) => sessionApi.setGoal(sessionRoomId, body),
     onSuccess: (_, { sessionRoomId }) => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
-      queryClient.invalidateQueries({ queryKey: sessionKeys.report(sessionRoomId) });
     },
   });
 }
@@ -99,7 +98,6 @@ export function useAddTodos() {
     mutationFn: ({ sessionRoomId, body }) => sessionApi.addTodos(sessionRoomId, body),
     onSuccess: (_, { sessionRoomId }) => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
-      queryClient.invalidateQueries({ queryKey: sessionKeys.report(sessionRoomId) });
     },
   });
 }
@@ -114,7 +112,7 @@ export function useToggleTodo() {
   >({
     mutationFn: ({ sessionRoomId, todoId }) => sessionApi.toggleTodo(sessionRoomId, todoId),
     onSuccess: (_, { sessionRoomId }) => {
-      queryClient.invalidateQueries({ queryKey: sessionKeys.report(sessionRoomId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
     },
   });
 }
