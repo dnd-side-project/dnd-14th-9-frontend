@@ -67,7 +67,7 @@ export type DurationRange =
   | "FIVE_TO_EIGHT_HOURS"
   | "TEN_PLUS_HOURS";
 
-export type SessionListStatus = "대기" | "진행중";
+export type SessionListStatus = "WAITING" | "IN_PROGRESS";
 
 // 목록 조회 파라미터
 export interface SessionListParams {
@@ -87,7 +87,7 @@ export interface SessionListParams {
 
 // 목록 아이템
 export interface SessionListItem {
-  category: string;
+  category: SessionCategory;
   title: string;
   hostNickname: string;
   status: SessionListStatus;
