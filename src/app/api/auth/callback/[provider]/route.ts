@@ -1,18 +1,13 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { isLoginProvider, normalizeInternalPath } from "@/lib/auth/login-policy";
-import {
-  ACCESS_TOKEN_COOKIE,
-  REDIRECT_AFTER_LOGIN_COOKIE,
-  REFRESH_TOKEN_COOKIE,
-} from "@/lib/auth/cookie-constants";
+import { isLoginProvider } from "@/lib/auth/login-policy";
 import { setAuthCookies } from "@/lib/auth/auth-cookies";
-
-function buildLoginRedirectUrl(request: NextRequest, reason: string): URL {
-  const url = new URL("/login", request.url);
-  url.searchParams.set("reason", reason);
-  return url;
-}
+import {
+  consumeRedirectAfterLoginCookie,
+  getCallbackTokens,
+  getRedirectAfterLoginPath,
+  redirectToLogin,
+} from "@/lib/auth/auth-route-utils";
 
 interface CallbackRouteContext {
   params: Promise<{
@@ -24,31 +19,30 @@ export async function GET(request: NextRequest, context: CallbackRouteContext) {
   const { provider } = await context.params;
 
   if (!isLoginProvider(provider)) {
-    return NextResponse.redirect(buildLoginRedirectUrl(request, "access_denied"));
+    return redirectToLogin(request, "access_denied");
   }
 
   const cookieStore = await cookies();
   const searchParams = request.nextUrl.searchParams;
   const error = searchParams.get("error");
-  const redirectPath = normalizeInternalPath(cookieStore.get(REDIRECT_AFTER_LOGIN_COOKIE)?.value);
+  const redirectPath = getRedirectAfterLoginPath(cookieStore);
 
   // OAuth 에러 처리 (사용자가 인증 취소 등)
   if (error) {
-    return NextResponse.redirect(buildLoginRedirectUrl(request, error));
+    return redirectToLogin(request, error);
   }
 
   // Query parameter에서 토큰 추출
-  const accessToken = searchParams.get(ACCESS_TOKEN_COOKIE);
-  const refreshToken = searchParams.get(REFRESH_TOKEN_COOKIE);
+  const { accessToken, refreshToken } = getCallbackTokens(searchParams);
 
   if (!accessToken || !refreshToken) {
     console.error("OAuth callback: No tokens in query parameters");
-    return NextResponse.redirect(buildLoginRedirectUrl(request, "no_token"));
+    return redirectToLogin(request, "no_token");
   }
 
   setAuthCookies(cookieStore, { accessToken, refreshToken });
   // 인증 성공 시 복귀 경로 쿠키를 1회성으로 소비한다.
-  cookieStore.delete(REDIRECT_AFTER_LOGIN_COOKIE);
+  consumeRedirectAfterLoginCookie(cookieStore);
 
   // 인증 성공 - 저장된 경로 또는 홈으로 리다이렉트
   return NextResponse.redirect(new URL(redirectPath, request.url));
