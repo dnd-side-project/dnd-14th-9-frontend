@@ -57,62 +57,36 @@ export function useSessionReport(sessionId: string) {
   });
 }
 
-export function useJoinSession() {
-  const queryClient = useQueryClient();
+const createSessionMutationHook = <TData, TVariables extends { sessionRoomId: string }>(
+  mutationFn: (vars: TVariables) => Promise<TData>
+) => {
+  return () => {
+    const queryClient = useQueryClient();
+    return useMutation<TData, unknown, TVariables>({
+      mutationFn,
+      onSuccess: (_, { sessionRoomId }) => {
+        queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
+      },
+    });
+  };
+};
 
-  return useMutation<
-    ApiSuccessResponse<JoinSessionResponse>,
-    unknown,
-    { sessionRoomId: string; body: JoinSessionRequest }
-  >({
-    mutationFn: ({ sessionRoomId, body }) => sessionApi.join(sessionRoomId, body),
-    onSuccess: (_, { sessionRoomId }) => {
-      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
-    },
-  });
-}
+export const useJoinSession = createSessionMutationHook<
+  ApiSuccessResponse<JoinSessionResponse>,
+  { sessionRoomId: string; body: JoinSessionRequest }
+>(({ sessionRoomId, body }) => sessionApi.join(sessionRoomId, body));
 
-export function useSetGoal() {
-  const queryClient = useQueryClient();
+export const useSetGoal = createSessionMutationHook<
+  ApiSuccessResponse<SetGoalResponse>,
+  { sessionRoomId: string; body: SetGoalRequest }
+>(({ sessionRoomId, body }) => sessionApi.setGoal(sessionRoomId, body));
 
-  return useMutation<
-    ApiSuccessResponse<SetGoalResponse>,
-    unknown,
-    { sessionRoomId: string; body: SetGoalRequest }
-  >({
-    mutationFn: ({ sessionRoomId, body }) => sessionApi.setGoal(sessionRoomId, body),
-    onSuccess: (_, { sessionRoomId }) => {
-      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
-    },
-  });
-}
+export const useAddTodos = createSessionMutationHook<
+  ApiSuccessResponse<AddTodosResponse>,
+  { sessionRoomId: string; body: AddTodosRequest }
+>(({ sessionRoomId, body }) => sessionApi.addTodos(sessionRoomId, body));
 
-export function useAddTodos() {
-  const queryClient = useQueryClient();
-
-  return useMutation<
-    ApiSuccessResponse<AddTodosResponse>,
-    unknown,
-    { sessionRoomId: string; body: AddTodosRequest }
-  >({
-    mutationFn: ({ sessionRoomId, body }) => sessionApi.addTodos(sessionRoomId, body),
-    onSuccess: (_, { sessionRoomId }) => {
-      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
-    },
-  });
-}
-
-export function useToggleTodo() {
-  const queryClient = useQueryClient();
-
-  return useMutation<
-    ApiSuccessResponse<ToggleTodoResponse>,
-    unknown,
-    { sessionRoomId: string; todoId: string }
-  >({
-    mutationFn: ({ sessionRoomId, todoId }) => sessionApi.toggleTodo(sessionRoomId, todoId),
-    onSuccess: (_, { sessionRoomId }) => {
-      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
-    },
-  });
-}
+export const useToggleTodo = createSessionMutationHook<
+  ApiSuccessResponse<ToggleTodoResponse>,
+  { sessionRoomId: string; todoId: string }
+>(({ sessionRoomId, todoId }) => sessionApi.toggleTodo(sessionRoomId, todoId));
