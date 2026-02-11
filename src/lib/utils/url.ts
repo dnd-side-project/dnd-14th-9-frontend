@@ -27,7 +27,7 @@ export function buildQueryString(params: QueryParams): string {
   });
 
   const query = searchParams.toString();
-  return query;
+  return query ? `?${query}` : "";
 }
 
 export function parseQueryString<T extends Record<string, string>>(search: string): Partial<T> {
