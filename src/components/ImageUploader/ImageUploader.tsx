@@ -5,6 +5,7 @@ import { forwardRef, useRef, useCallback, useId, type InputHTMLAttributes } from
 
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { cn } from "@/lib/utils/utils";
+import { Button } from "../Button/Button";
 import { CloudUploadIcon } from "../Icon/CloudUploadIcon";
 import { FileIcon } from "../Icon/FileIcon";
 import { ProgressRing } from "../ProgressRing/ProgressRing";
@@ -75,6 +76,8 @@ export interface ImageUploaderProps
   uploadingText?: string;
   /** 컨테이너 클래스 */
   containerClassName?: string;
+  /** 업로드 취소 시 콜백 */
+  onCancel?: () => void;
 }
 
 export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
@@ -90,6 +93,7 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
       disabled = false,
       hintText = "최대 5MB 파일만 허용 가능",
       uploadingText = "업로드 중...",
+      onCancel,
       id,
       ...props
     },
@@ -203,15 +207,27 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
 
           {/* 상태별 콘텐츠 렌더링 */}
           {isUploading ? (
-            <>
+            <div className="flex flex-col items-center gap-3">
               <ProgressRing progress={uploadProgress!} />
               <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
                 {uploadingText}
               </span>
-            </>
+              <Button
+                variant="outlined"
+                colorScheme="secondary"
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCancel?.();
+                }}
+              >
+                취소하기
+              </Button>
+            </div>
           ) : (
             <>
               <CloudUploadIcon size="xlarge" className="text-green-600" />
+              <span className="text-sm text-gray-50">커버 사진을 등록해주세요</span>
               <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
                 {hintText}
               </span>
