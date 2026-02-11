@@ -21,7 +21,7 @@ const buttonVariants = cva(
         xlarge: "h-16 min-w-[106px] px-xl py-md",
         large: "h-14 min-w-[94px] px-lg py-xs",
         medium: "h-12 min-w-[82px] px-md py-2xs",
-        small: "h-10 min-w-[70px] px-2xs py-2xs",
+        small: "h-10 min-w-[70px] px-2xs py-2xs text-xs",
         xsmall: "h-8 min-w-[58px] px-2 py-1",
       },
       iconOnly: {
