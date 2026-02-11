@@ -3,11 +3,13 @@ import { NextResponse } from "next/server";
 
 import {
   ACCESS_TOKEN_COOKIE,
+  LOGIN_ERROR_COOKIE,
+  LOGIN_ERROR_MAX_AGE_SECONDS,
   REDIRECT_AFTER_LOGIN_COOKIE,
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
   REFRESH_TOKEN_COOKIE,
 } from "./cookie-constants";
-import { normalizeInternalPath } from "./login-policy";
+import { getLoginReasonMessage, normalizeInternalPath } from "./login-policy";
 
 interface CookieReader {
   get: (name: string) => { value: string } | undefined;
@@ -65,4 +67,68 @@ export function getCallbackTokens(searchParams: URLSearchParams) {
     accessToken: searchParams.get(ACCESS_TOKEN_COOKIE),
     refreshToken: searchParams.get(REFRESH_TOKEN_COOKIE),
   };
+}
+
+interface CookieSetter {
+  set: (
+    name: string,
+    value: string,
+    options?: {
+      path?: string;
+      maxAge?: number;
+      sameSite?: "lax" | "strict" | "none";
+      secure?: boolean;
+    }
+  ) => void;
+}
+
+export function setLoginErrorCookie(cookieSetter: CookieSetter, reason: string) {
+  cookieSetter.set(LOGIN_ERROR_COOKIE, reason, {
+    path: "/",
+    maxAge: LOGIN_ERROR_MAX_AGE_SECONDS,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
+}
+
+export function getLoginErrorReason(cookieReader: CookieReader): string | null {
+  return cookieReader.get(LOGIN_ERROR_COOKIE)?.value ?? null;
+}
+
+export function consumeLoginErrorCookie(cookieWriter: CookieWriter) {
+  cookieWriter.delete(LOGIN_ERROR_COOKIE);
+}
+
+interface LoginPagePropsParams {
+  searchParams: Record<string, string | string[] | undefined>;
+  cookieStore: CookieReader & CookieWriter;
+}
+
+interface LoginPagePropsResult {
+  reasonMessage: string | null;
+  nextPath: string;
+}
+
+export function getLoginPageProps({
+  searchParams,
+  cookieStore,
+}: LoginPagePropsParams): LoginPagePropsResult {
+  // 쿠키에서 에러 확인 (우선순위 1)
+  const errorFromCookie = getLoginErrorReason(cookieStore);
+
+  // URL 파라미터에서 에러 확인 (우선순위 2, 하위 호환성)
+  const reasonParam = searchParams.reason;
+  const reasonFromUrl = Array.isArray(reasonParam) ? reasonParam[0] : reasonParam;
+
+  const reason = errorFromCookie ?? reasonFromUrl;
+  const reasonMessage = getLoginReasonMessage(reason);
+
+  // 에러 쿠키를 1회성으로 소비
+  if (errorFromCookie) {
+    consumeLoginErrorCookie(cookieStore);
+  }
+
+  const nextPath = normalizeInternalPath(cookieStore.get(REDIRECT_AFTER_LOGIN_COOKIE)?.value);
+
+  return { reasonMessage, nextPath };
 }
