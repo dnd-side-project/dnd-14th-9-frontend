@@ -18,7 +18,7 @@ export function OAuthLoginForm({ nextPath }: OAuthLoginFormProps) {
   };
 
   return (
-    <div className="w-[360px]">
+    <div className="w-[360px] max-w-full">
       <p className="sr-only" aria-live="polite">
         {loadingProvider === kakaoProvider
           ? "카카오 로그인 중…"
@@ -31,7 +31,7 @@ export function OAuthLoginForm({ nextPath }: OAuthLoginFormProps) {
         <form
           action="/api/auth/login"
           method="get"
-          className="w-[360px]"
+          className="w-full"
           onSubmit={() => handleSubmit(kakaoProvider)}
         >
           <input type="hidden" name="provider" value={kakaoProvider} />
@@ -47,7 +47,7 @@ export function OAuthLoginForm({ nextPath }: OAuthLoginFormProps) {
         <form
           action="/api/auth/login"
           method="get"
-          className="w-[360px]"
+          className="w-full"
           onSubmit={() => handleSubmit(googleProvider)}
         >
           <input type="hidden" name="provider" value={googleProvider} />

@@ -25,7 +25,7 @@ export function LoginModal({ nextPath }: LoginModalProps) {
       {/* 오버레이 */}
       <div className="bg-overlay-default fixed inset-0" />
 
-      <div className="relative z-10">
+      <div className="relative z-10 w-full max-w-[360px] md:max-w-[400px] lg:max-w-[440px]">
         <LoginCard nextPath={nextPath} onClose={handleClose} />
       </div>
     </div>

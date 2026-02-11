@@ -9,7 +9,7 @@ interface LoginCardProps {
 
 export function LoginCard({ reasonMessage, nextPath, onClose }: LoginCardProps) {
   return (
-    <div className="border-sm border-border-gray-stronger bg-surface-default p-3xl relative flex h-[360px] w-[440px] flex-col items-start justify-between rounded-lg shadow-[0_0_80px_0_var(--color-alpha-black-32)]">
+    <div className="border-sm border-border-gray-stronger bg-surface-default p-3xl relative flex min-h-[360px] w-[440px] max-w-full flex-col items-start justify-between rounded-lg shadow-[0_0_80px_0_var(--color-alpha-black-32)]">
       {onClose ? (
         <button
           type="button"
@@ -22,7 +22,7 @@ export function LoginCard({ reasonMessage, nextPath, onClose }: LoginCardProps) 
       ) : null}
 
       <div className="w-full">
-        <div className="mb-lg gap-2xs flex flex-col text-center sm:text-left">
+        <div className="mb-lg gap-2xs flex flex-col text-left">
           <h2 className="font-pretendard text-text-primary text-2xl leading-[140%] font-semibold">
             회원가입 / 로그인
           </h2>
@@ -32,7 +32,7 @@ export function LoginCard({ reasonMessage, nextPath, onClose }: LoginCardProps) 
         </div>
 
         {reasonMessage ? (
-          <p className="font-pretendard text-text-status-negative-default text-center text-sm sm:text-left">
+          <p className="font-pretendard text-text-status-negative-default text-left text-sm">
             {reasonMessage}
           </p>
         ) : null}
