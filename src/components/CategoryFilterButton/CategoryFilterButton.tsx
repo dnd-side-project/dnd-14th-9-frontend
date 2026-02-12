@@ -19,9 +19,9 @@ const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
   {
     variants: {
       isSelected: {
-        true: "bg-[#52EE8533] text-green-600",
+        true: "bg-[#52EE8533] text-green-600 rounded-sm",
         false:
-          "hover:bg-[#52EE8533] hover:text-green-600 active:bg-[#52EE8533] active:text-green-600",
+          "hover:bg-[#52EE8533] hover:text-green-600 hover:rounded-sm active:bg-[#52EE8533] active:text-green-600 active:rounded-sm",
       },
     },
     defaultVariants: {
