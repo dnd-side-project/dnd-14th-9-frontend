@@ -1,0 +1,21 @@
+import { LOGIN_PROVIDERS, LOGIN_REASON_MESSAGES } from "@/lib/auth/auth-constants";
+
+export type LoginProvider = (typeof LOGIN_PROVIDERS)[number];
+type LoginReason = keyof typeof LOGIN_REASON_MESSAGES;
+
+export function isLoginProvider(value: string | null | undefined): value is LoginProvider {
+  if (!value) return false;
+  return LOGIN_PROVIDERS.includes(value as LoginProvider);
+}
+
+export function normalizeInternalPath(path: string | null | undefined): string {
+  if (!path) return "/";
+  if (!path.startsWith("/") || path.startsWith("//")) return "/";
+  if (path === "/login" || path.startsWith("/login?")) return "/";
+  return path;
+}
+
+export function getLoginReasonMessage(reason: string | null | undefined): string | null {
+  if (!reason) return null;
+  return LOGIN_REASON_MESSAGES[reason as LoginReason] ?? null;
+}

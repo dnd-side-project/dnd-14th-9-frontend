@@ -1,14 +1,19 @@
 /* eslint-disable no-console */
+import { DEFAULT_API_ERROR_MESSAGE, getApiErrorMessageByCode } from "@/lib/api/api-error-messages";
 import type { ApiErrorResponse } from "@/types/shared/types";
 
 export interface ExecuteFetchOptions {
   timeout?: number;
   retry?: RetryOptions;
   signal?: AbortSignal;
+  responseType?: "json" | "raw";
+  throwOnHttpError?: boolean;
 }
 
 export const isDev = process.env.NODE_ENV === "development";
 export const API_URL = process.env.NEXT_PUBLIC_API_URL;
+export const SERVER_API_URL =
+  process.env.BACKEND_API_BASE ?? process.env.NEXT_PUBLIC_BACKEND_API_BASE ?? API_URL;
 
 export type RequestMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
@@ -86,16 +91,55 @@ export function buildRetryConfig(retry?: RetryOptions) {
   };
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
+  if (!isRecord(value)) return false;
+  return (
+    value.isSuccess === false && typeof value.code === "string" && typeof value.message === "string"
+  );
+}
+
+function getApiErrorMessage(value: unknown, status: number): string {
+  if (isApiErrorResponse(value)) {
+    return getApiErrorMessageByCode(value.code) ?? value.message;
+  }
+
+  if (isRecord(value) && typeof value.code === "string") {
+    const mappedMessage = getApiErrorMessageByCode(value.code);
+    if (mappedMessage) return mappedMessage;
+  }
+
+  // 백엔드 스펙 전환 전 응답 포맷 호환 (success/error.message)
+  if (isRecord(value) && isRecord(value.error) && typeof value.error.message === "string") {
+    return value.error.message;
+  }
+
+  return status >= 500 ? DEFAULT_API_ERROR_MESSAGE : `HTTP error! status: ${status}`;
+}
+
 // ===== 공통 fetch 실행 =====
 
-export async function executeFetch<T>(
+type ExecuteFetchResult<
+  T,
+  R extends ExecuteFetchOptions["responseType"] | undefined,
+> = R extends "raw" ? Response : T;
+
+export async function executeFetch<
+  T = unknown,
+  R extends ExecuteFetchOptions["responseType"] | undefined = "json",
+>(
   method: RequestMethod,
   url: string,
   init: RequestInit,
-  options?: ExecuteFetchOptions
-): Promise<T> {
+  options?: ExecuteFetchOptions & { responseType?: R }
+): Promise<ExecuteFetchResult<T, R>> {
   const retryConfig = buildRetryConfig(options?.retry);
   const timeout = options?.timeout ?? 30000;
+  const responseType = options?.responseType ?? "json";
+  const throwOnHttpError = options?.throwOnHttpError ?? true;
   let attempt = 0;
 
   while (true) {
@@ -113,39 +157,69 @@ export async function executeFetch<T>(
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        let errorData: ApiErrorResponse | null = null;
-        try {
-          errorData = await response.json();
-        } catch {
-          // JSON 파싱 실패 시 무시
-        }
-
-        const error = new ApiError(
-          errorData?.error.message ?? `HTTP error! status: ${response.status}`,
-          response.status,
-          errorData
+        const retryableError = new ApiError(
+          `HTTP error! status: ${response.status}`,
+          response.status
         );
 
-        if (shouldRetry(error, attempt, retryConfig.maxRetries, retryConfig.retryableStatuses)) {
+        if (
+          shouldRetry(
+            retryableError,
+            attempt,
+            retryConfig.maxRetries,
+            retryConfig.retryableStatuses
+          )
+        ) {
           attempt++;
           const delay = retryConfig.retryDelay * Math.pow(2, attempt - 1);
-          log("error", `Retry ${attempt}/${retryConfig.maxRetries} after ${delay}ms`, error);
+          log(
+            "error",
+            `Retry ${attempt}/${retryConfig.maxRetries} after ${delay}ms`,
+            retryableError
+          );
           await sleep(delay);
           continue;
         }
 
-        log("error", response.status, errorData);
-        throw error;
+        if (throwOnHttpError) {
+          let errorPayload: unknown = null;
+          let errorData: ApiErrorResponse | null = null;
+          try {
+            errorPayload = await response.json();
+            if (isApiErrorResponse(errorPayload)) {
+              errorData = errorPayload;
+            }
+          } catch {
+            // JSON 파싱 실패 시 무시
+          }
+
+          const error = new ApiError(
+            getApiErrorMessage(errorPayload, response.status),
+            response.status,
+            errorData
+          );
+
+          log("error", response.status, errorData);
+          throw error;
+        }
+
+        if (responseType === "raw") {
+          return response as ExecuteFetchResult<T, R>;
+        }
+      }
+
+      if (responseType === "raw") {
+        return response as ExecuteFetchResult<T, R>;
       }
 
       if (response.status === 204) {
         log("response", response.status, "No Content");
-        return null as T;
+        return null as ExecuteFetchResult<T, R>;
       }
 
-      const responseData = await response.json();
+      const responseData = (await response.json()) as T;
       log("response", response.status, responseData);
-      return responseData;
+      return responseData as ExecuteFetchResult<T, R>;
     } catch (error) {
       clearTimeout(timeoutId);
 

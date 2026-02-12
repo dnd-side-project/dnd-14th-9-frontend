@@ -1,5 +1,6 @@
-import { API_URL, type RetryOptions, type RequestMethod, executeFetch } from "./api-client";
 import { buildQueryString } from "@/lib/utils/url";
+
+import { API_URL, type RetryOptions, type RequestMethod, executeFetch } from "./api-client";
 
 type RequestConfig = {
   url: string;

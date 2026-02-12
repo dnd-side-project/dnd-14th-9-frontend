@@ -1,9 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { Heart, Settings, Search, X } from "lucide-react";
 import { createElement } from "react";
+
+import { Heart, Settings, Search, X } from "lucide-react";
 
 import { Button } from "@/components/Button/Button";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
+
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
   title: "Components/Button",
@@ -14,14 +16,18 @@ const meta = {
     docs: {
       description: {
         component:
-          "다양한 상황에서 사용할 수 있는 반응형 버튼 컴포넌트입니다. 4가지 variant(primary, secondary, tertiary, text)와 5가지 size(xlarge, large, medium, small, xsmall)를 지원합니다.",
+          "다양한 상황에서 사용할 수 있는 반응형 버튼 컴포넌트입니다. 3가지 variant(solid, outlined, ghost)와 colorScheme(primary, secondary, tertiary), 5가지 size(xlarge, large, medium, small, xsmall)를 지원합니다.",
       },
     },
   },
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "secondary", "tertiary", "text"],
+      options: ["solid", "outlined", "ghost"],
+    },
+    colorScheme: {
+      control: "select",
+      options: ["primary", "secondary", "tertiary"],
     },
     size: {
       control: "select",
@@ -47,32 +53,62 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Variant Stories
-export const Primary: Story = {
+// SOLID Variant Stories
+export const SolidPrimary: Story = {
   args: {
-    variant: "primary",
-    children: "Primary",
+    variant: "solid",
+    colorScheme: "primary",
+    children: "Solid Primary",
   },
 };
 
-export const Secondary: Story = {
+export const SolidSecondary: Story = {
   args: {
-    variant: "secondary",
-    children: "Secondary",
+    variant: "solid",
+    colorScheme: "secondary",
+    children: "Solid Secondary",
   },
 };
 
-export const Tertiary: Story = {
+export const SolidTertiary: Story = {
   args: {
-    variant: "tertiary",
-    children: "Tertiary",
+    variant: "solid",
+    colorScheme: "tertiary",
+    children: "Solid Tertiary",
   },
 };
 
-export const Text: Story = {
+// OUTLINED Variant Stories
+export const OutlinedPrimary: Story = {
   args: {
-    variant: "text",
-    children: "Text Only",
+    variant: "outlined",
+    colorScheme: "primary",
+    children: "Outlined Primary",
+  },
+};
+
+export const OutlinedSecondary: Story = {
+  args: {
+    variant: "outlined",
+    colorScheme: "secondary",
+    children: "Outlined Secondary",
+  },
+};
+
+// GHOST Variant Stories
+export const GhostPrimary: Story = {
+  args: {
+    variant: "ghost",
+    colorScheme: "primary",
+    children: "Ghost Primary",
+  },
+};
+
+export const GhostSecondary: Story = {
+  args: {
+    variant: "ghost",
+    colorScheme: "secondary",
+    children: "Ghost Secondary",
   },
 };
 
@@ -113,17 +149,28 @@ export const XSmall: Story = {
 };
 
 // Disabled States
-export const PrimaryDisabled: Story = {
+export const SolidDisabled: Story = {
   args: {
-    variant: "primary",
+    variant: "solid",
+    colorScheme: "primary",
     children: "Disabled",
     disabled: true,
   },
 };
 
-export const TertiaryDisabled: Story = {
+export const OutlinedDisabled: Story = {
   args: {
-    variant: "tertiary",
+    variant: "outlined",
+    colorScheme: "primary",
+    children: "Disabled",
+    disabled: true,
+  },
+};
+
+export const GhostDisabled: Story = {
+  args: {
+    variant: "ghost",
+    colorScheme: "primary",
     children: "Disabled",
     disabled: true,
   },
@@ -155,21 +202,23 @@ export const IconOnlyXLarge: Story = {
 };
 
 // Icon Only with different variants
-export const IconOnlySecondary: Story = {
+export const IconOnlyOutlined: Story = {
   args: {
     iconOnly: true,
     leftIcon: createElement(Search, { size: 24 }),
     size: "medium",
-    variant: "secondary",
+    variant: "outlined",
+    colorScheme: "primary",
   },
 };
 
-export const IconOnlyTertiary: Story = {
+export const IconOnlyGhost: Story = {
   args: {
     iconOnly: true,
     leftIcon: createElement(X, { size: 24 }),
     size: "medium",
-    variant: "tertiary",
+    variant: "ghost",
+    colorScheme: "primary",
   },
 };
 
