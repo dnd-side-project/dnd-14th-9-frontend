@@ -12,7 +12,7 @@ export async function Header() {
   const isAuthenticated = await getServerAuthState();
 
   return (
-    <header className="border-border-subtle bg-surface-default py-sm mx-auto flex h-full max-w-screen-2xl items-center justify-between border-b px-[50px]">
+    <header className="border-border-subtle bg-surface-default px-lg md:px-xl md:py-sm mx-auto flex h-full max-w-[1280px] items-center justify-between border-b py-[15px] lg:px-[50px]">
       <Link
         href="/"
         aria-label="홈으로 이동"
@@ -30,6 +30,7 @@ export async function Header() {
               size="small"
               variant="solid"
               colorScheme="primary"
+              className="px-xs py-2xs md:px-sm md:py-xs"
             >
               세션 만들기
             </ButtonLink>
@@ -42,6 +43,7 @@ export async function Header() {
             size="small"
             variant="outlined"
             colorScheme="secondary"
+            className="px-xs py-2xs md:px-sm md:py-xs"
           >
             회원가입 / 로그인
           </ButtonLink>
