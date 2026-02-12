@@ -22,7 +22,7 @@ const buttonVariants = cva(
         xlarge: "h-16 min-w-[106px] px-xl py-md",
         large: "h-14 min-w-[94px] px-lg py-xs",
         medium: "h-12 min-w-[82px] px-md py-2xs",
-        small: "h-10 min-w-[70px] px-2xs py-2xs text-xs",
+        small: "px-sm py-xs text-xs leading-[140%] font-semibold",
         xsmall: "h-8 min-w-[58px] px-2 py-1",
       },
       iconOnly: {
@@ -105,7 +105,7 @@ type GhostButtonProps = {
   colorScheme?: "primary" | "secondary";
 };
 
-type ButtonVariantProps = SolidButtonProps | OutlinedButtonProps | GhostButtonProps;
+export type ButtonVariantProps = SolidButtonProps | OutlinedButtonProps | GhostButtonProps;
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
   Omit<VariantProps<typeof buttonVariants>, "variant" | "colorScheme"> &
