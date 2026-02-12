@@ -7,7 +7,6 @@ import {
   getCallbackTokens,
   getRedirectAfterLoginPath,
   redirectToLogin,
-  setLoginErrorCookie,
 } from "@/lib/auth/auth-route-utils";
 import { isLoginProvider } from "@/lib/auth/login-policy";
 
@@ -23,7 +22,6 @@ export async function GET(request: NextRequest, context: CallbackRouteContext) {
   const cookieStore = await cookies();
 
   if (!isLoginProvider(provider)) {
-    setLoginErrorCookie(cookieStore, "access_denied");
     return redirectToLogin(request, "access_denied");
   }
 
@@ -33,7 +31,6 @@ export async function GET(request: NextRequest, context: CallbackRouteContext) {
 
   // OAuth 에러 처리 (사용자가 인증 취소 등)
   if (error) {
-    setLoginErrorCookie(cookieStore, error);
     return redirectToLogin(request, error);
   }
 
@@ -42,7 +39,6 @@ export async function GET(request: NextRequest, context: CallbackRouteContext) {
 
   if (!accessToken || !refreshToken) {
     console.error("OAuth callback: No tokens in query parameters");
-    setLoginErrorCookie(cookieStore, "no_token");
     return redirectToLogin(request, "no_token");
   }
 
