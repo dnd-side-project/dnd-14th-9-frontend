@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { ButtonLink } from "@/components/ButtonLink/ButtonLink";
-import { ProfileIcon } from "@/components/Icon/ProfileIcon";
+import { ProfileDropdown } from "@/components/Header/ProfileDropdown";
 import { getServerAuthState } from "@/lib/auth/server";
 
 /**
@@ -27,21 +27,13 @@ export async function Header() {
             <ButtonLink
               href="/session/create"
               aria-label="세션 만들기"
-              size="xsmall"
+              size="small"
               variant="solid"
               colorScheme="primary"
             >
               세션 만들기
             </ButtonLink>
-
-            <button
-              type="button"
-              disabled
-              aria-label="프로필 메뉴"
-              className="border-border-subtle hover:bg-surface-subtle focus-visible:ring-primary flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <ProfileIcon size="medium" />
-            </button>
+            <ProfileDropdown />
           </>
         ) : (
           <ButtonLink
