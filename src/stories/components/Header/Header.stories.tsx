@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ButtonLink } from "@/components/ButtonLink/ButtonLink";
+import { ButtonLink } from "@/components/Button/ButtonLink";
 import { ProfileDropdown } from "@/components/Header/ProfileDropdown";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
