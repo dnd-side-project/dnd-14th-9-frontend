@@ -19,11 +19,12 @@ interface CallbackRouteContext {
 export async function GET(request: NextRequest, context: CallbackRouteContext) {
   const { provider } = await context.params;
 
+  const cookieStore = await cookies();
+
   if (!isLoginProvider(provider)) {
     return redirectToLogin(request, "access_denied");
   }
 
-  const cookieStore = await cookies();
   const searchParams = request.nextUrl.searchParams;
   const error = searchParams.get("error");
   const redirectPath = getRedirectAfterLoginPath(cookieStore);
