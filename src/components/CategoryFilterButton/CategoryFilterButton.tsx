@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils/utils";
 
 // 카테고리 필터 버튼 스타일 정의
-const categoryFilterButtonVariants = cva(
+const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
   [
     "inline-flex items-center justify-center",
     "bg-transparent",
@@ -31,7 +31,7 @@ const categoryFilterButtonVariants = cva(
 );
 
 export type CategoryFilterButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
-  Omit<VariantProps<typeof categoryFilterButtonVariants>, "isSelected"> & {
+  Omit<VariantProps<typeof CATEGORY_FILTER_BUTTON_VARIANTS>, "isSelected"> & {
     isSelected?: boolean;
   };
 
@@ -40,7 +40,7 @@ export const CategoryFilterButton = forwardRef<HTMLButtonElement, CategoryFilter
     return (
       <button
         ref={ref}
-        className={cn(categoryFilterButtonVariants({ isSelected, className }))}
+        className={cn(CATEGORY_FILTER_BUTTON_VARIANTS({ isSelected, className }))}
         aria-pressed={isSelected}
         {...props}
       >
@@ -52,4 +52,4 @@ export const CategoryFilterButton = forwardRef<HTMLButtonElement, CategoryFilter
 
 CategoryFilterButton.displayName = "CategoryFilterButton";
 
-export { categoryFilterButtonVariants };
+export { CATEGORY_FILTER_BUTTON_VARIANTS };
