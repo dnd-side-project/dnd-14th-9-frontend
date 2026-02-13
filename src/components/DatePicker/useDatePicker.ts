@@ -5,10 +5,7 @@ import {
   formatDateWithDay,
   formatYearMonth,
   isDateInRange,
-  isPastDate,
   isSameDay,
-  isToday,
-  isWithinTwoWeeks,
 } from "@/lib/utils/date";
 
 import type { CalendarDay, DatePickerProps, DateRange } from "./DatePicker.types";
@@ -55,6 +52,15 @@ export function useDatePicker({
     const startDayOfWeek = firstDay.getDay();
     const daysInMonth = lastDay.getDate();
 
+    // 루프 전에 한 번만 계산
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTime = today.getTime();
+
+    const twoWeeksLater = new Date(today);
+    twoWeeksLater.setDate(today.getDate() + 14);
+    const twoWeeksLaterTime = twoWeeksLater.getTime();
+
     const days: CalendarDay[] = [];
 
     for (let i = 0; i < startDayOfWeek; i++) {
@@ -73,9 +79,12 @@ export function useDatePicker({
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const isPast = isPastDate(date);
-      const isTodayDate = isToday(date);
-      const isSelectable = isWithinTwoWeeks(date);
+      date.setHours(0, 0, 0, 0);
+      const dateTime = date.getTime();
+
+      const isPast = dateTime < todayTime;
+      const isTodayDate = dateTime === todayTime;
+      const isSelectable = dateTime >= todayTime && dateTime <= twoWeeksLaterTime;
 
       const isRangeStart = selectedRange.startDate
         ? isSameDay(date, selectedRange.startDate)
