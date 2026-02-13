@@ -27,7 +27,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       <div
         ref={ref}
         className={cn(
-          "border-border-subtle flex h-[345px] w-[356px] flex-col rounded-md border p-4",
+          "border-border-subtle flex min-h-[345px] w-[356px] flex-col rounded-md border p-4",
           disabled && "pointer-events-none opacity-50",
           className
         )}
