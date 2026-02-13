@@ -4,9 +4,10 @@
 
 /* Tailwind v4 Design Tokens - Style Dictionary가 자동 생성 */
 @import "../styles/tokens/theme.css";
+@import "../styles/tokens/theme-light.css";
 
-/* 다크 모드 variant */
-@custom-variant dark (&:is(.dark *));
+/* 라이트 모드 variant */
+@custom-variant light (&:is(.light *));
 
 /* shadcn/ui 토큰을 Tailwind @theme으로 노출 */
 @theme inline {
@@ -130,6 +131,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background-default text-foreground;
   }
 }

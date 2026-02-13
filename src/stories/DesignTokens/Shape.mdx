@@ -1,0 +1,309 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Design Tokens/Shape" />
+
+# 형태 토큰 (Shape Tokens)
+
+Border Radius와 Border Width 토큰입니다.
+
+---
+
+## Border Radius
+
+모서리 둥글기입니다.
+
+<table>
+  <thead>
+    <tr>
+      <th>토큰</th>
+      <th>값</th>
+      <th>Tailwind 클래스</th>
+      <th>용도</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>none</code>
+      </td>
+      <td>0px</td>
+      <td>
+        <code>rounded-none</code>
+      </td>
+      <td>각진 모서리</td>
+    </tr>
+    <tr>
+      <td>
+        <code>2xs</code>
+      </td>
+      <td>2px</td>
+      <td>
+        <code>rounded-2xs</code>
+      </td>
+      <td>아주 미세한 둥글기</td>
+    </tr>
+    <tr>
+      <td>
+        <code>xs</code>
+      </td>
+      <td>4px</td>
+      <td>
+        <code>rounded-xs</code>
+      </td>
+      <td>미세한 둥글기</td>
+    </tr>
+    <tr>
+      <td>
+        <code>sm</code>
+      </td>
+      <td>6px</td>
+      <td>
+        <code>rounded-sm</code>
+      </td>
+      <td>작은 둥글기</td>
+    </tr>
+    <tr>
+      <td>
+        <code>md</code>
+      </td>
+      <td>8px</td>
+      <td>
+        <code>rounded-md</code>
+      </td>
+      <td>기본 둥글기</td>
+    </tr>
+    <tr>
+      <td>
+        <code>lg</code>
+      </td>
+      <td>12px</td>
+      <td>
+        <code>rounded-lg</code>
+      </td>
+      <td>큰 둥글기</td>
+    </tr>
+    <tr>
+      <td>
+        <code>xl</code>
+      </td>
+      <td>16px</td>
+      <td>
+        <code>rounded-xl</code>
+      </td>
+      <td>매우 큰 둥글기</td>
+    </tr>
+    <tr>
+      <td>
+        <code>2xl</code>
+      </td>
+      <td>20px</td>
+      <td>
+        <code>rounded-2xl</code>
+      </td>
+      <td>아주 큰 둥글기</td>
+    </tr>
+    <tr>
+      <td>
+        <code>3xl</code>
+      </td>
+      <td>24px</td>
+      <td>
+        <code>rounded-3xl</code>
+      </td>
+      <td>최대 둥글기</td>
+    </tr>
+    <tr>
+      <td>
+        <code>max</code>
+      </td>
+      <td>999px</td>
+      <td>
+        <code>rounded-max</code>
+      </td>
+      <td>완전 원형 (pill)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginTop: "24px" }}>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{ width: "64px", height: "64px", backgroundColor: "#27ea67", borderRadius: "0px" }}
+    />
+    <code>none</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{ width: "64px", height: "64px", backgroundColor: "#27ea67", borderRadius: "2px" }}
+    />
+    <code>2xs</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{ width: "64px", height: "64px", backgroundColor: "#27ea67", borderRadius: "4px" }}
+    />
+    <code>xs</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{ width: "64px", height: "64px", backgroundColor: "#27ea67", borderRadius: "6px" }}
+    />
+    <code>sm</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{ width: "64px", height: "64px", backgroundColor: "#27ea67", borderRadius: "8px" }}
+    />
+    <code>md</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{ width: "64px", height: "64px", backgroundColor: "#27ea67", borderRadius: "12px" }}
+    />
+    <code>lg</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{ width: "64px", height: "64px", backgroundColor: "#27ea67", borderRadius: "16px" }}
+    />
+    <code>xl</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{ width: "64px", height: "64px", backgroundColor: "#27ea67", borderRadius: "20px" }}
+    />
+    <code>2xl</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{ width: "64px", height: "64px", backgroundColor: "#27ea67", borderRadius: "24px" }}
+    />
+    <code>3xl</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{ width: "64px", height: "64px", backgroundColor: "#27ea67", borderRadius: "999px" }}
+    />
+    <code>max</code>
+  </div>
+</div>
+
+---
+
+## Border Width
+
+테두리 두께입니다.
+
+<table>
+  <thead>
+    <tr>
+      <th>토큰</th>
+      <th>값</th>
+      <th>Tailwind 클래스</th>
+      <th>용도</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>sm</code>
+      </td>
+      <td>1px</td>
+      <td>
+        <code>border-sm</code>
+      </td>
+      <td>기본 테두리</td>
+    </tr>
+    <tr>
+      <td>
+        <code>md</code>
+      </td>
+      <td>2px</td>
+      <td>
+        <code>border-md</code>
+      </td>
+      <td>강조 테두리</td>
+    </tr>
+    <tr>
+      <td>
+        <code>lg</code>
+      </td>
+      <td>4px</td>
+      <td>
+        <code>border-lg</code>
+      </td>
+      <td>두꺼운 테두리</td>
+    </tr>
+  </tbody>
+</table>
+
+<div style={{ display: "flex", gap: "24px", marginTop: "24px" }}>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{
+        width: "80px",
+        height: "48px",
+        backgroundColor: "#f5f7fa",
+        border: "1px solid #464c53",
+        borderRadius: "8px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <span style={{ fontSize: "12px", color: "#464c53" }}>1px</span>
+    </div>
+    <code>sm</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{
+        width: "80px",
+        height: "48px",
+        backgroundColor: "#f5f7fa",
+        border: "2px solid #464c53",
+        borderRadius: "8px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <span style={{ fontSize: "12px", color: "#464c53" }}>2px</span>
+    </div>
+    <code>md</code>
+  </div>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+    <div
+      style={{
+        width: "80px",
+        height: "48px",
+        backgroundColor: "#f5f7fa",
+        border: "4px solid #464c53",
+        borderRadius: "8px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <span style={{ fontSize: "12px", color: "#464c53" }}>4px</span>
+    </div>
+    <code>lg</code>
+  </div>
+</div>
+
+---
+
+## 사용 가이드라인
+
+### Border Radius
+
+- **Input, Button**: `rounded-md` ~ `rounded-lg`
+- **Card, Modal**: `rounded-lg` ~ `rounded-xl`
+- **Tag, Badge**: `rounded-max` (pill 형태)
+- **Avatar**: `rounded-max` (원형)
+
+### Border Width
+
+- **기본 테두리**: `border-sm` (1px)
+- **포커스 상태**: `border-md` (2px)
+- **강조 테두리**: `border-lg` (4px)

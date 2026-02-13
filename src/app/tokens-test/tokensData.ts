@@ -8,393 +8,303 @@ export type TokenItem = {
 // Semantic Background Colors
 // ============================================================
 export const SEMANTIC_BACKGROUNDS: TokenItem[] = [
-  { label: "background.white", className: "bg-background-white text-light-gray-90" },
-  { label: "background.gray-subtier", className: "bg-background-gray-subtier text-light-gray-90" },
-  { label: "background.gray-subtle", className: "bg-background-gray-subtle text-light-gray-90" },
-  { label: "background.inverse", className: "bg-background-inverse text-light-gray-0" },
-  { label: "background.dim", className: "bg-background-dim text-light-gray-0" },
+  { label: "background.default", className: "bg-background-default text-gray-900" },
+  { label: "background.subtle", className: "bg-background-subtle text-gray-900" },
+  { label: "background.subtler", className: "bg-background-subtler text-gray-900" },
+  { label: "background.inverse", className: "bg-background-inverse text-common-white" },
 ];
 
 // ============================================================
 // Semantic Surface Colors
 // ============================================================
 export const SEMANTIC_SURFACES: TokenItem[] = [
-  { label: "surface.white", className: "bg-surface-white text-light-gray-90" },
-  { label: "surface.inverse", className: "bg-surface-inverse text-light-gray-0" },
-  { label: "surface.gray-subtler", className: "bg-surface-gray-subtler text-light-gray-90" },
-  { label: "surface.gray-subtle", className: "bg-surface-gray-subtle text-light-gray-90" },
-  { label: "surface.disabled", className: "bg-surface-disabled text-light-gray-90" },
-  { label: "surface.primary-subtler", className: "bg-surface-primary-subtler text-light-gray-90" },
+  { label: "surface.default", className: "bg-surface-default text-gray-900" },
+  { label: "surface.inverse", className: "bg-surface-inverse text-common-white" },
+  { label: "surface.subtler", className: "bg-surface-subtler text-gray-900" },
+  { label: "surface.subtle", className: "bg-surface-subtle text-gray-900" },
+  { label: "surface.strong", className: "bg-surface-strong text-gray-900" },
+  { label: "surface.disabled", className: "bg-surface-disabled text-common-white" },
+  { label: "surface.primary-subtler", className: "bg-surface-primary-subtler text-gray-900" },
+  { label: "surface.primary-subtle", className: "bg-surface-primary-subtle text-gray-900" },
+  { label: "surface.primary-default", className: "bg-surface-primary-default text-gray-900" },
+  { label: "surface.secondary-subtler", className: "bg-surface-secondary-subtler text-gray-900" },
+  { label: "surface.secondary-subtle", className: "bg-surface-secondary-subtle text-gray-900" },
   {
-    label: "surface.secondary-subtler",
-    className: "bg-surface-secondary-subtler text-light-gray-90",
+    label: "surface.secondary-default",
+    className: "bg-surface-secondary-default text-common-white",
   },
-  { label: "surface.point-subtler", className: "bg-surface-point-subtler text-light-gray-90" },
-  { label: "surface.danger-subtler", className: "bg-surface-danger-subtler text-light-gray-90" },
-  { label: "surface.warning-subtler", className: "bg-surface-warning-subtler text-light-gray-90" },
-  { label: "surface.success-subtler", className: "bg-surface-success-subtler text-light-gray-90" },
+  {
+    label: "surface.status-danger-subtler",
+    className: "bg-surface-status-danger-subtler text-gray-900",
+  },
+  {
+    label: "surface.status-warning-subtler",
+    className: "bg-surface-status-warning-subtler text-gray-900",
+  },
+  {
+    label: "surface.status-success-subtler",
+    className: "bg-surface-status-success-subtler text-gray-900",
+  },
 ];
 
 // ============================================================
 // Border Colors
 // ============================================================
 export const BORDER_SAMPLES: TokenItem[] = [
-  { label: "border-inverse", className: "border-border-inverse bg-gray-90" },
+  { label: "border-default", className: "border-border-default", bgClassName: "bg-gray-900" },
+  { label: "border-subtle", className: "border-border-subtle", bgClassName: "bg-gray-900" },
+  { label: "border-strong", className: "border-border-strong", bgClassName: "bg-gray-900" },
+  { label: "border-stronger", className: "border-border-stronger", bgClassName: "bg-gray-900" },
+  { label: "border-inverse", className: "border-border-inverse" },
   { label: "border-disabled", className: "border-border-disabled" },
-  { label: "border-gray-light", className: "border-border-gray-light" },
-  { label: "border-gray", className: "border-border-gray" },
-  { label: "border-gray-dark", className: "border-border-gray-dark" },
-  { label: "border-gray-darker", className: "border-border-gray-darker" },
-  { label: "border-primary-light", className: "border-border-primary-light" },
-  { label: "border-primary", className: "border-border-primary" },
-  { label: "border-secondary-light", className: "border-border-secondary-light" },
-  { label: "border-secondary", className: "border-border-secondary" },
-  { label: "border-point-light", className: "border-border-point-light" },
-  { label: "border-point", className: "border-border-point" },
-  { label: "border-danger-light", className: "border-border-danger-light" },
-  { label: "border-warning-light", className: "border-border-warning-light" },
-  { label: "border-warning", className: "border-border-warning" },
-  { label: "border-success-light", className: "border-border-success-light" },
-  { label: "border-success", className: "border-border-success" },
+  { label: "border-gray-default", className: "border-border-gray-default" },
+  { label: "border-gray-strong", className: "border-border-gray-strong" },
+  { label: "border-gray-stronger", className: "border-border-gray-stronger" },
+  { label: "border-primary-subtler", className: "border-border-primary-subtler" },
+  { label: "border-primary-default", className: "border-border-primary-default" },
+  { label: "border-secondary-subtler", className: "border-border-secondary-subtler" },
+  { label: "border-secondary-default", className: "border-border-secondary-default" },
+  { label: "border-error-subtler", className: "border-border-error-subtler" },
+  { label: "border-error-default", className: "border-border-error-default" },
+  { label: "border-warning-subtler", className: "border-border-warning-subtler" },
+  { label: "border-warning-default", className: "border-border-warning-default" },
+  { label: "border-success-subtler", className: "border-border-success-subtler" },
+  { label: "border-success-default", className: "border-border-success-default" },
 ];
 
 // ============================================================
 // Divider Colors
 // ============================================================
 export const DIVIDER_SAMPLES: TokenItem[] = [
-  { label: "divider-gray-light", className: "border-divider-gray-light" },
-  { label: "divider-gray", className: "border-divider-gray" },
-  { label: "divider-gray-dark", className: "border-divider-gray-dark" },
-  { label: "divider-gray-darker", className: "border-divider-gray-darker" },
-  { label: "divider-inverse", className: "border-divider-inverse", bgClassName: "bg-gray-90" },
-  { label: "divider-primary-light", className: "border-divider-primary-light" },
-  { label: "divider-primary", className: "border-divider-primary" },
-  { label: "divider-secondary-light", className: "border-divider-secondary-light" },
-  { label: "divider-secondary", className: "border-divider-secondary" },
-  { label: "divider-error", className: "border-divider-error" },
-  { label: "divider-point", className: "border-divider-point" },
+  { label: "divider-default", className: "border-divider-default" },
+  { label: "divider-subtle", className: "border-divider-subtle" },
+  { label: "divider-inverse", className: "border-divider-inverse", bgClassName: "bg-gray-900" },
 ];
 
 // ============================================================
-// Primitive Gray Scale (light.gray.*)
+// Primitive Gray Scale
 // ============================================================
-export const LIGHT_GRAY_SCALE: TokenItem[] = [
-  { label: "light.gray.0", className: "bg-light-gray-0 text-light-gray-90" },
-  { label: "light.gray.5", className: "bg-light-gray-5 text-light-gray-90" },
-  { label: "light.gray.10", className: "bg-light-gray-10 text-light-gray-90" },
-  { label: "light.gray.20", className: "bg-light-gray-20 text-light-gray-90" },
-  { label: "light.gray.30", className: "bg-light-gray-30 text-light-gray-90" },
-  { label: "light.gray.40", className: "bg-light-gray-40 text-light-gray-90" },
-  { label: "light.gray.50", className: "bg-light-gray-50 text-light-gray-0" },
-  { label: "light.gray.60", className: "bg-light-gray-60 text-light-gray-0" },
-  { label: "light.gray.70", className: "bg-light-gray-70 text-light-gray-0" },
-  { label: "light.gray.80", className: "bg-light-gray-80 text-light-gray-0" },
-  { label: "light.gray.90", className: "bg-light-gray-90 text-light-gray-0" },
-  { label: "light.gray.95", className: "bg-light-gray-95 text-light-gray-0" },
-  { label: "light.gray.100", className: "bg-light-gray-100 text-light-gray-0" },
+export const GRAY_SCALE: TokenItem[] = [
+  { label: "gray.50", className: "bg-gray-50 text-gray-900" },
+  { label: "gray.100", className: "bg-gray-100 text-gray-900" },
+  { label: "gray.200", className: "bg-gray-200 text-gray-900" },
+  { label: "gray.300", className: "bg-gray-300 text-gray-900" },
+  { label: "gray.400", className: "bg-gray-400 text-gray-900" },
+  { label: "gray.500", className: "bg-gray-500 text-common-white" },
+  { label: "gray.600", className: "bg-gray-600 text-common-white" },
+  { label: "gray.700", className: "bg-gray-700 text-common-white" },
+  { label: "gray.800", className: "bg-gray-800 text-common-white" },
+  { label: "gray.900", className: "bg-gray-900 text-common-white" },
+  { label: "gray.950", className: "bg-gray-950 text-common-white" },
 ];
 
 // ============================================================
-// Primitive Primary Scale (light.primary.*)
+// Primary Scale (Green)
 // ============================================================
-export const LIGHT_PRIMARY_SCALE: TokenItem[] = [
-  { label: "light.primary.5", className: "bg-light-primary-5 text-light-gray-90" },
-  { label: "light.primary.10", className: "bg-light-primary-10 text-light-gray-90" },
-  { label: "light.primary.20", className: "bg-light-primary-20 text-light-gray-90" },
-  { label: "light.primary.30", className: "bg-light-primary-30 text-light-gray-90" },
-  { label: "light.primary.40", className: "bg-light-primary-40 text-light-gray-90" },
-  { label: "light.primary.50", className: "bg-light-primary-50 text-light-gray-90" },
-  { label: "light.primary.60", className: "bg-light-primary-60 text-light-gray-90" },
-  { label: "light.primary.70", className: "bg-light-primary-70 text-light-gray-0" },
-  { label: "light.primary.80", className: "bg-light-primary-80 text-light-gray-0" },
-  { label: "light.primary.90", className: "bg-light-primary-90 text-light-gray-0" },
-  { label: "light.primary.95", className: "bg-light-primary-95 text-light-gray-0" },
+export const GREEN_SCALE: TokenItem[] = [
+  { label: "green.50", className: "bg-green-50 text-gray-900" },
+  { label: "green.100", className: "bg-green-100 text-gray-900" },
+  { label: "green.200", className: "bg-green-200 text-gray-900" },
+  { label: "green.300", className: "bg-green-300 text-gray-900" },
+  { label: "green.400", className: "bg-green-400 text-gray-900" },
+  { label: "green.500", className: "bg-green-500 text-gray-900" },
+  { label: "green.600", className: "bg-green-600 text-common-white" },
+  { label: "green.700", className: "bg-green-700 text-common-white" },
+  { label: "green.800", className: "bg-green-800 text-common-white" },
+  { label: "green.900", className: "bg-green-900 text-common-white" },
+  { label: "green.950", className: "bg-green-950 text-common-white" },
 ];
 
 // ============================================================
-// Primitive Secondary Scale (light.secondary.*)
+// Secondary Scale (Teal)
 // ============================================================
-export const LIGHT_SECONDARY_SCALE: TokenItem[] = [
-  { label: "light.secondary.5", className: "bg-light-secondary-5 text-light-gray-90" },
-  { label: "light.secondary.10", className: "bg-light-secondary-10 text-light-gray-90" },
-  { label: "light.secondary.20", className: "bg-light-secondary-20 text-light-gray-90" },
-  { label: "light.secondary.30", className: "bg-light-secondary-30 text-light-gray-90" },
-  { label: "light.secondary.40", className: "bg-light-secondary-40 text-light-gray-90" },
-  { label: "light.secondary.50", className: "bg-light-secondary-50 text-light-gray-90" },
-  { label: "light.secondary.60", className: "bg-light-secondary-60 text-light-gray-0" },
-  { label: "light.secondary.70", className: "bg-light-secondary-70 text-light-gray-0" },
-  { label: "light.secondary.80", className: "bg-light-secondary-80 text-light-gray-0" },
-  { label: "light.secondary.90", className: "bg-light-secondary-90 text-light-gray-0" },
-  { label: "light.secondary.95", className: "bg-light-secondary-95 text-light-gray-0" },
+export const TEAL_SCALE: TokenItem[] = [
+  { label: "teal.50", className: "bg-teal-50 text-gray-900" },
+  { label: "teal.100", className: "bg-teal-100 text-gray-900" },
+  { label: "teal.200", className: "bg-teal-200 text-gray-900" },
+  { label: "teal.300", className: "bg-teal-300 text-gray-900" },
+  { label: "teal.400", className: "bg-teal-400 text-gray-900" },
+  { label: "teal.500", className: "bg-teal-500 text-gray-900" },
+  { label: "teal.600", className: "bg-teal-600 text-common-white" },
+  { label: "teal.700", className: "bg-teal-700 text-common-white" },
+  { label: "teal.800", className: "bg-teal-800 text-common-white" },
+  { label: "teal.900", className: "bg-teal-900 text-common-white" },
+  { label: "teal.950", className: "bg-teal-950 text-common-white" },
 ];
 
 // ============================================================
-// Primitive Point Scale (light.point.*)
+// Error Scale (Red)
 // ============================================================
-export const LIGHT_POINT_SCALE: TokenItem[] = [
-  { label: "light.point.10", className: "bg-light-point-10 text-light-gray-90" },
-  { label: "light.point.30", className: "bg-light-point-30 text-light-gray-90" },
-  { label: "light.point.40", className: "bg-light-point-40 text-light-gray-90" },
-  { label: "light.point.50", className: "bg-light-point-50 text-light-gray-0" },
+export const RED_SCALE: TokenItem[] = [
+  { label: "red.50", className: "bg-red-50 text-gray-900" },
+  { label: "red.100", className: "bg-red-100 text-gray-900" },
+  { label: "red.200", className: "bg-red-200 text-gray-900" },
+  { label: "red.300", className: "bg-red-300 text-gray-900" },
+  { label: "red.400", className: "bg-red-400 text-gray-900" },
+  { label: "red.500", className: "bg-red-500 text-common-white" },
+  { label: "red.600", className: "bg-red-600 text-common-white" },
+  { label: "red.700", className: "bg-red-700 text-common-white" },
+  { label: "red.800", className: "bg-red-800 text-common-white" },
+  { label: "red.900", className: "bg-red-900 text-common-white" },
+  { label: "red.950", className: "bg-red-950 text-common-white" },
 ];
 
 // ============================================================
-// Primitive Error Scale (light.error.*)
+// Warning Scale (Yellow)
 // ============================================================
-export const LIGHT_ERROR_SCALE: TokenItem[] = [
-  { label: "light.error.5", className: "bg-light-error-5 text-light-gray-90" },
-  { label: "light.error.10", className: "bg-light-error-10 text-light-gray-90" },
-  { label: "light.error.20", className: "bg-light-error-20 text-light-gray-90" },
-  { label: "light.error.30", className: "bg-light-error-30 text-light-gray-90" },
-  { label: "light.error.40", className: "bg-light-error-40 text-light-gray-90" },
-  { label: "light.error.50", className: "bg-light-error-50 text-light-gray-0" },
-  { label: "light.error.60", className: "bg-light-error-60 text-light-gray-0" },
-  { label: "light.error.70", className: "bg-light-error-70 text-light-gray-0" },
-  { label: "light.error.80", className: "bg-light-error-80 text-light-gray-0" },
-  { label: "light.error.90", className: "bg-light-error-90 text-light-gray-0" },
-  { label: "light.error.95", className: "bg-light-error-95 text-light-gray-0" },
+export const YELLOW_SCALE: TokenItem[] = [
+  { label: "yellow.50", className: "bg-yellow-50 text-gray-900" },
+  { label: "yellow.100", className: "bg-yellow-100 text-gray-900" },
+  { label: "yellow.200", className: "bg-yellow-200 text-gray-900" },
+  { label: "yellow.300", className: "bg-yellow-300 text-gray-900" },
+  { label: "yellow.400", className: "bg-yellow-400 text-gray-900" },
+  { label: "yellow.500", className: "bg-yellow-500 text-gray-900" },
+  { label: "yellow.600", className: "bg-yellow-600 text-gray-900" },
+  { label: "yellow.700", className: "bg-yellow-700 text-common-white" },
+  { label: "yellow.800", className: "bg-yellow-800 text-common-white" },
+  { label: "yellow.900", className: "bg-yellow-900 text-common-white" },
+  { label: "yellow.950", className: "bg-yellow-950 text-common-white" },
 ];
 
 // ============================================================
-// Primitive Warning Scale (light.warning.*)
+// Success Scale (Cyan)
 // ============================================================
-export const LIGHT_WARNING_SCALE: TokenItem[] = [
-  { label: "light.warning.5", className: "bg-light-warning-5 text-light-gray-90" },
-  { label: "light.warning.10", className: "bg-light-warning-10 text-light-gray-90" },
-  { label: "light.warning.20", className: "bg-light-warning-20 text-light-gray-90" },
-  { label: "light.warning.30", className: "bg-light-warning-30 text-light-gray-90" },
-  { label: "light.warning.40", className: "bg-light-warning-40 text-light-gray-90" },
-  { label: "light.warning.50", className: "bg-light-warning-50 text-light-gray-90" },
-  { label: "light.warning.60", className: "bg-light-warning-60 text-light-gray-90" },
-  { label: "light.warning.70", className: "bg-light-warning-70 text-light-gray-0" },
-  { label: "light.warning.80", className: "bg-light-warning-80 text-light-gray-0" },
-  { label: "light.warning.90", className: "bg-light-warning-90 text-light-gray-0" },
-  { label: "light.warning.95", className: "bg-light-warning-95 text-light-gray-0" },
-];
-
-// ============================================================
-// Primitive Success Scale (light.success.*)
-// ============================================================
-export const LIGHT_SUCCESS_SCALE: TokenItem[] = [
-  { label: "light.success.5", className: "bg-light-success-5 text-light-gray-90" },
-  { label: "light.success.10", className: "bg-light-success-10 text-light-gray-90" },
-  { label: "light.success.20", className: "bg-light-success-20 text-light-gray-90" },
-  { label: "light.success.30", className: "bg-light-success-30 text-light-gray-90" },
-  { label: "light.success.40", className: "bg-light-success-40 text-light-gray-90" },
-  { label: "light.success.50", className: "bg-light-success-50 text-light-gray-90" },
-  { label: "light.success.60", className: "bg-light-success-60 text-light-gray-90" },
-  { label: "light.success.70", className: "bg-light-success-70 text-light-gray-0" },
-  { label: "light.success.80", className: "bg-light-success-80 text-light-gray-0" },
-  { label: "light.success.90", className: "bg-light-success-90 text-light-gray-0" },
-  { label: "light.success.95", className: "bg-light-success-95 text-light-gray-0" },
+export const CYAN_SCALE: TokenItem[] = [
+  { label: "cyan.50", className: "bg-cyan-50 text-gray-900" },
+  { label: "cyan.100", className: "bg-cyan-100 text-gray-900" },
+  { label: "cyan.200", className: "bg-cyan-200 text-gray-900" },
+  { label: "cyan.300", className: "bg-cyan-300 text-gray-900" },
+  { label: "cyan.400", className: "bg-cyan-400 text-gray-900" },
+  { label: "cyan.500", className: "bg-cyan-500 text-gray-900" },
+  { label: "cyan.600", className: "bg-cyan-600 text-common-white" },
+  { label: "cyan.700", className: "bg-cyan-700 text-common-white" },
+  { label: "cyan.800", className: "bg-cyan-800 text-common-white" },
+  { label: "cyan.900", className: "bg-cyan-900 text-common-white" },
+  { label: "cyan.950", className: "bg-cyan-950 text-common-white" },
 ];
 
 // ============================================================
 // Common Colors
 // ============================================================
 export const COMMON_COLORS: TokenItem[] = [
-  { label: "light.common.white", className: "bg-light-common-white text-light-gray-90" },
-  { label: "light.common.black", className: "bg-light-common-black text-light-gray-0" },
-  { label: "common.white", className: "bg-common-white text-light-gray-90" },
-  { label: "common.black", className: "bg-common-black text-light-gray-0" },
+  { label: "common.white", className: "bg-common-white text-gray-900" },
+  { label: "common.black", className: "bg-common-black text-common-white" },
 ];
 
 // ============================================================
-// Opacity Colors (Gray/Black/White)
+// Alpha Colors (Black Opacity)
 // ============================================================
-export const GRAY_OPACITY_COLORS: TokenItem[] = [
-  { label: "light.gray-opacity.5", className: "bg-light-gray-opacity-5 text-light-gray-90" },
-  { label: "light.gray-opacity.10", className: "bg-light-gray-opacity-10 text-light-gray-90" },
-  { label: "light.gray-opacity.20", className: "bg-light-gray-opacity-20 text-light-gray-90" },
-  { label: "light.gray-opacity.30", className: "bg-light-gray-opacity-30 text-light-gray-0" },
-  { label: "light.gray-opacity.40", className: "bg-light-gray-opacity-40 text-light-gray-0" },
-  { label: "light.gray-opacity.50", className: "bg-light-gray-opacity-50 text-light-gray-0" },
+export const ALPHA_BLACK_COLORS: TokenItem[] = [
+  { label: "alpha.black.8", className: "bg-alpha-black-8 text-gray-900" },
+  { label: "alpha.black.16", className: "bg-alpha-black-16 text-gray-900" },
+  { label: "alpha.black.24", className: "bg-alpha-black-24 text-gray-900" },
+  { label: "alpha.black.32", className: "bg-alpha-black-32 text-common-white" },
+  { label: "alpha.black.48", className: "bg-alpha-black-48 text-common-white" },
+  { label: "alpha.black.64", className: "bg-alpha-black-64 text-common-white" },
+  { label: "alpha.black.80", className: "bg-alpha-black-80 text-common-white" },
 ];
 
-export const PRIMITIVE_WHITE_OPACITY_COLORS: TokenItem[] = [
+// ============================================================
+// Alpha Colors (White Opacity)
+// ============================================================
+export const ALPHA_WHITE_COLORS: TokenItem[] = [
   {
-    label: "light.white-opacity.5",
-    className: "bg-light-white-opacity-5 text-light-gray-0",
-    bgClassName: "bg-gray-90",
+    label: "alpha.white.8",
+    className: "bg-alpha-white-8 text-common-white",
+    bgClassName: "bg-gray-900",
   },
   {
-    label: "light.white-opacity.10",
-    className: "bg-light-white-opacity-10 text-light-gray-0",
-    bgClassName: "bg-gray-90",
+    label: "alpha.white.16",
+    className: "bg-alpha-white-16 text-common-white",
+    bgClassName: "bg-gray-900",
   },
   {
-    label: "light.white-opacity.20",
-    className: "bg-light-white-opacity-20 text-light-gray-0",
-    bgClassName: "bg-gray-90",
+    label: "alpha.white.24",
+    className: "bg-alpha-white-24 text-common-white",
+    bgClassName: "bg-gray-900",
   },
   {
-    label: "light.white-opacity.30",
-    className: "bg-light-white-opacity-30 text-light-gray-0",
-    bgClassName: "bg-gray-90",
+    label: "alpha.white.32",
+    className: "bg-alpha-white-32 text-common-white",
+    bgClassName: "bg-gray-900",
   },
   {
-    label: "light.white-opacity.40",
-    className: "bg-light-white-opacity-40 text-light-gray-90",
-    bgClassName: "bg-gray-90",
+    label: "alpha.white.48",
+    className: "bg-alpha-white-48 text-gray-900",
+    bgClassName: "bg-gray-900",
   },
   {
-    label: "light.white-opacity.50",
-    className: "bg-light-white-opacity-50 text-light-gray-90",
-    bgClassName: "bg-gray-90",
-  },
-];
-
-export const BLACK_OPACITY_COLORS: TokenItem[] = [
-  { label: "black-opacity.5", className: "bg-black-opacity-5 text-light-gray-90" },
-  { label: "black-opacity.10", className: "bg-black-opacity-10 text-light-gray-90" },
-  { label: "black-opacity.20", className: "bg-black-opacity-20 text-light-gray-90" },
-  { label: "black-opacity.30", className: "bg-black-opacity-30 text-light-gray-0" },
-  { label: "black-opacity.40", className: "bg-black-opacity-40 text-light-gray-0" },
-  { label: "black-opacity.50", className: "bg-black-opacity-50 text-light-gray-0" },
-];
-
-export const ALIAS_WHITE_OPACITY_COLORS: TokenItem[] = [
-  {
-    label: "white-opacity.5",
-    className: "bg-white-opacity-5 text-light-gray-0",
-    bgClassName: "bg-gray-90",
+    label: "alpha.white.64",
+    className: "bg-alpha-white-64 text-gray-900",
+    bgClassName: "bg-gray-900",
   },
   {
-    label: "white-opacity.10",
-    className: "bg-white-opacity-10 text-light-gray-0",
-    bgClassName: "bg-gray-90",
-  },
-  {
-    label: "white-opacity.20",
-    className: "bg-white-opacity-20 text-light-gray-0",
-    bgClassName: "bg-gray-90",
-  },
-  {
-    label: "white-opacity.30",
-    className: "bg-white-opacity-30 text-light-gray-0",
-    bgClassName: "bg-gray-90",
-  },
-  {
-    label: "white-opacity.40",
-    className: "bg-white-opacity-40 text-light-gray-90",
-    bgClassName: "bg-gray-90",
-  },
-  {
-    label: "white-opacity.50",
-    className: "bg-white-opacity-50 text-light-gray-90",
-    bgClassName: "bg-gray-90",
+    label: "alpha.white.80",
+    className: "bg-alpha-white-80 text-gray-900",
+    bgClassName: "bg-gray-900",
   },
 ];
 
 // ============================================================
-// Alias Gray Scale (gray.*)
+// Overlay Colors
 // ============================================================
-export const GRAY_SCALE: TokenItem[] = [
-  { label: "gray.5", className: "bg-gray-5 text-light-gray-90" },
-  { label: "gray.10", className: "bg-gray-10 text-light-gray-90" },
-  { label: "gray.20", className: "bg-gray-20 text-light-gray-90" },
-  { label: "gray.30", className: "bg-gray-30 text-light-gray-90" },
-  { label: "gray.40", className: "bg-gray-40 text-light-gray-90" },
-  { label: "gray.50", className: "bg-gray-50 text-light-gray-0" },
-  { label: "gray.60", className: "bg-gray-60 text-light-gray-0" },
-  { label: "gray.70", className: "bg-gray-70 text-light-gray-0" },
-  { label: "gray.80", className: "bg-gray-80 text-light-gray-0" },
-  { label: "gray.90", className: "bg-gray-90 text-light-gray-0" },
-  { label: "gray.95", className: "bg-gray-95 text-light-gray-0" },
+export const OVERLAY_COLORS: TokenItem[] = [
+  { label: "overlay.subtle", className: "bg-overlay-subtle text-common-white" },
+  { label: "overlay.default", className: "bg-overlay-default text-common-white" },
+  { label: "overlay.strong", className: "bg-overlay-strong text-common-white" },
 ];
 
 // ============================================================
-// Alias Primary Scale (primary.*)
+// Text Colors
 // ============================================================
-export const PRIMARY_SCALE: TokenItem[] = [
-  { label: "primary.5", className: "bg-primary-5 text-light-gray-90" },
-  { label: "primary.10", className: "bg-primary-10 text-light-gray-90" },
-  { label: "primary.20", className: "bg-primary-20 text-light-gray-90" },
-  { label: "primary.30", className: "bg-primary-30 text-light-gray-90" },
-  { label: "primary.40", className: "bg-primary-40 text-light-gray-90" },
-  { label: "primary.50", className: "bg-primary-50 text-light-gray-90" },
-  { label: "primary.60", className: "bg-primary-60 text-light-gray-90" },
-  { label: "primary.70", className: "bg-primary-70 text-light-gray-0" },
-  { label: "primary.80", className: "bg-primary-80 text-light-gray-0" },
-  { label: "primary.90", className: "bg-primary-90 text-light-gray-0" },
-  { label: "primary.95", className: "bg-primary-95 text-light-gray-0" },
-];
-
-// ============================================================
-// Alias Secondary Scale (secondary.*)
-// ============================================================
-export const SECONDARY_SCALE: TokenItem[] = [
-  { label: "secondary.5", className: "bg-secondary-5 text-light-gray-90" },
-  { label: "secondary.10", className: "bg-secondary-10 text-light-gray-90" },
-  { label: "secondary.20", className: "bg-secondary-20 text-light-gray-90" },
-  { label: "secondary.30", className: "bg-secondary-30 text-light-gray-90" },
-  { label: "secondary.40", className: "bg-secondary-40 text-light-gray-90" },
-  { label: "secondary.50", className: "bg-secondary-50 text-light-gray-90" },
-  { label: "secondary.60", className: "bg-secondary-60 text-light-gray-0" },
-  { label: "secondary.70", className: "bg-secondary-70 text-light-gray-0" },
-  { label: "secondary.80", className: "bg-secondary-80 text-light-gray-0" },
-  { label: "secondary.90", className: "bg-secondary-90 text-light-gray-0" },
-  { label: "secondary.95", className: "bg-secondary-95 text-light-gray-0" },
-];
-
-// ============================================================
-// Alias Point Scale (point.*)
-// ============================================================
-export const POINT_SCALE: TokenItem[] = [
-  { label: "point.30", className: "bg-point-30 text-light-gray-90" },
-  { label: "point.40", className: "bg-point-40 text-light-gray-90" },
-  { label: "point.50", className: "bg-point-50 text-light-gray-0" },
-];
-
-// ============================================================
-// Alias Error Scale (error.*)
-// ============================================================
-export const ERROR_SCALE: TokenItem[] = [
-  { label: "error.5", className: "bg-error-5 text-light-gray-90" },
-  { label: "error.10", className: "bg-error-10 text-light-gray-90" },
-  { label: "error.20", className: "bg-error-20 text-light-gray-90" },
-  { label: "error.30", className: "bg-error-30 text-light-gray-90" },
-  { label: "error.40", className: "bg-error-40 text-light-gray-90" },
-  { label: "error.50", className: "bg-error-50 text-light-gray-0" },
-  { label: "error.60", className: "bg-error-60 text-light-gray-0" },
-  { label: "error.70", className: "bg-error-70 text-light-gray-0" },
-  { label: "error.80", className: "bg-error-80 text-light-gray-0" },
-  { label: "error.90", className: "bg-error-90 text-light-gray-0" },
-  { label: "error.95", className: "bg-error-95 text-light-gray-0" },
-];
-
-// ============================================================
-// Alias Warning Scale (warning.*)
-// ============================================================
-export const WARNING_SCALE: TokenItem[] = [
-  { label: "warning.5", className: "bg-warning-5 text-light-gray-90" },
-  { label: "warning.10", className: "bg-warning-10 text-light-gray-90" },
-  { label: "warning.20", className: "bg-warning-20 text-light-gray-90" },
-  { label: "warning.30", className: "bg-warning-30 text-light-gray-90" },
-  { label: "warning.40", className: "bg-warning-40 text-light-gray-90" },
-  { label: "warning.50", className: "bg-warning-50 text-light-gray-90" },
-  { label: "warning.60", className: "bg-warning-60 text-light-gray-90" },
-  { label: "warning.70", className: "bg-warning-70 text-light-gray-0" },
-  { label: "warning.80", className: "bg-warning-80 text-light-gray-0" },
-  { label: "warning.90", className: "bg-warning-90 text-light-gray-0" },
-  { label: "warning.95", className: "bg-warning-95 text-light-gray-0" },
-];
-
-// ============================================================
-// Alias Success Scale (success.*)
-// ============================================================
-export const SUCCESS_SCALE: TokenItem[] = [
-  { label: "success.5", className: "bg-success-5 text-light-gray-90" },
-  { label: "success.10", className: "bg-success-10 text-light-gray-90" },
-  { label: "success.20", className: "bg-success-20 text-light-gray-90" },
-  { label: "success.30", className: "bg-success-30 text-light-gray-90" },
-  { label: "success.40", className: "bg-success-40 text-light-gray-90" },
-  { label: "success.50", className: "bg-success-50 text-light-gray-90" },
-  { label: "success.60", className: "bg-success-60 text-light-gray-90" },
-  { label: "success.70", className: "bg-success-70 text-light-gray-0" },
-  { label: "success.80", className: "bg-success-80 text-light-gray-0" },
-  { label: "success.90", className: "bg-success-90 text-light-gray-0" },
-  { label: "success.95", className: "bg-success-95 text-light-gray-0" },
+export const TEXT_COLORS: TokenItem[] = [
+  { label: "text.primary", className: "text-text-primary", bgClassName: "bg-common-white" },
+  { label: "text.secondary", className: "text-text-secondary", bgClassName: "bg-common-white" },
+  { label: "text.tertiary", className: "text-text-tertiary", bgClassName: "bg-common-white" },
+  { label: "text.muted", className: "text-text-muted", bgClassName: "bg-common-white" },
+  { label: "text.disabled", className: "text-text-disabled", bgClassName: "bg-common-white" },
+  { label: "text.inverse", className: "text-text-inverse", bgClassName: "bg-common-white" },
+  {
+    label: "text.brand-default",
+    className: "text-text-brand-default",
+    bgClassName: "bg-common-white",
+  },
+  {
+    label: "text.brand-subtle",
+    className: "text-text-brand-subtle",
+    bgClassName: "bg-common-white",
+  },
+  { label: "text.brand-link", className: "text-text-brand-link", bgClassName: "bg-common-white" },
+  {
+    label: "text.status-negative-default",
+    className: "text-text-status-negative-default",
+    bgClassName: "bg-common-white",
+  },
+  {
+    label: "text.status-negative-subtle",
+    className: "text-text-status-negative-subtle",
+    bgClassName: "bg-common-white",
+  },
+  {
+    label: "text.status-warning-default",
+    className: "text-text-status-warning-default",
+    bgClassName: "bg-common-white",
+  },
+  {
+    label: "text.status-warning-subtle",
+    className: "text-text-status-warning-subtle",
+    bgClassName: "bg-common-white",
+  },
+  {
+    label: "text.status-positive-default",
+    className: "text-text-status-positive-default",
+    bgClassName: "bg-common-white",
+  },
+  {
+    label: "text.status-positive-subtle",
+    className: "text-text-status-positive-subtle",
+    bgClassName: "bg-common-white",
+  },
 ];
 
 // ============================================================

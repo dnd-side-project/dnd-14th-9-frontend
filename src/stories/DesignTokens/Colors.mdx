@@ -1,0 +1,207 @@
+import { Meta, ColorPalette, ColorItem } from "@storybook/addon-docs/blocks";
+
+<Meta title="Design Tokens/Colors" />
+
+# 색상 토큰 (Color Tokens)
+
+우리 서비스의 색상 시스템입니다. Style Dictionary를 통해 Figma Tokens Studio에서 자동 생성됩니다.
+
+---
+
+## Primitive Colors
+
+기본 색상 팔레트입니다. 직접 사용하기보다는 Semantic Color를 통해 사용하는 것을 권장합니다.
+
+### Gray Scale
+
+중립적인 회색 계열 색상입니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Gray"
+    subtitle="중립 색상"
+    colors={{
+      "50": "#f5f7fa",
+      "100": "#e6e8ea",
+      "200": "#cdd1d5",
+      "300": "#b1b8be",
+      "400": "#8a949e",
+      "500": "#6d7882",
+      "600": "#58616a",
+      "700": "#464c53",
+      "800": "#33363d",
+      "900": "#1e2124",
+      "950": "#0b0f0e",
+    }}
+  />
+</ColorPalette>
+
+### Green (Primary)
+
+브랜드를 대표하는 Primary 색상입니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Green"
+    subtitle="Primary / 브랜드 색상"
+    colors={{
+      "50": "#e9fdf0",
+      "100": "#cff9db",
+      "200": "#a7f4be",
+      "300": "#7feea0",
+      "400": "#48ec7e",
+      "500": "#27ea67",
+      "600": "#22d15c",
+      "700": "#1cb44f",
+      "800": "#178a42",
+      "900": "#145f32",
+      "950": "#0f4a27",
+    }}
+  />
+</ColorPalette>
+
+### Teal (Secondary)
+
+보조 색상으로 사용됩니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Teal"
+    subtitle="Secondary / 보조 색상"
+    colors={{
+      "50": "#f0fdfa",
+      "100": "#cbfbf1",
+      "200": "#96f7e4",
+      "300": "#46ecd5",
+      "400": "#00d5be",
+      "500": "#00bba7",
+      "600": "#009689",
+      "700": "#00786f",
+      "800": "#005f5a",
+      "900": "#0b4f4a",
+      "950": "#022f2e",
+    }}
+  />
+</ColorPalette>
+
+### Red (Error/Danger)
+
+오류, 경고, 삭제 등 부정적인 상태를 나타냅니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Red"
+    subtitle="Error / Danger"
+    colors={{
+      "50": "#ffe8ec",
+      "100": "#ffd0d8",
+      "200": "#ffb3c1",
+      "300": "#ff758f",
+      "400": "#ff4d6d",
+      "500": "#ff1744",
+      "600": "#cc1236",
+      "700": "#990e29",
+      "800": "#66091b",
+      "900": "#4d0714",
+      "950": "#2d0a0e",
+    }}
+  />
+</ColorPalette>
+
+### Yellow (Warning)
+
+주의가 필요한 상태를 나타냅니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Yellow"
+    subtitle="Warning / 주의"
+    colors={{
+      "50": "#fefce8",
+      "100": "#fef9c2",
+      "200": "#fff085",
+      "300": "#ffdf20",
+      "400": "#fdc700",
+      "500": "#f0b100",
+      "600": "#d08700",
+      "700": "#a65f00",
+      "800": "#894b00",
+      "900": "#733e0a",
+      "950": "#432004",
+    }}
+  />
+</ColorPalette>
+
+### Cyan (Success)
+
+성공, 완료 등 긍정적인 상태를 나타냅니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Cyan"
+    subtitle="Success / 성공"
+    colors={{
+      "50": "#ecfeff",
+      "100": "#cefafe",
+      "200": "#a2f4fd",
+      "300": "#53eafd",
+      "400": "#00d3f2",
+      "500": "#00b8db",
+      "600": "#0092b8",
+      "700": "#007595",
+      "800": "#005f78",
+      "900": "#104e64",
+      "950": "#053345",
+    }}
+  />
+</ColorPalette>
+
+### Common
+
+기본 흑백 색상입니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Common"
+    subtitle="기본 흑백"
+    colors={{
+      white: "#ffffff",
+      black: "#000000",
+    }}
+  />
+</ColorPalette>
+
+---
+
+## Alpha Colors
+
+투명도가 적용된 색상입니다. Overlay, 배경 블러 등에 사용됩니다.
+
+<ColorPalette>
+  <ColorItem
+    title="Alpha Black"
+    subtitle="검정 투명도"
+    colors={{
+      "8%": "rgba(0, 0, 0, 0.08)",
+      "16%": "rgba(0, 0, 0, 0.16)",
+      "24%": "rgba(0, 0, 0, 0.24)",
+      "32%": "rgba(0, 0, 0, 0.32)",
+      "48%": "rgba(0, 0, 0, 0.48)",
+      "64%": "rgba(0, 0, 0, 0.64)",
+      "80%": "rgba(0, 0, 0, 0.8)",
+    }}
+  />
+  <ColorItem
+    title="Alpha White"
+    subtitle="흰색 투명도"
+    colors={{
+      "8%": "rgba(255, 255, 255, 0.08)",
+      "16%": "rgba(255, 255, 255, 0.16)",
+      "24%": "rgba(255, 255, 255, 0.24)",
+      "32%": "rgba(255, 255, 255, 0.32)",
+      "48%": "rgba(255, 255, 255, 0.48)",
+      "64%": "rgba(255, 255, 255, 0.64)",
+      "80%": "rgba(255, 255, 255, 0.8)",
+    }}
+  />
+</ColorPalette>

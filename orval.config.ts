@@ -1,4 +1,5 @@
 import { existsSync } from "fs";
+
 import { defineConfig } from "orval";
 
 // Swagger/OpenAPI 명세 파일 경로
@@ -20,7 +21,7 @@ export default defineConfig({
       client: "react-query",
       override: {
         mutator: {
-          path: "./src/lib/api-client.ts",
+          path: "./src/lib/api/custom-instance.ts",
           name: "customInstance",
         },
         query: {
