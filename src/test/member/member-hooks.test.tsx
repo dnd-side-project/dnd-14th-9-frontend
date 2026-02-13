@@ -9,7 +9,7 @@ import {
   useUpdateInterestCategories,
   useUpdateNickname,
   useUpdateProfileImage,
-} from "@/features/member/hooks/memberHooks";
+} from "@/features/member/hooks/useMemberHooks";
 import type { MemberProfile } from "@/features/member/types";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
