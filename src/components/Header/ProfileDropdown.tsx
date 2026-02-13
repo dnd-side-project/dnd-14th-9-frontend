@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { ProfileIcon } from "@/components/Icon/ProfileIcon";
+import { ProfilePopup } from "@/features/member/components/ProfilePopup/ProfilePopup";
 
 /**
  * TODO(이경환): 임시 프로필 패널 컴포넌트입니다.
@@ -13,10 +14,7 @@ import { ProfileIcon } from "@/components/Icon/ProfileIcon";
 export function ProfileDropdown() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
-  const dialogId = useId();
-  const dialogTitleId = useId();
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -43,10 +41,7 @@ export function ProfileDropdown() {
   }, [isOpen]);
 
   const handleLogout = async () => {
-    if (isLoggingOut) return;
-
     try {
-      setIsLoggingOut(true);
       const response = await fetch("/api/auth/logout", { method: "POST" });
 
       if (!response.ok) {
@@ -57,47 +52,39 @@ export function ProfileDropdown() {
       router.refresh();
     } catch (error) {
       console.error("Logout error:", error);
-    } finally {
-      setIsLoggingOut(false);
     }
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative z-50">
       <button
         type="button"
         aria-label="프로필 메뉴"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        aria-controls={dialogId}
         onClick={() => setIsOpen((prev) => !prev)}
-        className="border-border-subtle bg-surface-subtle focus-visible:ring-primary focus-visible:outline- focus-visibl flex h-8 w-8 items-center justify-center rounded-full border p-2 transition-colors"
+        className="border-border-subtle bg-surface-subtle focus-visible:ring-primary focus-visible flex h-8 w-8 items-center justify-center rounded-full border p-2 transition-colors focus-visible:outline-none"
       >
-        <ProfileIcon size="xsmall" />
+        <ProfileIcon className="h-4 w-4" />
       </button>
 
-      {isOpen ? (
-        <div
-          id={dialogId}
-          role="dialog"
-          aria-modal="false"
-          aria-labelledby={dialogTitleId}
-          className="bg-surface-subtle border-border-subtle p-sm absolute top-[calc(100%+8px)] right-0 z-10 min-w-[128px] rounded-md border shadow-lg"
-        >
-          <h2 id={dialogTitleId} className="sr-only">
-            프로필 패널
-          </h2>
-          <button
-            type="button"
-            aria-label="로그아웃"
-            disabled={isLoggingOut}
-            onClick={handleLogout}
-            className="text-text-primary hover:bg-surface-subtler focus-visible:ring-primary px-sm py-xs flex w-full items-center justify-center rounded-sm text-sm focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isLoggingOut ? "로그아웃 중..." : "로그아웃"}
-          </button>
+      {isOpen && (
+        <div className="absolute top-[calc(100%+8px)] right-0 z-50 shadow-xl">
+          <ProfilePopup
+            name="빵가루 요정 쥐이" // TODO: 실제 데이터 연동 필요
+            email="sewonlim9060@naver.com" // TODO: 실제 데이터 연동 필요
+            focusTimeMinutes={30} // TODO: 실제 데이터 연동 필요
+            totalTimeMinutes={60} // TODO: 실제 데이터 연동 필요
+            todoCompleted={8} // TODO: 실제 데이터 연동 필요
+            todoTotal={10} // TODO: 실제 데이터 연동 필요
+            onClose={() => setIsOpen(false)}
+            onLogoutClick={handleLogout}
+            onProfileSettingsClick={() => console.log("Profile Settings Clicked")}
+            onReportClick={() => console.log("Report Clicked")}
+            onFeedbackClick={() => console.log("Feedback Clicked")}
+          />
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
