@@ -74,6 +74,14 @@ const HEADER_VIEWPORTS = {
     },
     type: "desktop",
   },
+  desktopXL: {
+    name: "DesktopXL (1440px)",
+    styles: {
+      width: "1440px",
+      height: "900px",
+    },
+    type: "desktop",
+  },
 } satisfies Record<string, Viewport>;
 
 const meta = {
@@ -142,6 +150,18 @@ export const Desktop: Story = {
   globals: {
     viewport: {
       value: "desktop",
+      isRotated: false,
+    },
+  },
+};
+
+export const DesktopXL: Story = {
+  args: {
+    isAuthenticated: false,
+  },
+  globals: {
+    viewport: {
+      value: "desktopXL",
       isRotated: false,
     },
   },

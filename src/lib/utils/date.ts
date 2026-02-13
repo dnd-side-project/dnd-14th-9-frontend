@@ -81,6 +81,10 @@ export function formatYearMonth(date: Date | string): string {
   return `${year}.${month}`;
 }
 
+export function getCurrentYear(now: Date = new Date()): number {
+  return now.getFullYear();
+}
+
 export function isSameDay(date1: Date, date2: Date): boolean {
   return (
     date1.getFullYear() === date2.getFullYear() &&
