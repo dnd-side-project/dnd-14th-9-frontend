@@ -11,10 +11,10 @@ import { Header } from "@/components/Header/Header";
  */
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Header />
-      <main>{children}</main>
+      <main className="w-full flex-1">{children}</main>
       <Footer />
-    </>
+    </div>
   );
 }
