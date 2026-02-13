@@ -120,7 +120,7 @@ describe("DatePicker", () => {
       );
     });
 
-    it("시작일보다 이전 날짜를 선택하면 새로운 시작일로 설정되어야 합니다", () => {
+    it("시작일보다 이전 날짜를 선택하면 날짜를 swap하여 범위가 설정되어야 합니다", () => {
       const onChange = jest.fn();
       render(<DatePicker onChange={onChange} />);
 
@@ -130,12 +130,11 @@ describe("DatePicker", () => {
       fireEvent.click(day20);
       fireEvent.click(day15);
 
-      expect(onChange).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          startDate: expect.any(Date),
-          endDate: null,
-        })
-      );
+      // 20일 클릭 후 15일 클릭 시, startDate=15, endDate=20으로 swap
+      expect(onChange).toHaveBeenCalledTimes(2);
+      const lastCall = onChange.mock.calls[1][0];
+      expect(lastCall.startDate.getDate()).toBe(15);
+      expect(lastCall.endDate.getDate()).toBe(20);
     });
   });
 
