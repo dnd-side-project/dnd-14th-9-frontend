@@ -1,87 +1,54 @@
-"use client";
+import Link from "next/link";
 
-import { useState } from "react";
-
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
-import { authApi } from "@/features/auth/api";
-import { setCookie } from "@/lib/auth/client-cookies";
-import {
-  REDIRECT_AFTER_LOGIN_COOKIE,
-  REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
-} from "@/lib/auth/cookie-constants";
-import { useAuthStore } from "@/stores/authStore";
+import { ButtonLink } from "@/components/Button/ButtonLink";
+import { ProfileDropdown } from "@/components/Header/ProfileDropdown";
+import { getServerAuthState } from "@/lib/auth/server";
 
 /**
- * Header - 공통 헤더/네비게이션
- *
- * TODO(이경환): 디자인 확정 후 구현
- * - 로고
- * - 네비게이션 메뉴
- * - 로그인/로그아웃 버튼
+ * Header - GNB (Global Navigation Bar) 서버 컴포넌트
+ * httpOnly 쿠키에서 인증 상태를 읽어 UI를 렌더링합니다.
  */
-export function Header() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  const openLogin = () => {
-    const query = searchParams.toString();
-    const returnPath = `${pathname}${query ? `?${query}` : ""}`;
-    setCookie(REDIRECT_AFTER_LOGIN_COOKIE, returnPath, REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS);
-    router.push("/login");
-  };
-
-  const handleLogout = async () => {
-    if (isLoggingOut) return;
-
-    try {
-      setIsLoggingOut(true);
-      const response = await authApi.logout();
-
-      if (response.isSuccess) {
-        // Zustand 상태 업데이트
-        setAuth(false);
-
-        // 홈으로 리다이렉트
-        router.push("/");
-      }
-    } catch (error) {
-      console.error("로그아웃 실패:", error);
-      alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsLoggingOut(false);
-    }
-  };
+export async function Header() {
+  const isAuthenticated = await getServerAuthState();
 
   return (
-    <>
-      <header className="border-b border-gray-200 p-4">
-        <div className="flex items-center justify-between">
-          <div>Header placeholder</div>
+    <header className="border-border-subtle bg-surface-default px-lg md:px-xl md:py-sm mx-auto flex h-full max-w-[1280px] items-center justify-between border-b py-[15px] lg:px-[50px]">
+      <Link
+        href="/"
+        aria-label="홈으로 이동"
+        className="text-common-white focus-visible:ring-primary text-[27px] leading-[120%] font-bold transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:outline-none"
+      >
+        GAK
+      </Link>
 
-          {/* 로그인/로그아웃 버튼 */}
-          {isAuthenticated ? (
-            <button
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600 disabled:bg-gray-400"
+      <div className="gap-sm flex items-center justify-end">
+        {isAuthenticated ? (
+          <>
+            <ButtonLink
+              href="/session/create"
+              aria-label="세션 만들기"
+              size="small"
+              variant="solid"
+              colorScheme="primary"
+              className="px-xs py-2xs md:px-sm md:py-xs"
             >
-              {isLoggingOut ? "로그아웃 중..." : "로그아웃"}
-            </button>
-          ) : (
-            <button
-              onClick={openLogin}
-              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-            >
-              로그인
-            </button>
-          )}
-        </div>
-      </header>
-    </>
+              세션 만들기
+            </ButtonLink>
+            <ProfileDropdown />
+          </>
+        ) : (
+          <ButtonLink
+            href="/login"
+            aria-label="로그인"
+            size="small"
+            variant="outlined"
+            colorScheme="secondary"
+            className="px-xs py-2xs md:px-sm md:py-xs"
+          >
+            회원가입 / 로그인
+          </ButtonLink>
+        )}
+      </div>
+    </header>
   );
 }
