@@ -141,8 +141,13 @@ export function useDatePicker({
         newRange = { startDate: date, endDate: null };
         setSelectionPhase("end");
       } else {
-        if (selectedRange.startDate && date >= selectedRange.startDate) {
-          newRange = { startDate: selectedRange.startDate, endDate: date };
+        if (selectedRange.startDate) {
+          // 클릭한 날짜가 startDate 이후면 그대로, 이전이면 swap
+          if (date >= selectedRange.startDate) {
+            newRange = { startDate: selectedRange.startDate, endDate: date };
+          } else {
+            newRange = { startDate: date, endDate: selectedRange.startDate };
+          }
         } else {
           newRange = { startDate: date, endDate: null };
         }
