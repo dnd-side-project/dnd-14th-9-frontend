@@ -14,7 +14,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
   ({ value, defaultValue, onChange, disabled, className }, ref) => {
     const {
       displayYearMonth,
-      todayYearMonth,
+      displayText,
       calendarDays,
       goToPrevMonth,
       goToNextMonth,
@@ -25,15 +25,26 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       <div
         ref={ref}
         className={cn(
-          "border-border-subtle h-[345px] w-[356px] rounded-md border p-4",
+          "border-border-subtle flex h-[345px] w-[356px] flex-col rounded-md border p-4",
           disabled && "pointer-events-none opacity-50",
           className
         )}
       >
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
+          {/* Year/Month and Date Display */}
+          <div className="flex items-center gap-3">
+            <span className="text-text-secondary text-[18px] font-semibold">
+              {displayYearMonth}
+            </span>
+            <div className="text-text-disabled flex items-center gap-1 text-[13px]">
+              <CalendarIcon size="xsmall" />
+              <span>{displayText}</span>
+            </div>
+          </div>
+
           {/* Month Navigation */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={goToPrevMonth}
@@ -42,9 +53,6 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
             >
               <ChevronDownIcon size="small" className="rotate-90" />
             </button>
-            <span className="text-text-secondary text-[18px] font-semibold">
-              {displayYearMonth}
-            </span>
             <button
               type="button"
               onClick={goToNextMonth}
@@ -53,12 +61,6 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
             >
               <ChevronDownIcon size="small" className="-rotate-90" />
             </button>
-          </div>
-
-          {/* Today Display */}
-          <div className="text-text-disabled flex items-center gap-1 text-[13px]">
-            <CalendarIcon size="xsmall" />
-            <span>{todayYearMonth}</span>
           </div>
         </div>
 
@@ -75,7 +77,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7">
+        <div className="grid flex-1 grid-cols-7">
           {calendarDays.map((day, index) => (
             <button
               key={index}
@@ -83,23 +85,33 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
               disabled={day.isDisabled || !day.date}
               onClick={() => day.date && handleDateClick(day.date)}
               className={cn(
-                "flex h-10 items-center justify-center text-[15px] transition-colors",
+                "flex h-11 w-full items-center justify-center text-[15px] transition-colors",
                 // Base state
                 !day.date && "cursor-default",
                 day.date && !day.isDisabled && "hover:bg-alpha-white-8 cursor-pointer",
                 // Text colors
                 day.isDisabled && "text-text-disabled cursor-not-allowed",
                 !day.isDisabled && !day.isSelected && "text-text-secondary",
-                // Today
-                day.isToday && !day.isSelected && "bg-alpha-white-16 rounded-sm",
-                // Selected (start or end)
-                day.isSelected &&
-                  "text-text-brand-default rounded-sm bg-green-500/10 font-semibold",
-                // In range (between start and end)
-                day.isInRange && "bg-alpha-white-8 rounded-sm"
+                // Today (when not selected and not in range)
+                day.isToday && !day.isSelected && !day.isInRange && "bg-alpha-white-16 rounded-sm",
+                // In range (including selected dates) - full cell background
+                day.isInRange && "bg-alpha-white-8"
               )}
             >
-              {day.date ? day.dayOfMonth : ""}
+              {day.date ? (
+                <span
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center",
+                    // Selected (start or end) - smaller inner element
+                    day.isSelected &&
+                      "text-text-brand-default rounded-sm bg-green-500/10 font-semibold"
+                  )}
+                >
+                  {day.dayOfMonth}
+                </span>
+              ) : (
+                ""
+              )}
             </button>
           ))}
         </div>

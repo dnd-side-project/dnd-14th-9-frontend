@@ -1,13 +1,22 @@
 import { useState, useMemo, useCallback } from "react";
 
-import { formatYearMonth, isDateInRange, isPastDate, isSameDay, isToday } from "@/lib/utils/date";
+import {
+  formatDateRangeDisplay,
+  formatDateWithDay,
+  formatYearMonth,
+  isDateInRange,
+  isPastDate,
+  isSameDay,
+  isToday,
+  isWithinTwoWeeks,
+} from "@/lib/utils/date";
 
 import type { CalendarDay, DatePickerProps, DateRange } from "./DatePicker.types";
 
 interface UseDatePickerReturn {
   currentMonth: Date;
   displayYearMonth: string;
-  todayYearMonth: string;
+  displayText: string;
   calendarDays: CalendarDay[];
   selectedRange: DateRange;
   goToPrevMonth: () => void;
@@ -28,7 +37,13 @@ export function useDatePicker({
 
   const selectedRange = value ?? internalRange;
   const displayYearMonth = formatYearMonth(currentMonth);
-  const todayYearMonth = formatYearMonth(new Date());
+
+  const displayText = useMemo(() => {
+    if (selectedRange.startDate && selectedRange.endDate) {
+      return formatDateRangeDisplay(selectedRange.startDate, selectedRange.endDate);
+    }
+    return formatDateWithDay(new Date());
+  }, [selectedRange.startDate, selectedRange.endDate]);
 
   const calendarDays = useMemo((): CalendarDay[] => {
     const year = currentMonth.getFullYear();
@@ -38,7 +53,6 @@ export function useDatePicker({
     const lastDay = new Date(year, month + 1, 0);
 
     const startDayOfWeek = firstDay.getDay();
-
     const daysInMonth = lastDay.getDate();
 
     const days: CalendarDay[] = [];
@@ -61,6 +75,7 @@ export function useDatePicker({
       const date = new Date(year, month, day);
       const isPast = isPastDate(date);
       const isTodayDate = isToday(date);
+      const isSelectable = isWithinTwoWeeks(date);
 
       const isRangeStart = selectedRange.startDate
         ? isSameDay(date, selectedRange.startDate)
@@ -75,10 +90,10 @@ export function useDatePicker({
         isToday: isTodayDate,
         isPast,
         isSelected,
-        isInRange: isInRangeDate && !isSelected,
+        isInRange: isInRangeDate,
         isRangeStart,
         isRangeEnd,
-        isDisabled: isPast,
+        isDisabled: !isSelectable,
       });
     }
 
@@ -136,7 +151,7 @@ export function useDatePicker({
   return {
     currentMonth,
     displayYearMonth,
-    todayYearMonth,
+    displayText,
     calendarDays,
     selectedRange,
     goToPrevMonth,

@@ -102,3 +102,43 @@ export function isDateInRange(date: Date, start: Date | null, end: Date | null):
 
   return d.getTime() >= s.getTime() && d.getTime() <= e.getTime();
 }
+
+const KOREAN_DAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
+export function getKoreanDayOfWeek(date: Date): string {
+  return KOREAN_DAYS[date.getDay()];
+}
+
+export function formatDateWithDay(date: Date): string {
+  const year = String(date.getFullYear()).slice(2);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const dayOfWeek = getKoreanDayOfWeek(date);
+
+  return `${year}/${month}/${day}(${dayOfWeek})`;
+}
+
+export function formatDateRangeDisplay(start: Date, end: Date): string {
+  const startYear = String(start.getFullYear()).slice(2);
+  const startMonth = String(start.getMonth() + 1).padStart(2, "0");
+  const startDay = String(start.getDate()).padStart(2, "0");
+  const startDayOfWeek = getKoreanDayOfWeek(start);
+
+  const endDay = String(end.getDate()).padStart(2, "0");
+  const endDayOfWeek = getKoreanDayOfWeek(end);
+
+  return `${startYear}/${startMonth}/${startDay} (${startDayOfWeek}) ~ ${endDay} (${endDayOfWeek})`;
+}
+
+export function isWithinTwoWeeks(date: Date): boolean {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const twoWeeksLater = new Date(today);
+  twoWeeksLater.setDate(today.getDate() + 14);
+
+  const target = new Date(date);
+  target.setHours(0, 0, 0, 0);
+
+  return target.getTime() >= today.getTime() && target.getTime() <= twoWeeksLater.getTime();
+}
