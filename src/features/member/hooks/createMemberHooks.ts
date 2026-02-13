@@ -23,7 +23,7 @@ interface CreateMemberHooksConfig<
 > {
   queryKey?: string;
   getMe: () => Promise<ApiSuccessResponse<TMeResponse>>;
-  updateMe: (data: TUpdatePayload) => Promise<ApiSuccessResponse<TMeResponse>>;
+  updateMe?: (data: TUpdatePayload) => Promise<ApiSuccessResponse<TMeResponse>>;
   getMyReport?: () => Promise<ApiSuccessResponse<TReportResponse>>;
   deleteMe?: () => Promise<ApiSuccessResponse<null>>;
   staleTime?: number;
@@ -37,13 +37,13 @@ type BaseMemberHooksReturn<
   keys: MemberQueryKeys;
   useMe: () => UseQueryResult<ApiSuccessResponse<TMeResponse>>;
   prefetchMe: () => Promise<DehydratedState>;
+} & Partial<{
   useUpdateMe: () => UseMutationResult<
     ApiSuccessResponse<TMeResponse>,
     unknown,
     TUpdatePayload,
     { previousData?: ApiSuccessResponse<TMeResponse> }
   >;
-} & Partial<{
   useMyReport: () => UseQueryResult<ApiSuccessResponse<TReportResponse>>;
   prefetchMyReport: () => Promise<DehydratedState>;
   useDeleteMe: () => UseMutationResult<ApiSuccessResponse<null>, unknown, void>;
@@ -70,7 +70,7 @@ export function createMemberHooks<
     get: config.getMe,
     update: config.updateMe,
     remove: config.deleteMe,
-    optimisticUpdate: true,
+    optimisticUpdate: Boolean(config.updateMe),
     staleTime: config.staleTime,
     onUpdateSuccess: config.getMyReport
       ? (queryClient) => {
@@ -78,10 +78,6 @@ export function createMemberHooks<
         }
       : undefined,
   });
-
-  if (!singleton.useUpdate) {
-    throw new Error("createMemberHooks requires updateMe configuration.");
-  }
 
   const keys: MemberQueryKeys = {
     all: singleton.keys.all,
@@ -93,8 +89,11 @@ export function createMemberHooks<
     keys,
     useMe: singleton.useGet,
     prefetchMe: singleton.prefetch,
-    useUpdateMe: singleton.useUpdate,
   };
+
+  if (config.updateMe && singleton.useUpdate) {
+    result.useUpdateMe = singleton.useUpdate;
+  }
 
   if (config.getMyReport) {
     result.useMyReport = function useMyReport() {
