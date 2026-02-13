@@ -97,7 +97,9 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
                 // Today (when not selected and not in range)
                 day.isToday && !day.isSelected && !day.isInRange && "bg-alpha-white-16 rounded-sm",
                 // In range (including selected dates) - full cell background
-                day.isInRange && "bg-alpha-white-8"
+                day.isInRange && "bg-alpha-white-8",
+                day.isRangeStart && "rounded-l-sm",
+                day.isRangeEnd && "rounded-r-sm"
               )}
             >
               {day.date ? (
