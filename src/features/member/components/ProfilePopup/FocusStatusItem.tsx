@@ -35,10 +35,10 @@ export function FocusStatusItem({
             <CircularProgressBar
               progress={focusPercentage}
               size={56}
-              strokeWidth={4}
+              strokeWidth={5.6}
               trackClassName="stroke-gray-700"
               indicatorClassName="stroke-green-100"
-              showText={false}
+              showText={true}
             >
               <span className="font-pretendard text-sm font-semibold text-green-100">
                 {Math.round(focusPercentage)}%
