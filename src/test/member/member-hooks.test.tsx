@@ -103,9 +103,9 @@ describe("memberHooks mutation", () => {
 
     await act(async () => {
       await result.current.mutateAsync({
-        interestCategory1: "DEVELOPMENT",
-        interestCategory2: "DESIGN",
-        interestCategory3: "CREATIVE",
+        firstInterestCategory: "DEVELOPMENT",
+        secondInterestCategory: "DESIGN",
+        thirdInterestCategory: "CREATIVE",
       });
     });
 

@@ -4,7 +4,6 @@ import type { ApiSuccessResponse } from "@/types/shared/types";
 import type {
   MemberProfile,
   MemberReport,
-  UpdateMePayload,
   UpdateInterestCategoriesRequest,
   UpdateNicknameRequest,
   UpdateProfileImageRequest,
@@ -72,29 +71,6 @@ export const memberApi = {
       "/api/members/me/interest-categories",
       body
     );
-  },
-
-  /**
-   * @deprecated 분리된 updateProfileImage / updateNickname / updateInterestCategories 사용 권장
-   */
-  updateMe: async (payload: UpdateMePayload): Promise<ApiSuccessResponse<MemberProfile>> => {
-    if (payload.profileImage !== undefined) {
-      return memberApi.updateProfileImage({ profileImage: payload.profileImage });
-    }
-
-    if (payload.nickname !== undefined) {
-      return memberApi.updateNickname({ nickname: payload.nickname });
-    }
-
-    if (payload.interestCategory1 && payload.interestCategory2) {
-      return memberApi.updateInterestCategories({
-        interestCategory1: payload.interestCategory1,
-        interestCategory2: payload.interestCategory2,
-        interestCategory3: payload.interestCategory3,
-      });
-    }
-
-    throw new Error("지원하지 않는 회원 정보 수정 payload입니다.");
   },
 
   getMyReport: async (): Promise<ApiSuccessResponse<MemberReport>> => {
