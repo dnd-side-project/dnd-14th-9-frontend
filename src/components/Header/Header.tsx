@@ -13,7 +13,7 @@ export async function Header() {
 
   return (
     <header className="border-border-subtle bg-surface-default sticky top-0 z-50 w-full border-b">
-      <div className="px-lg md:px-xl md:py-sm mx-auto flex h-full max-w-[1280px] items-center justify-between py-[15px] lg:px-[50px]">
+      <div className="px-lg md:px-xl md:py-sm mx-auto flex h-full max-w-[1280px] items-center justify-between py-[15px] xl:px-[50px]">
         <Link
           href="/"
           aria-label="홈으로 이동"

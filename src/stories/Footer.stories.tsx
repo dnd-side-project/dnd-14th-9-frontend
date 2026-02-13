@@ -40,3 +40,12 @@ export const Desktop: Story = {
     },
   },
 };
+
+export const DesktopXL: Story = {
+  parameters: {
+    viewport: {
+      defaultViewport: "reset", // or a specific large viewport if configured, otherwise default full width
+    },
+    chromatic: { viewports: [1440] },
+  },
+};
