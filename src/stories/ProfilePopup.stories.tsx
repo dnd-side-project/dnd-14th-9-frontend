@@ -24,7 +24,7 @@ const meta: Meta<typeof ProfilePopup> = {
 export default meta;
 type Story = StoryObj<typeof ProfilePopup>;
 
-export const Default: Story = {
+export const WithAvatar: Story = {
   args: {
     name: "빵가루 요정 쥐이",
     email: "sewonlim9060@naver.com",
@@ -41,16 +41,17 @@ export const Default: Story = {
   },
 };
 
-export const NoAvatar: Story = {
+export const Default: Story = {
   args: {
-    ...Default.args,
+    ...WithAvatar.args,
     avatarSrc: undefined,
   },
 };
 
 export const ZeroProgress: Story = {
   args: {
-    ...Default.args,
+    ...WithAvatar.args,
+    avatarSrc: undefined,
     focusTimeMinutes: 0,
     totalTimeMinutes: 60,
     todoCompleted: 0,
