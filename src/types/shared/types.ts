@@ -1,3 +1,5 @@
+import type { BackendErrorCode } from "@/lib/error/error-codes";
+
 /**
  * 백엔드 기준 HTTP Status 문자열
  */
@@ -11,21 +13,7 @@ export type ApiSuccessCode = "COMMON200";
 /**
  * 백엔드 기준 에러 코드
  */
-export type ApiErrorCode =
-  | "COMMON500"
-  | "COMMON400_1"
-  | "AUTH401_1"
-  | "AUTH401_2"
-  | "AUTH401_3"
-  | "AUTH401_4"
-  | "AUTH401_5"
-  | "AUTH401_6"
-  | "AUTH401_7"
-  | "AUTH401_8"
-  | "AWS500_1"
-  | "AWS500_2"
-  | "AWS500_3"
-  | (string & {});
+export type ApiErrorCode = BackendErrorCode | (string & {});
 
 /**
  * 백엔드 기준 전체 응답 코드

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { DEFAULT_API_ERROR_MESSAGE, getApiErrorMessageByCode } from "@/lib/api/api-error-messages";
+import { DEFAULT_API_ERROR_MESSAGE, getApiErrorMessageByCode } from "@/lib/error/error-codes";
 import type { ApiErrorResponse } from "@/types/shared/types";
 
 export interface ExecuteFetchOptions {
