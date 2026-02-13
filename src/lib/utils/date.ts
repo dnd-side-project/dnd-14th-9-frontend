@@ -124,10 +124,20 @@ export function formatDateRangeDisplay(start: Date, end: Date): string {
   const startDay = String(start.getDate()).padStart(2, "0");
   const startDayOfWeek = getKoreanDayOfWeek(start);
 
-  const endDay = String(end.getDate()).padStart(2, "0");
+  const isSameYear = start.getFullYear() === end.getFullYear();
+  const isSameMonth = isSameYear && start.getMonth() === end.getMonth();
+
   const endDayOfWeek = getKoreanDayOfWeek(end);
 
-  return `${startYear}/${startMonth}/${startDay} (${startDayOfWeek}) ~ ${endDay} (${endDayOfWeek})`;
+  if (isSameMonth) {
+    const endDay = String(end.getDate()).padStart(2, "0");
+    return `${startYear}/${startMonth}/${startDay}(${startDayOfWeek}) ~ ${endDay}(${endDayOfWeek})`;
+  }
+
+  const endYear = String(end.getFullYear()).slice(2);
+  const endMonth = String(end.getMonth() + 1).padStart(2, "0");
+  const endDay = String(end.getDate()).padStart(2, "0");
+  return `${startYear}/${startMonth}/${startDay}(${startDayOfWeek}) ~ ${endYear}/${endMonth}/${endDay}(${endDayOfWeek})`;
 }
 
 export function isWithinTwoWeeks(date: Date): boolean {
