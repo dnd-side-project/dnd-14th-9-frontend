@@ -1,10 +1,14 @@
 import Link from "next/link";
 
+import { getCurrentYear } from "@/lib/utils/date";
+
 /**
  * Footer - 공통 푸터
  * Figma Node ID: 1466-22771
  */
 export function Footer() {
+  const currentYear = getCurrentYear();
+
   return (
     <footer className="bg-surface-strong w-full">
       {/* Top Divider */}
@@ -71,7 +75,7 @@ export function Footer() {
           <div className="bg-border-subtle h-px w-full shrink-0" />
           <div className="py-sm flex w-full items-center">
             <p className="text-[10px] leading-[1.4] text-gray-700 md:text-[11px]">
-              © 2026 GAK. all rights reserved.
+              © {currentYear} GAK. all rights reserved.
             </p>
           </div>
         </div>
