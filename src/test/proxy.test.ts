@@ -485,7 +485,7 @@ describe("Proxy Middleware", () => {
       expect(setCookies[1]).toContain(newRefreshToken);
     });
 
-    it("보호된 라우트에서 재발급 응답 형식이 비정상이면 로그인 라우트로 리다이렉트해야 함", async () => {
+    it("보호된 라우트에서 재발급 응답 형식이 비정상이면 로그인 라우트(COMMON500)로 리다이렉트해야 함", async () => {
       // Given
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const request = new NextRequest("http://localhost:3000/dashboard", {
@@ -509,13 +509,13 @@ describe("Proxy Middleware", () => {
       const response = await proxy(request);
 
       // Then
-      expectLoginRedirect(response, "invalid_response");
+      expectLoginRedirect(response, "COMMON500");
       expectRedirectAfterLoginCookie(response, "/dashboard");
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
 
-    it("재발급 API가 실패하면 로그인 라우트로 리다이렉트해야 함", async () => {
+    it("재발급 API가 실패하면 백엔드 에러 코드로 로그인 라우트에 리다이렉트해야 함", async () => {
       // Given: refreshToken만 있음
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const request = new NextRequest("http://localhost:3000/dashboard", {
@@ -528,13 +528,19 @@ describe("Proxy Middleware", () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
+        json: jest.fn().mockResolvedValue({
+          code: "AUTH401_4",
+          message: "기한이 만료된 Refresh 토큰입니다.",
+          isSuccess: false,
+          httpStatus: "UNAUTHORIZED",
+        }),
       });
 
       // When
       const response = await proxy(request);
 
       // Then: 로그인 라우트로 리다이렉트 + 세션 쿠키 정리
-      expectLoginRedirect(response, "session_expired");
+      expectLoginRedirect(response, "AUTH401_4");
       expectRedirectAfterLoginCookie(response, "/dashboard");
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
@@ -600,7 +606,7 @@ describe("Proxy Middleware", () => {
       const response = await proxy(request);
 
       // Then: refreshToken 없으므로 재발급 불가 → 로그인 라우트
-      expectLoginRedirect(response, "refresh_token_missing");
+      expectLoginRedirect(response, "auth_required");
       expectRedirectAfterLoginCookie(response, "/dashboard");
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
@@ -734,7 +740,7 @@ describe("Proxy Middleware", () => {
       expect(response.status).toBe(200);
     });
 
-    it("만료된 토큰 → 재발급 실패 → 로그인 라우트", async () => {
+    it("만료된 토큰 → 재발급 실패 → 백엔드 에러 코드로 로그인 라우트", async () => {
       // Given: 만료된 토큰
       const expiredToken = createMockToken(-60);
       const expiredRefreshToken = createMockToken(-60);
@@ -749,13 +755,19 @@ describe("Proxy Middleware", () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
+        json: jest.fn().mockResolvedValue({
+          code: "AUTH401_4",
+          message: "기한이 만료된 Refresh 토큰입니다.",
+          isSuccess: false,
+          httpStatus: "UNAUTHORIZED",
+        }),
       });
 
       // When
       const response = await proxy(request);
 
       // Then: 로그인 라우트로 리다이렉트
-      expectLoginRedirect(response, "session_expired");
+      expectLoginRedirect(response, "AUTH401_4");
       expectRedirectAfterLoginCookie(response, "/dashboard");
     });
   });

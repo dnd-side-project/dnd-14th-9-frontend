@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { SocialLoginButton } from "@/features/auth/components/SocialLoginButton";
 import { saveLastLoginProvider } from "@/features/auth/lib/last-login-provider";
-import { LOGIN_PROVIDERS, type LoginProvider } from "@/lib/auth/auth-constants";
+import { LOGIN_PROVIDERS, type LoginProvider } from "@/lib/auth/login-policy";
 
 interface OAuthLoginFormProps {
   nextPath: string;
