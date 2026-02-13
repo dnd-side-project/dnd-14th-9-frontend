@@ -69,7 +69,7 @@ export function ProfileDropdown() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-[calc(100%+8px)] right-0 z-50 shadow-xl">
+        <div className="absolute top-[calc(100%+12px)] right-0 z-50 shadow-xl">
           <ProfilePopup
             name="빵가루 요정 쥐이" // TODO: 실제 데이터 연동 필요
             email="sewonlim9060@naver.com" // TODO: 실제 데이터 연동 필요
