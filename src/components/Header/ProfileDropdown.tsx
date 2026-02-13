@@ -63,7 +63,7 @@ export function ProfileDropdown() {
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="border-border-subtle bg-surface-subtle focus-visible:ring-primary focus-visible flex h-8 w-8 items-center justify-center rounded-full border p-2 transition-colors focus-visible:outline-none"
+        className="border-border-subtle bg-surface-subtle focus-visible:ring-primary focus-visible flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border p-2 transition-colors focus-visible:outline-none"
       >
         <ProfileIcon className="h-4 w-4" />
       </button>

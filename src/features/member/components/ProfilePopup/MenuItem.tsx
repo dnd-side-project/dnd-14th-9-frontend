@@ -15,7 +15,7 @@ export function MenuItem({ icon, label, isActive, className, ...props }: MenuIte
   return (
     <button
       className={cn(
-        "group flex h-[55px] w-full items-center gap-1 rounded-md border-[2px] p-4 transition-all duration-200",
+        "group flex h-[55px] w-full cursor-pointer items-center gap-1 rounded-md border-[2px] p-4 transition-all duration-200",
         isActive
           ? "border-green-500 bg-gray-800"
           : "border-transparent bg-gray-800 hover:border-green-500 hover:bg-gray-800",

@@ -22,7 +22,7 @@ export function ProfileHeader({ name, email, avatarSrc, onClose }: ProfileHeader
       </div>
       <button
         onClick={onClose}
-        className="flex items-center justify-center rounded-lg p-2.5 transition-colors hover:bg-gray-800"
+        className="flex cursor-pointer items-center justify-center rounded-lg p-2.5 transition-colors hover:bg-gray-800"
         aria-label="Close"
       >
         <div className="h-6 w-6 overflow-hidden">
