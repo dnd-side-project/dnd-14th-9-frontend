@@ -82,7 +82,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
         <div className="grid flex-1 grid-cols-7">
           {calendarDays.map((day, index) => (
             <button
-              key={index}
+              key={day.date ? day.date.toISOString() : `empty-${index}`}
               type="button"
               disabled={day.isDisabled || !day.date}
               onClick={() => day.date && handleDateClick(day.date)}
