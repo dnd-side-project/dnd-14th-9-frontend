@@ -1,21 +1,21 @@
 export type MemberInterestCategory =
   | "DEVELOPMENT"
   | "DESIGN"
-  | "PLAN&PM"
-  | "CAREER"
-  | "STUDY"
+  | "PLANNING_PM"
+  | "CAREER_SELF_DEVELOPMENT"
+  | "STUDY_READING"
   | "CREATIVE"
-  | "TEAMPROJECT"
+  | "TEAM_PROJECT"
   | "FREE";
 
 export interface MemberProfile {
-  id: number;
-  nickname: string;
-  profileImageUrl: string | null;
-  bio: string | null;
-  firstInterestCategory: MemberInterestCategory;
-  secondInterestCategory: MemberInterestCategory;
-  thirdInterestCategory: MemberInterestCategory | null;
+  id?: number;
+  nickname?: string;
+  profileImageUrl?: string;
+  bio?: string;
+  firstInterestCategory?: MemberInterestCategory;
+  secondInterestCategory?: MemberInterestCategory;
+  thirdInterestCategory?: MemberInterestCategory;
   firstLogin?: boolean;
 }
 
@@ -44,7 +44,7 @@ export interface UpdateNicknameRequest {
 }
 
 export interface UpdateInterestCategoriesRequest {
-  firstInterestCategory: MemberInterestCategory;
-  secondInterestCategory: MemberInterestCategory;
-  thirdInterestCategory?: MemberInterestCategory | null;
+  firstInterestCategory?: MemberInterestCategory;
+  secondInterestCategory?: MemberInterestCategory;
+  thirdInterestCategory?: MemberInterestCategory;
 }

@@ -52,8 +52,8 @@ describe("member route handlers", () => {
     const request = new NextRequest("http://localhost:3000/api/members/me/interest-categories", {
       method: "PATCH",
       body: JSON.stringify({
-        interestCategory1: "DEVELOPMENT",
-        interestCategory2: "DESIGN",
+        firstInterestCategory: "DEVELOPMENT",
+        secondInterestCategory: "DESIGN",
       }),
       headers: { "Content-Type": "application/json" },
     });

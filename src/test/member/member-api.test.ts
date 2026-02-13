@@ -20,7 +20,7 @@ const mockMemberProfile: MemberProfile = {
   bio: "안녕하세요",
   firstInterestCategory: "DEVELOPMENT",
   secondInterestCategory: "DESIGN",
-  thirdInterestCategory: null,
+  thirdInterestCategory: "CREATIVE",
   firstLogin: false,
 };
 
@@ -73,13 +73,13 @@ describe("memberApi", () => {
     mockedApi.patch.mockResolvedValueOnce(mockMemberProfileResponse);
 
     const body: {
-      interestCategory1: MemberInterestCategory;
-      interestCategory2: MemberInterestCategory;
-      interestCategory3: MemberInterestCategory;
+      firstInterestCategory: MemberInterestCategory;
+      secondInterestCategory: MemberInterestCategory;
+      thirdInterestCategory: MemberInterestCategory;
     } = {
-      interestCategory1: "DEVELOPMENT",
-      interestCategory2: "DESIGN",
-      interestCategory3: "CREATIVE",
+      firstInterestCategory: "DEVELOPMENT",
+      secondInterestCategory: "DESIGN",
+      thirdInterestCategory: "CREATIVE",
     };
 
     await memberApi.updateInterestCategories(body);

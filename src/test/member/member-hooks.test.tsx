@@ -38,7 +38,7 @@ function createMockProfileResponse(nickname: string): ApiSuccessResponse<MemberP
       bio: "소개",
       firstInterestCategory: "DEVELOPMENT",
       secondInterestCategory: "DESIGN",
-      thirdInterestCategory: null,
+      thirdInterestCategory: "CREATIVE",
       firstLogin: false,
     },
   };
