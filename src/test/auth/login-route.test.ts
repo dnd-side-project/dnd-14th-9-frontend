@@ -5,8 +5,8 @@
 import { NextRequest } from "next/server";
 
 import { GET } from "@/app/api/auth/login/route";
-import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
 import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
+import { LOGIN_PROVIDERS } from "@/lib/auth/login-policy";
 
 function hasSetCookie(response: Response, matcher: (cookie: string) => boolean): boolean {
   return response.headers.getSetCookie().some(matcher);
@@ -82,14 +82,14 @@ describe("OAuth Login Route Handler", () => {
     ).toBe(true);
   });
 
-  it("provider가 유효하지 않으면 로그인 페이지(access_denied)로 리다이렉트해야 함", async () => {
+  it("provider가 유효하지 않으면 로그인 페이지(OAUTH401_5)로 리다이렉트해야 함", async () => {
     const request = new NextRequest(
       "http://localhost:3000/api/auth/login?provider=naver&next=/dashboard"
     );
 
     const response = await GET(request);
 
-    expectLoginRedirect(response, "access_denied");
+    expectLoginRedirect(response, "OAUTH401_5");
     expect(
       hasSetCookie(response, (cookie) => cookie.startsWith(`${REDIRECT_AFTER_LOGIN_COOKIE}=`))
     ).toBe(false);

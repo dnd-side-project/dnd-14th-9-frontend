@@ -6,13 +6,13 @@ import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
 import { GET } from "@/app/api/auth/callback/[provider]/route";
-import { LOGIN_PROVIDERS } from "@/lib/auth/auth-constants";
 import { setAuthCookies } from "@/lib/auth/auth-cookies";
 import {
   ACCESS_TOKEN_COOKIE,
   REDIRECT_AFTER_LOGIN_COOKIE,
   REFRESH_TOKEN_COOKIE,
 } from "@/lib/auth/cookie-constants";
+import { LOGIN_PROVIDERS } from "@/lib/auth/login-policy";
 
 // Next.js cookies() mock
 jest.mock("next/headers", () => ({
@@ -196,10 +196,10 @@ describe("OAuth Callback Route Handler", () => {
 
   describe("에러 케이스", () => {
     it("error 파라미터가 있으면 reason만 포함해 로그인으로 리다이렉트해야 함", async () => {
-      const url = buildCallbackUrl(googleProvider, { error: "access_denied" });
+      const url = buildCallbackUrl(googleProvider, { error: "OAUTH401_2" });
       const response = await executeCallbackRoute(url);
 
-      expectLoginRedirect(response, "access_denied");
+      expectLoginRedirect(response, "OAUTH401_2");
     });
 
     it("error 분기에서 redirectAfterLogin 쿠키 값이 외부 URL이어도 로그인 리다이렉트 쿼리에 노출하지 않아야 함", async () => {
@@ -207,10 +207,10 @@ describe("OAuth Callback Route Handler", () => {
         value: "https://malicious.com/steal",
       });
 
-      const url = buildCallbackUrl(googleProvider, { error: "access_denied" });
+      const url = buildCallbackUrl(googleProvider, { error: "OAUTH401_2" });
       const response = await executeCallbackRoute(url);
 
-      expectLoginRedirect(response, "access_denied");
+      expectLoginRedirect(response, "OAUTH401_2");
     });
 
     it("accessToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -220,7 +220,7 @@ describe("OAuth Callback Route Handler", () => {
       const response = await executeCallbackRoute(url);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith("OAuth callback: No tokens in query parameters");
-      expectLoginRedirect(response, "no_token");
+      expectLoginRedirect(response, "OAUTH401_1");
     });
 
     it("refreshToken이 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -230,7 +230,7 @@ describe("OAuth Callback Route Handler", () => {
       const response = await executeCallbackRoute(url);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith("OAuth callback: No tokens in query parameters");
-      expectLoginRedirect(response, "no_token");
+      expectLoginRedirect(response, "OAUTH401_1");
     });
 
     it("토큰이 모두 없으면 에러와 함께 리다이렉트해야 함", async () => {
@@ -238,7 +238,7 @@ describe("OAuth Callback Route Handler", () => {
       const response = await executeCallbackRoute(url);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith("OAuth callback: No tokens in query parameters");
-      expectLoginRedirect(response, "no_token");
+      expectLoginRedirect(response, "OAUTH401_1");
     });
   });
 
@@ -265,7 +265,7 @@ describe("OAuth Callback Route Handler", () => {
       expect(response.status).toBe(307);
     });
 
-    it("허용되지 않은 provider면 로그인 페이지(access_denied)로 리다이렉트해야 함", async () => {
+    it("허용되지 않은 provider면 로그인 페이지(OAUTH401_5)로 리다이렉트해야 함", async () => {
       const url = buildCallbackUrl("naver", {
         [ACCESS_TOKEN_COOKIE]: "access123",
         [REFRESH_TOKEN_COOKIE]: "refresh456",
@@ -273,7 +273,7 @@ describe("OAuth Callback Route Handler", () => {
       const response = await executeCallbackRoute(url);
 
       expect(mockSetAuthCookies).not.toHaveBeenCalled();
-      expectLoginRedirect(response, "access_denied");
+      expectLoginRedirect(response, "OAUTH401_5");
     });
   });
 });

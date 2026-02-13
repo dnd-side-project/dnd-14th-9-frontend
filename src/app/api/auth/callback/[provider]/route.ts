@@ -9,6 +9,7 @@ import {
   redirectToLogin,
 } from "@/lib/auth/auth-route-utils";
 import { isLoginProvider } from "@/lib/auth/login-policy";
+import { BACKEND_ERROR_CODES } from "@/lib/error/error-codes";
 
 interface CallbackRouteContext {
   params: Promise<{
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest, context: CallbackRouteContext) {
   const cookieStore = await cookies();
 
   if (!isLoginProvider(provider)) {
-    return redirectToLogin(request, "access_denied");
+    return redirectToLogin(request, BACKEND_ERROR_CODES.OAUTH2_UNSUPPORTED_PROVIDER);
   }
 
   const searchParams = request.nextUrl.searchParams;
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest, context: CallbackRouteContext) {
 
   if (!accessToken || !refreshToken) {
     console.error("OAuth callback: No tokens in query parameters");
-    return redirectToLogin(request, "no_token");
+    return redirectToLogin(request, BACKEND_ERROR_CODES.OAUTH2_LOGIN_FAILED);
   }
 
   setAuthCookies(cookieStore, { accessToken, refreshToken });
