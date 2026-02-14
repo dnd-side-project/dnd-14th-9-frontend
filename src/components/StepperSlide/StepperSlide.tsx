@@ -8,6 +8,8 @@ import { useStepperSlide } from "./useStepperSlide";
 
 import type { StepperSlideProps } from "./StepperSlide.types";
 
+const TICK_VALUES = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] as const;
+
 export const StepperSlide = forwardRef<HTMLDivElement, StepperSlideProps>(
   ({ value, onChange, myFocusValue, min = 0, max = 100, disabled = false, className }, ref) => {
     const { isDragging, percentage, trackRef, handleMouseDown, handleTrackClick, handleKeyDown } =
@@ -21,8 +23,6 @@ export const StepperSlide = forwardRef<HTMLDivElement, StepperSlideProps>(
 
     const myFocusPercentage =
       myFocusValue !== undefined ? ((myFocusValue - min) / (max - min)) * 100 : undefined;
-
-    const ticks = Array.from({ length: 11 }, (_, i) => i * 10);
 
     return (
       <div
@@ -113,7 +113,7 @@ export const StepperSlide = forwardRef<HTMLDivElement, StepperSlideProps>(
 
         {/* 격자선 및 숫자 */}
         <div className="relative mt-2 h-6 w-full">
-          {ticks.map((tick) => (
+          {TICK_VALUES.map((tick) => (
             <div
               key={tick}
               className="absolute flex -translate-x-1/2 transform flex-col items-center"

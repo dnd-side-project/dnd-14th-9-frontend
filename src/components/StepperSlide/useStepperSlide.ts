@@ -31,13 +31,13 @@ export function useStepperSlide({
 
   const getValueFromPosition = useCallback(
     (clientX: number) => {
-      if (!trackRef.current) return value;
+      if (!trackRef.current) return min;
       const rect = trackRef.current.getBoundingClientRect();
       const position = (clientX - rect.left) / rect.width;
       const rawValue = min + position * (max - min);
       return Math.round(Math.min(max, Math.max(min, rawValue)));
     },
-    [min, max, value]
+    [min, max]
   );
 
   const handleMouseDown = useCallback(
@@ -93,9 +93,7 @@ export function useStepperSlide({
 
     const handleMouseMove = (e: MouseEvent) => {
       const newValue = getValueFromPosition(e.clientX);
-      if (newValue !== value) {
-        onChange(newValue);
-      }
+      onChange(newValue);
     };
 
     const handleMouseUp = () => {
@@ -109,7 +107,7 @@ export function useStepperSlide({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, getValueFromPosition, value, onChange]);
+  }, [isDragging, getValueFromPosition, onChange]);
 
   return {
     isDragging,
