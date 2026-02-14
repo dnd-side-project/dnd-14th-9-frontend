@@ -27,12 +27,14 @@ import type {
   UpdateProfileImageRequest,
 } from "../types";
 
+const MEMBER_STALE_TIME = 5 * 60 * 1000;
+
 // createSingletonHooks로 기본 me 관련 훅 생성 (Session의 createCrudHooks와 동일한 역할)
 const memberCore = createSingletonHooks<MemberProfile, never>({
   queryKey: "member",
   get: memberApi.getMe,
   remove: memberApi.deleteMe,
-  staleTime: 5 * 60 * 1000, // 5분
+  staleTime: MEMBER_STALE_TIME, // 5분
 });
 
 // 캐시 키 (Session의 sessionKeys와 동일한 구조)
@@ -40,6 +42,7 @@ export const memberKeys = {
   all: memberCore.keys.all,
   me: memberCore.keys.data, // "data" 대신 "me"라는 도메인 친화적 이름 사용
   data: memberCore.keys.data, // 하위 호환성 유지
+  edit: () => ["member", "edit"] as const,
   report: () => ["member", "report"] as const,
 };
 
@@ -47,6 +50,23 @@ export const memberKeys = {
 export const useMe = memberCore.useGet;
 export const useDeleteMe = memberCore.useDelete!;
 export const prefetchMe = memberCore.prefetch;
+
+export function useMeForEdit() {
+  return useQuery<ApiSuccessResponse<MemberProfile>>({
+    queryKey: memberKeys.edit(),
+    queryFn: memberApi.getMeForEdit,
+    staleTime: MEMBER_STALE_TIME,
+  });
+}
+
+export async function prefetchMeForEdit() {
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: memberKeys.edit(),
+    queryFn: memberApi.getMeForEdit,
+  });
+  return dehydrate(queryClient);
+}
 
 // Report 쿼리 (Session의 useSessionReport와 동일한 패턴)
 export function useMyReport() {
@@ -76,6 +96,8 @@ function createMemberProfileMutation<TVariables>(
       onSuccess: (data) => {
         // 프로필 수정 시 me 캐시 직접 업데이트
         queryClient.setQueryData(memberKeys.me(), data);
+        // edit 조회 캐시 무효화
+        queryClient.invalidateQueries({ queryKey: memberKeys.edit() });
         // report도 무효화
         queryClient.invalidateQueries({ queryKey: memberKeys.report() });
       },

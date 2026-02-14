@@ -2,12 +2,11 @@ import { NextRequest } from "next/server";
 
 import { forwardToBackend } from "@/lib/api/api-route-forwarder";
 
-export async function DELETE(request: NextRequest) {
+export async function GET(request: NextRequest) {
   return forwardToBackend({
     request,
-    method: "DELETE",
-    pathWithQuery: "/members/me",
-    clearAuthCookiesOnSuccess: true,
+    method: "GET",
+    pathWithQuery: "/members/me/edit",
     forwardRequestCookies: true,
   });
 }

@@ -106,8 +106,9 @@ describe("memberApi", () => {
     expect((options.body as FormData).get("profileImage")).toBe(file);
   });
 
-  it("getMe/getMyReport/deleteMe가 기존 엔드포인트를 유지해야 한다", async () => {
+  it("조회/리포트/탈퇴 엔드포인트가 명세 경로를 호출해야 한다", async () => {
     mockedApi.get
+      .mockResolvedValueOnce(mockMemberProfileResponse)
       .mockResolvedValueOnce(mockMemberProfileResponse)
       .mockResolvedValueOnce(mockReportResponse);
     mockedApi.delete.mockResolvedValueOnce({
@@ -118,11 +119,13 @@ describe("memberApi", () => {
     });
 
     await memberApi.getMe();
+    await memberApi.getMeForEdit();
     await memberApi.getMyReport();
     await memberApi.deleteMe();
 
-    expect(mockedApi.get).toHaveBeenNthCalledWith(1, "/api/members/me");
-    expect(mockedApi.get).toHaveBeenNthCalledWith(2, "/api/members/me/report");
+    expect(mockedApi.get).toHaveBeenNthCalledWith(1, "/api/members/me/profile");
+    expect(mockedApi.get).toHaveBeenNthCalledWith(2, "/api/members/me/edit");
+    expect(mockedApi.get).toHaveBeenNthCalledWith(3, "/api/members/me/report");
     expect(mockedApi.delete).toHaveBeenCalledWith("/api/members/me");
   });
 });

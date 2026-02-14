@@ -40,7 +40,11 @@ async function patchProfileImage<T>(endpoint: string, body: FormData): Promise<T
  */
 export const memberApi = {
   getMe: async (): Promise<ApiSuccessResponse<MemberProfile>> => {
-    return api.get<ApiSuccessResponse<MemberProfile>>("/api/members/me");
+    return api.get<ApiSuccessResponse<MemberProfile>>("/api/members/me/profile");
+  },
+
+  getMeForEdit: async (): Promise<ApiSuccessResponse<MemberProfile>> => {
+    return api.get<ApiSuccessResponse<MemberProfile>>("/api/members/me/edit");
   },
 
   updateProfileImage: async (

@@ -6,6 +6,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { memberApi } from "@/features/member/api";
 import {
   memberKeys,
+  useMeForEdit,
   useUpdateInterestCategories,
   useUpdateNickname,
   useUpdateProfileImage,
@@ -16,6 +17,7 @@ import type { ApiSuccessResponse } from "@/types/shared/types";
 jest.mock("@/features/member/api", () => ({
   memberApi: {
     getMe: jest.fn(),
+    getMeForEdit: jest.fn(),
     getMyReport: jest.fn(),
     deleteMe: jest.fn(),
     updateProfileImage: jest.fn(),
@@ -112,5 +114,28 @@ describe("memberHooks mutation", () => {
     await waitFor(() => {
       expect(queryClient.getQueryData(memberKeys.me())).toEqual(response);
     });
+  });
+});
+
+describe("memberHooks query", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("useMeForEdit는 edit 엔드포인트 결과를 edit 키로 캐시해야 한다", async () => {
+    const queryClient = new QueryClient();
+    const response = createMockProfileResponse("edit-profile");
+    mockedMemberApi.getMeForEdit.mockResolvedValueOnce(response);
+
+    const { result } = renderHook(() => useMeForEdit(), {
+      wrapper: createWrapper(queryClient),
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(mockedMemberApi.getMeForEdit).toHaveBeenCalledTimes(1);
+    expect(queryClient.getQueryData(memberKeys.edit())).toEqual(response);
   });
 });
