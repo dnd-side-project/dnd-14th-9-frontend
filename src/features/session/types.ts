@@ -45,17 +45,19 @@ export interface Session {
 // 세션 목록 조회 API 관련 타입
 // ============================================
 
-// Enum 타입들 (변경 가능성 있음)
+// Enum 타입들
 export type SessionCategory =
-  | "ALL"
   | "DEVELOPMENT"
   | "DESIGN"
-  | "PLAN&PM"
-  | "CAREER"
-  | "STUDY"
+  | "PLANNING_PM"
+  | "CAREER_SELF_DEVELOPMENT"
+  | "STUDY_READING"
   | "CREATIVE"
-  | "TEAMPROJECT"
+  | "TEAM_PROJECT"
   | "FREE";
+
+// 필터용 카테고리 (ALL 포함)
+export type SessionCategoryFilter = "ALL" | SessionCategory;
 
 export type SessionSort = "POPULAR" | "LATEST";
 
@@ -72,7 +74,7 @@ export type SessionListStatus = "WAITING" | "IN_PROGRESS";
 // 목록 조회 파라미터
 export interface SessionListParams {
   keyword?: string;
-  category?: SessionCategory;
+  category?: SessionCategoryFilter;
   sort?: SessionSort;
   startDate?: string;
   endDate?: string;
@@ -113,21 +115,21 @@ export interface SessionListResponse {
 // ============================================
 
 // 세션 생성 요청
-// TODO(장근호): 서버 스펙 확정 후 수정 필요
 export interface CreateSessionRequest {
-  title: string; // 제목
-  startTime: string; // 시작 시간 (ISO 8601 형식)
-  durationMinutes: number; // 세션 진행 시간 (분)
-  maxParticipants: number; // 참여 인원
+  title: string; // 제목 (최대 20자)
+  summary: string; // 세션 요약 (최대 50자)
+  notice: string; // 공지사항 (최대 100자)
   category: SessionCategory; // 카테고리
-  summary: string; // 한줄소개
-  notice?: string; // 공지사항 (선택)
+  startTime: string; // 시작 시간 (현재로부터 5분 이후)
+  sessionDurationMinutes: number; // 세션 진행 시간 (분, 양수)
+  maxParticipants: number; // 최대 참가 인원 (양수)
+  requiredFocusRate?: number; // 최소 집중도 기준 (기본값 0)
+  requiredAchievementRate?: number; // 최소 달성률 기준 (기본값 0)
 }
 
 // 세션 생성 응답
-// TODO(장근호): 서버 응답 확정 후 수정 필요
 export interface CreateSessionResponse {
-  sessionId: string;
+  createdSessionId: number;
 }
 
 // ============================================

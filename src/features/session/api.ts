@@ -33,9 +33,15 @@ export const sessionApi = {
   },
 
   createSession: async (
-    body: CreateSessionRequest
+    body: CreateSessionRequest,
+    image?: File
   ): Promise<ApiSuccessResponse<CreateSessionResponse>> => {
-    return api.post<ApiSuccessResponse<CreateSessionResponse>>("/api/sessions", body);
+    const formData = new FormData();
+    formData.append("request", new Blob([JSON.stringify(body)], { type: "application/json" }));
+    if (image) {
+      formData.append("image", image);
+    }
+    return api.post<ApiSuccessResponse<CreateSessionResponse>>("/api/sessions", formData);
   },
 
   join: async (
