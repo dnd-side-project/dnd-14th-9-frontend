@@ -9,7 +9,7 @@ import type {
   UpdateProfileImageRequest,
 } from "./types";
 
-async function patchMultipart<T>(endpoint: string, body: FormData): Promise<T> {
+async function patchProfileImage<T>(endpoint: string, body: FormData): Promise<T> {
   const response = await fetch(endpoint, {
     method: "PATCH",
     credentials: "include",
@@ -52,7 +52,7 @@ export const memberApi = {
       formData.append("profileImage", body.profileImage);
     }
 
-    return patchMultipart<ApiSuccessResponse<MemberProfile>>(
+    return patchProfileImage<ApiSuccessResponse<MemberProfile>>(
       "/api/members/me/profile-image",
       formData
     );
