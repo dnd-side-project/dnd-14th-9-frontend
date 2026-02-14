@@ -71,16 +71,19 @@ function buildUrl(endpoint: string, isServer: boolean, params?: RequestOptions["
 async function buildHeaders(
   isServer: boolean,
   options?: RequestOptions,
-  hasBody: boolean = false
+  hasBody: boolean = false,
+  isFormData: boolean = false
 ): Promise<Record<string, string>> {
   const headers: Record<string, string> = {
     ...options?.headers,
   };
 
-  if (hasBody) {
+  // FormData는 브라우저가 Content-Type을 자동 설정 (boundary 포함)
+  if (hasBody && !isFormData) {
     headers["Content-Type"] = "application/json";
   }
 
+  // 서버 사이드에서만 httpOnly 쿠키 접근 가능
   if (isServer && !options?.skipAuth) {
     const cookies = await getCookiesFn();
     const cookieStore = await cookies();
@@ -101,13 +104,14 @@ async function createRequestContext(
 ) {
   const isServer = typeof window === "undefined";
   const hasBody = data !== undefined && method !== "GET";
+  const isFormData = data instanceof FormData;
   const url = buildUrl(endpoint, isServer, options?.params);
-  const headers = await buildHeaders(isServer, options, hasBody);
+  const headers = await buildHeaders(isServer, options, hasBody, isFormData);
 
   const requestInit: RequestInit = {
     method,
     headers,
-    body: hasBody ? JSON.stringify(data) : undefined,
+    body: hasBody ? (isFormData ? data : JSON.stringify(data)) : undefined,
   };
 
   if (!isServer) {
