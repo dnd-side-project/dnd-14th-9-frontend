@@ -133,19 +133,17 @@ export interface CreateSessionResponse {
 }
 
 // ============================================
-// 세션 참여 토글 API 관련 타입
+// 세션 참여 API 관련 타입
 // ============================================
 
-// 세션 참여 토글 요청
-// TODO(장근호): 서버 스펙 확정 후 수정 필요
-export interface JoinSessionRequest {
-  memberId?: string; // 유저 ID (인증 토큰에서 추출 시 불필요)
-}
+// 세션 참여 Role
+export type SessionRole = "HOST" | "PARTICIPANT";
 
-// 세션 참여 토글 응답
-// TODO(장근호): 서버 응답 확정 후 수정 필요
+// 세션 참여 응답
 export interface JoinSessionResponse {
-  joined: boolean; // 참여 상태 (true: 참여함, false: 참여 취소됨)
+  sessionId: number; // 참여한 세션 ID
+  memberId: number; // 참여한 멤버(본인) ID
+  role: SessionRole; // 해당 세션에서의 본인의 Role
 }
 
 // ============================================

@@ -20,7 +20,6 @@ import type {
   SessionReportResponse,
   CreateSessionRequest,
   CreateSessionResponse,
-  JoinSessionRequest,
   JoinSessionResponse,
   SetGoalRequest,
   SetGoalResponse,
@@ -76,8 +75,8 @@ const createSessionMutationHook = <TData, TVariables extends { sessionRoomId: st
 
 export const useJoinSession = createSessionMutationHook<
   ApiSuccessResponse<JoinSessionResponse>,
-  { sessionRoomId: string; body: JoinSessionRequest }
->(({ sessionRoomId, body }) => sessionApi.join(sessionRoomId, body));
+  { sessionRoomId: string }
+>(({ sessionRoomId }) => sessionApi.join(sessionRoomId));
 
 export const useSetGoal = createSessionMutationHook<
   ApiSuccessResponse<SetGoalResponse>,
