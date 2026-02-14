@@ -88,6 +88,7 @@ describe("member route handlers", () => {
       body: JSON.stringify({
         firstInterestCategory: "DEVELOPMENT",
         secondInterestCategory: "DESIGN",
+        thirdInterestCategory: null,
       }),
       headers: { "Content-Type": "application/json" },
     });

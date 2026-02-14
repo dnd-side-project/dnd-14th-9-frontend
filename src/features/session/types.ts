@@ -1,3 +1,5 @@
+import type { MemberInterestCategory } from "@/types/shared/member-interest-category";
+
 // TODO(장근호) - 서버 구성 확인 후 수정 작업 진행.
 export type ParticipantStatus =
   | "joined" // 입장함 (아직 준비 안 함)
@@ -10,7 +12,7 @@ export interface Participant {
   nickname: string;
   profileImageUrl?: string;
   bio?: string; // 자기소개
-  interest_category: string; // union type 변경
+  interest_category: MemberInterestCategory;
   socialProvider: "google" | "kakao";
   providerId: string;
   created_at: string;
