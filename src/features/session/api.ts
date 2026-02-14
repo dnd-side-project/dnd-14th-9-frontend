@@ -40,7 +40,7 @@ export const sessionApi = {
     if (image) {
       formData.append("image", image);
     }
-    return api.post<ApiSuccessResponse<CreateSessionResponse>>("/api/sessions", formData);
+    return api.post<ApiSuccessResponse<CreateSessionResponse>>("/api/sessions/create", formData);
   },
 
   join: async (sessionId: string): Promise<ApiSuccessResponse<JoinSessionResponse>> => {

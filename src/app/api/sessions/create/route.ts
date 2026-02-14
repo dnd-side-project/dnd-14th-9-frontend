@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const baseUrl = SERVER_API_URL || API_URL;
 
-    const response = await fetch(`${baseUrl}/sessions`, {
+    const response = await fetch(`${baseUrl}/sessions/create`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
