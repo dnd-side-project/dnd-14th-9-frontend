@@ -1,7 +1,6 @@
 import { ProfilePopup } from "@/features/member/components/ProfilePopup/ProfilePopup";
 
-// eslint-disable-next-line storybook/no-renderer-packages
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta: Meta<typeof ProfilePopup> = {
   title: "Features/Member/ProfilePopup",

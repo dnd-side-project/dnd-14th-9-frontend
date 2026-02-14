@@ -14,7 +14,7 @@ export function ProfileHeader({ name, email, avatarSrc, onClose }: ProfileHeader
   return (
     <div className="flex w-full items-center gap-4 bg-gray-900 px-6 pt-6 pb-2">
       <div className="flex h-[44px] w-[44px] shrink-0 items-center justify-center">
-        <Avatar src={avatarSrc} alt={name} size={44} />
+        <Avatar src={avatarSrc} alt={name} size="large" />
       </div>
       <div className="flex flex-1 flex-col items-start gap-1">
         <p className="text-common-white font-pretendard w-full text-lg font-semibold">{name}</p>

@@ -1,7 +1,6 @@
 import { Avatar } from "./Avatar";
 
-// eslint-disable-next-line storybook/no-renderer-packages
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const META = {
   title: "Components/Avatar",
