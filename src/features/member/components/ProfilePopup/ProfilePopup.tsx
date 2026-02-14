@@ -40,6 +40,33 @@ export function ProfilePopup({
   onFeedbackClick,
   onLogoutClick,
 }: ProfilePopupProps) {
+  const menuItems = [
+    {
+      key: "profile-settings",
+      icon: <ProfileIcon className="h-[22px] w-[22px]" />,
+      label: "프로필 설정",
+      onClick: onProfileSettingsClick,
+    },
+    {
+      key: "report",
+      icon: <FileText size={16} strokeWidth={1.5} />,
+      label: "기록 리포트",
+      onClick: onReportClick,
+    },
+    {
+      key: "feedback",
+      icon: <MessageSquare size={18} strokeWidth={1.5} />,
+      label: "피드백",
+      onClick: onFeedbackClick,
+    },
+    {
+      key: "logout",
+      icon: <LogOut size={16} strokeWidth={1.5} />,
+      label: "로그아웃",
+      onClick: onLogoutClick,
+    },
+  ];
+
   return (
     <div
       className={cn(
@@ -58,30 +85,9 @@ export function ProfilePopup({
             todoTotal={todoTotal}
           />
 
-          <MenuItem
-            icon={<ProfileIcon className="h-[22px] w-[22px]" />}
-            label="프로필 설정"
-            onClick={onProfileSettingsClick}
-            // isActive // Example usage
-          />
-
-          <MenuItem
-            icon={<FileText size={16} strokeWidth={1.5} />}
-            label="기록 리포트"
-            onClick={onReportClick}
-          />
-
-          <MenuItem
-            icon={<MessageSquare size={18} strokeWidth={1.5} />}
-            label="피드백"
-            onClick={onFeedbackClick}
-          />
-
-          <MenuItem
-            icon={<LogOut size={16} strokeWidth={1.5} />}
-            label="로그아웃"
-            onClick={onLogoutClick}
-          />
+          {menuItems.map((item) => (
+            <MenuItem key={item.key} icon={item.icon} label={item.label} onClick={item.onClick} />
+          ))}
         </div>
       </div>
     </div>
