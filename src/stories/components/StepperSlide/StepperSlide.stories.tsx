@@ -51,6 +51,10 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
+  args: {
+    value: 50,
+    onChange: () => {},
+  },
   render: () => {
     const [value, setValue] = useState(50);
     return <StepperSlide value={value} onChange={setValue} />;
@@ -58,6 +62,11 @@ export const Default: Story = {
 };
 
 export const WithMyFocus: Story = {
+  args: {
+    value: 70,
+    onChange: () => {},
+    myFocusValue: 40,
+  },
   render: () => {
     const [value, setValue] = useState(70);
     return <StepperSlide value={value} onChange={setValue} myFocusValue={40} />;
@@ -72,6 +81,11 @@ export const WithMyFocus: Story = {
 };
 
 export const Disabled: Story = {
+  args: {
+    value: 50,
+    onChange: () => {},
+    disabled: true,
+  },
   render: () => {
     const [value, setValue] = useState(50);
     return <StepperSlide value={value} onChange={setValue} disabled />;
@@ -86,6 +100,11 @@ export const Disabled: Story = {
 };
 
 export const WithValueDisplay: Story = {
+  args: {
+    value: 30,
+    onChange: () => {},
+    myFocusValue: 60,
+  },
   render: () => {
     const [value, setValue] = useState(30);
     return (
@@ -105,6 +124,11 @@ export const WithValueDisplay: Story = {
 };
 
 export const OnLightBackground: Story = {
+  args: {
+    value: 50,
+    onChange: () => {},
+    myFocusValue: 30,
+  },
   render: () => {
     const [value, setValue] = useState(50);
     return <StepperSlide value={value} onChange={setValue} myFocusValue={30} />;
@@ -129,6 +153,11 @@ export const OnLightBackground: Story = {
 };
 
 export const FullWidth474: Story = {
+  args: {
+    value: 50,
+    onChange: () => {},
+    myFocusValue: 40,
+  },
   render: () => {
     const [value, setValue] = useState(50);
     return <StepperSlide value={value} onChange={setValue} myFocusValue={40} />;
@@ -141,6 +170,9 @@ export const FullWidth474: Story = {
     ),
   ],
   parameters: {
+    backgrounds: {
+      default: "dark",
+    },
     docs: {
       description: {
         story: "전체 너비 474px에서의 슬라이더 예시입니다.",
