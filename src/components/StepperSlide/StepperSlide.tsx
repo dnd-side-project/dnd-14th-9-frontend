@@ -34,19 +34,20 @@ export const StepperSlide = forwardRef<HTMLDivElement, StepperSlideProps>(
         )}
       >
         {/* 말풍선 영역 */}
-        <div className="relative mb-3 h-8">
+        <div className="relative mb-3 h-9.5">
           {/* 내 집중도 말풍선 */}
           {myFocusPercentage !== undefined && (
             <div className="absolute top-0" style={{ left: `${myFocusPercentage}%` }}>
               <div
                 className={cn(
                   "relative -translate-x-1/2",
-                  "rounded-sm bg-gray-700 px-2 py-1 text-xs whitespace-nowrap text-gray-200",
+                  "flex h-8.75 w-14 items-center justify-center",
+                  "rounded-sm bg-gray-700 font-semibold whitespace-nowrap text-gray-200",
                   "after:absolute after:top-full after:left-1/2 after:-translate-x-1/2",
                   "after:border-4 after:border-transparent after:border-t-gray-700 after:content-['']"
                 )}
               >
-                내 집중도
+                <span className="px-xs box-border text-xs">내 집중도</span>
               </div>
             </div>
           )}
@@ -56,13 +57,14 @@ export const StepperSlide = forwardRef<HTMLDivElement, StepperSlideProps>(
             <div
               className={cn(
                 "relative -translate-x-1/2",
-                "text-common-white rounded-sm bg-green-600 px-2 py-1 text-xs font-semibold",
+                "flex h-8.75 w-13 items-center justify-center",
+                "rounded-sm bg-green-600 font-semibold",
                 "after:absolute after:top-full after:left-1/2 after:-translate-x-1/2",
                 "after:border-4 after:border-transparent after:border-t-green-600 after:content-['']",
                 isDragging && "scale-110 transition-transform"
               )}
             >
-              {value}%
+              <div className="text-text-inverse text-base">{value}%</div>
             </div>
           </div>
         </div>
@@ -82,7 +84,7 @@ export const StepperSlide = forwardRef<HTMLDivElement, StepperSlideProps>(
           {/* 내 집중도 마커 */}
           {myFocusPercentage !== undefined && (
             <div
-              className="absolute top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-gray-400"
+              className="absolute top-1/2 h-4 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-400"
               style={{ left: `${myFocusPercentage}%` }}
             />
           )}
@@ -93,7 +95,7 @@ export const StepperSlide = forwardRef<HTMLDivElement, StepperSlideProps>(
               "absolute top-1/2 -translate-x-1/2 -translate-y-1/2",
               "h-5 w-5 rounded-full",
               "border-common-white border-2 bg-green-600",
-              "cursor-grab shadow-lg",
+              "cursor-grab shadow-[0_0_8px_0_#00000029]",
               "focus:ring-2 focus:ring-green-400 focus:outline-none",
               isDragging && "scale-110 cursor-grabbing"
             )}
