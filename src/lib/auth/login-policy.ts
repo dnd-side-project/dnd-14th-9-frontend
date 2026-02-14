@@ -1,7 +1,7 @@
-import { LOGIN_PROVIDERS, LOGIN_REASON_MESSAGES } from "@/lib/auth/auth-constants";
+import { getApiErrorMessageByCode } from "@/lib/error/error-codes";
 
+export const LOGIN_PROVIDERS = ["google", "kakao"] as const;
 export type LoginProvider = (typeof LOGIN_PROVIDERS)[number];
-type LoginReason = keyof typeof LOGIN_REASON_MESSAGES;
 
 export function isLoginProvider(value: string | null | undefined): value is LoginProvider {
   if (!value) return false;
@@ -17,5 +17,5 @@ export function normalizeInternalPath(path: string | null | undefined): string {
 
 export function getLoginReasonMessage(reason: string | null | undefined): string | null {
   if (!reason) return null;
-  return LOGIN_REASON_MESSAGES[reason as LoginReason] ?? null;
+  return getApiErrorMessageByCode(reason);
 }

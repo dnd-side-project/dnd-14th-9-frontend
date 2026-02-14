@@ -8,6 +8,7 @@ import {
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
   REFRESH_TOKEN_COOKIE,
 } from "@/lib/auth/cookie-constants";
+import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 
 // 공개 라우트 (인증 불필요)
 const PUBLIC_ROUTES = ["/", "/login"];
@@ -31,6 +32,10 @@ interface TryRefreshTokenOptions {
   allowPassThroughOnFailure?: boolean;
 }
 
+interface ErrorCodeResponseBody {
+  code: string;
+}
+
 function isRefreshResponseBody(data: unknown): data is RefreshResponseBody {
   if (!data || typeof data !== "object" || !("result" in data)) {
     return false;
@@ -43,6 +48,26 @@ function isRefreshResponseBody(data: unknown): data is RefreshResponseBody {
 
   const tokenPair = result as Record<string, unknown>;
   return typeof tokenPair.accessToken === "string" && typeof tokenPair.refreshToken === "string";
+}
+
+function isErrorCodeResponseBody(data: unknown): data is ErrorCodeResponseBody {
+  if (!data || typeof data !== "object") {
+    return false;
+  }
+
+  return typeof (data as { code?: unknown }).code === "string";
+}
+
+async function getErrorCodeFromResponse(response: Response): Promise<string | null> {
+  try {
+    const data: unknown = await response.json();
+    if (!isErrorCodeResponseBody(data)) {
+      return null;
+    }
+    return data.code;
+  } catch {
+    return null;
+  }
 }
 
 export async function proxy(request: NextRequest) {
@@ -73,7 +98,10 @@ export async function proxy(request: NextRequest) {
   // 토큰 없으면 로그인 라우트로 리다이렉트
   if (!accessToken) {
     if (!refreshToken) {
-      return redirectToLoginRoute(request, { clearAuth: true, reason: "auth_required" });
+      return redirectToLoginRoute(request, {
+        clearAuth: true,
+        reason: LOGIN_INTERNAL_ERROR_CODES.AUTH_REQUIRED,
+      });
     }
     return await tryRefreshToken(request, refreshToken);
   }
@@ -83,7 +111,10 @@ export async function proxy(request: NextRequest) {
     if (refreshToken) {
       return await tryRefreshToken(request, refreshToken);
     }
-    return redirectToLoginRoute(request, { clearAuth: true, reason: "refresh_token_missing" });
+    return redirectToLoginRoute(request, {
+      clearAuth: true,
+      reason: LOGIN_INTERNAL_ERROR_CODES.AUTH_REQUIRED,
+    });
   }
 
   return NextResponse.next();
@@ -176,7 +207,10 @@ async function tryRefreshToken(
       if (allowPassThroughOnFailure) {
         return NextResponse.next();
       }
-      return redirectToLoginRoute(request, { clearAuth: true, reason: "config_error" });
+      return redirectToLoginRoute(request, {
+        clearAuth: true,
+        reason: LOGIN_INTERNAL_ERROR_CODES.CONFIG_ERROR,
+      });
     }
 
     // fetch 타임아웃 설정 (필수 버그 픽스)
@@ -207,7 +241,12 @@ async function tryRefreshToken(
         }
         return response;
       }
-      return redirectToLoginRoute(request, { clearAuth: true, reason: "session_expired" });
+
+      const errorCode = await getErrorCodeFromResponse(reissueResponse);
+      return redirectToLoginRoute(request, {
+        clearAuth: true,
+        reason: errorCode ?? BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
+      });
     }
 
     const data: unknown = await reissueResponse.json();
@@ -218,7 +257,10 @@ async function tryRefreshToken(
       if (allowPassThroughOnFailure) {
         return NextResponse.next();
       }
-      return redirectToLoginRoute(request, { clearAuth: true, reason: "invalid_response" });
+      return redirectToLoginRoute(request, {
+        clearAuth: true,
+        reason: BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
+      });
     }
 
     const response = NextResponse.next();
@@ -242,7 +284,10 @@ async function tryRefreshToken(
     if (allowPassThroughOnFailure) {
       return NextResponse.next();
     }
-    return redirectToLoginRoute(request, { clearAuth: true, reason: "network_error" });
+    return redirectToLoginRoute(request, {
+      clearAuth: true,
+      reason: LOGIN_INTERNAL_ERROR_CODES.NETWORK_ERROR,
+    });
   }
 }
 

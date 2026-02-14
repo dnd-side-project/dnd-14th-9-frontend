@@ -4,6 +4,7 @@ import {
   formatDateTime,
   isToday,
   isPastTime,
+  getCurrentYear,
 } from "@/lib/utils/date";
 
 describe("formatDateDot", () => {
@@ -151,5 +152,11 @@ describe("isPastTime", () => {
   it("먼 미래 날짜를 false로 반환해야 합니다", () => {
     const farFuture = new Date("2030-12-31T23:59:59");
     expect(isPastTime(farFuture)).toBe(false);
+  });
+});
+
+describe("getCurrentYear", () => {
+  it("주어진 Date의 연도를 반환해야 합니다", () => {
+    expect(getCurrentYear(new Date("2026-02-13T00:00:00"))).toBe(2026);
   });
 });

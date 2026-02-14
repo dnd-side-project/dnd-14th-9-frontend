@@ -1,0 +1,103 @@
+export const BACKEND_ERROR_CODES = {
+  // Common
+  COMMON_INTERNAL_SERVER_ERROR: "COMMON500",
+  COMMON_BAD_REQUEST: "COMMON400_1",
+
+  // OAuth2
+  OAUTH2_LOGIN_FAILED: "OAUTH401_1",
+  OAUTH2_ACCESS_DENIED: "OAUTH401_2",
+  OAUTH2_PROVIDER_ERROR: "OAUTH401_3",
+  OAUTH2_INVALID_REQUEST: "OAUTH401_4",
+  OAUTH2_UNSUPPORTED_PROVIDER: "OAUTH401_5",
+  OAUTH2_UNKNOWN_ERROR: "OAUTH500_1",
+
+  // Auth
+  INVALID_AUTHORIZATION_HEADER: "AUTH401_1",
+  INVALID_TOKEN_FORMAT: "AUTH401_2",
+  ACCESS_TOKEN_EXPIRED: "AUTH401_3",
+  REFRESH_TOKEN_EXPIRED: "AUTH401_4",
+  NOT_FOUND_REFRESH_TOKEN: "AUTH401_5",
+  REFRESH_TOKEN_REQUIRED: "AUTH401_6",
+  REFRESH_TOKEN_MISMATCH: "AUTH401_7",
+
+  // AWS S3
+  S3_UPLOAD_FAIL: "AWS500_1",
+  S3_DELETE_FAIL: "AWS500_2",
+  S3_DOWNLOAD_FAIL: "AWS500_3",
+
+  // Member
+  MEMBER_NOT_FOUND: "MEMBER404_1",
+  MEMBER_HAS_ACTIVE_SESSION: "MEMBER409_1",
+
+  // Session
+  SESSION_START_TIME_TOO_SOON: "SESSION400_1",
+
+  // File
+  INVALID_IMAGE_TYPE: "FILE400_1",
+  FILE_TOO_LARGE: "FILE400_2",
+  FILE_VALIDATION_FAILED: "FILE400_3",
+} as const;
+
+export type BackendErrorCode = (typeof BACKEND_ERROR_CODES)[keyof typeof BACKEND_ERROR_CODES];
+
+export const LOGIN_INTERNAL_ERROR_CODES = {
+  AUTH_REQUIRED: "auth_required",
+  NETWORK_ERROR: "network_error",
+  CONFIG_ERROR: "config_error",
+} as const;
+
+export type LoginInternalErrorCode =
+  (typeof LOGIN_INTERNAL_ERROR_CODES)[keyof typeof LOGIN_INTERNAL_ERROR_CODES];
+
+export const DEFAULT_API_ERROR_MESSAGE =
+  "요청 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+
+export const ERROR_MESSAGE_MAP = {
+  [BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR]: "서버 처리 중 오류가 발생했습니다.",
+  [BACKEND_ERROR_CODES.COMMON_BAD_REQUEST]: "잘못된 요청입니다.",
+
+  [BACKEND_ERROR_CODES.OAUTH2_LOGIN_FAILED]: "OAuth2 로그인에 실패했습니다.",
+  [BACKEND_ERROR_CODES.OAUTH2_ACCESS_DENIED]: "소셜 로그인 인증이 거부되었습니다.",
+  [BACKEND_ERROR_CODES.OAUTH2_PROVIDER_ERROR]: "소셜 로그인 제공자 처리 중 오류가 발생했습니다.",
+  [BACKEND_ERROR_CODES.OAUTH2_INVALID_REQUEST]: "OAuth2 요청이 올바르지 않습니다.",
+  [BACKEND_ERROR_CODES.OAUTH2_UNSUPPORTED_PROVIDER]: "지원하지 않는 소셜 로그인 제공자입니다.",
+  [BACKEND_ERROR_CODES.OAUTH2_UNKNOWN_ERROR]: "예상치 못한 오류가 발생했습니다.",
+
+  [BACKEND_ERROR_CODES.INVALID_AUTHORIZATION_HEADER]: "올바르지 않은 Authorization 헤더입니다.",
+  [BACKEND_ERROR_CODES.INVALID_TOKEN_FORMAT]: "토큰 형식이 올바르지 않습니다.",
+  [BACKEND_ERROR_CODES.ACCESS_TOKEN_EXPIRED]: "기한이 만료된 Access 토큰입니다.",
+  [BACKEND_ERROR_CODES.REFRESH_TOKEN_EXPIRED]: "기한이 만료된 Refresh 토큰입니다.",
+  [BACKEND_ERROR_CODES.NOT_FOUND_REFRESH_TOKEN]: "존재하지 않는 Refresh 토큰입니다.",
+  [BACKEND_ERROR_CODES.REFRESH_TOKEN_REQUIRED]: "Refresh 토큰이 전달되지 않았습니다.",
+  [BACKEND_ERROR_CODES.REFRESH_TOKEN_MISMATCH]: "Refresh 토큰 정보가 일치하지 않습니다.",
+
+  [BACKEND_ERROR_CODES.S3_UPLOAD_FAIL]: "S3 업로드에 실패했습니다.",
+  [BACKEND_ERROR_CODES.S3_DELETE_FAIL]: "S3 파일 삭제에 실패했습니다.",
+  [BACKEND_ERROR_CODES.S3_DOWNLOAD_FAIL]: "S3 파일 조회에 실패했습니다.",
+
+  [BACKEND_ERROR_CODES.MEMBER_NOT_FOUND]: "존재하지 않는 사용자입니다.",
+  [BACKEND_ERROR_CODES.MEMBER_HAS_ACTIVE_SESSION]:
+    "완료되지 않은 세션이 존재하여 탈퇴할 수 없습니다.",
+
+  [BACKEND_ERROR_CODES.SESSION_START_TIME_TOO_SOON]:
+    "세션 시작 시간은 현재 시각 기준 5분 이후로 설정해야 합니다.",
+
+  [BACKEND_ERROR_CODES.INVALID_IMAGE_TYPE]: "허용되지 않은 이미지 형식입니다.",
+  [BACKEND_ERROR_CODES.FILE_TOO_LARGE]: "이미지 파일 크기가 너무 큽니다.",
+  [BACKEND_ERROR_CODES.FILE_VALIDATION_FAILED]: "파일 검증에 실패했습니다.",
+
+  [LOGIN_INTERNAL_ERROR_CODES.AUTH_REQUIRED]: "로그인이 필요합니다.",
+  [LOGIN_INTERNAL_ERROR_CODES.NETWORK_ERROR]: "네트워크 오류가 발생했습니다. 다시 시도해 주세요.",
+  [LOGIN_INTERNAL_ERROR_CODES.CONFIG_ERROR]:
+    "로그인 설정 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+} as const;
+
+export function getApiErrorMessageByCode(code: string | null | undefined): string | null {
+  if (!code) return null;
+
+  if (Object.hasOwn(ERROR_MESSAGE_MAP, code)) {
+    return ERROR_MESSAGE_MAP[code as keyof typeof ERROR_MESSAGE_MAP];
+  }
+
+  return null;
+}

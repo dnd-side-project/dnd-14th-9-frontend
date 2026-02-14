@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, type ComponentPropsWithoutRef } from "react";
+import { forwardRef, type ComponentPropsWithoutRef, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils/utils";
 
@@ -17,6 +17,8 @@ export interface ProgressRingProps extends ComponentPropsWithoutRef<"div"> {
   progressClassName?: string;
   /** 퍼센트 텍스트 표시 여부 */
   showPercent?: boolean;
+  /** 중앙 콘텐츠 */
+  children?: ReactNode;
 }
 
 export const ProgressRing = forwardRef<HTMLDivElement, ProgressRingProps>(
@@ -28,6 +30,7 @@ export const ProgressRing = forwardRef<HTMLDivElement, ProgressRingProps>(
       trackClassName = "stroke-gray-700",
       progressClassName = "stroke-green-600",
       showPercent = true,
+      children,
       className,
       ...props
     },
@@ -77,9 +80,13 @@ export const ProgressRing = forwardRef<HTMLDivElement, ProgressRingProps>(
         </svg>
         {/* 중앙 퍼센트 텍스트 */}
         {showPercent && (
-          <span className="absolute text-[10px] font-semibold text-gray-300">
-            {Math.round(clampedProgress)}%
-          </span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            {children || (
+              <span className="text-[10px] font-semibold text-gray-300">
+                {Math.round(clampedProgress)}%
+              </span>
+            )}
+          </div>
         )}
       </div>
     );
