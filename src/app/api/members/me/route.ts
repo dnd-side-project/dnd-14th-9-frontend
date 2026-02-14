@@ -16,7 +16,7 @@ export async function PATCH(request: NextRequest) {
     request,
     method: "PATCH",
     pathWithQuery: "/members/me",
-    includeRequestBody: true,
+    includeRequestBody: "json",
     forwardRequestCookies: true,
   });
 }
