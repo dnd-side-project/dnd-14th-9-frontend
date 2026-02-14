@@ -3,7 +3,7 @@ import { Avatar } from "./Avatar";
 // eslint-disable-next-line storybook/no-renderer-packages
 import type { Meta, StoryObj } from "@storybook/react";
 
-const meta = {
+const META = {
   title: "Components/Avatar",
   component: Avatar,
   parameters: {
@@ -31,17 +31,17 @@ const meta = {
   },
 } satisfies Meta<typeof Avatar>;
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default META;
+type Story = StoryObj<typeof META>;
 
-export const Default: Story = {
+export const DEFAULT: Story = {
   args: {
     type: "empty",
     size: "xlarge",
   },
 };
 
-export const Image: Story = {
+export const IMAGE: Story = {
   args: {
     type: "image",
     size: "xlarge",
@@ -49,7 +49,7 @@ export const Image: Story = {
   },
 };
 
-export const Edit: Story = {
+export const EDIT: Story = {
   args: {
     type: "image",
     size: "xlarge",
@@ -57,7 +57,7 @@ export const Edit: Story = {
   },
 };
 
-export const Sizes: Story = {
+export const SIZES: Story = {
   render: (args) => (
     <div className="flex items-end gap-4">
       <Avatar {...args} size="xlarge" />

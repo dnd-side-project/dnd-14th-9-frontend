@@ -9,7 +9,7 @@ import { EditProfileIcon } from "@/components/Icon/EditProfileIcon";
 import { type IconProps } from "@/components/Icon/Icon";
 import { cn } from "@/lib/utils/utils";
 
-const avatarVariants = cva(
+const AVATAR_VARIANTS = cva(
   "relative inline-flex items-center justify-center overflow-hidden rounded-full bg-surface-subtle border border-border-strong box-border",
   {
     variants: {
@@ -32,7 +32,7 @@ const avatarVariants = cva(
 );
 
 export interface AvatarProps
-  extends Omit<ComponentPropsWithoutRef<"div">, "children">, VariantProps<typeof avatarVariants> {
+  extends Omit<ComponentPropsWithoutRef<"div">, "children">, VariantProps<typeof AVATAR_VARIANTS> {
   src?: string;
   alt?: string;
   edit?: boolean;
@@ -66,7 +66,7 @@ export const Avatar = ({
   const isSmall = size === "small";
 
   return (
-    <div className={cn(avatarVariants({ size, type, className }))} {...props}>
+    <div className={cn(AVATAR_VARIANTS({ size, type, className }))} {...props}>
       {type === "image" && src ? (
         <Image
           src={src}

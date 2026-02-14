@@ -4,7 +4,7 @@ import { Icon, type IconProps } from "./Icon";
 
 export type EditProfileIconProps = Omit<IconProps, "svg">;
 
-const EditProfileSvg = (
+const EDIT_PROFILE_SVG = (
   <svg
     width="100%"
     height="100%"
@@ -27,7 +27,7 @@ const EditProfileSvg = (
 );
 
 export const EditProfileIcon = forwardRef<HTMLSpanElement, EditProfileIconProps>((props, ref) => {
-  return <Icon ref={ref} svg={EditProfileSvg} {...props} />;
+  return <Icon ref={ref} svg={EDIT_PROFILE_SVG} {...props} />;
 });
 
 EditProfileIcon.displayName = "EditProfileIcon";

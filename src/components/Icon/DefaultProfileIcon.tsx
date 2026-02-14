@@ -4,7 +4,7 @@ import { Icon, type IconProps } from "./Icon";
 
 export type DefaultProfileIconProps = Omit<IconProps, "svg">;
 
-const DefaultProfileSvg = (
+const DEFAULT_PROFILE_SVG = (
   <svg
     width="100%"
     height="100%"
@@ -28,7 +28,7 @@ const DefaultProfileSvg = (
 
 export const DefaultProfileIcon = forwardRef<HTMLSpanElement, DefaultProfileIconProps>(
   (props, ref) => {
-    return <Icon ref={ref} svg={DefaultProfileSvg} {...props} />;
+    return <Icon ref={ref} svg={DEFAULT_PROFILE_SVG} {...props} />;
   }
 );
 
