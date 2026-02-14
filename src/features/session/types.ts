@@ -193,8 +193,20 @@ export interface ToggleTodoResponse {
 // 세션 상세 조회 API 관련 타입
 // ============================================
 
-// TODO(장근호): 서버 응답 확정 후 수정 필요
-export type SessionDetailResponse = SessionListItem;
+export interface SessionDetailResponse {
+  sessionId: number;
+  category: string; // 한글로 응답됨 (예: "개발")
+  title: string;
+  hostNickname: string;
+  status: string; // 한글로 응답됨 (예: "대기")
+  currentParticipants: number;
+  maxParticipants: number;
+  sessionDurationMinutes: number;
+  startTime: string;
+  imageUrl: string;
+  summary: string;
+  notice: string;
+}
 
 // ============================================
 // 세션 리포트 조회 API 관련 타입
