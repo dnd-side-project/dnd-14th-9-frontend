@@ -1,8 +1,7 @@
 "use client";
 
-import { CircularProgressBar } from "@/components/CircularProgressBar/CircularProgressBar";
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
-import { cn } from "@/lib/utils/utils";
+import { ProgressRing } from "@/components/ProgressRing/ProgressRing";
 
 interface FocusStatusItemProps {
   focusTimeMinutes: number;
@@ -32,18 +31,17 @@ export function FocusStatusItem({
             </p>
           </div>
           <div className="flex h-[56px] w-[56px] shrink-0 items-center justify-center px-[13px] py-4">
-            <CircularProgressBar
+            <ProgressRing
               progress={focusPercentage}
               size={56}
               strokeWidth={5.6}
               trackClassName="stroke-gray-700"
-              indicatorClassName="stroke-green-100"
-              showText={true}
+              progressClassName="stroke-green-100"
             >
               <span className="font-pretendard text-sm font-semibold text-green-100">
                 {Math.round(focusPercentage)}%
               </span>
-            </CircularProgressBar>
+            </ProgressRing>
           </div>
         </div>
         <div className="h-[1px] w-full bg-gray-700" /> {/* Divider replacement */}
