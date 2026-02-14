@@ -1,6 +1,8 @@
 import type { MemberInterestCategory } from "@/types/shared/member-interest-category";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
+export type { MemberInterestCategory } from "@/types/shared/member-interest-category";
+
 export type MemberSocialProvider = "kakao" | "google";
 
 // GET /members/me/profile 응답 result

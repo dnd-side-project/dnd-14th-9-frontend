@@ -65,6 +65,7 @@ export async function prefetchMeForEdit() {
   await queryClient.prefetchQuery({
     queryKey: memberKeys.edit(),
     queryFn: memberApi.getMeForEdit,
+    staleTime: MEMBER_STALE_TIME,
   });
   return dehydrate(queryClient);
 }
