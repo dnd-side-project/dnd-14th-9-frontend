@@ -11,16 +11,6 @@ export async function GET(request: NextRequest) {
   });
 }
 
-export async function PATCH(request: NextRequest) {
-  return forwardToBackend({
-    request,
-    method: "PATCH",
-    pathWithQuery: "/members/me",
-    includeRequestBody: true,
-    forwardRequestCookies: true,
-  });
-}
-
 export async function DELETE(request: NextRequest) {
   return forwardToBackend({
     request,
