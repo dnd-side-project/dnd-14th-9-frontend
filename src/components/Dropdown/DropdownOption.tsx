@@ -32,9 +32,9 @@ export function DropdownOption({
       onClick={handleClick}
       className={cn(
         "border-border-subtle bg-surface-default cursor-pointer border-b leading-none transition-colors last:border-b-0",
+        "hover:bg-surface-strong hover:text-text-secondary",
         styles.text,
         isSelected ? "text-text-primary" : "text-text-muted",
-        !isSelected && "hover:text-text-primary",
         option.disabled && "cursor-not-allowed opacity-50"
       )}
     >
