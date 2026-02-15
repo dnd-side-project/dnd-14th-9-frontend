@@ -2,12 +2,12 @@ import { NextRequest } from "next/server";
 
 import { forwardToBackend } from "@/lib/api/api-route-forwarder";
 
-export async function PATCH(request: NextRequest) {
+export async function POST(request: NextRequest) {
   return forwardToBackend({
     request,
-    method: "PATCH",
-    pathWithQuery: "/members/me/nickname",
-    includeRequestBody: "json",
+    method: "POST",
+    pathWithQuery: "/sessions/create",
+    includeRequestBody: "formData",
     forwardRequestCookies: true,
   });
 }

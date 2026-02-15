@@ -7,7 +7,6 @@ import type {
   AddTodosResponse,
   CreateSessionRequest,
   CreateSessionResponse,
-  JoinSessionRequest,
   JoinSessionResponse,
   SessionDetailResponse,
   SessionListParams,
@@ -33,19 +32,19 @@ export const sessionApi = {
   },
 
   createSession: async (
-    body: CreateSessionRequest
+    body: CreateSessionRequest,
+    image?: File
   ): Promise<ApiSuccessResponse<CreateSessionResponse>> => {
-    return api.post<ApiSuccessResponse<CreateSessionResponse>>("/api/sessions", body);
+    const formData = new FormData();
+    formData.append("request", new Blob([JSON.stringify(body)], { type: "application/json" }));
+    if (image) {
+      formData.append("image", image);
+    }
+    return api.post<ApiSuccessResponse<CreateSessionResponse>>("/api/sessions/create", formData);
   },
 
-  join: async (
-    sessionRoomId: string,
-    body: JoinSessionRequest
-  ): Promise<ApiSuccessResponse<JoinSessionResponse>> => {
-    return api.post<ApiSuccessResponse<JoinSessionResponse>>(
-      `/api/sessions/${sessionRoomId}/join`,
-      body
-    );
+  join: async (sessionId: string): Promise<ApiSuccessResponse<JoinSessionResponse>> => {
+    return api.post<ApiSuccessResponse<JoinSessionResponse>>(`/api/sessions/${sessionId}/join`);
   },
 
   setGoal: async (

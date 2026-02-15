@@ -10,7 +10,8 @@ interface ForwardToBackendOptions {
   request?: NextRequest;
   method: ForwardMethod;
   pathWithQuery: string;
-  includeRequestBody?: boolean;
+  /** Request body 처리 방식: 'json' | 'formData' | false (기본값: false) */
+  includeRequestBody?: "json" | "formData" | false;
   clearAuthCookiesOnSuccess?: boolean;
   forwardRequestCookies?: boolean;
 }
@@ -41,7 +42,11 @@ export async function forwardToBackend(options: ForwardToBackendOptions) {
   let body: unknown;
 
   if (options.includeRequestBody && options.request) {
-    body = await options.request.json().catch(() => undefined);
+    if (options.includeRequestBody === "json") {
+      body = await options.request.json().catch(() => undefined);
+    } else if (options.includeRequestBody === "formData") {
+      body = await options.request.formData().catch(() => undefined);
+    }
   }
 
   try {

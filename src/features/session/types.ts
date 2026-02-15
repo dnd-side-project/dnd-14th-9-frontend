@@ -47,17 +47,19 @@ export interface Session {
 // 세션 목록 조회 API 관련 타입
 // ============================================
 
-// Enum 타입들 (변경 가능성 있음)
+// Enum 타입들
 export type SessionCategory =
-  | "ALL"
   | "DEVELOPMENT"
   | "DESIGN"
-  | "PLAN&PM"
-  | "CAREER"
-  | "STUDY"
+  | "PLANNING_PM"
+  | "CAREER_SELF_DEVELOPMENT"
+  | "STUDY_READING"
   | "CREATIVE"
-  | "TEAMPROJECT"
+  | "TEAM_PROJECT"
   | "FREE";
+
+// 필터용 카테고리 (ALL 포함)
+export type SessionCategoryFilter = "ALL" | SessionCategory;
 
 export type SessionSort = "POPULAR" | "LATEST";
 
@@ -74,7 +76,7 @@ export type SessionListStatus = "WAITING" | "IN_PROGRESS";
 // 목록 조회 파라미터
 export interface SessionListParams {
   keyword?: string;
-  category?: SessionCategory;
+  category?: SessionCategoryFilter;
   sort?: SessionSort;
   startDate?: string;
   endDate?: string;
@@ -115,37 +117,35 @@ export interface SessionListResponse {
 // ============================================
 
 // 세션 생성 요청
-// TODO(장근호): 서버 스펙 확정 후 수정 필요
 export interface CreateSessionRequest {
-  title: string; // 제목
-  startTime: string; // 시작 시간 (ISO 8601 형식)
-  durationMinutes: number; // 세션 진행 시간 (분)
-  maxParticipants: number; // 참여 인원
+  title: string; // 제목 (최대 20자)
+  summary: string; // 세션 요약 (최대 50자)
+  notice: string; // 공지사항 (최대 100자)
   category: SessionCategory; // 카테고리
-  summary: string; // 한줄소개
-  notice?: string; // 공지사항 (선택)
+  startTime: string; // 시작 시간 (현재로부터 5분 이후)
+  sessionDurationMinutes: number; // 세션 진행 시간 (분, 양수)
+  maxParticipants: number; // 최대 참가 인원 (양수)
+  requiredFocusRate?: number; // 최소 집중도 기준 (기본값 0)
+  requiredAchievementRate?: number; // 최소 달성률 기준 (기본값 0)
 }
 
 // 세션 생성 응답
-// TODO(장근호): 서버 응답 확정 후 수정 필요
 export interface CreateSessionResponse {
-  sessionId: string;
+  createdSessionId: number;
 }
 
 // ============================================
-// 세션 참여 토글 API 관련 타입
+// 세션 참여 API 관련 타입
 // ============================================
 
-// 세션 참여 토글 요청
-// TODO(장근호): 서버 스펙 확정 후 수정 필요
-export interface JoinSessionRequest {
-  memberId?: string; // 유저 ID (인증 토큰에서 추출 시 불필요)
-}
+// 세션 참여 Role
+export type SessionRole = "HOST" | "PARTICIPANT";
 
-// 세션 참여 토글 응답
-// TODO(장근호): 서버 응답 확정 후 수정 필요
+// 세션 참여 응답
 export interface JoinSessionResponse {
-  joined: boolean; // 참여 상태 (true: 참여함, false: 참여 취소됨)
+  sessionId: number; // 참여한 세션 ID
+  memberId: number; // 참여한 멤버(본인) ID
+  role: SessionRole; // 해당 세션에서의 본인의 Role
 }
 
 // ============================================
@@ -195,8 +195,20 @@ export interface ToggleTodoResponse {
 // 세션 상세 조회 API 관련 타입
 // ============================================
 
-// TODO(장근호): 서버 응답 확정 후 수정 필요
-export type SessionDetailResponse = SessionListItem;
+export interface SessionDetailResponse {
+  sessionId: number;
+  category: string; // 한글로 응답됨 (예: "개발")
+  title: string;
+  hostNickname: string;
+  status: string; // 한글로 응답됨 (예: "대기")
+  currentParticipants: number;
+  maxParticipants: number;
+  sessionDurationMinutes: number;
+  startTime: string;
+  imageUrl: string;
+  summary: string;
+  notice: string;
+}
 
 // ============================================
 // 세션 리포트 조회 API 관련 타입
