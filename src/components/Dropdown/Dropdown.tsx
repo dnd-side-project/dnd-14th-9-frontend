@@ -16,8 +16,8 @@ export function Dropdown({
   onChange,
   placeholder = "선택",
   disabled = false,
-  size = "large",
-  radius = "max",
+  size = "full",
+  radius = "sm",
   className,
 }: DropdownProps) {
   const { isOpen, selectedValue, toggle, selectOption, containerRef, listRef } = useDropdown({
@@ -31,7 +31,12 @@ export function Dropdown({
   const hasSelection = selectedValue !== null;
 
   // size에 따른 드롭다운 너비
-  const dropdownWidth = size === "small" ? "w-[74px]" : "w-[89px]";
+  const dropdownWidthMap = {
+    full: "w-full",
+    large: "w-[89px]",
+    small: "w-[74px]",
+  };
+  const dropdownWidth = dropdownWidthMap[size ?? "full"];
 
   return (
     <div ref={containerRef} className={cn("relative", className)}>
@@ -44,7 +49,7 @@ export function Dropdown({
         disabled={disabled}
         aria-haspopup="listbox"
         className={cn(
-          hasSelection && "text-text-primary",
+          hasSelection && ["text-text-primary", "text-[16px]"],
           isOpen && ["border-text-brand-default", "shadow-[0_0_8px_0_#27EA674D]"]
         )}
       >
@@ -56,11 +61,11 @@ export function Dropdown({
           ref={listRef}
           role="listbox"
           className={cn(
-            "absolute top-full left-0 z-50 mt-1",
+            "absolute top-full left-0 z-50 mt-3",
             dropdownWidth,
             "max-h-[224px] overflow-y-auto",
             "border-border-subtle rounded-sm border",
-            "bg-surface-strong p-xs",
+            "bg-surface-strong",
             "scrollbar-hide"
           )}
         >
@@ -70,6 +75,7 @@ export function Dropdown({
               option={option}
               isSelected={option.value === selectedValue}
               onSelect={selectOption}
+              size={size ?? undefined}
             />
           ))}
         </ul>

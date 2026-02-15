@@ -28,6 +28,7 @@ export interface DropdownOptionProps {
   option: DropdownOption;
   isSelected: boolean;
   onSelect: (value: string) => void;
+  size?: "full" | "large" | "small";
 }
 
 export interface UseDropdownProps {

@@ -40,8 +40,8 @@ const meta = {
   argTypes: {
     size: {
       control: "select",
-      options: ["large", "small"],
-      description: "드롭다운 크기",
+      options: ["full", "large", "small"],
+      description: "드롭다운 크기 (full: 100%, large: 89px, small: 74px)",
     },
     radius: {
       control: "select",
@@ -155,30 +155,52 @@ export const Controlled: Story = {
   },
 };
 
+export const Large: Story = {
+  args: {
+    options: SAMPLE_OPTIONS,
+    size: "large",
+    placeholder: "선택",
+  },
+};
+
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
       <div className="flex items-start gap-4">
-        <span className="w-24 text-sm text-gray-400">Large</span>
-        <Dropdown options={SAMPLE_OPTIONS} placeholder="선택" />
-        <Dropdown options={SAMPLE_OPTIONS} defaultValue="latest" />
+        <span className="w-24 shrink-0 text-sm text-gray-400">Full (반응형)</span>
+        <div className="w-90">
+          <Dropdown options={SAMPLE_OPTIONS} placeholder="선택" />
+        </div>
+        <div className="w-90">
+          <Dropdown options={SAMPLE_OPTIONS} defaultValue="latest" />
+        </div>
       </div>
       <div className="flex items-start gap-4">
-        <span className="w-24 text-sm text-gray-400">Small</span>
+        <span className="w-24 shrink-0 text-sm text-gray-400">Large</span>
+        <Dropdown options={SAMPLE_OPTIONS} size="large" placeholder="선택" />
+        <Dropdown options={SAMPLE_OPTIONS} size="large" defaultValue="latest" />
+      </div>
+      <div className="flex items-start gap-4">
+        <span className="w-24 shrink-0 text-sm text-gray-400">Small</span>
         <Dropdown options={SAMPLE_OPTIONS} size="small" placeholder="선택" />
         <Dropdown options={SAMPLE_OPTIONS} size="small" defaultValue="latest" />
       </div>
       <div className="flex items-start gap-4">
-        <span className="w-24 text-sm text-gray-400">Radius SM</span>
-        <Dropdown options={SAMPLE_OPTIONS} radius="sm" placeholder="선택" />
-        <Dropdown options={SAMPLE_OPTIONS} radius="sm" defaultValue="latest" />
+        <span className="w-24 shrink-0 text-sm text-gray-400">Radius SM</span>
+        <div className="w-90">
+          <Dropdown options={SAMPLE_OPTIONS} radius="sm" placeholder="선택" />
+        </div>
+        <div className="w-90">
+          <Dropdown options={SAMPLE_OPTIONS} radius="sm" defaultValue="latest" />
+        </div>
       </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: "Dropdown 컴포넌트의 모든 변형을 한눈에 비교합니다.",
+        story:
+          "Dropdown 컴포넌트의 모든 변형을 한눈에 비교합니다. Full 크기는 부모 컨테이너 너비에 맞춰집니다.",
       },
     },
   },
