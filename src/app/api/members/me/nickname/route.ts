@@ -7,7 +7,7 @@ export async function PATCH(request: NextRequest) {
     request,
     method: "PATCH",
     pathWithQuery: "/members/me/nickname",
-    includeRequestBody: true,
+    includeRequestBody: "json",
     forwardRequestCookies: true,
   });
 }
