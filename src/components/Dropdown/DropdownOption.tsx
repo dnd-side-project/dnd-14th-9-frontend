@@ -5,6 +5,12 @@ import { cn } from "@/lib/utils/utils";
 
 import type { DropdownOptionProps } from "./Dropdown.types";
 
+const SIZE_STYLES = {
+  full: { text: "text-[16px]", container: "px-xs h-14", showIcon: true },
+  large: { text: "text-sm", container: "px-sm h-10", showIcon: false },
+  small: { text: "text-xs", container: "px-sm h-7", showIcon: false },
+} as const;
+
 export function DropdownOption({
   option,
   isSelected,
@@ -16,14 +22,7 @@ export function DropdownOption({
     onSelect(option.value);
   };
 
-  // size별 스타일 매핑
-  const sizeStyles = {
-    full: { text: "text-[16px]", container: "px-xs h-14", showIcon: true },
-    large: { text: "text-sm", container: "px-sm h-10", showIcon: false },
-    small: { text: "text-xs", container: "px-sm h-7", showIcon: false },
-  };
-
-  const styles = sizeStyles[size];
+  const styles = SIZE_STYLES[size];
 
   return (
     <li

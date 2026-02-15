@@ -9,6 +9,12 @@ import { useDropdown } from "./useDropdown";
 
 import type { DropdownProps } from "./Dropdown.types";
 
+const DROPDOWN_WIDTH_MAP = {
+  full: "w-full",
+  large: "w-[89px]",
+  small: "w-[74px]",
+} as const;
+
 export function Dropdown({
   options,
   value,
@@ -30,13 +36,7 @@ export function Dropdown({
   const selectedLabel = options.find((opt) => opt.value === selectedValue)?.label;
   const hasSelection = selectedValue !== null;
 
-  // size에 따른 드롭다운 너비
-  const dropdownWidthMap = {
-    full: "w-full",
-    large: "w-[89px]",
-    small: "w-[74px]",
-  };
-  const dropdownWidth = dropdownWidthMap[size ?? "full"];
+  const dropdownWidth = DROPDOWN_WIDTH_MAP[size ?? "full"];
 
   return (
     <div ref={containerRef} className={cn("relative", className)}>
