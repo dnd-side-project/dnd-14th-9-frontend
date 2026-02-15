@@ -164,6 +164,9 @@ export const Large: Story = {
 };
 
 export const AllVariants: Story = {
+  args: {
+    options: SAMPLE_OPTIONS,
+  },
   render: () => (
     <div className="flex flex-col gap-6">
       <div className="flex items-start gap-4">
