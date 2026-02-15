@@ -6,16 +6,17 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { memberApi } from "@/features/member/api";
 import {
   memberKeys,
+  useMeForEdit,
   useUpdateInterestCategories,
   useUpdateNickname,
   useUpdateProfileImage,
 } from "@/features/member/hooks/useMemberHooks";
-import type { MemberProfile } from "@/features/member/types";
-import type { ApiSuccessResponse } from "@/types/shared/types";
+import type { MemberProfileMutationResponse } from "@/features/member/types";
 
 jest.mock("@/features/member/api", () => ({
   memberApi: {
     getMe: jest.fn(),
+    getMeForEdit: jest.fn(),
     getMyReport: jest.fn(),
     deleteMe: jest.fn(),
     updateProfileImage: jest.fn(),
@@ -26,7 +27,7 @@ jest.mock("@/features/member/api", () => ({
 
 const mockedMemberApi = memberApi as jest.Mocked<typeof memberApi>;
 
-function createMockProfileResponse(nickname: string): ApiSuccessResponse<MemberProfile> {
+function createMockProfileResponse(nickname: string): MemberProfileMutationResponse {
   return {
     isSuccess: true,
     code: "COMMON200",
@@ -35,11 +36,11 @@ function createMockProfileResponse(nickname: string): ApiSuccessResponse<MemberP
       id: 1,
       nickname,
       profileImageUrl: "https://example.com/profile.png",
+      email: "tem@tem.com",
       bio: "소개",
       firstInterestCategory: "DEVELOPMENT",
       secondInterestCategory: "DESIGN",
-      thirdInterestCategory: "CREATIVE",
-      firstLogin: false,
+      thirdInterestCategory: null,
     },
   };
 }
@@ -55,7 +56,7 @@ describe("memberHooks mutation", () => {
     jest.clearAllMocks();
   });
 
-  it("useUpdateNickname 성공 시 member me 캐시를 응답값으로 동기화해야 한다", async () => {
+  it("useUpdateNickname 성공 시 member edit 캐시를 응답값으로 동기화해야 한다", async () => {
     const queryClient = new QueryClient();
     const response = createMockProfileResponse("new용");
     mockedMemberApi.updateNickname.mockResolvedValueOnce(response);
@@ -69,11 +70,11 @@ describe("memberHooks mutation", () => {
     });
 
     await waitFor(() => {
-      expect(queryClient.getQueryData(memberKeys.me())).toEqual(response);
+      expect(queryClient.getQueryData(memberKeys.edit())).toEqual(response);
     });
   });
 
-  it("useUpdateProfileImage 성공 시 member me 캐시를 응답값으로 동기화해야 한다", async () => {
+  it("useUpdateProfileImage 성공 시 member edit 캐시를 응답값으로 동기화해야 한다", async () => {
     const queryClient = new QueryClient();
     const response = createMockProfileResponse("image-updated");
     const file = new File(["binary"], "profile.png", { type: "image/png" });
@@ -88,11 +89,11 @@ describe("memberHooks mutation", () => {
     });
 
     await waitFor(() => {
-      expect(queryClient.getQueryData(memberKeys.me())).toEqual(response);
+      expect(queryClient.getQueryData(memberKeys.edit())).toEqual(response);
     });
   });
 
-  it("useUpdateInterestCategories 성공 시 member me 캐시를 응답값으로 동기화해야 한다", async () => {
+  it("useUpdateInterestCategories 성공 시 member edit 캐시를 응답값으로 동기화해야 한다", async () => {
     const queryClient = new QueryClient();
     const response = createMockProfileResponse("category-updated");
     mockedMemberApi.updateInterestCategories.mockResolvedValueOnce(response);
@@ -105,12 +106,35 @@ describe("memberHooks mutation", () => {
       await result.current.mutateAsync({
         firstInterestCategory: "DEVELOPMENT",
         secondInterestCategory: "DESIGN",
-        thirdInterestCategory: "CREATIVE",
+        thirdInterestCategory: null,
       });
     });
 
     await waitFor(() => {
-      expect(queryClient.getQueryData(memberKeys.me())).toEqual(response);
+      expect(queryClient.getQueryData(memberKeys.edit())).toEqual(response);
     });
+  });
+});
+
+describe("memberHooks query", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("useMeForEdit는 edit 엔드포인트 결과를 edit 키로 캐시해야 한다", async () => {
+    const queryClient = new QueryClient();
+    const response = createMockProfileResponse("edit-profile");
+    mockedMemberApi.getMeForEdit.mockResolvedValueOnce(response);
+
+    const { result } = renderHook(() => useMeForEdit(), {
+      wrapper: createWrapper(queryClient),
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(mockedMemberApi.getMeForEdit).toHaveBeenCalledTimes(1);
+    expect(queryClient.getQueryData(memberKeys.edit())).toEqual(response);
   });
 });

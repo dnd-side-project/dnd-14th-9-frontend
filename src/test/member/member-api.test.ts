@@ -1,5 +1,12 @@
 import { memberApi } from "@/features/member/api";
-import type { MemberInterestCategory, MemberProfile, MemberReport } from "@/features/member/types";
+import type {
+  GetMeForEditResponse,
+  GetMeResponse,
+  MemberInterestCategory,
+  MemberProfileMutationResponse,
+  MemberProfileView,
+  MemberReport,
+} from "@/features/member/types";
 import { api } from "@/lib/api/api";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
@@ -13,22 +20,44 @@ jest.mock("@/lib/api/api", () => ({
 
 const mockedApi = api as jest.Mocked<typeof api>;
 
-const mockMemberProfile: MemberProfile = {
+const mockMemberProfile: MemberProfileView = {
   id: 1,
   nickname: "new용",
   profileImageUrl: "https://example.com/profile.png",
-  bio: "안녕하세요",
-  firstInterestCategory: "DEVELOPMENT",
-  secondInterestCategory: "DESIGN",
-  thirdInterestCategory: "CREATIVE",
+  email: "tem@tem.com",
+  socialProvider: "kakao",
+  totalParticipationTime: 60,
+  focusedTime: 30,
+  focusRate: 50,
+  totalTodoCount: 10,
+  completeTodoCount: 8,
+  todoCompletionRate: 80,
   firstLogin: false,
 };
 
-const mockMemberProfileResponse: ApiSuccessResponse<MemberProfile> = {
+const mockMemberProfileResponse: GetMeResponse = {
   isSuccess: true,
   code: "COMMON200",
   message: "성공적으로 요청을 처리했습니다.",
   result: mockMemberProfile,
+};
+
+const mockMemberEditResponse: GetMeForEditResponse = {
+  ...mockMemberProfileResponse,
+  result: {
+    id: 1,
+    nickname: "new용",
+    profileImageUrl: "https://example.com/profile.png",
+    email: "tem@tem.com",
+    bio: "안녕하세요",
+    firstInterestCategory: "DEVELOPMENT",
+    secondInterestCategory: "DESIGN",
+    thirdInterestCategory: null,
+  },
+};
+
+const mockMemberMutationResponse: MemberProfileMutationResponse = {
+  ...mockMemberEditResponse,
 };
 
 const mockReportResponse: ApiSuccessResponse<MemberReport> = {
@@ -60,7 +89,7 @@ describe("memberApi", () => {
   });
 
   it("닉네임 수정 시 분리된 nickname 엔드포인트를 호출해야 한다", async () => {
-    mockedApi.patch.mockResolvedValueOnce(mockMemberProfileResponse);
+    mockedApi.patch.mockResolvedValueOnce(mockMemberMutationResponse);
 
     await memberApi.updateNickname({ nickname: "new용" });
 
@@ -70,16 +99,16 @@ describe("memberApi", () => {
   });
 
   it("관심 카테고리 수정 시 분리된 interest-categories 엔드포인트를 호출해야 한다", async () => {
-    mockedApi.patch.mockResolvedValueOnce(mockMemberProfileResponse);
+    mockedApi.patch.mockResolvedValueOnce(mockMemberMutationResponse);
 
     const body: {
       firstInterestCategory: MemberInterestCategory;
       secondInterestCategory: MemberInterestCategory;
-      thirdInterestCategory: MemberInterestCategory;
+      thirdInterestCategory: MemberInterestCategory | null;
     } = {
       firstInterestCategory: "DEVELOPMENT",
       secondInterestCategory: "DESIGN",
-      thirdInterestCategory: "CREATIVE",
+      thirdInterestCategory: null,
     };
 
     await memberApi.updateInterestCategories(body);
@@ -91,7 +120,7 @@ describe("memberApi", () => {
     const file = new File(["binary"], "profile.png", { type: "image/png" });
     fetchMock.mockResolvedValueOnce({
       ok: true,
-      json: async () => mockMemberProfileResponse,
+      json: async () => mockMemberMutationResponse,
     });
 
     await memberApi.updateProfileImage({ profileImage: file });
@@ -106,9 +135,10 @@ describe("memberApi", () => {
     expect((options.body as FormData).get("profileImage")).toBe(file);
   });
 
-  it("getMe/getMyReport/deleteMe가 기존 엔드포인트를 유지해야 한다", async () => {
+  it("조회/리포트/탈퇴 엔드포인트가 명세 경로를 호출해야 한다", async () => {
     mockedApi.get
       .mockResolvedValueOnce(mockMemberProfileResponse)
+      .mockResolvedValueOnce(mockMemberEditResponse)
       .mockResolvedValueOnce(mockReportResponse);
     mockedApi.delete.mockResolvedValueOnce({
       isSuccess: true,
@@ -118,11 +148,13 @@ describe("memberApi", () => {
     });
 
     await memberApi.getMe();
+    await memberApi.getMeForEdit();
     await memberApi.getMyReport();
     await memberApi.deleteMe();
 
-    expect(mockedApi.get).toHaveBeenNthCalledWith(1, "/api/members/me");
-    expect(mockedApi.get).toHaveBeenNthCalledWith(2, "/api/members/me/report");
+    expect(mockedApi.get).toHaveBeenNthCalledWith(1, "/api/members/me/profile");
+    expect(mockedApi.get).toHaveBeenNthCalledWith(2, "/api/members/me/edit");
+    expect(mockedApi.get).toHaveBeenNthCalledWith(3, "/api/members/me/report");
     expect(mockedApi.delete).toHaveBeenCalledWith("/api/members/me");
   });
 });

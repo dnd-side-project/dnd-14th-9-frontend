@@ -5,8 +5,10 @@
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { GET as getMeForEdit } from "@/app/api/members/me/edit/route";
 import { PATCH as patchInterestCategories } from "@/app/api/members/me/interest-categories/route";
 import { PATCH as patchNickname } from "@/app/api/members/me/nickname/route";
+import { GET as getMeProfile } from "@/app/api/members/me/profile/route";
 import { PATCH as patchProfileImage } from "@/app/api/members/me/profile-image/route";
 import { forwardToBackend } from "@/lib/api/api-route-forwarder";
 
@@ -26,6 +28,38 @@ describe("member route handlers", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     global.fetch = fetchMock as unknown as typeof fetch;
+  });
+
+  it("profile 라우트는 forwardToBackend로 /members/me/profile을 위임해야 한다", async () => {
+    mockedForwardToBackend.mockResolvedValueOnce(NextResponse.json({}, { status: 200 }));
+    const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
+      method: "GET",
+    });
+
+    await getMeProfile(request);
+
+    expect(mockedForwardToBackend).toHaveBeenCalledWith({
+      request,
+      method: "GET",
+      pathWithQuery: "/members/me/profile",
+      forwardRequestCookies: true,
+    });
+  });
+
+  it("edit 라우트는 forwardToBackend로 /members/me/edit를 위임해야 한다", async () => {
+    mockedForwardToBackend.mockResolvedValueOnce(NextResponse.json({}, { status: 200 }));
+    const request = new NextRequest("http://localhost:3000/api/members/me/edit", {
+      method: "GET",
+    });
+
+    await getMeForEdit(request);
+
+    expect(mockedForwardToBackend).toHaveBeenCalledWith({
+      request,
+      method: "GET",
+      pathWithQuery: "/members/me/edit",
+      forwardRequestCookies: true,
+    });
   });
 
   it("nickname 라우트는 forwardToBackend로 /members/me/nickname을 위임해야 한다", async () => {
@@ -54,6 +88,7 @@ describe("member route handlers", () => {
       body: JSON.stringify({
         firstInterestCategory: "DEVELOPMENT",
         secondInterestCategory: "DESIGN",
+        thirdInterestCategory: null,
       }),
       headers: { "Content-Type": "application/json" },
     });

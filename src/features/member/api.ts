@@ -1,12 +1,16 @@
 import { api } from "@/lib/api/api";
-import type { ApiSuccessResponse } from "@/types/shared/types";
 
 import type {
-  MemberProfile,
-  MemberReport,
+  DeleteMeResponse,
+  GetMeForEditResponse,
+  GetMeResponse,
+  GetMyReportResponse,
   UpdateInterestCategoriesRequest,
+  UpdateInterestCategoriesResponse,
   UpdateNicknameRequest,
+  UpdateNicknameResponse,
   UpdateProfileImageRequest,
+  UpdateProfileImageResponse,
 } from "./types";
 
 async function patchProfileImage<T>(endpoint: string, body: FormData): Promise<T> {
@@ -39,45 +43,38 @@ async function patchProfileImage<T>(endpoint: string, body: FormData): Promise<T
  * 모든 요청은 프론트 Route Handler(/api/members/*)를 경유합니다.
  */
 export const memberApi = {
-  getMe: async (): Promise<ApiSuccessResponse<MemberProfile>> => {
-    return api.get<ApiSuccessResponse<MemberProfile>>("/api/members/me");
+  getMe: async (): Promise<GetMeResponse> => {
+    return api.get<GetMeResponse>("/api/members/me/profile");
+  },
+
+  getMeForEdit: async (): Promise<GetMeForEditResponse> => {
+    return api.get<GetMeForEditResponse>("/api/members/me/edit");
   },
 
   updateProfileImage: async (
     body: UpdateProfileImageRequest
-  ): Promise<ApiSuccessResponse<MemberProfile>> => {
+  ): Promise<UpdateProfileImageResponse> => {
     const formData = new FormData();
+    formData.append("profileImage", body.profileImage);
 
-    if (body.profileImage) {
-      formData.append("profileImage", body.profileImage);
-    }
-
-    return patchProfileImage<ApiSuccessResponse<MemberProfile>>(
-      "/api/members/me/profile-image",
-      formData
-    );
+    return patchProfileImage<UpdateProfileImageResponse>("/api/members/me/profile-image", formData);
   },
 
-  updateNickname: async (
-    body: UpdateNicknameRequest
-  ): Promise<ApiSuccessResponse<MemberProfile>> => {
-    return api.patch<ApiSuccessResponse<MemberProfile>>("/api/members/me/nickname", body);
+  updateNickname: async (body: UpdateNicknameRequest): Promise<UpdateNicknameResponse> => {
+    return api.patch<UpdateNicknameResponse>("/api/members/me/nickname", body);
   },
 
   updateInterestCategories: async (
     body: UpdateInterestCategoriesRequest
-  ): Promise<ApiSuccessResponse<MemberProfile>> => {
-    return api.patch<ApiSuccessResponse<MemberProfile>>(
-      "/api/members/me/interest-categories",
-      body
-    );
+  ): Promise<UpdateInterestCategoriesResponse> => {
+    return api.patch<UpdateInterestCategoriesResponse>("/api/members/me/interest-categories", body);
   },
 
-  getMyReport: async (): Promise<ApiSuccessResponse<MemberReport>> => {
-    return api.get<ApiSuccessResponse<MemberReport>>("/api/members/me/report");
+  getMyReport: async (): Promise<GetMyReportResponse> => {
+    return api.get<GetMyReportResponse>("/api/members/me/report");
   },
 
-  deleteMe: async (): Promise<ApiSuccessResponse<null>> => {
-    return api.delete<ApiSuccessResponse<null>>("/api/members/me");
+  deleteMe: async (): Promise<DeleteMeResponse> => {
+    return api.delete<DeleteMeResponse>("/api/members/me");
   },
 };
