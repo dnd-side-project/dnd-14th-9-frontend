@@ -42,7 +42,7 @@ describe("member route handlers", () => {
       request,
       method: "PATCH",
       pathWithQuery: "/members/me/nickname",
-      includeRequestBody: true,
+      includeRequestBody: "json",
       forwardRequestCookies: true,
     });
   });
@@ -64,7 +64,7 @@ describe("member route handlers", () => {
       request,
       method: "PATCH",
       pathWithQuery: "/members/me/interest-categories",
-      includeRequestBody: true,
+      includeRequestBody: "json",
       forwardRequestCookies: true,
     });
   });
