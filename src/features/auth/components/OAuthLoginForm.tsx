@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 
-import { GuideBox } from "@/features/auth/components/GuideBox";
-import { SocialLoginButton } from "@/features/auth/components/SocialLoginButton";
+import { OAuthProviderItem } from "@/features/auth/components/OAuthProviderItem";
 import {
   getLastLoginProvider,
   saveLastLoginProvider,
@@ -14,19 +13,16 @@ interface OAuthLoginFormProps {
   nextPath: string;
 }
 
-const subscribeLastLoginProvider = () => () => undefined;
-
 export function OAuthLoginForm({ nextPath }: OAuthLoginFormProps) {
   const [googleProvider, kakaoProvider] = LOGIN_PROVIDERS;
   const [loadingProvider, setLoadingProvider] = useState<LoginProvider | null>(null);
-  const lastLoginProvider = useSyncExternalStore(
-    subscribeLastLoginProvider,
-    getLastLoginProvider,
-    () => null
+  const [lastLoginProvider, setLastLoginProvider] = useState<LoginProvider | null>(
+    getLastLoginProvider
   );
 
   const handleSubmit = (provider: LoginProvider) => {
     saveLastLoginProvider(provider);
+    setLastLoginProvider(provider);
     setLoadingProvider(provider);
   };
 
@@ -45,53 +41,21 @@ export function OAuthLoginForm({ nextPath }: OAuthLoginFormProps) {
       </p>
 
       <div className="gap-lg flex flex-col">
-        <div className="relative w-full">
-          {shouldShowGuide(kakaoProvider) ? (
-            <div className="pointer-events-none absolute bottom-[calc(100%+15px)] left-1/2 z-20 -translate-x-1/2">
-              <GuideBox>{guideMessage}</GuideBox>
-            </div>
-          ) : null}
+        <OAuthProviderItem
+          provider={kakaoProvider}
+          nextPath={nextPath}
+          loadingProvider={loadingProvider}
+          guideMessage={shouldShowGuide(kakaoProvider) ? guideMessage : undefined}
+          onSubmit={handleSubmit}
+        />
 
-          <form
-            action="/api/auth/login"
-            method="get"
-            className="w-full"
-            onSubmit={() => handleSubmit(kakaoProvider)}
-          >
-            <input type="hidden" name="provider" value={kakaoProvider} />
-            <input type="hidden" name="next" value={nextPath} />
-            <SocialLoginButton
-              provider={kakaoProvider}
-              type="submit"
-              isLoading={loadingProvider === kakaoProvider}
-              disabled={loadingProvider !== null}
-            />
-          </form>
-        </div>
-
-        <div className="relative w-full">
-          {shouldShowGuide(googleProvider) ? (
-            <div className="pointer-events-none absolute bottom-[calc(100%+15px)] left-1/2 z-20 -translate-x-1/2">
-              <GuideBox>{guideMessage}</GuideBox>
-            </div>
-          ) : null}
-
-          <form
-            action="/api/auth/login"
-            method="get"
-            className="w-full"
-            onSubmit={() => handleSubmit(googleProvider)}
-          >
-            <input type="hidden" name="provider" value={googleProvider} />
-            <input type="hidden" name="next" value={nextPath} />
-            <SocialLoginButton
-              provider={googleProvider}
-              type="submit"
-              isLoading={loadingProvider === googleProvider}
-              disabled={loadingProvider !== null}
-            />
-          </form>
-        </div>
+        <OAuthProviderItem
+          provider={googleProvider}
+          nextPath={nextPath}
+          loadingProvider={loadingProvider}
+          guideMessage={shouldShowGuide(googleProvider) ? guideMessage : undefined}
+          onSubmit={handleSubmit}
+        />
       </div>
     </div>
   );
