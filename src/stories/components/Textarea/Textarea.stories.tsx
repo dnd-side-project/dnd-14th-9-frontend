@@ -77,7 +77,7 @@ export const SmallSize: Story = {
   },
 };
 
-export const Error: Story = {
+export const ErrorState: Story = {
   args: {
     label: "내용",
     placeholder: "내용을 입력하세요",
