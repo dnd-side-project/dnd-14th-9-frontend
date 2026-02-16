@@ -16,7 +16,7 @@ export interface MemberProfileView {
   focusedTime: number;
   focusRate: number;
   totalTodoCount: number;
-  completeTodoCount: number;
+  completedTodoCount: number;
   todoCompletionRate: number;
   firstLogin: boolean;
 }
