@@ -21,7 +21,7 @@ const textareaVariants = cva(
   [
     "w-full",
     "max-w-90",
-    "p-xs",
+    "p-md",
     "rounded-sm",
     "border",
     "text-base",
