@@ -17,7 +17,7 @@ const SIZE_STYLES = {
   small: { minHeight: "87px" },
 } as const;
 
-const TEXTAREA_VARIANTS = cva(
+const textareaVariants = cva(
   [
     "w-full",
     "max-w-90",
@@ -67,7 +67,7 @@ const TEXTAREA_VARIANTS = cva(
 export interface TextareaProps
   extends
     Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size">,
-    VariantProps<typeof TEXTAREA_VARIANTS> {
+    VariantProps<typeof textareaVariants> {
   label?: string;
   error?: boolean;
   errorMessage?: string;
@@ -106,8 +106,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     const isControlled = value !== undefined;
     const currentValue = isControlled ? value : internalValue;
-    const hasValue = String(currentValue).length > 0;
     const characterCount = String(currentValue).length;
+    const hasValue = characterCount > 0;
 
     const getState = () => {
       if (disabled) return "disabled";
@@ -153,7 +153,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           ref={ref}
           id={textareaId}
-          className={cn(TEXTAREA_VARIANTS({ state: getState() }), className)}
+          className={cn(textareaVariants({ state: getState() }), className)}
           style={SIZE_STYLES[size]}
           disabled={disabled}
           value={currentValue}
