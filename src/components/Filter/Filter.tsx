@@ -15,13 +15,15 @@ const FILTER_VARIANTS = cva(
     "font-pretendard",
     "font-semibold",
     "text-gray-200",
+    "bg-surface-strong",
     "transition-all",
     "focus-visible:outline-none",
   ],
   {
     variants: {
       size: {
-        large: ["w-[89px]", "h-10", "text-sm", "py-xs", "pr-xs", "pl-sm"],
+        full: ["w-full", "h-14", "text-[16px]", "px-xs"],
+        large: ["w-[89px]", "h-10", "text-[16px]", "py-xs", "pr-xs", "pl-sm"],
         small: ["w-[74px]", "h-7", "text-xs", "py-xs", "pr-xs", "pl-sm"],
       },
       radius: {
