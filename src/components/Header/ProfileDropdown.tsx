@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -21,30 +21,40 @@ const ProfilePopup = dynamic(() => loadProfilePopup().then((mod) => mod.ProfileP
 export function ProfileDropdown() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const { data, isPending, isError } = useMe();
   const profile = data?.result;
 
+  const closeDropdown = () => {
+    setIsOpen(false);
+    triggerRef.current?.focus();
+  };
+
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleClickOutside = (event: MouseEvent) => {
+    dialogRef.current?.focus();
+
+    const handleClickOutside = (event: PointerEvent) => {
       if (!containerRef.current?.contains(event.target as Node)) {
-        setIsOpen(false);
+        closeDropdown();
       }
     };
 
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsOpen(false);
+        closeDropdown();
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("pointerdown", handleClickOutside);
     document.addEventListener("keydown", handleEscapeKey);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("pointerdown", handleClickOutside);
       document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [isOpen]);
@@ -57,7 +67,7 @@ export function ProfileDropdown() {
         throw new Error("Logout failed");
       }
 
-      setIsOpen(false);
+      closeDropdown();
       router.refresh();
     } catch (error) {
       console.error("Logout error:", error);
@@ -87,25 +97,18 @@ export function ProfileDropdown() {
       return renderFallback("프로필 정보가 없습니다.");
     }
 
-    return (
-      <ProfilePopup
-        profile={profile}
-        onClose={() => setIsOpen(false)}
-        onLogoutClick={handleLogout}
-        onProfileSettingsClick={() => console.log("Profile Settings Clicked")}
-        onReportClick={() => console.log("Report Clicked")}
-        onFeedbackClick={() => console.log("Feedback Clicked")}
-      />
-    );
+    return <ProfilePopup profile={profile} onClose={closeDropdown} onLogoutClick={handleLogout} />;
   };
 
   return (
     <div ref={containerRef} className="relative z-50">
       <button
+        ref={triggerRef}
         type="button"
         aria-label="프로필 메뉴"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
+        aria-controls={isOpen ? dialogId : undefined}
         onMouseEnter={handlePrefetchPopup}
         onFocus={handlePrefetchPopup}
         onClick={() => setIsOpen((prev) => !prev)}
@@ -115,7 +118,15 @@ export function ProfileDropdown() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-[calc(100%+12px)] right-0 z-50 shadow-xl">
+        <div
+          id={dialogId}
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="false"
+          aria-label="프로필 메뉴"
+          tabIndex={-1}
+          className="absolute top-[calc(100%+12px)] right-0 z-50 shadow-xl"
+        >
           {renderPopupContent()}
         </div>
       )}
