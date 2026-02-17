@@ -7,10 +7,12 @@ import { CategoryFilterButton } from "@/components/CategoryFilterButton/Category
 import { DatePicker } from "@/components/DatePicker/DatePicker";
 import { Filter } from "@/components/Filter/Filter";
 import { CalendarIcon } from "@/components/Icon/CalendarIcon";
+import { InfoIcon } from "@/components/Icon/InfoIcon";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { ImageUploader } from "@/components/ImageUploader/ImageUploader";
 import { Input } from "@/components/Input/Input";
+import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
 import { Textarea } from "@/components/Textarea/Textarea";
 import { formatDateTimeDisplay, formatDurationKorean } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
@@ -42,6 +44,7 @@ export function SessionCreateForm() {
   const [startDateTime, setStartDateTime] = useState<Date | null>(null);
   const [duration, setDuration] = useState(90); // 기본값 1시간 30분
   const [participants, setParticipants] = useState(5); // 기본값 5명
+  const [achievementRange, setAchievementRange] = useState(50); // To do 달성도 범위
 
   // DatePicker 팝업 상태
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -272,6 +275,52 @@ export function SessionCreateForm() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* To do 달성도 범위 설정 */}
+      <div className="flex w-[70%] flex-col gap-2">
+        <div className="flex items-center gap-1">
+          <span className="text-text-secondary text-base leading-none">To do 달성도 범위 설정</span>
+          <div className="group relative flex items-center">
+            <InfoIcon size="xsmall" className="text-text-muted cursor-pointer" />
+            <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="rounded-sm bg-gray-700 px-3 py-2 text-xs whitespace-nowrap text-gray-200">
+                내 달성도보다 높은 범위는 설정할 수 없어요.
+              </div>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700" />
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center rounded-sm border border-gray-700 p-4">
+          <StepperSlide
+            value={achievementRange}
+            onChange={setAchievementRange}
+            myFocusValue={70}
+            className="w-[80%]"
+          />
+        </div>
+      </div>
+
+      {/* 버튼 그룹 */}
+      <div className="mt-20 mb-20 flex justify-center gap-4">
+        <Button
+          type="button"
+          variant="solid"
+          colorScheme="tertiary"
+          size="large"
+          className="w-full max-w-70.5"
+        >
+          그만두기
+        </Button>
+        <Button
+          type="submit"
+          variant="solid"
+          colorScheme="primary"
+          size="large"
+          className="w-full max-w-70.5"
+        >
+          세션 만들기
+        </Button>
       </div>
     </form>
   );
