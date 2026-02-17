@@ -14,7 +14,6 @@ interface RequestOptions {
   timeout?: number;
   retry?: RetryOptions;
   signal?: AbortSignal;
-  skipAuth?: boolean;
   throwOnHttpError?: boolean;
 }
 
@@ -79,15 +78,17 @@ async function buildHeaders(
   };
 
   // FormData는 브라우저가 Content-Type을 자동 설정 (boundary 포함)
-  if (hasBody && !isFormData) {
+  // 호출자가 이미 Content-Type을 지정한 경우(예: multipart 원본 전달) 덮어쓰지 않음
+  if (hasBody && !isFormData && !headers["Content-Type"]) {
     headers["Content-Type"] = "application/json";
   }
 
-  // 서버 사이드에서만 httpOnly 쿠키 접근 가능
-  if (isServer && !options?.skipAuth) {
+  // 서버 사이드에서만 httpOnly 쿠키 접근 가능 (이미 Authorization이 설정된 경우 덮어쓰지 않음)
+  if (isServer && !headers.Authorization) {
     const cookies = await getCookiesFn();
     const cookieStore = await cookies();
     const token = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
+
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
@@ -105,13 +106,18 @@ async function createRequestContext(
   const isServer = typeof window === "undefined";
   const hasBody = data !== undefined && method !== "GET";
   const isFormData = data instanceof FormData;
+  const isRawBody = data instanceof ArrayBuffer || ArrayBuffer.isView(data);
   const url = buildUrl(endpoint, isServer, options?.params);
-  const headers = await buildHeaders(isServer, options, hasBody, isFormData);
+  const headers = await buildHeaders(isServer, options, hasBody, isFormData || isRawBody);
 
   const requestInit: RequestInit = {
     method,
     headers,
-    body: hasBody ? (isFormData ? data : JSON.stringify(data)) : undefined,
+    body: hasBody
+      ? isFormData || isRawBody
+        ? (data as BodyInit)
+        : JSON.stringify(data)
+      : undefined,
   };
 
   if (!isServer) {

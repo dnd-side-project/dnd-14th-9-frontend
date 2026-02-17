@@ -18,7 +18,7 @@ import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
 import { Textarea } from "@/components/Textarea/Textarea";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
-import { formatDateTimeDisplay, formatDurationKorean } from "@/lib/utils/date";
+import { formatDateTimeDisplay, formatDurationKorean, formatLocalDateTime } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
 import {
   MEMBER_INTEREST_CATEGORIES,
@@ -157,9 +157,10 @@ export function SessionCreateForm() {
         summary: validation.data.summary,
         notice: validation.data.notice,
         category: validation.data.category,
-        startTime: validation.data.startTime.toISOString(),
+        startTime: formatLocalDateTime(validation.data.startTime),
         sessionDurationMinutes: validation.data.sessionDurationMinutes,
         maxParticipants: validation.data.maxParticipants,
+        requiredFocusRate: 0,
         requiredAchievementRate: validation.data.requiredAchievementRate,
       };
 

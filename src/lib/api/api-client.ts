@@ -87,7 +87,7 @@ export function buildRetryConfig(retry?: RetryOptions) {
   return {
     maxRetries: retry?.maxRetries ?? 3,
     retryDelay: retry?.retryDelay ?? 1000,
-    retryableStatuses: retry?.retryableStatuses ?? [408, 429, 500, 502, 503, 504],
+    retryableStatuses: retry?.retryableStatuses ?? [408, 429, 502, 503, 504],
   };
 }
 
