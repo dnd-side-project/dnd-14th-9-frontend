@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
 import { DatePicker } from "@/components/DatePicker/DatePicker";
@@ -14,6 +16,8 @@ import { ImageUploader } from "@/components/ImageUploader/ImageUploader";
 import { Input } from "@/components/Input/Input";
 import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
 import { Textarea } from "@/components/Textarea/Textarea";
+import { ApiError } from "@/lib/api/api-client";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { formatDateTimeDisplay, formatDurationKorean } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
 import {
@@ -21,6 +25,11 @@ import {
   MEMBER_INTEREST_CATEGORY_LABELS,
   type MemberInterestCategory,
 } from "@/types/shared/member-interest-category";
+
+import { useCreateSession } from "../hooks/useSessionHooks";
+import { validateSessionForm, type SessionFormErrors } from "../utils/validateSessionForm";
+
+import type { CreateSessionRequest } from "../types";
 
 const MIN_DURATION = 30;
 const MAX_DURATION = 180;
@@ -105,8 +114,83 @@ export function SessionCreateForm() {
     setSelectedImage(null);
   }, []);
 
+  // validation / API 연동 상태
+  const [formErrors, setFormErrors] = useState<SessionFormErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
+  const router = useRouter();
+  const { mutate: createSession, isPending } = useCreateSession();
+
+  const clearFieldError = useCallback((field: keyof SessionFormErrors) => {
+    setFormErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }, []);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      setServerError(null);
+
+      // useState 값 → zod 스키마 형태로 매핑
+      const validation = validateSessionForm({
+        title: roomName,
+        summary: roomDescription,
+        notice,
+        category: selectedCategory ?? undefined,
+        startTime: startDateTime ?? undefined,
+        sessionDurationMinutes: duration,
+        maxParticipants: participants,
+        requiredAchievementRate: achievementRange,
+      });
+
+      if (!validation.success) {
+        setFormErrors(validation.errors);
+        return;
+      }
+
+      // CreateSessionRequest 구성 (Date → ISO 문자열 변환)
+      const body: CreateSessionRequest = {
+        title: validation.data.title,
+        summary: validation.data.summary,
+        notice: validation.data.notice,
+        category: validation.data.category,
+        startTime: validation.data.startTime.toISOString(),
+        sessionDurationMinutes: validation.data.sessionDurationMinutes,
+        maxParticipants: validation.data.maxParticipants,
+        requiredAchievementRate: validation.data.requiredAchievementRate,
+      };
+
+      createSession(
+        { body, image: selectedImage ?? undefined },
+        {
+          onSuccess: () => router.push("/"),
+          onError: (error) => {
+            const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+            setServerError(message);
+          },
+        }
+      );
+    },
+    [
+      roomName,
+      roomDescription,
+      notice,
+      selectedCategory,
+      startDateTime,
+      duration,
+      participants,
+      achievementRange,
+      selectedImage,
+      createSession,
+      router,
+    ]
+  );
+
   return (
-    <form className="gap-xl flex w-full flex-col">
+    <form className="gap-xl flex w-full flex-col" onSubmit={handleSubmit}>
       {/* 방 이름 */}
       <Input
         label="방 이름*"
@@ -114,8 +198,13 @@ export function SessionCreateForm() {
         maxLength={20}
         showCharacterCount
         value={roomName}
-        onChange={(e) => setRoomName(e.target.value)}
+        onChange={(e) => {
+          setRoomName(e.target.value);
+          clearFieldError("title");
+        }}
         onClear={() => setRoomName("")}
+        error={!!formErrors.title}
+        errorMessage={formErrors.title}
         containerClassName="max-w-full"
         className="max-w-full"
       />
@@ -127,8 +216,13 @@ export function SessionCreateForm() {
         maxLength={50}
         showCharacterCount
         value={roomDescription}
-        onChange={(e) => setRoomDescription(e.target.value)}
+        onChange={(e) => {
+          setRoomDescription(e.target.value);
+          clearFieldError("summary");
+        }}
         onClear={() => setRoomDescription("")}
+        error={!!formErrors.summary}
+        errorMessage={formErrors.summary}
         containerClassName="max-w-full"
         className="max-w-full"
       />
@@ -140,7 +234,12 @@ export function SessionCreateForm() {
         maxLength={100}
         showCharacterCount
         value={notice}
-        onChange={(e) => setNotice(e.target.value)}
+        onChange={(e) => {
+          setNotice(e.target.value);
+          clearFieldError("notice");
+        }}
+        error={!!formErrors.notice}
+        errorMessage={formErrors.notice}
         containerClassName="max-w-full"
         className="h-[260px] max-w-full"
       />
@@ -185,13 +284,19 @@ export function SessionCreateForm() {
             <CategoryFilterButton
               key={category}
               isSelected={selectedCategory === category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => {
+                setSelectedCategory(category);
+                clearFieldError("category");
+              }}
               type="button"
             >
               {MEMBER_INTEREST_CATEGORY_LABELS[category]}
             </CategoryFilterButton>
           ))}
         </div>
+        {formErrors.category && (
+          <span className="text-status-error text-sm">{formErrors.category}</span>
+        )}
       </div>
 
       {/* 세션 세부 설정 */}
@@ -232,9 +337,15 @@ export function SessionCreateForm() {
                   mode="single"
                   showTimePicker
                   value={startDateTime}
-                  onChange={setStartDateTime}
+                  onChange={(date) => {
+                    setStartDateTime(date);
+                    clearFieldError("startTime");
+                  }}
                 />
               </div>
+            )}
+            {formErrors.startTime && (
+              <span className="text-status-error text-sm">{formErrors.startTime}</span>
             )}
           </div>
 
@@ -343,6 +454,13 @@ export function SessionCreateForm() {
         <div className="w-45 shrink-0" aria-hidden="true" />
       </div>
 
+      {/* 서버 에러 배너 */}
+      {serverError && (
+        <div className="bg-status-error/10 text-status-error rounded-sm px-4 py-3 text-sm">
+          {serverError}
+        </div>
+      )}
+
       {/* 버튼 그룹 */}
       <div className="mt-20 mb-20 flex justify-center gap-4">
         <Button
@@ -351,6 +469,8 @@ export function SessionCreateForm() {
           colorScheme="tertiary"
           size="large"
           className="w-full max-w-70.5"
+          disabled={isPending}
+          onClick={() => router.back()}
         >
           그만두기
         </Button>
@@ -360,8 +480,9 @@ export function SessionCreateForm() {
           colorScheme="primary"
           size="large"
           className="w-full max-w-70.5"
+          disabled={isPending}
         >
-          세션 만들기
+          {isPending ? "생성 중..." : "세션 만들기"}
         </Button>
       </div>
     </form>
