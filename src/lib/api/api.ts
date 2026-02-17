@@ -18,6 +18,8 @@ interface RequestOptions {
   throwOnHttpError?: boolean;
 }
 
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? process.env.NEXT_PUBLIC_FRONTEND_ORIGIN;
+
 // next/headers 모듈 캐싱 — 매 요청마다 동적 import를 반복하지 않음
 let cachedCookiesFn:
   | (() => Promise<{ get: (name: string) => { value: string } | undefined }>)
@@ -41,11 +43,20 @@ function buildUrl(endpoint: string, isServer: boolean, params?: RequestOptions["
   if (isAbsoluteUrl(endpoint)) {
     url = new URL(endpoint);
   } else if (isServer) {
-    const baseUrl = SERVER_API_URL || API_URL;
-    if (!baseUrl) {
-      throw new Error("Server API base URL is not configured");
+    const isLocalApiEndpoint = /^\/api(?:\/|$)/.test(endpoint);
+
+    if (isLocalApiEndpoint) {
+      if (!FRONTEND_ORIGIN) {
+        throw new Error("Frontend origin is not configured for /api endpoints");
+      }
+      url = new URL(endpoint, FRONTEND_ORIGIN);
+    } else {
+      const baseUrl = SERVER_API_URL || API_URL;
+      if (!baseUrl) {
+        throw new Error("Server API base URL is not configured");
+      }
+      url = new URL(`${baseUrl}${endpoint}`);
     }
-    url = new URL(`${baseUrl}${endpoint}`);
   } else {
     url = new URL(endpoint, window.location.origin);
   }
