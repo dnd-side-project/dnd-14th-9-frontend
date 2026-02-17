@@ -33,21 +33,31 @@ interface PaginationProps {
 const ELLIPSIS = "..." as const;
 
 function getPageNumbers(totalPage: number, currentPage: number) {
-  const maxPagesToShow = 5;
+  const maxPagesToShow = 7;
+  const siblingCount = 1;
 
   if (totalPage <= maxPagesToShow) {
     return Array.from({ length: totalPage }, (_, index) => index + 1);
   }
 
-  if (currentPage <= 3) {
-    return [1, 2, 3, ELLIPSIS, totalPage];
+  const leftSibling = Math.max(currentPage - siblingCount, 2);
+  const rightSibling = Math.min(currentPage + siblingCount, totalPage - 1);
+  const pages: Array<number | typeof ELLIPSIS> = [1];
+
+  if (leftSibling > 2) {
+    pages.push(ELLIPSIS);
   }
 
-  if (currentPage >= totalPage - 2) {
-    return [1, ELLIPSIS, totalPage - 2, totalPage - 1, totalPage];
+  for (let page = leftSibling; page <= rightSibling; page += 1) {
+    pages.push(page);
   }
 
-  return [1, ELLIPSIS, currentPage, ELLIPSIS, totalPage];
+  if (rightSibling < totalPage - 1) {
+    pages.push(ELLIPSIS);
+  }
+
+  pages.push(totalPage);
+  return pages;
 }
 
 export function Pagination({
@@ -57,30 +67,35 @@ export function Pagination({
   variant = "list",
   className,
 }: PaginationProps) {
-  const normalizedTotalPage = Math.max(totalPage, 1);
-  const normalizedCurrentPage = Math.min(Math.max(currentPage, 1), normalizedTotalPage);
+  if (totalPage <= 0) {
+    return null;
+  }
+
+  const normalizedCurrentPage = Math.min(Math.max(currentPage, 1), totalPage);
 
   const handlePageChange = (nextPage: number) => {
-    const normalizedNextPage = Math.min(Math.max(nextPage, 1), normalizedTotalPage);
+    const normalizedNextPage = Math.min(Math.max(nextPage, 1), totalPage);
     if (normalizedNextPage === normalizedCurrentPage) {
       return;
     }
 
     onPageChange(normalizedNextPage);
   };
+  const isFirstPage = normalizedCurrentPage === 1;
+  const isLastPage = normalizedCurrentPage === totalPage;
+  const goToPreviousPage = () => handlePageChange(normalizedCurrentPage - 1);
+  const goToNextPage = () => handlePageChange(normalizedCurrentPage + 1);
 
   if (variant === "fraction") {
     return (
       <div className={cn("flex items-center gap-[15px]", className)}>
         <button
           type="button"
-          onClick={() => handlePageChange(normalizedCurrentPage - 1)}
-          disabled={normalizedCurrentPage === 1}
+          onClick={goToPreviousPage}
+          disabled={isFirstPage}
           className={cn(
             "flex size-10 items-center justify-center rounded-full bg-white/16 p-1 transition-colors",
-            normalizedCurrentPage === 1
-              ? "cursor-not-allowed opacity-50"
-              : "cursor-pointer hover:bg-gray-100"
+            isFirstPage ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:bg-gray-100"
           )}
           aria-label="Previous page"
         >
@@ -88,18 +103,16 @@ export function Pagination({
         </button>
 
         <span className="font-regular text-[18px] text-[#6d7882]">
-          {normalizedCurrentPage}/{normalizedTotalPage}
+          {normalizedCurrentPage}/{totalPage}
         </span>
 
         <button
           type="button"
-          onClick={() => handlePageChange(normalizedCurrentPage + 1)}
-          disabled={normalizedCurrentPage === normalizedTotalPage}
+          onClick={goToNextPage}
+          disabled={isLastPage}
           className={cn(
             "flex size-10 items-center justify-center rounded-full bg-white/16 p-1 transition-colors",
-            normalizedCurrentPage === normalizedTotalPage
-              ? "cursor-not-allowed opacity-50"
-              : "cursor-pointer hover:bg-gray-100"
+            isLastPage ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:bg-gray-100"
           )}
           aria-label="Next page"
         >
@@ -109,19 +122,17 @@ export function Pagination({
     );
   }
 
-  const pages = getPageNumbers(normalizedTotalPage, normalizedCurrentPage);
+  const pages = getPageNumbers(totalPage, normalizedCurrentPage);
 
   return (
     <div className={cn("flex items-center gap-6", className)}>
       <button
         type="button"
-        onClick={() => handlePageChange(normalizedCurrentPage - 1)}
-        disabled={normalizedCurrentPage === 1}
+        onClick={goToPreviousPage}
+        disabled={isFirstPage}
         className={cn(
           "flex items-center gap-2 text-[16px] text-[#6d7882] transition-colors",
-          normalizedCurrentPage === 1
-            ? "cursor-not-allowed opacity-50"
-            : "cursor-pointer hover:text-gray-900"
+          isFirstPage ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-gray-900"
         )}
         aria-label="Previous page"
       >
@@ -149,6 +160,7 @@ export function Pagination({
               key={page}
               type="button"
               onClick={() => handlePageChange(page)}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
                 "font-regular flex size-8 items-center justify-center rounded-[8px] text-[16px] transition-colors",
                 isActive
@@ -164,13 +176,11 @@ export function Pagination({
 
       <button
         type="button"
-        onClick={() => handlePageChange(normalizedCurrentPage + 1)}
-        disabled={normalizedCurrentPage === normalizedTotalPage}
+        onClick={goToNextPage}
+        disabled={isLastPage}
         className={cn(
           "flex items-center gap-2 text-[16px] text-[#6d7882] transition-colors",
-          normalizedCurrentPage === normalizedTotalPage
-            ? "cursor-not-allowed opacity-50"
-            : "cursor-pointer hover:text-gray-900"
+          isLastPage ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-gray-900"
         )}
         aria-label="Next page"
       >
