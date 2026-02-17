@@ -54,17 +54,17 @@ export const Stepper = forwardRef<HTMLDivElement, StepperProps>(
             onClick={handleDecrement}
             disabled={!canDecrement || disabled}
             className={cn(
-              "text-text-muted transition-colors",
+              "p-xs flex h-7 w-7 items-center justify-center rounded-xs border transition-colors",
               canDecrement && !disabled
-                ? "hover:text-text-secondary cursor-pointer"
-                : "cursor-not-allowed opacity-50"
+                ? "cursor-pointer border-gray-600 bg-transparent text-gray-300"
+                : "cursor-not-allowed border-gray-800 bg-gray-900 text-gray-800"
             )}
             aria-label="감소"
           >
-            <MinusIcon size="medium" />
+            <MinusIcon size="xsmall" />
           </button>
 
-          <span className="text-text-secondary min-w-[80px] text-center text-base font-medium">
+          <span className="text-text-secondary min-w-20 text-center text-base font-medium">
             {formatDisplay(value)}
           </span>
 
@@ -73,14 +73,14 @@ export const Stepper = forwardRef<HTMLDivElement, StepperProps>(
             onClick={handleIncrement}
             disabled={!canIncrement || disabled}
             className={cn(
-              "text-text-muted transition-colors",
+              "p-xs flex h-7 w-7 items-center justify-center rounded-xs border transition-colors",
               canIncrement && !disabled
-                ? "hover:text-text-secondary cursor-pointer"
-                : "cursor-not-allowed opacity-50"
+                ? "cursor-pointer border-gray-600 bg-transparent text-gray-300"
+                : "cursor-not-allowed border-gray-800 bg-gray-900 text-gray-800"
             )}
             aria-label="증가"
           >
-            <PlusIcon size="medium" />
+            <PlusIcon size="xsmall" />
           </button>
         </div>
       </div>
