@@ -2,7 +2,7 @@ import { forwardRef } from "react";
 
 import { Icon, type IconProps } from "./Icon";
 
-const ArrowLeftSvg = (
+const ARROW_LEFT_SVG = (
   <svg
     width="100%"
     height="100%"
@@ -20,7 +20,7 @@ const ArrowLeftSvg = (
 export type ArrowLeftIconProps = Omit<IconProps, "svg">;
 
 export const ArrowLeftIcon = forwardRef<HTMLSpanElement, ArrowLeftIconProps>((props, ref) => {
-  return <Icon ref={ref} svg={ArrowLeftSvg} {...props} />;
+  return <Icon ref={ref} svg={ARROW_LEFT_SVG} {...props} />;
 });
 
 ArrowLeftIcon.displayName = "ArrowLeftIcon";
