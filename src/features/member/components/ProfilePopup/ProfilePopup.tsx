@@ -35,13 +35,16 @@ export function ProfilePopup({
   onFeedbackClick,
   onLogoutClick,
 }: ProfilePopupProps) {
-  const name = profile.nickname;
-  const email = profile.email ?? "";
-  const avatarSrc = profile.profileImageUrl || undefined;
-  const focusTimeMinutes = profile.focusedTime;
-  const totalTimeMinutes = profile.totalParticipationTime;
-  const todoCompleted = profile.completedTodoCount;
-  const todoTotal = profile.totalTodoCount;
+  const {
+    nickname,
+    email,
+    profileImageUrl,
+    focusedTime,
+    totalParticipationTime,
+    completedTodoCount,
+    totalTodoCount,
+  } = profile;
+
   const handleMenuItemClick = (callback?: () => void) => () => {
     onClose?.();
     callback?.();
@@ -77,7 +80,7 @@ export function ProfilePopup({
       kind: "action" as const,
       icon: <LogOut size={16} strokeWidth={1.5} />,
       label: "로그아웃",
-      onClick: onLogoutClick,
+      onClick: handleMenuItemClick(onLogoutClick),
     },
   ];
 
@@ -88,15 +91,20 @@ export function ProfilePopup({
         className
       )}
     >
-      <ProfileHeader name={name} email={email} avatarSrc={avatarSrc} onClose={onClose} />
+      <ProfileHeader
+        nickname={nickname}
+        email={email}
+        profileImageUrl={profileImageUrl}
+        onClose={onClose}
+      />
 
       <div className="flex h-[512px] w-full flex-col items-start justify-center gap-0 p-6">
         <div className="flex w-full flex-col items-start gap-3">
           <FocusStatusItem
-            focusTimeMinutes={focusTimeMinutes}
-            totalTimeMinutes={totalTimeMinutes}
-            todoCompleted={todoCompleted}
-            todoTotal={todoTotal}
+            focusedTime={focusedTime}
+            totalParticipationTime={totalParticipationTime}
+            completedTodoCount={completedTodoCount}
+            totalTodoCount={totalTodoCount}
           />
 
           {menuItems.map((item) =>

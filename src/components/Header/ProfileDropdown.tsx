@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
 import { ProfileIcon } from "@/components/Icon/ProfileIcon";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
+
+import { useProfileDropdownDialog } from "./hooks/useProfileDropdownDialog";
 
 const loadProfilePopup = () => import("@/features/member/components/ProfilePopup/ProfilePopup");
 
@@ -20,44 +20,18 @@ const ProfilePopup = dynamic(() => loadProfilePopup().then((mod) => mod.ProfileP
  */
 export function ProfileDropdown() {
   const router = useRouter();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const dialogId = useId();
-  const [isOpen, setIsOpen] = useState(false);
+  const {
+    isOpen,
+    dialogId,
+    dialogTitleId,
+    containerRef,
+    triggerRef,
+    dialogRef,
+    closeDropdown,
+    toggleDropdown,
+  } = useProfileDropdownDialog();
   const { data, isPending, isError } = useMe();
   const profile = data?.result;
-
-  const closeDropdown = () => {
-    setIsOpen(false);
-    triggerRef.current?.focus();
-  };
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    dialogRef.current?.focus();
-
-    const handleClickOutside = (event: PointerEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) {
-        closeDropdown();
-      }
-    };
-
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closeDropdown();
-      }
-    };
-
-    document.addEventListener("pointerdown", handleClickOutside);
-    document.addEventListener("keydown", handleEscapeKey);
-
-    return () => {
-      document.removeEventListener("pointerdown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscapeKey);
-    };
-  }, [isOpen]);
 
   const handleLogout = async () => {
     try {
@@ -108,10 +82,10 @@ export function ProfileDropdown() {
         aria-label="프로필 메뉴"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        aria-controls={isOpen ? dialogId : undefined}
+        aria-controls={dialogId}
         onMouseEnter={handlePrefetchPopup}
         onFocus={handlePrefetchPopup}
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={toggleDropdown}
         className="border-border-subtle bg-surface-subtle focus-visible:ring-primary focus-visible flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border p-2 transition-colors focus-visible:outline-none"
       >
         <ProfileIcon className="h-4 w-4" />
@@ -123,10 +97,13 @@ export function ProfileDropdown() {
           ref={dialogRef}
           role="dialog"
           aria-modal="false"
-          aria-label="프로필 메뉴"
+          aria-labelledby={dialogTitleId}
           tabIndex={-1}
           className="absolute top-[calc(100%+12px)] right-0 z-50 shadow-xl"
         >
+          <h2 id={dialogTitleId} className="sr-only">
+            프로필 메뉴
+          </h2>
           {renderPopupContent()}
         </div>
       )}
