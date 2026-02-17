@@ -16,17 +16,11 @@ import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
 import { Textarea } from "@/components/Textarea/Textarea";
 import { formatDateTimeDisplay, formatDurationKorean } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
-
-const CATEGORIES = [
-  "개발",
-  "디자인",
-  "기획 · PM",
-  "커리어 · 자기개발",
-  "스터디 · 독서",
-  "크리에이티브",
-  "팀 프로젝트",
-  "자유",
-] as const;
+import {
+  MEMBER_INTEREST_CATEGORIES,
+  MEMBER_INTEREST_CATEGORY_LABELS,
+  type MemberInterestCategory,
+} from "@/types/shared/member-interest-category";
 
 const MIN_DURATION = 30;
 const MAX_DURATION = 180;
@@ -39,7 +33,7 @@ export function SessionCreateForm() {
   const [roomDescription, setRoomDescription] = useState("");
   const [notice, setNotice] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<MemberInterestCategory | null>(null);
 
   // 세부 설정 상태
   const [startDateTime, setStartDateTime] = useState<Date | null>(null);
@@ -187,14 +181,14 @@ export function SessionCreateForm() {
       <div className="flex flex-col gap-2">
         <span className="text-text-secondary text-base">카테고리</span>
         <div className="flex flex-wrap gap-3">
-          {CATEGORIES.map((category) => (
+          {MEMBER_INTEREST_CATEGORIES.map((category) => (
             <CategoryFilterButton
               key={category}
               isSelected={selectedCategory === category}
               onClick={() => setSelectedCategory(category)}
               type="button"
             >
-              {category}
+              {MEMBER_INTEREST_CATEGORY_LABELS[category]}
             </CategoryFilterButton>
           ))}
         </div>
