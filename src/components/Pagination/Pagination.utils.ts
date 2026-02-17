@@ -6,13 +6,11 @@ const EARLY_PAGE_THRESHOLD = 4;
 const LATE_PAGE_OFFSET = 3;
 const SIBLING_OFFSET = 1;
 
-export type PageSlot = number | typeof ELLIPSIS | null;
+export type PageSlot = number | typeof ELLIPSIS;
 
 export function getPageSlots(totalPage: number, currentPage: number): PageSlot[] {
   if (totalPage <= PAGE_SLOT_COUNT) {
-    const pages = Array.from({ length: totalPage }, (_, index) => index + 1);
-    const placeholders = Array.from({ length: PAGE_SLOT_COUNT - totalPage }, () => null);
-    return [...pages, ...placeholders];
+    return Array.from({ length: totalPage }, (_, index) => index + 1);
   }
 
   // 항상 7개 슬롯을 유지해 페이지 전환 시 레이아웃 시프트를 방지한다.

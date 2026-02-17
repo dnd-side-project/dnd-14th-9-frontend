@@ -54,14 +54,8 @@ export function PaginationList({
         <span>이전</span>
       </button>
 
-      <div className="flex items-center gap-2">
+      <div className="flex w-[272px] items-center justify-center gap-2">
         {pages.map((page, index) => {
-          if (page === null) {
-            return (
-              <span key={`placeholder-${index}`} aria-hidden className="flex size-8 shrink-0" />
-            );
-          }
-
           if (page === ELLIPSIS) {
             return (
               <span
