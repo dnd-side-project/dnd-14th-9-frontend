@@ -1,6 +1,6 @@
 import { useEffect, useState, type ComponentProps } from "react";
 
-import { Pagination } from "./Pagination";
+import { Pagination } from "../../../components/Pagination/Pagination";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
