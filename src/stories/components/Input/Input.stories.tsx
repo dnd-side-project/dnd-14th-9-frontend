@@ -49,6 +49,10 @@ const meta = {
       control: "number",
       description: "입력 가능한 최대 글자 수",
     },
+    showCharacterCount: {
+      control: "boolean",
+      description: "글자 수 표시 여부 (maxLength와 함께 사용)",
+    },
   },
   decorators: [
     (Story) => (
@@ -143,6 +147,34 @@ export const WithMaxLength: Story = {
     docs: {
       description: {
         story: "최대 글자 수가 제한된 Input입니다. (최대 10자)",
+      },
+    },
+  },
+};
+
+export const WithCharacterCount: Story = {
+  render: (args) => {
+    const [value, setValue] = useState("");
+    return (
+      <Input
+        {...args}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onClear={() => setValue("")}
+      />
+    );
+  },
+  args: {
+    label: "방 이름*",
+    placeholder: "예) 아침코딩모각작",
+    maxLength: 20,
+    showCharacterCount: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "글자 수를 실시간으로 표시하는 Input입니다. maxLength와 showCharacterCount를 함께 사용합니다.",
       },
     },
   },
