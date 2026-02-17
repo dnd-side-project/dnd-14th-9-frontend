@@ -1,11 +1,11 @@
 import { useState } from "react";
 
 import { DatePicker } from "@/components/DatePicker/DatePicker";
-import type { DateRange } from "@/components/DatePicker/DatePicker.types";
+import type { DateRange, DatePickerRangeProps } from "@/components/DatePicker/DatePicker.types";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-const meta = {
+const meta: Meta<DatePickerRangeProps> = {
   title: "Components/DatePicker",
   component: DatePicker,
   tags: ["autodocs"],
@@ -14,7 +14,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "날짜 범위를 선택할 수 있는 DatePicker 컴포넌트입니다. 월별 뷰로 달력을 표시하며, 이전/다음 월 네비게이션을 지원합니다.",
+          "날짜 범위 또는 단일 날짜를 선택할 수 있는 DatePicker 컴포넌트입니다. 월별 뷰로 달력을 표시하며, 이전/다음 월 네비게이션을 지원합니다.",
       },
     },
     backgrounds: {
@@ -26,10 +26,6 @@ const meta = {
       control: "boolean",
       description: "비활성화 상태",
     },
-    onChange: {
-      action: "changed",
-      description: "날짜 범위가 변경될 때 호출되는 콜백",
-    },
   },
   decorators: [
     (Story) => (
@@ -38,17 +34,22 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof DatePicker>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<DatePickerRangeProps>;
 
 export const Default: Story = {
-  args: {},
+  args: {
+    mode: "range",
+  },
 };
 
 export const Controlled: Story = {
-  render: (args) => {
+  args: {
+    mode: "range",
+  },
+  render: function ControlledStory() {
     const [range, setRange] = useState<DateRange>({
       startDate: null,
       endDate: null,
@@ -56,7 +57,7 @@ export const Controlled: Story = {
 
     return (
       <div className="flex flex-col gap-4">
-        <DatePicker {...args} value={range} onChange={setRange} />
+        <DatePicker mode="range" value={range} onChange={setRange} />
         <div className="text-text-secondary text-sm">
           <p>시작일: {range.startDate?.toLocaleDateString() ?? "선택 안됨"}</p>
           <p>종료일: {range.endDate?.toLocaleDateString() ?? "선택 안됨"}</p>
@@ -75,6 +76,7 @@ export const Controlled: Story = {
 
 export const WithDefaultValue: Story = {
   args: {
+    mode: "range",
     defaultValue: {
       startDate: new Date(),
       endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
@@ -91,12 +93,63 @@ export const WithDefaultValue: Story = {
 
 export const Disabled: Story = {
   args: {
+    mode: "range",
     disabled: true,
   },
   parameters: {
     docs: {
       description: {
         story: "비활성화된 상태의 DatePicker입니다.",
+      },
+    },
+  },
+};
+
+export const SingleMode: Story = {
+  args: {
+    mode: "range",
+  },
+  render: function SingleModeStory() {
+    const [date, setDate] = useState<Date | null>(null);
+
+    return (
+      <div className="flex flex-col gap-4">
+        <DatePicker mode="single" value={date} onChange={setDate} />
+        <div className="text-text-secondary text-sm">
+          <p>선택된 날짜: {date?.toLocaleDateString() ?? "선택 안됨"}</p>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "단일 날짜 선택 모드입니다.",
+      },
+    },
+  },
+};
+
+export const SingleWithTimePicker: Story = {
+  args: {
+    mode: "range",
+  },
+  render: function SingleWithTimePickerStory() {
+    const [date, setDate] = useState<Date | null>(null);
+
+    return (
+      <div className="flex flex-col gap-4">
+        <DatePicker mode="single" showTimePicker value={date} onChange={setDate} />
+        <div className="text-text-secondary text-sm">
+          <p>선택된 날짜/시간: {date?.toLocaleString() ?? "선택 안됨"}</p>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "단일 날짜 + 시간 선택 모드입니다.",
       },
     },
   },

@@ -72,6 +72,7 @@ export interface InputProps
   errorMessage?: string;
   onClear?: () => void;
   containerClassName?: string;
+  showCharacterCount?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -89,6 +90,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       onFocus,
       onBlur,
       onChange,
+      showCharacterCount = false,
+      maxLength,
       id,
       ...props
     },
@@ -102,7 +105,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const isControlled = value !== undefined;
     const currentValue = isControlled ? value : internalValue;
-    const hasValue = String(currentValue).length > 0;
+    const characterCount = String(currentValue).length;
+    const hasValue = characterCount > 0;
+    const showCount = showCharacterCount && maxLength !== undefined;
 
     const getState = () => {
       if (disabled) return "disabled";
@@ -163,6 +168,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             )}
             disabled={disabled}
             value={currentValue}
+            maxLength={maxLength}
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChange={handleChange}
@@ -184,6 +190,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             </button>
           )}
         </div>
+
+        {showCount && (
+          <span
+            className={cn(
+              "text-sm",
+              error ? "text-text-status-negative-default" : "text-text-muted"
+            )}
+            aria-live="polite"
+          >
+            {characterCount}/{maxLength}
+          </span>
+        )}
 
         {error && errorMessage && (
           <span id={errorMessageId} className="text-text-status-negative-default text-sm">
