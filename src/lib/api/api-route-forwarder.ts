@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { clearAuthCookies } from "@/lib/auth/auth-cookies";
+import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
+import {
+  buildRefreshCookieHeader,
+  getCookieValue,
+  mergeCookieHeaderWithAuthTokens,
+} from "@/lib/auth/cookie-header-utils";
+import { REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+import { parseRefreshTokenPair, type RefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 
 import { api } from "./api";
 
@@ -16,6 +23,12 @@ interface ForwardToBackendOptions {
   forwardRequestCookies?: boolean;
 }
 
+interface AuthRetryResult {
+  response: Response;
+  refreshedTokens: RefreshTokenPair | null;
+  shouldClearAuthCookies: boolean;
+}
+
 function getDefaultErrorResponse(status: number, statusText: string) {
   return {
     isSuccess: false,
@@ -25,12 +38,31 @@ function getDefaultErrorResponse(status: number, statusText: string) {
   };
 }
 
-function buildForwardHeaders(options: ForwardToBackendOptions): Record<string, string> | undefined {
+async function parseForwardBody(options: ForwardToBackendOptions): Promise<unknown> {
+  if (!options.request || !options.includeRequestBody) {
+    return undefined;
+  }
+
+  if (options.includeRequestBody === "json") {
+    return options.request.json().catch(() => undefined);
+  }
+
+  if (options.includeRequestBody === "formData") {
+    return options.request.formData().catch(() => undefined);
+  }
+
+  return undefined;
+}
+
+function buildForwardHeaders(
+  options: ForwardToBackendOptions,
+  cookieHeaderOverride?: string | null
+): Record<string, string> | undefined {
   if (!options.request || !options.forwardRequestCookies) {
     return undefined;
   }
 
-  const cookie = options.request.headers.get("cookie");
+  const cookie = cookieHeaderOverride ?? options.request.headers.get("cookie");
   if (!cookie) {
     return undefined;
   }
@@ -38,52 +70,156 @@ function buildForwardHeaders(options: ForwardToBackendOptions): Record<string, s
   return { Cookie: cookie };
 }
 
-export async function forwardToBackend(options: ForwardToBackendOptions) {
-  let body: unknown;
+async function sendBackendRequest(
+  options: ForwardToBackendOptions,
+  body: unknown,
+  cookieHeaderOverride?: string | null
+) {
+  return api.server.request(options.method, options.pathWithQuery, body, {
+    headers: buildForwardHeaders(options, cookieHeaderOverride),
+    throwOnHttpError: false,
+    // BFF는 전달받은 쿠키만 사용하고, 서버 전역 쿠키에서 Authorization을 주입하지 않는다.
+    skipAuth: true,
+  });
+}
 
-  if (options.includeRequestBody && options.request) {
-    if (options.includeRequestBody === "json") {
-      body = await options.request.json().catch(() => undefined);
-    } else if (options.includeRequestBody === "formData") {
-      body = await options.request.formData().catch(() => undefined);
-    }
+async function refreshTokens(refreshToken: string): Promise<RefreshTokenPair | null> {
+  const refreshResponse = await api.server.request("POST", "/auth/refresh", undefined, {
+    headers: { Cookie: buildRefreshCookieHeader(refreshToken) },
+    throwOnHttpError: false,
+    skipAuth: true,
+  });
+
+  if (!refreshResponse.ok) {
+    return null;
+  }
+
+  const responseBody: unknown = await refreshResponse.json().catch(() => null);
+  return parseRefreshTokenPair(responseBody);
+}
+
+function canRetryWithRefresh(response: Response, options: ForwardToBackendOptions): boolean {
+  return (
+    response.status === 401 &&
+    Boolean(options.forwardRequestCookies) &&
+    Boolean(options.request) &&
+    options.pathWithQuery !== "/auth/refresh"
+  );
+}
+
+async function resolveResponseWithAuthRetry(
+  options: ForwardToBackendOptions,
+  body: unknown,
+  originalCookieHeader: string | null,
+  initialResponse: Response
+): Promise<AuthRetryResult> {
+  if (!canRetryWithRefresh(initialResponse, options)) {
+    return {
+      response: initialResponse,
+      refreshedTokens: null,
+      shouldClearAuthCookies: false,
+    };
+  }
+
+  const refreshToken = getCookieValue(originalCookieHeader, REFRESH_TOKEN_COOKIE);
+  if (!refreshToken) {
+    return {
+      response: initialResponse,
+      refreshedTokens: null,
+      shouldClearAuthCookies: true,
+    };
+  }
+
+  const refreshedTokens = await refreshTokens(refreshToken);
+  if (!refreshedTokens) {
+    return {
+      response: initialResponse,
+      refreshedTokens: null,
+      shouldClearAuthCookies: true,
+    };
+  }
+
+  const retryCookieHeader = mergeCookieHeaderWithAuthTokens(originalCookieHeader, refreshedTokens);
+  const retriedResponse = await sendBackendRequest(options, body, retryCookieHeader);
+
+  if (retriedResponse.status === 401 || retriedResponse.status === 403) {
+    return {
+      response: retriedResponse,
+      refreshedTokens: null,
+      shouldClearAuthCookies: true,
+    };
+  }
+
+  return {
+    response: retriedResponse,
+    refreshedTokens,
+    shouldClearAuthCookies: false,
+  };
+}
+
+function applyAuthCookies(
+  nextResponse: NextResponse,
+  options: ForwardToBackendOptions,
+  response: Response,
+  refreshedTokens: RefreshTokenPair | null,
+  shouldClearAuthCookies: boolean
+) {
+  if (options.clearAuthCookiesOnSuccess && response.ok) {
+    clearAuthCookies(nextResponse.cookies);
+    return;
+  }
+
+  if (refreshedTokens) {
+    setAuthCookies(nextResponse.cookies, refreshedTokens);
+  }
+
+  if (shouldClearAuthCookies) {
+    clearAuthCookies(nextResponse.cookies);
+  }
+}
+
+async function parseBackendResponsePayload(response: Response): Promise<unknown> {
+  const responseText = await response.text();
+  if (!responseText) {
+    return null;
   }
 
   try {
-    const response = await api.server.request(options.method, options.pathWithQuery, body, {
-      headers: buildForwardHeaders(options),
-      throwOnHttpError: false,
-    });
+    return JSON.parse(responseText);
+  } catch {
+    return getDefaultErrorResponse(response.status, response.statusText);
+  }
+}
+
+export async function forwardToBackend(options: ForwardToBackendOptions) {
+  const body = await parseForwardBody(options);
+  const originalCookieHeader = options.request?.headers.get("cookie") ?? null;
+
+  try {
+    const initialResponse = await sendBackendRequest(options, body, originalCookieHeader);
+    const { response, refreshedTokens, shouldClearAuthCookies } =
+      await resolveResponseWithAuthRetry(options, body, originalCookieHeader, initialResponse);
 
     if (response.status === 204) {
       const noContentResponse = new NextResponse(null, { status: 204 });
-
-      if (options.clearAuthCookiesOnSuccess) {
-        clearAuthCookies(noContentResponse.cookies);
-      }
-
+      applyAuthCookies(
+        noContentResponse,
+        options,
+        response,
+        refreshedTokens,
+        shouldClearAuthCookies
+      );
       return noContentResponse;
     }
 
-    const responseText = await response.text();
-    let responsePayload: unknown = null;
-
-    if (responseText) {
-      try {
-        responsePayload = JSON.parse(responseText);
-      } catch {
-        responsePayload = getDefaultErrorResponse(response.status, response.statusText);
-      }
-    }
+    const responsePayload = await parseBackendResponsePayload(response);
 
     const nextResponse = NextResponse.json(
       responsePayload ?? getDefaultErrorResponse(response.status, response.statusText),
       { status: response.status }
     );
 
-    if (options.clearAuthCookiesOnSuccess && response.ok) {
-      clearAuthCookies(nextResponse.cookies);
-    }
+    applyAuthCookies(nextResponse, options, response, refreshedTokens, shouldClearAuthCookies);
 
     return nextResponse;
   } catch (error) {

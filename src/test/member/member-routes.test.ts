@@ -16,18 +16,11 @@ jest.mock("@/lib/api/api-route-forwarder", () => ({
   forwardToBackend: jest.fn(),
 }));
 
-jest.mock("@/lib/api/api-client", () => ({
-  SERVER_API_URL: "https://backend.example.com",
-}));
-
 const mockedForwardToBackend = forwardToBackend as jest.MockedFunction<typeof forwardToBackend>;
 
 describe("member route handlers", () => {
-  const fetchMock = jest.fn();
-
   beforeEach(() => {
     jest.clearAllMocks();
-    global.fetch = fetchMock as unknown as typeof fetch;
   });
 
   it("profile 라우트는 forwardToBackend로 /members/me/profile을 위임해야 한다", async () => {
@@ -104,41 +97,20 @@ describe("member route handlers", () => {
     });
   });
 
-  it("profile-image 라우트는 multipart body와 쿠키를 backend로 전달해야 한다", async () => {
-    const responsePayload = {
-      isSuccess: true,
-      code: "COMMON200",
-      message: "성공",
-      result: { id: 1 },
-    };
-    fetchMock.mockResolvedValueOnce({
-      status: 200,
-      statusText: "OK",
-      text: async () => JSON.stringify(responsePayload),
-    });
-
-    const formData = new FormData();
-    const file = new File(["binary"], "profile.png", { type: "image/png" });
-    formData.append("profileImage", file);
-
+  it("profile-image 라우트는 forwardToBackend로 /members/me/profile-image를 위임해야 한다", async () => {
+    mockedForwardToBackend.mockResolvedValueOnce(NextResponse.json({}, { status: 200 }));
     const request = new NextRequest("http://localhost:3000/api/members/me/profile-image", {
       method: "PATCH",
-      body: formData,
-      headers: { cookie: "accessToken=abc" },
     });
 
-    const response = await patchProfileImage(request);
-    const body = await response.json();
+    await patchProfileImage(request);
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe("https://backend.example.com/members/me/profile-image");
-    expect(options.method).toBe("PATCH");
-    expect(options.headers).toEqual({ Cookie: "accessToken=abc" });
-    expect(options.body).toBeInstanceOf(FormData);
-    expect((options.body as FormData).get("profileImage")).toBeTruthy();
-
-    expect(response.status).toBe(200);
-    expect(body).toEqual(responsePayload);
+    expect(mockedForwardToBackend).toHaveBeenCalledWith({
+      request,
+      method: "PATCH",
+      pathWithQuery: "/members/me/profile-image",
+      includeRequestBody: "formData",
+      forwardRequestCookies: true,
+    });
   });
 });

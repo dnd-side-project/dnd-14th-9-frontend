@@ -2,12 +2,13 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
+import { buildRefreshCookieHeader } from "@/lib/auth/cookie-header-utils";
 import {
   ACCESS_TOKEN_COOKIE,
-  REDIRECT_AFTER_LOGIN_COOKIE,
-  REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
   REFRESH_TOKEN_COOKIE,
 } from "@/lib/auth/cookie-constants";
+import { buildLoginRedirectUrl, setRedirectAfterLoginCookie } from "@/lib/auth/auth-route-utils";
+import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 
 // 공개 라우트 (인증 불필요)
@@ -19,62 +20,15 @@ const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
 // 토큰 갱신 API 타임아웃 (10초)
 const REFRESH_TIMEOUT_MS = 10000;
 
-interface RefreshTokenPair {
-  accessToken: string;
-  refreshToken: string;
-}
-
-interface RefreshResponseBody {
-  result: RefreshTokenPair;
-}
-
 interface TryRefreshTokenOptions {
   allowPassThroughOnFailure?: boolean;
-}
-
-interface ErrorCodeResponseBody {
-  code: string;
-}
-
-function isRefreshResponseBody(data: unknown): data is RefreshResponseBody {
-  if (!data || typeof data !== "object" || !("result" in data)) {
-    return false;
-  }
-
-  const result = (data as { result?: unknown }).result;
-  if (!result || typeof result !== "object") {
-    return false;
-  }
-
-  const tokenPair = result as Record<string, unknown>;
-  return typeof tokenPair.accessToken === "string" && typeof tokenPair.refreshToken === "string";
-}
-
-function isErrorCodeResponseBody(data: unknown): data is ErrorCodeResponseBody {
-  if (!data || typeof data !== "object") {
-    return false;
-  }
-
-  return typeof (data as { code?: unknown }).code === "string";
-}
-
-async function getErrorCodeFromResponse(response: Response): Promise<string | null> {
-  try {
-    const data: unknown = await response.json();
-    if (!isErrorCodeResponseBody(data)) {
-      return null;
-    }
-    return data.code;
-  } catch {
-    return null;
-  }
 }
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
-  // API 관련 경로는 패스
+  // API 및 well-known 경로는 BFF/Route Handler에서 인증을 처리한다.
   if (pathname.startsWith("/api") || pathname.startsWith("/.well-known")) {
     return NextResponse.next();
   }
@@ -127,24 +81,11 @@ function redirectToLoginRoute(
     reason?: string;
   }
 ): NextResponse {
-  const loginUrl = new URL("/login", request.url);
-  if (options?.reason) {
-    loginUrl.searchParams.set("reason", options.reason);
-  }
-
+  const loginUrl = options?.reason
+    ? buildLoginRedirectUrl(request, options.reason)
+    : new URL("/login", request.url);
   const response = NextResponse.redirect(loginUrl);
-
-  // 로그인 후 복귀할 경로 저장 (Open Redirect 방지)
-  const returnPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
-  const safeReturnPath =
-    returnPath.startsWith("/") && !returnPath.startsWith("//") ? returnPath : "/";
-
-  response.cookies.set(REDIRECT_AFTER_LOGIN_COOKIE, safeReturnPath, {
-    path: "/",
-    maxAge: REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
+  setRedirectAfterLoginCookie(response, `${request.nextUrl.pathname}${request.nextUrl.search}`);
 
   if (options?.clearAuth) {
     clearAuthCookies(response.cookies);
@@ -223,7 +164,7 @@ async function tryRefreshToken(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Cookie: `${REFRESH_TOKEN_COOKIE}=${refreshToken}`,
+          Cookie: buildRefreshCookieHeader(refreshToken),
         },
         credentials: "include",
         signal: controller.signal,
@@ -250,9 +191,10 @@ async function tryRefreshToken(
     }
 
     const data: unknown = await reissueResponse.json();
+    const tokens = parseRefreshTokenPair(data);
 
     // API 응답 검증 (필수 버그 픽스)
-    if (!isRefreshResponseBody(data)) {
+    if (!tokens) {
       console.error("Proxy: Invalid refresh response format");
       if (allowPassThroughOnFailure) {
         return NextResponse.next();
@@ -265,8 +207,8 @@ async function tryRefreshToken(
 
     const response = NextResponse.next();
     setAuthCookies(response.cookies, {
-      accessToken: data.result.accessToken,
-      refreshToken: data.result.refreshToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     });
 
     if (process.env.NODE_ENV !== "production") {
