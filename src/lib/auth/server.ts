@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { cookies } from "next/headers";
 
 import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
@@ -7,8 +9,8 @@ import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
  * - RSC, Server Actions, Route Handlers에서 사용 가능
  * - accessToken 쿠키 존재 여부로 인증 여부 판단
  */
-export async function getServerAuthState(): Promise<boolean> {
+export const getServerAuthState = cache(async (): Promise<boolean> => {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
   return !!accessToken;
-}
+});

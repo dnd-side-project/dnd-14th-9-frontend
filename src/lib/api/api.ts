@@ -15,12 +15,17 @@ interface RequestOptions {
   retry?: RetryOptions;
   signal?: AbortSignal;
   throwOnHttpError?: boolean;
+  skipAuth?: boolean;
 }
+
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? process.env.NEXT_PUBLIC_FRONTEND_ORIGIN;
 
 // next/headers 모듈 캐싱 — 매 요청마다 동적 import를 반복하지 않음
 let cachedCookiesFn:
   | (() => Promise<{ get: (name: string) => { value: string } | undefined }>)
   | null = null;
+
+let cachedHeadersFn: (() => Promise<{ get: (name: string) => string | null }>) | null = null;
 
 async function getCookiesFn() {
   if (!cachedCookiesFn) {
@@ -28,6 +33,14 @@ async function getCookiesFn() {
     cachedCookiesFn = cookies;
   }
   return cachedCookiesFn;
+}
+
+async function getHeadersFn() {
+  if (!cachedHeadersFn) {
+    const { headers } = await import("next/headers");
+    cachedHeadersFn = headers as () => Promise<{ get: (name: string) => string | null }>;
+  }
+  return cachedHeadersFn;
 }
 
 function isAbsoluteUrl(url: string): boolean {
@@ -40,11 +53,20 @@ function buildUrl(endpoint: string, isServer: boolean, params?: RequestOptions["
   if (isAbsoluteUrl(endpoint)) {
     url = new URL(endpoint);
   } else if (isServer) {
-    const baseUrl = SERVER_API_URL || API_URL;
-    if (!baseUrl) {
-      throw new Error("Server API base URL is not configured");
+    const isLocalApiEndpoint = /^\/api(?:\/|$)/.test(endpoint);
+
+    if (isLocalApiEndpoint) {
+      if (!FRONTEND_ORIGIN) {
+        throw new Error("Frontend origin is not configured for /api endpoints");
+      }
+      url = new URL(endpoint, FRONTEND_ORIGIN);
+    } else {
+      const baseUrl = SERVER_API_URL || API_URL;
+      if (!baseUrl) {
+        throw new Error("Server API base URL is not configured");
+      }
+      url = new URL(`${baseUrl}${endpoint}`);
     }
-    url = new URL(`${baseUrl}${endpoint}`);
   } else {
     url = new URL(endpoint, window.location.origin);
   }
@@ -69,6 +91,7 @@ function buildUrl(endpoint: string, isServer: boolean, params?: RequestOptions["
 
 async function buildHeaders(
   isServer: boolean,
+  endpoint: string,
   options?: RequestOptions,
   hasBody: boolean = false,
   isFormData: boolean = false
@@ -76,6 +99,7 @@ async function buildHeaders(
   const headers: Record<string, string> = {
     ...options?.headers,
   };
+  const isLocalApiEndpoint = /^\/api(?:\/|$)/.test(endpoint);
 
   // FormData는 브라우저가 Content-Type을 자동 설정 (boundary 포함)
   // 호출자가 이미 Content-Type을 지정한 경우(예: multipart 원본 전달) 덮어쓰지 않음
@@ -83,14 +107,23 @@ async function buildHeaders(
     headers["Content-Type"] = "application/json";
   }
 
-  // 서버 사이드에서만 httpOnly 쿠키 접근 가능 (이미 Authorization이 설정된 경우 덮어쓰지 않음)
-  if (isServer && !headers.Authorization) {
-    const cookies = await getCookiesFn();
-    const cookieStore = await cookies();
-    const token = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
+  // 서버 사이드에서만 httpOnly 쿠키 접근 가능
+  if (isServer && !options?.skipAuth) {
+    // 서버에서 내부 /api 호출 시에는 Authorization 대신 현재 요청의 쿠키를 전달한다.
+    if (isLocalApiEndpoint && !headers.Cookie) {
+      const requestHeaders = await getHeadersFn();
+      const headerStore = await requestHeaders();
+      const cookieHeader = headerStore.get("cookie");
+      if (cookieHeader) {
+        headers.Cookie = cookieHeader;
+      }
+    } else if (!isLocalApiEndpoint) {
+      const cookies = await getCookiesFn();
+      const cookieStore = await cookies();
+      const token = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
     }
   }
 
@@ -108,7 +141,7 @@ async function createRequestContext(
   const isFormData = data instanceof FormData;
   const isRawBody = data instanceof ArrayBuffer || ArrayBuffer.isView(data);
   const url = buildUrl(endpoint, isServer, options?.params);
-  const headers = await buildHeaders(isServer, options, hasBody, isFormData || isRawBody);
+  const headers = await buildHeaders(isServer, endpoint, options, hasBody, isFormData);
 
   const requestInit: RequestInit = {
     method,

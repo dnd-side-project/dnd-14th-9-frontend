@@ -1,5 +1,9 @@
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
+import { memberQueries } from "@/features/member/hooks/useMemberHooks";
+import { getServerAuthState } from "@/lib/auth/server";
 
 /**
  * WithHeader Layout
@@ -9,12 +13,21 @@ import { Header } from "@/components/Header/Header";
  * - children: 페이지 콘텐츠
  * - Footer: 공통 푸터
  */
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = await getServerAuthState();
+  const queryClient = new QueryClient();
+
+  if (isAuthenticated) {
+    await queryClient.prefetchQuery(memberQueries.me());
+  }
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <main className="w-full flex-1">{children}</main>
-      <Footer />
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="flex min-h-screen flex-col">
+        <Header isAuthenticated={isAuthenticated} />
+        <main className="mx-auto w-full max-w-7xl flex-1">{children}</main>
+        <Footer />
+      </div>
+    </HydrationBoundary>
   );
 }

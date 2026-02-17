@@ -4,20 +4,21 @@ import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
 import { ProgressRing } from "@/components/ProgressRing/ProgressRing";
 
 interface FocusStatusItemProps {
-  focusTimeMinutes: number;
-  totalTimeMinutes: number;
-  todoCompleted: number;
-  todoTotal: number;
+  focusedTime: number;
+  totalParticipationTime: number;
+  completedTodoCount: number;
+  totalTodoCount: number;
 }
 
 export function FocusStatusItem({
-  focusTimeMinutes,
-  totalTimeMinutes,
-  todoCompleted,
-  todoTotal,
+  focusedTime,
+  totalParticipationTime,
+  completedTodoCount,
+  totalTodoCount,
 }: FocusStatusItemProps) {
-  const focusPercentage = totalTimeMinutes > 0 ? (focusTimeMinutes / totalTimeMinutes) * 100 : 0;
-  const todoPercentage = todoTotal > 0 ? (todoCompleted / todoTotal) * 100 : 0;
+  const focusPercentage =
+    totalParticipationTime > 0 ? (focusedTime / totalParticipationTime) * 100 : 0;
+  const todoPercentage = totalTodoCount > 0 ? (completedTodoCount / totalTodoCount) * 100 : 0;
 
   return (
     <div className="flex h-[200px] w-full flex-col gap-6 rounded-md bg-gray-800 px-4 py-6">
@@ -26,8 +27,10 @@ export function FocusStatusItem({
           <div className="flex h-[56px] w-[241px] flex-col items-start gap-1">
             <p className="font-pretendard text-sm font-semibold text-gray-500">집중도</p>
             <p className="font-pretendard text-lg leading-[1.4] text-green-100">
-              <span className="font-bold">총 {focusTimeMinutes}분 </span>
-              <span className="text-sm font-semibold text-gray-400">/ {totalTimeMinutes}분</span>
+              <span className="font-bold">총 {focusedTime}분 </span>
+              <span className="text-sm font-semibold text-gray-400">
+                / {totalParticipationTime}분
+              </span>
             </p>
           </div>
           <div className="flex h-[56px] w-[56px] shrink-0 items-center justify-center px-[13px] py-4">
@@ -64,7 +67,7 @@ export function FocusStatusItem({
                 {Math.round(todoPercentage)}%
               </span>
               <span className="font-pretendard text-xs font-semibold text-gray-400">
-                {todoCompleted}/{todoTotal}
+                {completedTodoCount}/{totalTodoCount}
               </span>
             </div>
           </div>

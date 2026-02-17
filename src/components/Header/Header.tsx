@@ -1,16 +1,17 @@
 import Link from "next/link";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
-import { ProfileDropdown } from "@/components/Header/ProfileDropdown";
-import { getServerAuthState } from "@/lib/auth/server";
+import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
+
+interface HeaderProps {
+  isAuthenticated: boolean;
+}
 
 /**
  * Header - GNB (Global Navigation Bar) 서버 컴포넌트
- * httpOnly 쿠키에서 인증 상태를 읽어 UI를 렌더링합니다.
+ * 상위 레이아웃에서 주입된 인증 상태에 따라 UI를 렌더링합니다.
  */
-export async function Header() {
-  const isAuthenticated = await getServerAuthState();
-
+export function Header({ isAuthenticated }: HeaderProps) {
   return (
     <header className="border-border-subtle bg-surface-default sticky top-0 z-50 w-full border-b">
       <div className="px-lg md:px-xl md:py-sm mx-auto flex h-full max-w-[1280px] items-center justify-between py-[15px] xl:px-[50px]">

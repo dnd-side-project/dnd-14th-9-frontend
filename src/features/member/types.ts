@@ -9,7 +9,7 @@ export type MemberSocialProvider = "kakao" | "google";
 export interface MemberProfileView {
   id: number;
   nickname: string;
-  profileImageUrl: string;
+  profileImageUrl: string | null;
   email: string | null;
   socialProvider: MemberSocialProvider;
   totalParticipationTime: number;
