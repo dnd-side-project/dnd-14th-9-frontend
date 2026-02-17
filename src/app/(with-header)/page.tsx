@@ -47,21 +47,23 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   void params;
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<SearchFilterSectionSkeleton />}>
-        <SearchFilterSection />
-      </Suspense>
+    <div className="px-[54px]">
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <Suspense fallback={<SearchFilterSectionSkeleton />}>
+          <SearchFilterSection />
+        </Suspense>
 
-      {!isSearchMode && <Banner />}
+        {!isSearchMode && <Banner />}
 
-      {/* TODO(이경환): 팀 논의 필요 - 비로그인 시 빈 공간 vs 대체 콘텐츠 */}
-      <Suspense fallback={<RecommendedSectionSkeleton />}>
-        <RecommendedSection />
-      </Suspense>
+        {/* TODO(이경환): 팀 논의 필요 - 비로그인 시 빈 공간 vs 대체 콘텐츠 */}
+        <Suspense fallback={<RecommendedSectionSkeleton />}>
+          <RecommendedSection />
+        </Suspense>
 
-      <Suspense fallback={<RecruitingSectionSkeleton />}>
-        <RecruitingSection />
-      </Suspense>
-    </HydrationBoundary>
+        <Suspense fallback={<RecruitingSectionSkeleton />}>
+          <RecruitingSection />
+        </Suspense>
+      </HydrationBoundary>
+    </div>
   );
 }
