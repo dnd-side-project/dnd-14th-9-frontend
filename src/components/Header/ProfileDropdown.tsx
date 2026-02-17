@@ -2,11 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
 import { ProfileIcon } from "@/components/Icon/ProfileIcon";
-import { ProfilePopup } from "@/features/member/components/ProfilePopup/ProfilePopup";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
+
+const loadProfilePopup = () => import("@/features/member/components/ProfilePopup/ProfilePopup");
+
+const ProfilePopup = dynamic(() => loadProfilePopup().then((mod) => mod.ProfilePopup), {
+  ssr: false,
+});
 
 /**
  * TODO(이경환): 임시 프로필 패널 컴포넌트입니다.
@@ -58,6 +64,10 @@ export function ProfileDropdown() {
     }
   };
 
+  const handlePrefetchPopup = () => {
+    void loadProfilePopup();
+  };
+
   const renderFallback = (message: string) => (
     <div className="bg-surface-default text-text-secondary min-w-[220px] rounded-md border border-gray-700 p-4 text-sm">
       {message}
@@ -96,6 +106,8 @@ export function ProfileDropdown() {
         aria-label="프로필 메뉴"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
+        onMouseEnter={handlePrefetchPopup}
+        onFocus={handlePrefetchPopup}
         onClick={() => setIsOpen((prev) => !prev)}
         className="border-border-subtle bg-surface-subtle focus-visible:ring-primary focus-visible flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border p-2 transition-colors focus-visible:outline-none"
       >
