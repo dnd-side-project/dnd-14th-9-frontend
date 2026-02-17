@@ -1,0 +1,23 @@
+import { forwardRef } from "react";
+
+import { Icon, type IconProps } from "./Icon";
+
+const CHEVRON_LEFT_SVG = (
+  <svg
+    width="100%"
+    height="100%"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z" fill="currentColor" />
+  </svg>
+);
+
+export type ChevronLeftIconProps = Omit<IconProps, "svg">;
+
+export const ChevronLeftIcon = forwardRef<HTMLSpanElement, ChevronLeftIconProps>((props, ref) => {
+  return <Icon ref={ref} svg={CHEVRON_LEFT_SVG} {...props} />;
+});
+
+ChevronLeftIcon.displayName = "ChevronLeftIcon";
