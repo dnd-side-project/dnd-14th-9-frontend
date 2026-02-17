@@ -278,7 +278,7 @@ export function SessionCreateForm() {
       </div>
 
       {/* To do 달성도 범위 설정 */}
-      <div className="flex w-[70%] flex-col gap-2">
+      <div className="flex w-[calc(100%-400px)] flex-col gap-2">
         <div className="flex items-center gap-1">
           <span className="text-text-secondary text-base leading-none">To do 달성도 범위 설정</span>
           <div className="group relative flex items-center">
