@@ -77,7 +77,7 @@ export function SessionCreateForm() {
 
       {/* 카테고리 */}
       <div className="flex flex-col gap-2">
-        <span className="text-text-secondary text-base">카테고리*</span>
+        <span className="text-text-secondary text-base">카테고리</span>
         <div className="flex flex-wrap gap-3">
           {CATEGORIES.map((category) => (
             <CategoryFilterButton
