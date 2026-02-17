@@ -8,10 +8,11 @@ import { cn } from "@/lib/utils/utils";
 const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
   [
     "inline-flex items-center justify-center",
-    "bg-transparent",
-    "text-gray-200",
+    "bg-surface-strong",
+    "text-text-muted",
     "text-[14px] font-semibold font-pretendard",
     "py-sm px-md",
+    "rounded-sm",
     "cursor-pointer",
     "transition-colors",
     "border-none",
@@ -19,9 +20,9 @@ const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
   {
     variants: {
       isSelected: {
-        true: "bg-[#52EE8533] text-green-600 rounded-sm",
+        true: "bg-[#52EE8533] text-green-600",
         false:
-          "hover:bg-[#52EE8533] hover:text-green-600 hover:rounded-sm active:bg-[#52EE8533] active:text-green-600 active:rounded-sm",
+          "hover:bg-[#52EE8533] hover:text-green-600 active:bg-[#52EE8533] active:text-green-600",
       },
     },
     defaultVariants: {

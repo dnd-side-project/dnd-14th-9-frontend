@@ -2,14 +2,27 @@
 
 import { useState } from "react";
 
+import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
 import { ImageUploader } from "@/components/ImageUploader/ImageUploader";
 import { Input } from "@/components/Input/Input";
 import { Textarea } from "@/components/Textarea/Textarea";
+
+const CATEGORIES = [
+  "개발",
+  "디자인",
+  "기획 · PM",
+  "커리어 · 자기개발",
+  "스터디 · 독서",
+  "크리에이티브",
+  "팀 프로젝트",
+  "자유",
+] as const;
 
 export function SessionCreateForm() {
   const [roomName, setRoomName] = useState("");
   const [roomDescription, setRoomDescription] = useState("");
   const [notice, setNotice] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   return (
     <form className="gap-xl flex w-full flex-col">
@@ -60,6 +73,23 @@ export function SessionCreateForm() {
           containerClassName="max-w-[380px]"
         />
         <span className="text-text-secondary text-sm">* .jpg, .png 파일만 가능해요</span>
+      </div>
+
+      {/* 카테고리 */}
+      <div className="flex flex-col gap-2">
+        <span className="text-text-secondary text-base">카테고리*</span>
+        <div className="flex flex-wrap gap-3">
+          {CATEGORIES.map((category) => (
+            <CategoryFilterButton
+              key={category}
+              isSelected={selectedCategory === category}
+              onClick={() => setSelectedCategory(category)}
+              type="button"
+            >
+              {category}
+            </CategoryFilterButton>
+          ))}
+        </div>
       </div>
     </form>
   );
