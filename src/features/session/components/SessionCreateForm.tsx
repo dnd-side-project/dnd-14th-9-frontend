@@ -106,7 +106,7 @@ export function SessionCreateForm() {
   }, []);
 
   return (
-    <form className="gap-xl mx-auto flex w-full max-w-7xl flex-col">
+    <form className="gap-xl flex w-full flex-col">
       {/* 방 이름 */}
       <Input
         label="방 이름*"

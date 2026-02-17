@@ -2,7 +2,7 @@ import { SessionCreateForm } from "@/features/session/components/SessionCreateFo
 
 export default function SessionCreatePage() {
   return (
-    <main className="p-3xl w-full">
+    <main className="p-3xl mx-auto w-full max-w-7xl">
       {/* 제목 섹션 */}
       <header className="mb-2xl">
         <h1 className="text-[24px] leading-[140%] font-bold text-gray-50">세션 만들기</h1>
