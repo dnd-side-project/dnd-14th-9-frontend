@@ -12,6 +12,7 @@ import {
   useQueryClient,
   QueryClient,
   dehydrate,
+  queryOptions,
 } from "@tanstack/react-query";
 
 import { createSingletonHooks } from "@/hooks/createSingletonHooks";
@@ -20,7 +21,6 @@ import { memberApi } from "../api";
 
 import type {
   GetMeForEditResponse,
-  GetMyReportResponse,
   MemberProfileMutationResponse,
   MemberProfileView,
   UpdateInterestCategoriesRequest,
@@ -47,43 +47,57 @@ export const memberKeys = {
   report: () => ["member", "report"] as const,
 };
 
+export const memberQueries = {
+  me: () =>
+    queryOptions({
+      queryKey: memberKeys.me(),
+      queryFn: memberApi.getMe,
+      staleTime: MEMBER_STALE_TIME,
+    }),
+  edit: () =>
+    queryOptions({
+      queryKey: memberKeys.edit(),
+      queryFn: memberApi.getMeForEdit,
+      staleTime: MEMBER_STALE_TIME,
+    }),
+  report: () =>
+    queryOptions({
+      queryKey: memberKeys.report(),
+      queryFn: memberApi.getMyReport,
+    }),
+};
+
 // Query Hooks
-export const useMe = memberCore.useGet;
+export function useMe() {
+  return useQuery(memberQueries.me());
+}
+
 export const useDeleteMe = memberCore.useDelete!;
-export const prefetchMe = memberCore.prefetch;
+
+export async function prefetchMe() {
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery(memberQueries.me());
+  return dehydrate(queryClient);
+}
 
 export function useMeForEdit() {
-  return useQuery<GetMeForEditResponse>({
-    queryKey: memberKeys.edit(),
-    queryFn: memberApi.getMeForEdit,
-    staleTime: MEMBER_STALE_TIME,
-  });
+  return useQuery(memberQueries.edit());
 }
 
 export async function prefetchMeForEdit() {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: memberKeys.edit(),
-    queryFn: memberApi.getMeForEdit,
-    staleTime: MEMBER_STALE_TIME,
-  });
+  await queryClient.prefetchQuery(memberQueries.edit());
   return dehydrate(queryClient);
 }
 
 // Report 쿼리 (Session의 useSessionReport와 동일한 패턴)
 export function useMyReport() {
-  return useQuery<GetMyReportResponse>({
-    queryKey: memberKeys.report(),
-    queryFn: memberApi.getMyReport,
-  });
+  return useQuery(memberQueries.report());
 }
 
 export async function prefetchMyReport() {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: memberKeys.report(),
-    queryFn: memberApi.getMyReport,
-  });
+  await queryClient.prefetchQuery(memberQueries.report());
   return dehydrate(queryClient);
 }
 
