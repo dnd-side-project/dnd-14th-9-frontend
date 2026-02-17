@@ -72,7 +72,7 @@ export function OnboardingProfile({ className, onSkip, onNext }: OnboardingProfi
         <Button
           variant="ghost"
           colorScheme="secondary"
-          className="text-text-muted hover:text-text-secondary h-11 flex-1 text-base"
+          className="text-text-muted hover:text-text-secondary d h-11 flex-1"
           onClick={onSkip}
         >
           건너뛰기
@@ -83,7 +83,7 @@ export function OnboardingProfile({ className, onSkip, onNext }: OnboardingProfi
           className="h-11 flex-1 text-sm font-semibold"
           onClick={handleNext}
         >
-          완료
+          다음
         </Button>
       </div>
     </div>
