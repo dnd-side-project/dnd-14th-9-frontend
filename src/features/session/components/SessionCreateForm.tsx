@@ -319,27 +319,34 @@ export function SessionCreateForm() {
       </div>
 
       {/* To do 달성도 범위 설정 */}
-      <div className="flex w-[calc(100%-400px)] flex-col gap-2">
-        <div className="flex items-center gap-1">
-          <span className="text-text-secondary text-base leading-none">To do 달성도 범위 설정</span>
-          <div className="group relative flex items-center">
-            <InfoIcon size="xsmall" className="text-text-muted cursor-pointer" />
-            <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-100">
-              <div className="rounded-sm bg-gray-700 px-3 py-2 text-xs whitespace-nowrap text-gray-200">
-                내 달성도보다 높은 범위는 설정할 수 없어요.
+      <div className="flex gap-5">
+        <div className="flex flex-1 flex-col gap-2">
+          <div className="flex items-center gap-1">
+            <span className="text-text-secondary text-base leading-none">
+              To do 달성도 범위 설정
+            </span>
+            <div className="group relative flex items-center">
+              <InfoIcon size="xsmall" className="text-text-muted cursor-pointer" />
+              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="rounded-sm bg-gray-700 px-3 py-2 text-xs whitespace-nowrap text-gray-200">
+                  내 달성도보다 높은 범위는 설정할 수 없어요.
+                </div>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700" />
               </div>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700" />
             </div>
           </div>
+          <div className="flex items-center justify-center rounded-sm border border-gray-700 p-4">
+            <StepperSlide
+              value={achievementRange}
+              onChange={setAchievementRange}
+              myFocusValue={70}
+              className="w-[80%]"
+            />
+          </div>
         </div>
-        <div className="flex items-center justify-center rounded-sm border border-gray-700 p-4">
-          <StepperSlide
-            value={achievementRange}
-            onChange={setAchievementRange}
-            myFocusValue={70}
-            className="w-[80%]"
-          />
-        </div>
+        {/* 상단 진행시간/참여인원과 너비 맞춤 */}
+        <div className="w-45 shrink-0" aria-hidden="true" />
+        <div className="w-45 shrink-0" aria-hidden="true" />
       </div>
 
       {/* 버튼 그룹 */}
