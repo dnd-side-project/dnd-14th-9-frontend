@@ -47,7 +47,9 @@ describe("forwardToBackend", () => {
           200
         )
       )
-      .mockResolvedValueOnce(createJsonResponse({ isSuccess: true, result: { nickname: "A" } }, 200));
+      .mockResolvedValueOnce(
+        createJsonResponse({ isSuccess: true, result: { nickname: "A" } }, 200)
+      );
 
     const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
       headers: {
@@ -86,8 +88,12 @@ describe("forwardToBackend", () => {
         skipAuth: true,
       })
     );
-    expect(hasSetCookie(response, (cookie) => cookie.includes("accessToken=new_access"))).toBe(true);
-    expect(hasSetCookie(response, (cookie) => cookie.includes("refreshToken=new_refresh"))).toBe(true);
+    expect(hasSetCookie(response, (cookie) => cookie.includes("accessToken=new_access"))).toBe(
+      true
+    );
+    expect(hasSetCookie(response, (cookie) => cookie.includes("refreshToken=new_refresh"))).toBe(
+      true
+    );
   });
 
   it("refresh 실패 시 인증 쿠키를 정리하고 401을 반환해야 한다", async () => {
@@ -115,7 +121,9 @@ describe("forwardToBackend", () => {
   });
 
   it("401이 아니면 refresh를 시도하지 않아야 한다", async () => {
-    mockedServerRequest.mockResolvedValueOnce(createJsonResponse({ isSuccess: true, result: {} }, 200));
+    mockedServerRequest.mockResolvedValueOnce(
+      createJsonResponse({ isSuccess: true, result: {} }, 200)
+    );
 
     const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
       headers: {
@@ -169,7 +177,11 @@ describe("forwardToBackend", () => {
     expect(mockedServerRequest).toHaveBeenCalledTimes(3);
     expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
     expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
-    expect(hasSetCookie(response, (cookie) => cookie.includes("accessToken=new_access"))).toBe(false);
-    expect(hasSetCookie(response, (cookie) => cookie.includes("refreshToken=new_refresh"))).toBe(false);
+    expect(hasSetCookie(response, (cookie) => cookie.includes("accessToken=new_access"))).toBe(
+      false
+    );
+    expect(hasSetCookie(response, (cookie) => cookie.includes("refreshToken=new_refresh"))).toBe(
+      false
+    );
   });
 });

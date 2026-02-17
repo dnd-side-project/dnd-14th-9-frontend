@@ -2,12 +2,9 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
-import { buildRefreshCookieHeader } from "@/lib/auth/cookie-header-utils";
-import {
-  ACCESS_TOKEN_COOKIE,
-  REFRESH_TOKEN_COOKIE,
-} from "@/lib/auth/cookie-constants";
 import { buildLoginRedirectUrl, setRedirectAfterLoginCookie } from "@/lib/auth/auth-route-utils";
+import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+import { buildRefreshCookieHeader } from "@/lib/auth/cookie-header-utils";
 import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 
