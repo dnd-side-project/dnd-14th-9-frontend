@@ -38,6 +38,7 @@ export function SessionCreateForm() {
   const [roomName, setRoomName] = useState("");
   const [roomDescription, setRoomDescription] = useState("");
   const [notice, setNotice] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // 세부 설정 상태
@@ -138,6 +139,7 @@ export function SessionCreateForm() {
           hintText="최대 5MB 파일만 업로드 가능해요"
           accept="image/jpeg,image/png"
           containerClassName="max-w-[380px]"
+          onFileSelect={setSelectedImage}
         />
         <span className="text-text-secondary text-sm">* .jpg, .png 파일만 가능해요</span>
       </div>
