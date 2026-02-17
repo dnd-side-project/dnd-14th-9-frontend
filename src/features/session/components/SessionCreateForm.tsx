@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { ImageUploader } from "@/components/ImageUploader/ImageUploader";
 import { Input } from "@/components/Input/Input";
 import { Textarea } from "@/components/Textarea/Textarea";
 
@@ -49,6 +50,17 @@ export function SessionCreateForm() {
         containerClassName="max-w-full"
         className="h-[260px] max-w-full"
       />
+
+      {/* 대표 이미지 */}
+      <div className="flex flex-col gap-2">
+        <span className="text-text-secondary text-base">대표 이미지</span>
+        <ImageUploader
+          hintText="최대 5MB 파일만 업로드 가능해요"
+          accept="image/jpeg,image/png"
+          containerClassName="max-w-[380px]"
+        />
+        <span className="text-text-secondary text-sm">* .jpg, .png 파일만 가능해요</span>
+      </div>
     </form>
   );
 }
