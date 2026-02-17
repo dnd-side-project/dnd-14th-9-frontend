@@ -94,15 +94,15 @@ export function Pagination({
           onClick={goToPreviousPage}
           disabled={isFirstPage}
           className={cn(
-            "flex size-10 items-center justify-center rounded-full bg-white/16 p-1 transition-colors",
-            isFirstPage ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:bg-gray-100"
+            "bg-alpha-white-16 flex size-10 items-center justify-center rounded-full p-1 transition-colors",
+            isFirstPage ? "cursor-not-allowed opacity-50" : "hover:bg-surface-subtle cursor-pointer"
           )}
           aria-label="Previous page"
         >
-          <ChevronLeftIcon className="size-6 text-[#6d7882]" />
+          <ChevronLeftIcon className="text-text-disabled size-6" />
         </button>
 
-        <span className="font-regular text-[18px] text-[#6d7882]">
+        <span className="font-regular text-text-disabled text-[18px]">
           {normalizedCurrentPage}/{totalPage}
         </span>
 
@@ -111,12 +111,12 @@ export function Pagination({
           onClick={goToNextPage}
           disabled={isLastPage}
           className={cn(
-            "flex size-10 items-center justify-center rounded-full bg-white/16 p-1 transition-colors",
-            isLastPage ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:bg-gray-100"
+            "bg-alpha-white-16 flex size-10 items-center justify-center rounded-full p-1 transition-colors",
+            isLastPage ? "cursor-not-allowed opacity-50" : "hover:bg-surface-subtle cursor-pointer"
           )}
           aria-label="Next page"
         >
-          <ChevronRightIcon className="size-6 text-[#6d7882]" />
+          <ChevronRightIcon className="text-text-disabled size-6" />
         </button>
       </div>
     );
@@ -131,8 +131,8 @@ export function Pagination({
         onClick={goToPreviousPage}
         disabled={isFirstPage}
         className={cn(
-          "flex items-center gap-2 text-[16px] text-[#6d7882] transition-colors",
-          isFirstPage ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-gray-900"
+          "text-text-disabled flex items-center gap-2 text-[16px] transition-colors",
+          isFirstPage ? "cursor-not-allowed opacity-50" : "hover:text-text-secondary cursor-pointer"
         )}
         aria-label="Previous page"
       >
@@ -146,7 +146,7 @@ export function Pagination({
             return (
               <span
                 key={`ellipsis-${index}`}
-                className="flex size-8 items-center justify-center text-[16px] text-[#6d7882]"
+                className="text-text-disabled flex size-8 items-center justify-center text-[16px]"
               >
                 ...
               </span>
@@ -164,8 +164,8 @@ export function Pagination({
               className={cn(
                 "font-regular flex size-8 items-center justify-center rounded-[8px] text-[16px] transition-colors",
                 isActive
-                  ? "cursor-default bg-[#323635] text-white"
-                  : "cursor-pointer text-[#6d7882] hover:bg-gray-100"
+                  ? "bg-surface-subtle text-text-primary cursor-default"
+                  : "text-text-disabled hover:bg-surface-subtle cursor-pointer"
               )}
             >
               {page}
@@ -179,8 +179,8 @@ export function Pagination({
         onClick={goToNextPage}
         disabled={isLastPage}
         className={cn(
-          "flex items-center gap-2 text-[16px] text-[#6d7882] transition-colors",
-          isLastPage ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:text-gray-900"
+          "text-text-disabled flex items-center gap-2 text-[16px] transition-colors",
+          isLastPage ? "cursor-not-allowed opacity-50" : "hover:text-text-secondary cursor-pointer"
         )}
         aria-label="Next page"
       >

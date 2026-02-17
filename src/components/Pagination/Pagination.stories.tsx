@@ -23,7 +23,7 @@ function StatefulPagination({ totalPage, currentPage, variant, className }: Pagi
   };
 
   return (
-    <div className="dark rounded-2xl p-6" style={{ background: "#0b0f0e" }}>
+    <div className="bg-background-default dark rounded-2xl p-6">
       <Pagination
         totalPage={normalizedTotalPage}
         currentPage={page}
