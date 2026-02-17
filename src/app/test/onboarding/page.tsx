@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-import { OnboardingCategory } from "@/components/Onboarding/OnboardingCategory";
-import { OnboardingProfile } from "@/components/Onboarding/OnboardingProfile";
+import { OnboardingCategory } from "@/features/member/components/Onboarding/OnboardingCategory";
+import { OnboardingProfile } from "@/features/member/components/Onboarding/OnboardingProfile";
 
 export default function OnboardingTestPage() {
   const [step, setStep] = useState<"profile" | "category">("profile");
