@@ -72,7 +72,7 @@ export function OnboardingProfile({ className, onSkip, onNext }: OnboardingProfi
         <Button
           variant="ghost"
           colorScheme="secondary"
-          className="text-text-muted hover:text-text-secondary d h-11 flex-1"
+          className="text-text-muted hover:text-text-secondary h-11 flex-1"
           onClick={onSkip}
         >
           건너뛰기
