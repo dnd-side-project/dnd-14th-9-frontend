@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
@@ -92,6 +92,25 @@ export function SessionCreateForm() {
     setParticipants((prev) => Math.min(MAX_PARTICIPANTS, prev + 1));
   }, []);
 
+  // 이미지 미리보기 URL 생성
+  const imagePreviewUrl = useMemo(() => {
+    if (!selectedImage) return null;
+    return URL.createObjectURL(selectedImage);
+  }, [selectedImage]);
+
+  // 이미지 미리보기 URL 정리 (메모리 누수 방지)
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
+
+  const handleImageRemove = useCallback(() => {
+    setSelectedImage(null);
+  }, []);
+
   return (
     <form className="gap-xl flex w-full flex-col">
       {/* 방 이름 */}
@@ -135,12 +154,32 @@ export function SessionCreateForm() {
       {/* 대표 이미지 */}
       <div className="flex flex-col gap-2">
         <span className="text-text-secondary text-base">대표 이미지</span>
-        <ImageUploader
-          hintText="최대 5MB 파일만 업로드 가능해요"
-          accept="image/jpeg,image/png"
-          containerClassName="max-w-[380px]"
-          onFileSelect={setSelectedImage}
-        />
+        {imagePreviewUrl ? (
+          <div className="relative max-w-95">
+            <img
+              src={imagePreviewUrl}
+              alt="대표 이미지 미리보기"
+              className="h-36 w-full rounded-lg object-cover"
+            />
+            <Button
+              type="button"
+              variant="solid"
+              colorScheme="tertiary"
+              size="small"
+              onClick={handleImageRemove}
+              className="absolute top-2 right-2"
+            >
+              삭제
+            </Button>
+          </div>
+        ) : (
+          <ImageUploader
+            hintText="최대 5MB 파일만 업로드 가능해요"
+            accept="image/jpeg,image/png"
+            containerClassName="max-w-[380px]"
+            onFileSelect={setSelectedImage}
+          />
+        )}
         <span className="text-text-secondary text-sm">* .jpg, .png 파일만 가능해요</span>
       </div>
 
