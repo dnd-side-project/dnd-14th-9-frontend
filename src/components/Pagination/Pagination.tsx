@@ -31,33 +31,27 @@ interface PaginationProps {
 }
 
 const ELLIPSIS = "..." as const;
+const PAGE_SLOT_COUNT = 7;
 
-function getPageNumbers(totalPage: number, currentPage: number) {
-  const maxPagesToShow = 7;
-  const siblingCount = 1;
+type PageSlot = number | typeof ELLIPSIS | null;
 
-  if (totalPage <= maxPagesToShow) {
-    return Array.from({ length: totalPage }, (_, index) => index + 1);
+function getPageSlots(totalPage: number, currentPage: number): PageSlot[] {
+  if (totalPage <= PAGE_SLOT_COUNT) {
+    const pages = Array.from({ length: totalPage }, (_, index) => index + 1);
+    const placeholders = Array.from({ length: PAGE_SLOT_COUNT - totalPage }, () => null);
+    return [...pages, ...placeholders];
   }
 
-  const leftSibling = Math.max(currentPage - siblingCount, 2);
-  const rightSibling = Math.min(currentPage + siblingCount, totalPage - 1);
-  const pages: Array<number | typeof ELLIPSIS> = [1];
-
-  if (leftSibling > 2) {
-    pages.push(ELLIPSIS);
+  // 항상 7개 슬롯을 유지해 페이지 전환 시 레이아웃 시프트를 방지한다.
+  if (currentPage <= 4) {
+    return [1, 2, 3, 4, 5, ELLIPSIS, totalPage];
   }
 
-  for (let page = leftSibling; page <= rightSibling; page += 1) {
-    pages.push(page);
+  if (currentPage >= totalPage - 3) {
+    return [1, ELLIPSIS, totalPage - 4, totalPage - 3, totalPage - 2, totalPage - 1, totalPage];
   }
 
-  if (rightSibling < totalPage - 1) {
-    pages.push(ELLIPSIS);
-  }
-
-  pages.push(totalPage);
-  return pages;
+  return [1, ELLIPSIS, currentPage - 1, currentPage, currentPage + 1, ELLIPSIS, totalPage];
 }
 
 export function Pagination({
@@ -122,7 +116,7 @@ export function Pagination({
     );
   }
 
-  const pages = getPageNumbers(totalPage, normalizedCurrentPage);
+  const pages = getPageSlots(totalPage, normalizedCurrentPage);
 
   return (
     <div className={cn("flex items-center gap-6", className)}>
@@ -142,6 +136,12 @@ export function Pagination({
 
       <div className="flex items-center gap-2">
         {pages.map((page, index) => {
+          if (page === null) {
+            return (
+              <span key={`placeholder-${index}`} aria-hidden className="flex size-8 shrink-0" />
+            );
+          }
+
           if (page === ELLIPSIS) {
             return (
               <span
