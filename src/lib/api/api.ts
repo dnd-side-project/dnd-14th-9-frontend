@@ -99,6 +99,7 @@ async function buildHeaders(
   const headers: Record<string, string> = {
     ...options?.headers,
   };
+  const isLocalApiEndpoint = /^\/api(?:\/|$)/.test(endpoint);
 
   // FormData는 브라우저가 Content-Type을 자동 설정 (boundary 포함)
   if (hasBody && !isFormData) {
@@ -107,20 +108,20 @@ async function buildHeaders(
 
   // 서버 사이드에서만 httpOnly 쿠키 접근 가능
   if (isServer && !options?.skipAuth) {
-    const cookies = await getCookiesFn();
-    const cookieStore = await cookies();
-    const token = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    // 서버에서 내부 /api 호출 시 현재 요청의 쿠키를 전달해 Route Handler 인증 컨텍스트를 유지한다.
-    if (/^\/api(?:\/|$)/.test(endpoint) && !headers.Cookie) {
+    // 서버에서 내부 /api 호출 시에는 Authorization 대신 현재 요청의 쿠키를 전달한다.
+    if (isLocalApiEndpoint && !headers.Cookie) {
       const requestHeaders = await getHeadersFn();
       const headerStore = await requestHeaders();
       const cookieHeader = headerStore.get("cookie");
       if (cookieHeader) {
         headers.Cookie = cookieHeader;
+      }
+    } else if (!isLocalApiEndpoint) {
+      const cookies = await getCookiesFn();
+      const cookieStore = await cookies();
+      const token = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
       }
     }
   }
