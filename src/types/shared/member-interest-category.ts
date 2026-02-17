@@ -14,7 +14,7 @@ export type MemberInterestCategory = (typeof MEMBER_INTEREST_CATEGORIES)[number]
 export const MEMBER_INTEREST_CATEGORY_LABELS: Record<MemberInterestCategory, string> = {
   DEVELOPMENT: "개발",
   DESIGN: "디자인",
-  PLANNING_PM: "기획 / PM",
+  PLANNING_PM: "기획 · PM",
   CAREER_SELF_DEVELOPMENT: "커리어 · 자기계발",
   STUDY_READING: "스터디 · 독서",
   CREATIVE: "크리에이티브",
