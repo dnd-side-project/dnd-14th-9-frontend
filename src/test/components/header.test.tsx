@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 
 import { Header } from "@/components/Header/Header";
 
-jest.mock("@/components/Header/ProfileDropdown", () => ({
+jest.mock("@/features/member/components/ProfileDropdown/ProfileDropdown", () => ({
   ProfileDropdown: () => <div data-testid="profile-dropdown" />,
 }));
 

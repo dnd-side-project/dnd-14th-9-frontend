@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
-import { ProfileDropdown } from "@/components/Header/ProfileDropdown";
+import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
 
 interface HeaderProps {
   isAuthenticated: boolean;

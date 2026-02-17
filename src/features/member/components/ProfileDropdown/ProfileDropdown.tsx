@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { ProfileIcon } from "@/components/Icon/ProfileIcon";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 
-import { useProfileDropdownDialog } from "./hooks/useProfileDropdownDialog";
+import { useProfileDropdownDialog } from "../../hooks/useProfileDropdownDialog";
 
-const loadProfilePopup = () => import("@/features/member/components/ProfilePopup/ProfilePopup");
+const loadProfilePopup = () => import("@/features/member/components/ProfileDropdown/ProfilePopup");
 
 const ProfilePopup = dynamic(() => loadProfilePopup().then((mod) => mod.ProfilePopup), {
   ssr: false,

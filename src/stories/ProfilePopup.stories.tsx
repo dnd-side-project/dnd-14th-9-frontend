@@ -1,4 +1,4 @@
-import { ProfilePopup } from "@/features/member/components/ProfilePopup/ProfilePopup";
+import { ProfilePopup } from "@/features/member/components/ProfileDropdown/ProfilePopup";
 import type { MemberProfileView } from "@/features/member/types";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
