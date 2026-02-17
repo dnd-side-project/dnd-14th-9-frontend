@@ -156,3 +156,26 @@ export function isWithinTwoWeeks(date: Date): boolean {
 
   return target.getTime() >= today.getTime() && target.getTime() <= twoWeeksLater.getTime();
 }
+
+export function formatDurationKorean(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  if (hours === 0) {
+    return `${mins}분`;
+  }
+  if (mins === 0) {
+    return `${hours}시간`;
+  }
+  return `${hours}시간 ${mins}분`;
+}
+
+export function formatDateTimeDisplay(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const dayOfWeek = getKoreanDayOfWeek(date);
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${month}/${day}(${dayOfWeek}) ${hours}:${minutes}`;
+}
