@@ -1,3 +1,5 @@
+import { SessionCreateForm } from "@/features/session/components/SessionCreateForm";
+
 export default function SessionCreatePage() {
   return (
     <main className="p-3xl w-full">
@@ -6,6 +8,9 @@ export default function SessionCreatePage() {
         <h1 className="text-[24px] leading-[140%] font-bold text-gray-50">세션 만들기</h1>
         <p className="mt-2xs text-base text-gray-500">함께 집중할 공간을 만들어보세요</p>
       </header>
+
+      {/* 폼 섹션 */}
+      <SessionCreateForm />
     </main>
   );
 }
