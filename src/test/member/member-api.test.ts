@@ -30,7 +30,7 @@ const mockMemberProfile: MemberProfileView = {
   focusedTime: 30,
   focusRate: 50,
   totalTodoCount: 10,
-  completeTodoCount: 8,
+  completedTodoCount: 8,
   todoCompletionRate: 80,
   firstLogin: false,
 };

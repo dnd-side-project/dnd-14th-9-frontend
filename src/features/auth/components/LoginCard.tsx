@@ -1,7 +1,5 @@
 import { CloseIcon } from "@/components/Icon/CloseIcon";
-import { GuideBox } from "@/features/auth/components/GuideBox";
 import { OAuthLoginForm } from "@/features/auth/components/OAuthLoginForm";
-import { getLastLoginProvider } from "@/features/auth/lib/last-login-provider";
 
 interface LoginCardProps {
   reasonMessage?: string | null;
@@ -10,8 +8,6 @@ interface LoginCardProps {
 }
 
 export function LoginCard({ reasonMessage, nextPath, onClose }: LoginCardProps) {
-  const hasLoginHistory = getLastLoginProvider() !== null;
-
   return (
     <div className="border-sm border-border-gray-stronger bg-surface-default p-3xl relative flex min-h-[360px] w-[440px] max-w-full flex-col items-start justify-between rounded-lg shadow-[0_0_80px_0_var(--color-alpha-black-32)]">
       {onClose ? (
@@ -42,10 +38,7 @@ export function LoginCard({ reasonMessage, nextPath, onClose }: LoginCardProps) 
         ) : null}
       </div>
 
-      <div className="flex w-full flex-col items-center gap-[15px]">
-        <GuideBox arrowDirection="down">
-          {hasLoginHistory ? "최근 로그인됐어요" : "3초만에 회원가입하기"}
-        </GuideBox>
+      <div className="flex w-full flex-col items-center">
         <OAuthLoginForm nextPath={nextPath} />
       </div>
     </div>
