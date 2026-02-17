@@ -14,10 +14,6 @@ const ProfilePopup = dynamic(() => loadProfilePopup().then((mod) => mod.ProfileP
   ssr: false,
 });
 
-/**
- * TODO(이경환): 임시 프로필 패널 컴포넌트입니다.
- * 디자인 확정 후 피그마 시안 기준으로 전체 UI/인터랙션을 교체하세요.
- */
 export function ProfileDropdown() {
   const router = useRouter();
   const {
@@ -52,27 +48,21 @@ export function ProfileDropdown() {
     void loadProfilePopup();
   };
 
-  const renderFallback = (message: string) => (
+  const popupContent = isPending ? (
     <div className="bg-surface-default text-text-secondary min-w-[220px] rounded-md border border-gray-700 p-4 text-sm">
-      {message}
+      프로필 정보를 불러오는 중입니다.
     </div>
+  ) : isError ? (
+    <div className="bg-surface-default text-text-secondary min-w-[220px] rounded-md border border-gray-700 p-4 text-sm">
+      프로필 정보를 불러오지 못했습니다.
+    </div>
+  ) : !profile ? (
+    <div className="bg-surface-default text-text-secondary min-w-[220px] rounded-md border border-gray-700 p-4 text-sm">
+      프로필 정보가 없습니다.
+    </div>
+  ) : (
+    <ProfilePopup profile={profile} onClose={closeDropdown} onLogoutClick={handleLogout} />
   );
-
-  const renderPopupContent = () => {
-    if (isPending) {
-      return renderFallback("프로필 정보를 불러오는 중입니다.");
-    }
-
-    if (isError) {
-      return renderFallback("프로필 정보를 불러오지 못했습니다.");
-    }
-
-    if (!profile) {
-      return renderFallback("프로필 정보가 없습니다.");
-    }
-
-    return <ProfilePopup profile={profile} onClose={closeDropdown} onLogoutClick={handleLogout} />;
-  };
 
   return (
     <div ref={containerRef} className="relative z-50">
@@ -104,7 +94,7 @@ export function ProfileDropdown() {
           <h2 id={dialogTitleId} className="sr-only">
             프로필 메뉴
           </h2>
-          {renderPopupContent()}
+          {popupContent}
         </div>
       )}
     </div>

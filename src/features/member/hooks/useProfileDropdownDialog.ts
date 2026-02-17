@@ -24,16 +24,12 @@ export function useProfileDropdownDialog() {
 
     dialogRef.current?.focus();
 
-    const closeDropdownWithoutFocus = () => {
-      setIsOpen(false);
-    };
-
     const handleClickOutside = (event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof Node)) return;
 
       if (!containerRef.current?.contains(target)) {
-        closeDropdownWithoutFocus();
+        setIsOpen(false);
       }
     };
 
@@ -42,14 +38,15 @@ export function useProfileDropdownDialog() {
       if (!(target instanceof Node)) return;
 
       if (!containerRef.current?.contains(target)) {
-        closeDropdownWithoutFocus();
+        setIsOpen(false);
       }
     };
 
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        closeDropdown();
+        setIsOpen(false);
+        triggerRef.current?.focus();
       }
     };
 
