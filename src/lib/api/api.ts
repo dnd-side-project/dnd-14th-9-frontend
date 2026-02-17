@@ -25,12 +25,22 @@ let cachedCookiesFn:
   | (() => Promise<{ get: (name: string) => { value: string } | undefined }>)
   | null = null;
 
+let cachedHeadersFn: (() => Promise<{ get: (name: string) => string | null }>) | null = null;
+
 async function getCookiesFn() {
   if (!cachedCookiesFn) {
     const { cookies } = await import("next/headers");
     cachedCookiesFn = cookies;
   }
   return cachedCookiesFn;
+}
+
+async function getHeadersFn() {
+  if (!cachedHeadersFn) {
+    const { headers } = await import("next/headers");
+    cachedHeadersFn = headers as () => Promise<{ get: (name: string) => string | null }>;
+  }
+  return cachedHeadersFn;
 }
 
 function isAbsoluteUrl(url: string): boolean {
@@ -81,6 +91,7 @@ function buildUrl(endpoint: string, isServer: boolean, params?: RequestOptions["
 
 async function buildHeaders(
   isServer: boolean,
+  endpoint: string,
   options?: RequestOptions,
   hasBody: boolean = false,
   isFormData: boolean = false
@@ -102,6 +113,16 @@ async function buildHeaders(
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
+
+    // 서버에서 내부 /api 호출 시 현재 요청의 쿠키를 전달해 Route Handler 인증 컨텍스트를 유지한다.
+    if (/^\/api(?:\/|$)/.test(endpoint) && !headers.Cookie) {
+      const requestHeaders = await getHeadersFn();
+      const headerStore = await requestHeaders();
+      const cookieHeader = headerStore.get("cookie");
+      if (cookieHeader) {
+        headers.Cookie = cookieHeader;
+      }
+    }
   }
 
   return headers;
@@ -117,7 +138,7 @@ async function createRequestContext(
   const hasBody = data !== undefined && method !== "GET";
   const isFormData = data instanceof FormData;
   const url = buildUrl(endpoint, isServer, options?.params);
-  const headers = await buildHeaders(isServer, options, hasBody, isFormData);
+  const headers = await buildHeaders(isServer, endpoint, options, hasBody, isFormData);
 
   const requestInit: RequestInit = {
     method,

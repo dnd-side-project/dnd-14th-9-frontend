@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
 import { ProfileIcon } from "@/components/Icon/ProfileIcon";
 import { ProfilePopup } from "@/features/member/components/ProfilePopup/ProfilePopup";
+import { useMe } from "@/features/member/hooks/useMemberHooks";
 
 /**
  * TODO(이경환): 임시 프로필 패널 컴포넌트입니다.
@@ -15,6 +16,8 @@ export function ProfileDropdown() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const { data, isPending, isError } = useMe();
+  const profile = data?.result;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -55,6 +58,37 @@ export function ProfileDropdown() {
     }
   };
 
+  const renderFallback = (message: string) => (
+    <div className="bg-surface-default text-text-secondary min-w-[220px] rounded-md border border-gray-700 p-4 text-sm">
+      {message}
+    </div>
+  );
+
+  const renderPopupContent = () => {
+    if (isPending) {
+      return renderFallback("프로필 정보를 불러오는 중입니다.");
+    }
+
+    if (isError) {
+      return renderFallback("프로필 정보를 불러오지 못했습니다.");
+    }
+
+    if (!profile) {
+      return renderFallback("프로필 정보가 없습니다.");
+    }
+
+    return (
+      <ProfilePopup
+        profile={profile}
+        onClose={() => setIsOpen(false)}
+        onLogoutClick={handleLogout}
+        onProfileSettingsClick={() => console.log("Profile Settings Clicked")}
+        onReportClick={() => console.log("Report Clicked")}
+        onFeedbackClick={() => console.log("Feedback Clicked")}
+      />
+    );
+  };
+
   return (
     <div ref={containerRef} className="relative z-50">
       <button
@@ -70,19 +104,7 @@ export function ProfileDropdown() {
 
       {isOpen && (
         <div className="absolute top-[calc(100%+12px)] right-0 z-50 shadow-xl">
-          <ProfilePopup
-            name="빵가루 요정 쥐이" // TODO: 실제 데이터 연동 필요
-            email="sewonlim9060@naver.com" // TODO: 실제 데이터 연동 필요
-            focusTimeMinutes={30} // TODO: 실제 데이터 연동 필요
-            totalTimeMinutes={60} // TODO: 실제 데이터 연동 필요
-            todoCompleted={8} // TODO: 실제 데이터 연동 필요
-            todoTotal={10} // TODO: 실제 데이터 연동 필요
-            onClose={() => setIsOpen(false)}
-            onLogoutClick={handleLogout}
-            onProfileSettingsClick={() => console.log("Profile Settings Clicked")}
-            onReportClick={() => console.log("Report Clicked")}
-            onFeedbackClick={() => console.log("Feedback Clicked")}
-          />
+          {renderPopupContent()}
         </div>
       )}
     </div>

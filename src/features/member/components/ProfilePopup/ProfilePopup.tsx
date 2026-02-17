@@ -9,15 +9,11 @@ import { FocusStatusItem } from "./FocusStatusItem";
 import { MenuItem } from "./MenuItem";
 import { ProfileHeader } from "./ProfileHeader";
 
+import type { MemberProfileView } from "../../types";
+
 interface ProfilePopupProps {
   className?: string;
-  name: string;
-  email: string;
-  avatarSrc?: string;
-  focusTimeMinutes: number;
-  totalTimeMinutes: number;
-  todoCompleted: number;
-  todoTotal: number;
+  profile: MemberProfileView;
   onClose?: () => void;
   onProfileSettingsClick?: () => void;
   onReportClick?: () => void;
@@ -27,19 +23,21 @@ interface ProfilePopupProps {
 
 export function ProfilePopup({
   className,
-  name,
-  email,
-  avatarSrc,
-  focusTimeMinutes,
-  totalTimeMinutes,
-  todoCompleted,
-  todoTotal,
+  profile,
   onClose,
   onProfileSettingsClick,
   onReportClick,
   onFeedbackClick,
   onLogoutClick,
 }: ProfilePopupProps) {
+  const name = profile.nickname;
+  const email = profile.email ?? "";
+  const avatarSrc = profile.profileImageUrl || undefined;
+  const focusTimeMinutes = profile.focusedTime;
+  const totalTimeMinutes = profile.totalParticipationTime;
+  const todoCompleted = profile.completedTodoCount;
+  const todoTotal = profile.totalTodoCount;
+
   const menuItems = [
     {
       key: "profile-settings",
