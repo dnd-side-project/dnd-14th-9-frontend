@@ -1,100 +1,42 @@
 import { ArrowLeftIcon } from "@/components/Icon/ArrowLeftIcon";
 import { ArrowRightIcon } from "@/components/Icon/ArrowRightIcon";
-import { ChevronLeftIcon } from "@/components/Icon/ChevronLeftIcon";
-import { ChevronRightIcon } from "@/components/Icon/ChevronRightIcon";
+import { usePagination } from "@/hooks/usePagination";
 import { cn } from "@/lib/utils/utils";
 
 import { ELLIPSIS, getPageSlots } from "./Pagination.utils";
 
-interface PaginationProps {
-  /**
-   * 전체 페이지 수
-   */
+interface PaginationListProps {
   totalPage: number;
-  /**
-   * 현재 페이지 (1부터 시작)
-   */
   currentPage: number;
-  /**
-   * 페이지 변경 핸들러
-   */
   onPageChange: (page: number) => void;
-  /**
-   * 페이지네이션 스타일 변형
-   * - list: [화살표] 이전 1 2 3 ... 10 다음 [화살표]
-   * - fraction: [Chevron] 2/3 [Chevron]
-   * @default "list"
-   */
-  variant?: "list" | "fraction";
-  /**
-   * 추가 클래스
-   */
   className?: string;
 }
 
-export function Pagination({
+export function PaginationList({
   totalPage,
   currentPage,
   onPageChange,
-  variant = "list",
   className,
-}: PaginationProps) {
+}: PaginationListProps) {
+  const {
+    normalizedTotalPage,
+    normalizedCurrentPage,
+    isFirstPage,
+    isLastPage,
+    handlePageChange,
+    goToPreviousPage,
+    goToNextPage,
+  } = usePagination({
+    totalPage,
+    currentPage,
+    onPageChange,
+  });
+
   if (totalPage <= 0) {
     return null;
   }
 
-  const normalizedCurrentPage = Math.min(Math.max(currentPage, 1), totalPage);
-
-  const handlePageChange = (nextPage: number) => {
-    const normalizedNextPage = Math.min(Math.max(nextPage, 1), totalPage);
-    if (normalizedNextPage === normalizedCurrentPage) {
-      return;
-    }
-
-    onPageChange(normalizedNextPage);
-  };
-  const isFirstPage = normalizedCurrentPage === 1;
-  const isLastPage = normalizedCurrentPage === totalPage;
-  const goToPreviousPage = () => handlePageChange(normalizedCurrentPage - 1);
-  const goToNextPage = () => handlePageChange(normalizedCurrentPage + 1);
-
-  if (variant === "fraction") {
-    return (
-      <div className={cn("flex items-center gap-[15px]", className)}>
-        <button
-          type="button"
-          onClick={goToPreviousPage}
-          disabled={isFirstPage}
-          className={cn(
-            "bg-alpha-white-16 flex size-10 items-center justify-center rounded-full p-1 transition-colors",
-            isFirstPage ? "cursor-not-allowed opacity-50" : "hover:bg-surface-subtle cursor-pointer"
-          )}
-          aria-label="Previous page"
-        >
-          <ChevronLeftIcon className="text-text-disabled size-6" />
-        </button>
-
-        <span className="font-regular text-text-disabled text-[18px]">
-          {normalizedCurrentPage}/{totalPage}
-        </span>
-
-        <button
-          type="button"
-          onClick={goToNextPage}
-          disabled={isLastPage}
-          className={cn(
-            "bg-alpha-white-16 flex size-10 items-center justify-center rounded-full p-1 transition-colors",
-            isLastPage ? "cursor-not-allowed opacity-50" : "hover:bg-surface-subtle cursor-pointer"
-          )}
-          aria-label="Next page"
-        >
-          <ChevronRightIcon className="text-text-disabled size-6" />
-        </button>
-      </div>
-    );
-  }
-
-  const pages = getPageSlots(totalPage, normalizedCurrentPage);
+  const pages = getPageSlots(normalizedTotalPage, normalizedCurrentPage);
 
   return (
     <div className={cn("flex items-center gap-6", className)}>

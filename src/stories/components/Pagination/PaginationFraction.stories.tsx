@@ -1,34 +1,28 @@
 import { useEffect, useState, type ComponentProps } from "react";
 
-import { Pagination } from "../../../components/Pagination/Pagination";
+import { PaginationFraction } from "@/components/Pagination/PaginationFraction";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-type PaginationStoryProps = Omit<ComponentProps<typeof Pagination>, "onPageChange">;
+type PaginationFractionStoryProps = Omit<ComponentProps<typeof PaginationFraction>, "onPageChange">;
 
-function StatefulPagination({ totalPage, currentPage, variant, className }: PaginationStoryProps) {
-  const normalizedTotalPage = Math.max(totalPage, 1);
-  const [page, setPage] = useState(Math.min(Math.max(currentPage, 1), normalizedTotalPage));
+function StatefulPaginationFraction({
+  totalPage,
+  currentPage,
+  className,
+}: PaginationFractionStoryProps) {
+  const [page, setPage] = useState(currentPage);
 
   useEffect(() => {
-    setPage(Math.min(Math.max(currentPage, 1), normalizedTotalPage));
-  }, [currentPage, normalizedTotalPage]);
-
-  const handlePageChange = (nextPage: number) => {
-    if (nextPage < 1 || nextPage > normalizedTotalPage) {
-      return;
-    }
-
-    setPage(nextPage);
-  };
+    setPage(currentPage);
+  }, [currentPage]);
 
   return (
     <div className="bg-background-default dark rounded-2xl p-6">
-      <Pagination
-        totalPage={normalizedTotalPage}
+      <PaginationFraction
+        totalPage={totalPage}
         currentPage={page}
-        onPageChange={handlePageChange}
-        variant={variant}
+        onPageChange={setPage}
         className={className}
       />
     </div>
@@ -36,8 +30,8 @@ function StatefulPagination({ totalPage, currentPage, variant, className }: Pagi
 }
 
 const META = {
-  title: "Components/Pagination",
-  component: Pagination,
+  title: "Components/Pagination/Fraction",
+  component: PaginationFraction,
   parameters: {
     layout: "centered",
     backgrounds: {
@@ -49,7 +43,7 @@ const META = {
     totalPage: {
       control: {
         type: "number",
-        min: 1,
+        min: 0,
         step: 1,
       },
     },
@@ -70,19 +64,18 @@ const META = {
     },
   },
   args: {
-    totalPage: 20,
+    totalPage: 3,
     currentPage: 1,
     onPageChange: () => undefined,
   },
   render: (args) => (
-    <StatefulPagination
+    <StatefulPaginationFraction
       totalPage={args.totalPage ?? 1}
       currentPage={args.currentPage ?? 1}
-      variant={args.variant}
       className={args.className}
     />
   ),
-} satisfies Meta<typeof Pagination>;
+} satisfies Meta<typeof PaginationFraction>;
 
 export default META;
 type Story = StoryObj<typeof META>;
@@ -91,19 +84,19 @@ export const DEFAULT: Story = {};
 
 export const MIDDLE_PAGE: Story = {
   args: {
-    currentPage: 10,
+    currentPage: 2,
   },
 };
 
 export const LAST_PAGE: Story = {
   args: {
-    currentPage: 20,
+    currentPage: 3,
   },
 };
 
-export const SHORT_RANGE: Story = {
+export const ZERO_TOTAL_PAGE: Story = {
   args: {
-    totalPage: 5,
-    currentPage: 3,
+    totalPage: 0,
+    currentPage: 1,
   },
 };

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-import { Pagination } from "@/components/Pagination/Pagination";
+import { PaginationFraction } from "@/components/Pagination/PaginationFraction";
+import { PaginationList } from "@/components/Pagination/PaginationList";
 
 export default function PaginationTestPage() {
   const [listPage, setListPage] = useState(1);
@@ -22,8 +23,7 @@ export default function PaginationTestPage() {
               Current: {listPage} / Total: {listTotalPage}
             </p>
             <div className="flex justify-center py-4">
-              <Pagination
-                variant="list"
+              <PaginationList
                 totalPage={listTotalPage}
                 currentPage={listPage}
                 onPageChange={setListPage}
@@ -37,8 +37,7 @@ export default function PaginationTestPage() {
               Current: {fractionPage} / Total: {fractionTotalPage}
             </p>
             <div className="flex justify-center py-4">
-              <Pagination
-                variant="fraction"
+              <PaginationFraction
                 totalPage={fractionTotalPage}
                 currentPage={fractionPage}
                 onPageChange={setFractionPage}
