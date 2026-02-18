@@ -56,7 +56,7 @@ export function GoalAndTodoCard() {
   const displayTodos = isEditing ? draftTodos : todos;
 
   return (
-    <div className="gap-lg border-gray p-lg flex flex-6 flex-col rounded-lg border">
+    <div className="gap-lg border-gray p-lg flex h-157 flex-6 flex-col rounded-lg border">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
