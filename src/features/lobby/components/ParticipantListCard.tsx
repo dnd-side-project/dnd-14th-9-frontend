@@ -95,7 +95,7 @@ const MOCK_PARTICIPANTS: MockParticipant[] = [
 export function ParticipantListCard() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isKicking, setIsKicking] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
 
   const handleToggle = (memberId: string) => {
     setExpandedId((prev) => (prev === memberId ? null : memberId));
