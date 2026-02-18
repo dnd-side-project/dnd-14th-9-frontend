@@ -7,11 +7,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { PaginationList } from "@/components/Pagination/PaginationList";
 
 import { useSessionList } from "../../hooks/useSessionHooks";
+import { parseTimeSlotsParam } from "../../utils/timeSlots";
 import { Card } from "../Card/Card";
 
 import { RecruitingFilterBar } from "./RecruitingFilterBar";
 
-import type { DurationRange, SessionSort, SessionCategoryFilter, TimeSlot } from "../../types";
+import type { DurationRange, SessionSort, SessionCategoryFilter } from "../../types";
 
 const DEFAULT_PAGE_SIZE = 12;
 
@@ -36,10 +37,7 @@ export function RecruitingSection() {
   // 추가 필터 파라미터
   const startDate = searchParams.get("startDate") ?? undefined;
   const endDate = searchParams.get("endDate") ?? undefined;
-
-  // TODO(장근호): 타입 단언(as ...) 보다는 타입 가드나 유효성 검사 필요
-  const timeSlotParam = searchParams.get("timeSlots");
-  const timeSlots = timeSlotParam ? [timeSlotParam as TimeSlot] : undefined;
+  const timeSlots = parseTimeSlotsParam(searchParams.get("timeSlots"));
 
   const durationRange = (searchParams.get("durationRange") as DurationRange | null) ?? undefined;
   const participants = searchParams.get("participants")
@@ -54,7 +52,7 @@ export function RecruitingSection() {
     size: DEFAULT_PAGE_SIZE,
     startDate,
     endDate,
-    timeSlots,
+    timeSlots: timeSlots.length > 0 ? timeSlots : undefined,
     durationRange,
     participants,
   });
