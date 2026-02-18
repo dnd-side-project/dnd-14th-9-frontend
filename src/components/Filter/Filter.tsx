@@ -15,7 +15,6 @@ const FILTER_VARIANTS = cva(
     "font-pretendard",
     "font-semibold",
     "text-gray-200",
-    "bg-surface-strong",
     "transition-all",
     "focus-visible:outline-none",
   ],
@@ -23,12 +22,13 @@ const FILTER_VARIANTS = cva(
     variants: {
       size: {
         full: ["w-full", "h-14", "text-[16px]", "px-xs"],
-        large: ["w-[89px]", "h-10", "text-[16px]", "py-xs", "pr-xs", "pl-sm"],
-        small: ["w-[74px]", "h-7", "text-xs", "py-xs", "pr-xs", "pl-sm"],
+        large: ["w-[89px]", "h-10", "text-[14px]", "py-xs", "pr-xs", "pl-md"],
+        medium: ["w-[74px]", "h-7", "text-[12px]", "py-2xs", "pr-2xs", "pl-xs"],
       },
       radius: {
         max: "rounded-max",
         sm: "rounded-sm",
+        none: "rounded-none",
       },
       bordered: {
         true: "border border-border-default",
@@ -50,7 +50,7 @@ export interface FilterProps
 
 export const Filter = forwardRef<HTMLButtonElement, FilterProps>(
   ({ className, size, radius, bordered, isOpen = false, children, ...props }, ref) => {
-    const iconSize = size === "small" ? "small" : "medium";
+    const iconSize = size === "medium" ? "small" : "medium";
 
     return (
       <button
@@ -60,11 +60,13 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>(
         aria-expanded={isOpen}
         {...props}
       >
-        <span className="truncate">{children}</span>
-        <ChevronDownIcon
-          size={iconSize}
-          className={cn("shrink-0 transition-transform duration-200", isOpen && "rotate-180")}
-        />
+        <div className="gap-xs flex items-center">
+          <span className="truncate">{children}</span>
+          <ChevronDownIcon
+            size={iconSize}
+            className={cn("shrink-0 transition-transform duration-200", isOpen && "rotate-180")}
+          />
+        </div>
       </button>
     );
   }

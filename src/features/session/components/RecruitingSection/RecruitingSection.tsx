@@ -11,7 +11,7 @@ import { Card } from "../Card/Card";
 
 import { RecruitingFilterBar } from "./RecruitingFilterBar";
 
-import type { SessionSort, SessionCategoryFilter } from "../../types";
+import type { DurationRange, SessionSort, SessionCategoryFilter, TimeSlot } from "../../types";
 
 const DEFAULT_PAGE_SIZE = 12;
 
@@ -27,10 +27,24 @@ export function RecruitingSection() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // URL 파라미터 파싱
   const keyword = searchParams.get("q") ?? undefined;
   const category = (searchParams.get("category") as SessionCategoryFilter) ?? undefined;
   const sort = (searchParams.get("sort") as SessionSort) ?? "LATEST";
   const page = Number(searchParams.get("page") ?? "1");
+
+  // 추가 필터 파라미터
+  const startDate = searchParams.get("startDate") ?? undefined;
+  const endDate = searchParams.get("endDate") ?? undefined;
+
+  // TODO(장근호): 타입 단언(as ...) 보다는 타입 가드나 유효성 검사 필요
+  const timeSlotParam = searchParams.get("timeSlots");
+  const timeSlots = timeSlotParam ? [timeSlotParam as TimeSlot] : undefined;
+
+  const durationRange = (searchParams.get("durationRange") as DurationRange | null) ?? undefined;
+  const participants = searchParams.get("participants")
+    ? Number(searchParams.get("participants"))
+    : undefined;
 
   const { data, isPending } = useSessionList({
     keyword,
@@ -38,6 +52,11 @@ export function RecruitingSection() {
     sort,
     page,
     size: DEFAULT_PAGE_SIZE,
+    startDate,
+    endDate,
+    timeSlots,
+    durationRange,
+    participants,
   });
 
   const updateSearchParams = useCallback(
@@ -76,16 +95,21 @@ export function RecruitingSection() {
   const totalPage = data?.result?.totalPage ?? 0;
 
   return (
-    <section className="gap-xl flex flex-col">
-      <div className="flex items-center justify-between">
-        <h2 className="text-text-primary text-xl font-bold">모집 중인 세션</h2>
-        <RecruitingFilterBar sort={sort} onSortChange={handleSortChange} />
+    <section className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-[10px]">
+        <h2 className="text-text-primary text-2xl font-bold">지금 모집 중인 세션</h2>
+        <div className="flex justify-between">
+          <p className="text-text-secondary text-base">
+            마이페이지에서 설정한 카테고리를 기반해서 방을 추천해드려요
+          </p>
+          <RecruitingFilterBar sort={sort} onSortChange={handleSortChange} />
+        </div>
       </div>
 
       {isPending ? (
-        <div className="gap-md grid grid-cols-4">
+        <div className="grid grid-cols-4 gap-x-[24px] gap-y-[48px]">
           {Array.from({ length: DEFAULT_PAGE_SIZE }).map((_, i) => (
-            <div key={i} className="bg-surface-strong aspect-[4/3] animate-pulse rounded-lg" />
+            <div key={i} className="bg-surface-strong aspect-[320/170] animate-pulse rounded-lg" />
           ))}
         </div>
       ) : sessions.length === 0 ? (
@@ -93,7 +117,7 @@ export function RecruitingSection() {
           모집 중인 세션이 없습니다
         </div>
       ) : (
-        <div className="gap-md grid grid-cols-4">
+        <div className="grid grid-cols-4 gap-x-[24px] gap-y-[48px]">
           {sessions.map((session) => (
             <Card
               key={session.title + session.startTime}

@@ -89,15 +89,26 @@ export function SearchFilterSection() {
       </form>
 
       <div className="gap-xs flex flex-wrap">
-        {CATEGORY_FILTERS.map(({ value, label }) => (
-          <CategoryFilterButton
-            key={value}
-            isSelected={currentCategory === value}
-            onClick={() => handleCategoryChange(value)}
-          >
-            {label}
-          </CategoryFilterButton>
-        ))}
+        {CATEGORY_FILTERS.map(({ value, label }) => {
+          const isSelected = currentCategory === value;
+          return (
+            <CategoryFilterButton
+              key={value}
+              isSelected={isSelected}
+              onClick={() => handleCategoryChange(value)}
+              // TODO(이경환): CategoryFilterButton 내부 구현 확인 후 className 적용 여부 결정 필요
+              // 현재 CategoryFilterButton이 className prop을 받는지 확인 필요하지만,
+              // 받지 않는다면 내부 로직 수정 필요.
+              // 우선은 isSelected 일 때 Green Color 적용을 위해 CategoryFilterButton이
+              // variant="solid" | "outline" 등을 지원하는지 확인해야 함.
+              // 여기서는 일단 기존 로직 유지하되, 디자인 요구사항인
+              // "전체 선택 시 Green text"는 CategoryFilterButton 내부에서 처리되거나
+              // theme color 변경이 필요할 수 있음.
+            >
+              {label}
+            </CategoryFilterButton>
+          );
+        })}
       </div>
     </section>
   );

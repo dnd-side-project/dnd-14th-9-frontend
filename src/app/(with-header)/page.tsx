@@ -54,7 +54,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   });
 
   return (
-    <div className="gap-4xl flex flex-col px-[54px]">
+    <div className="my-[64px] flex flex-col gap-[48px] px-[54px]">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense fallback={<SearchFilterSectionSkeleton />}>
           <SearchFilterSection />
