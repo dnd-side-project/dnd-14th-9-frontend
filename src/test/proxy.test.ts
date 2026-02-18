@@ -118,37 +118,9 @@ describe("Proxy Middleware", () => {
       expect(response.status).toBe(200);
     });
 
-    it("/api/auth 경로는 인증 없이 통과해야 함", async () => {
-      // Given
-      const request = new NextRequest("http://localhost:3000/api/auth/callback/google");
-
-      // When
-      const response = await proxy(request);
-
-      // Then
-      expect(response.status).toBe(200);
-    });
-
-    it("/api 경로는 인증 없이 통과해야 함", async () => {
-      // Given
-      const request = new NextRequest("http://localhost:3000/api/health");
-
-      // When
-      const response = await proxy(request);
-
-      // Then
-      expect(response.status).toBe(200);
-    });
-
     it("인증 없이 접근 가능한 경로들은 토큰 검증을 하지 않아야 함", async () => {
-      const publicPaths = [
-        "/",
-        "/login",
-        "/api/auth/callback/google",
-        "/api/auth/logout",
-        "/api/health",
-        "/api/posts",
-      ];
+      // /api/auth/*, /api/sessions/* 는 matcher에서 제외되어 proxy를 타지 않음
+      const publicPaths = ["/", "/login"];
 
       for (const path of publicPaths) {
         const request = new NextRequest(`http://localhost:3000${path}`);
@@ -772,16 +744,19 @@ describe("Proxy Middleware", () => {
     });
   });
 
-  describe("/api/* 경로 토큰 재발급", () => {
-    it("/api/* 에 토큰이 없으면 재발급 없이 통과해야 함", async () => {
+  describe("/api/* 보호된 경로 (인증 필요)", () => {
+    // /api/auth/*, /api/sessions/* 는 matcher에서 제외되어 proxy를 타지 않음
+    // 나머지 /api/* 경로는 보호된 라우트로 동작함
+
+    it("/api/* 에 토큰이 없으면 로그인 리다이렉트해야 함", async () => {
       // Given: 토큰 없음
       const request = new NextRequest("http://localhost:3000/api/members/me/profile");
 
       // When
       const response = await proxy(request);
 
-      // Then: 재발급 시도 없이 통과
-      expect(response.status).toBe(200);
+      // Then: 로그인 리다이렉트
+      expectLoginRedirect(response, "auth_required");
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
@@ -849,7 +824,7 @@ describe("Proxy Middleware", () => {
       expect(setCookies.some((c) => c.includes(newRefreshToken))).toBe(true);
     });
 
-    it("/api/* 에서 재발급 실패해도 로그인 리다이렉트 없이 통과해야 함", async () => {
+    it("/api/* 에서 재발급 실패하면 로그인 리다이렉트해야 함", async () => {
       // Given: 만료된 토큰
       const accessToken = createMockToken(-60);
       const refreshToken = createMockToken(-60);
@@ -858,19 +833,25 @@ describe("Proxy Middleware", () => {
         headers: { cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}` },
       });
 
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 401 });
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: async () => ({
+          code: "AUTH401_4",
+          message: "기한이 만료된 Refresh 토큰입니다.",
+          isSuccess: false,
+          httpStatus: "UNAUTHORIZED",
+        }),
+      });
 
       // When
       const response = await proxy(request);
 
-      // Then: 리다이렉트 없이 통과 (클라이언트가 401 수신)
-      expect(response.status).toBe(200);
-      expect(response.headers.get("location")).toBeNull();
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
+      // Then: 로그인 리다이렉트
+      expectLoginRedirect(response, "AUTH401_4");
     });
 
-    it("/api/* 에서 재발급 네트워크 에러가 나도 리다이렉트 없이 통과해야 함", async () => {
+    it("/api/* 에서 재발급 네트워크 에러가 나면 로그인 리다이렉트해야 함", async () => {
       // Given
       const accessToken = createMockToken(-60);
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
@@ -884,9 +865,8 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: 네트워크 에러도 리다이렉트 없이 통과
-      expect(response.status).toBe(200);
-      expect(response.headers.get("location")).toBeNull();
+      // Then: 로그인 리다이렉트
+      expectLoginRedirect(response, "network_error");
     });
   });
 });

@@ -26,8 +26,7 @@ interface TryRefreshTokenOptions {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  // /api/* 경로는 공개 라우트처럼 처리: 재발급 실패 시 로그인 리다이렉트 없이 pass-through
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || pathname.startsWith("/api");
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
   // well-known 경로는 인증 처리 없이 통과한다.
   if (pathname.startsWith("/.well-known")) {
@@ -251,7 +250,7 @@ export const config = {
   matcher: [
     {
       source:
-        "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)$).*)",
+        "/((?!_next/static|_next/image|favicon.ico|api/auth(?:/.*)?$|api/sessions(?:/[^/]+)?$|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)$).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },
