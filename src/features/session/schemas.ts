@@ -15,7 +15,11 @@ export const createSessionFormSchema = z.object({
     .min(1, "방 한줄 소개를 입력해 주세요.")
     .max(50, "한줄 소개는 최대 50자까지 입력 가능합니다."),
 
-  notice: z.string().max(100, "공지사항은 최대 100자까지 입력 가능합니다.").default(""),
+  notice: z
+    .string()
+    .trim()
+    .min(1, "공지사항을 입력해 주세요.")
+    .max(100, "공지사항은 최대 100자까지 입력 가능합니다."),
 
   category: z.enum(MEMBER_INTEREST_CATEGORIES, {
     message: "카테고리를 선택해 주세요.",

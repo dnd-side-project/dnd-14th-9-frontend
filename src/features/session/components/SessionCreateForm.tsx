@@ -179,7 +179,7 @@ export function SessionCreateForm() {
 
       {/* 공지사항 */}
       <Textarea
-        label="공지사항"
+        label="공지사항*"
         placeholder="예) 세션의 규칙, 공지사항을 작성해주세요"
         maxLength={100}
         showCharacterCount
