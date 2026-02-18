@@ -1,5 +1,3 @@
-"use client";
-
 import { CalendarIcon } from "@/components/Icon/CalendarIcon";
 import { ClockIcon } from "@/components/Icon/ClockIcon";
 import { UsersIcon } from "@/components/Icon/UsersIcon";
