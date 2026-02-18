@@ -99,7 +99,7 @@ export function ParticipantListCard() {
   };
 
   return (
-    <div className="gap-lg border-gray p-lg flex flex-[4] flex-col rounded-lg border">
+    <div className="gap-lg border-gray p-lg flex flex-4 flex-col rounded-lg border">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
@@ -121,7 +121,7 @@ export function ParticipantListCard() {
       </span>
 
       {/* 참여자 목록 */}
-      <ul className="scrollbar-hide flex max-h-[296px] flex-col gap-2 overflow-y-auto">
+      <ul className="scrollbar-hide flex max-h-74 flex-col gap-2 overflow-y-auto">
         {MOCK_PARTICIPANTS.map((participant) => {
           const isExpanded = expandedId === participant.memberId;
           return (

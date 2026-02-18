@@ -1,6 +1,7 @@
 import { CountdownBanner } from "@/features/lobby/components/CountdownBanner";
 import { GoalAndTodoCard } from "@/features/lobby/components/GoalAndTodoCard";
 import { LobbyHeader } from "@/features/lobby/components/LobbyHeader";
+import { ParticipantListCard } from "@/features/lobby/components/ParticipantListCard";
 import { SessionInfoCard } from "@/features/lobby/components/SessionInfoCard";
 
 interface WaitingRoomPageProps {
@@ -20,6 +21,7 @@ export default async function WaitingRoomPage({ params }: WaitingRoomPageProps) 
         <SessionInfoCard />
         <div className="gap-lg flex">
           <GoalAndTodoCard />
+          <ParticipantListCard />
         </div>
       </div>
     </>
