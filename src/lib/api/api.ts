@@ -14,8 +14,8 @@ interface RequestOptions {
   timeout?: number;
   retry?: RetryOptions;
   signal?: AbortSignal;
-  skipAuth?: boolean;
   throwOnHttpError?: boolean;
+  skipAuth?: boolean;
 }
 
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? process.env.NEXT_PUBLIC_FRONTEND_ORIGIN;
@@ -102,7 +102,8 @@ async function buildHeaders(
   const isLocalApiEndpoint = /^\/api(?:\/|$)/.test(endpoint);
 
   // FormData는 브라우저가 Content-Type을 자동 설정 (boundary 포함)
-  if (hasBody && !isFormData) {
+  // 호출자가 이미 Content-Type을 지정한 경우(예: multipart 원본 전달) 덮어쓰지 않음
+  if (hasBody && !isFormData && !headers["Content-Type"]) {
     headers["Content-Type"] = "application/json";
   }
 
@@ -138,13 +139,18 @@ async function createRequestContext(
   const isServer = typeof window === "undefined";
   const hasBody = data !== undefined && method !== "GET";
   const isFormData = data instanceof FormData;
+  const isRawBody = data instanceof ArrayBuffer || ArrayBuffer.isView(data);
   const url = buildUrl(endpoint, isServer, options?.params);
   const headers = await buildHeaders(isServer, endpoint, options, hasBody, isFormData);
 
   const requestInit: RequestInit = {
     method,
     headers,
-    body: hasBody ? (isFormData ? data : JSON.stringify(data)) : undefined,
+    body: hasBody
+      ? isFormData || isRawBody
+        ? (data as BodyInit)
+        : JSON.stringify(data)
+      : undefined,
   };
 
   if (!isServer) {

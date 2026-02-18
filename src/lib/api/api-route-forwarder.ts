@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { clearAuthCookies } from "@/lib/auth/auth-cookies";
+import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 
 import { api } from "./api";
 
@@ -49,56 +50,44 @@ function buildForwardHeaders(
     return undefined;
   }
 
-  const cookie = cookieHeaderOverride ?? options.request.headers.get("cookie");
-  if (!cookie) {
-    return undefined;
+  const headers: Record<string, string> = {};
+
+  const cookie = options.request.headers.get("cookie");
+  if (cookie) {
+    headers.Cookie = cookie;
   }
 
-  return { Cookie: cookie };
-}
-
-async function sendBackendRequest(
-  options: ForwardToBackendOptions,
-  body: unknown,
-  cookieHeaderOverride?: string | null
-) {
-  return api.server.request(options.method, options.pathWithQuery, body, {
-    headers: buildForwardHeaders(options, cookieHeaderOverride),
-    throwOnHttpError: false,
-    // BFF는 전달받은 쿠키만 사용하고, 서버 전역 쿠키에서 Authorization을 주입하지 않는다.
-    skipAuth: true,
-  });
-}
-
-function applyAuthCookies(
-  nextResponse: NextResponse,
-  options: ForwardToBackendOptions,
-  response: Response
-) {
-  if (options.clearAuthCookiesOnSuccess && response.ok) {
-    clearAuthCookies(nextResponse.cookies);
-  }
-}
-
-async function parseBackendResponsePayload(response: Response): Promise<unknown> {
-  const responseText = await response.text();
-  if (!responseText) {
-    return null;
+  // 쿠키에서 accessToken을 읽어 Authorization 헤더 구성
+  const accessToken = options.request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  try {
-    return JSON.parse(responseText);
-  } catch {
-    return getDefaultErrorResponse(response.status, response.statusText);
-  }
+  return Object.keys(headers).length > 0 ? headers : undefined;
 }
 
 export async function forwardToBackend(options: ForwardToBackendOptions) {
-  const body = await parseForwardBody(options);
-  const originalCookieHeader = options.request?.headers.get("cookie") ?? null;
+  let body: unknown;
+  let extraHeaders: Record<string, string> | undefined;
+
+  if (options.includeRequestBody && options.request) {
+    if (options.includeRequestBody === "json") {
+      body = await options.request.json().catch(() => undefined);
+    } else if (options.includeRequestBody === "formData") {
+      // FormData를 직접 파싱하지 않고, 원본 Body(ArrayBuffer)와 Content-Type(boundary 포함)을 그대로 전달
+      body = await options.request.arrayBuffer();
+      const contentType = options.request.headers.get("content-type");
+      if (contentType) {
+        extraHeaders = { "Content-Type": contentType };
+      }
+    }
+  }
 
   try {
-    const response = await sendBackendRequest(options, body, originalCookieHeader);
+    const response = await api.server.request(options.method, options.pathWithQuery, body, {
+      headers: { ...buildForwardHeaders(options), ...extraHeaders },
+      throwOnHttpError: false,
+    });
 
     if (response.status === 204) {
       const noContentResponse = new NextResponse(null, { status: 204 });
