@@ -1,8 +1,12 @@
 "use client";
 
+import { CalendarIcon } from "@/components/Icon/CalendarIcon";
+import { ClockIcon } from "@/components/Icon/ClockIcon";
+import { UsersIcon } from "@/components/Icon/UsersIcon";
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
 import { Thumbnail } from "@/components/Thumbnail/Thumbnail";
-import { CardMeta } from "@/features/session/components/Card/CardMeta";
+import { formatSessionDateTime } from "@/lib/utils/date";
+import { formatParticipantCount, formatSessionDuration } from "@/lib/utils/format";
 
 const MOCK_SESSION = {
   title: "프론트엔드 스터디",
@@ -22,17 +26,35 @@ export function SessionInfoCard() {
     <section className="gap-lg p-lg border-gra flex flex-col rounded-lg border">
       <div className="gap-lg flex">
         <div className="gap-sm flex flex-1 flex-col">
-          <h2 className="text-text-primary text-lg font-bold">{MOCK_SESSION.title}</h2>
-          <p className="text-text-muted text-sm">{MOCK_SESSION.summary}</p>
-          <CardMeta
-            currentParticipants={MOCK_SESSION.currentParticipants}
-            maxParticipants={MOCK_SESSION.maxParticipants}
-            durationMinutes={MOCK_SESSION.durationMinutes}
-            sessionDate={MOCK_SESSION.startTime}
-          />
+          <h2 className="text-[24px] font-bold text-gray-50">{MOCK_SESSION.title}</h2>
+          <p className="text-[16px] text-gray-200">{MOCK_SESSION.summary}</p>
+          <div className="flex items-center gap-4 text-[16px] text-gray-400">
+            <span className="flex items-center gap-1">
+              <UsersIcon size="small" />
+              <span>
+                {formatParticipantCount(
+                  MOCK_SESSION.currentParticipants,
+                  MOCK_SESSION.maxParticipants
+                )}
+              </span>
+            </span>
+            <span className="flex items-center gap-1">
+              <ClockIcon size="small" />
+              <span>{formatSessionDuration(MOCK_SESSION.durationMinutes)}</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <CalendarIcon size="small" />
+              <span>{formatSessionDateTime(MOCK_SESSION.startTime)}</span>
+            </span>
+          </div>
         </div>
         <div className="w-[45%] shrink-0">
-          <Thumbnail src={MOCK_SESSION.thumbnailUrl} alt={MOCK_SESSION.title} radius="lg" />
+          <Thumbnail
+            src={MOCK_SESSION.thumbnailUrl}
+            alt={MOCK_SESSION.title}
+            radius="lg"
+            className="aspect-auto! h-51.75"
+          />
         </div>
       </div>
 
