@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { clearAuthCookies } from "@/lib/auth/auth-cookies";
+import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 
 import { api } from "./api";
 
@@ -30,28 +31,42 @@ function buildForwardHeaders(options: ForwardToBackendOptions): Record<string, s
     return undefined;
   }
 
+  const headers: Record<string, string> = {};
+
   const cookie = options.request.headers.get("cookie");
-  if (!cookie) {
-    return undefined;
+  if (cookie) {
+    headers.Cookie = cookie;
   }
 
-  return { Cookie: cookie };
+  // 쿠키에서 accessToken을 읽어 Authorization 헤더 구성
+  const accessToken = options.request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  return Object.keys(headers).length > 0 ? headers : undefined;
 }
 
 export async function forwardToBackend(options: ForwardToBackendOptions) {
   let body: unknown;
+  let extraHeaders: Record<string, string> | undefined;
 
   if (options.includeRequestBody && options.request) {
     if (options.includeRequestBody === "json") {
       body = await options.request.json().catch(() => undefined);
     } else if (options.includeRequestBody === "formData") {
-      body = await options.request.formData().catch(() => undefined);
+      // FormData를 직접 파싱하지 않고, 원본 Body(ArrayBuffer)와 Content-Type(boundary 포함)을 그대로 전달
+      body = await options.request.arrayBuffer();
+      const contentType = options.request.headers.get("content-type");
+      if (contentType) {
+        extraHeaders = { "Content-Type": contentType };
+      }
     }
   }
 
   try {
     const response = await api.server.request(options.method, options.pathWithQuery, body, {
-      headers: buildForwardHeaders(options),
+      headers: { ...buildForwardHeaders(options), ...extraHeaders },
       throwOnHttpError: false,
     });
 

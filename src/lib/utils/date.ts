@@ -170,6 +170,15 @@ export function formatDurationKorean(minutes: number): string {
   return `${hours}시간 ${mins}분`;
 }
 
+/**
+ * LocalDateTime 호환 ISO 포맷 (timezone·초 없이 로컬 시간 기준)
+ * 예: "2026-02-17T22:25"
+ */
+export function formatLocalDateTime(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 export function formatDateTimeDisplay(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");

@@ -2,25 +2,35 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
 import { DatePicker } from "@/components/DatePicker/DatePicker";
 import { Filter } from "@/components/Filter/Filter";
 import { CalendarIcon } from "@/components/Icon/CalendarIcon";
 import { InfoIcon } from "@/components/Icon/InfoIcon";
-import { MinusIcon } from "@/components/Icon/MinusIcon";
-import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { ImageUploader } from "@/components/ImageUploader/ImageUploader";
 import { Input } from "@/components/Input/Input";
+import { NumericStepper } from "@/components/NumericStepper/NumericStepper";
 import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
 import { Textarea } from "@/components/Textarea/Textarea";
-import { formatDateTimeDisplay, formatDurationKorean } from "@/lib/utils/date";
+import { useClickOutside } from "@/hooks/useClickOutside";
+import { ApiError } from "@/lib/api/api-client";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { formatDateTimeDisplay, formatDurationKorean, formatLocalDateTime } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
 import {
   MEMBER_INTEREST_CATEGORIES,
   MEMBER_INTEREST_CATEGORY_LABELS,
   type MemberInterestCategory,
 } from "@/types/shared/member-interest-category";
+
+import { useCreateSession } from "../hooks/useSessionHooks";
+import { validateSessionForm, type SessionFormErrors } from "../utils/validateSessionForm";
+
+import type { CreateSessionRequest } from "../types";
 
 const MIN_DURATION = 30;
 const MAX_DURATION = 180;
@@ -46,45 +56,8 @@ export function SessionCreateForm() {
   const datePickerContainerRef = useRef<HTMLDivElement>(null);
 
   // 외부 클릭 시 DatePicker 닫기
-  useEffect(() => {
-    if (!isDatePickerOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!datePickerContainerRef.current?.contains(event.target as Node)) {
-        setIsDatePickerOpen(false);
-      }
-    };
-
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsDatePickerOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscapeKey);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscapeKey);
-    };
-  }, [isDatePickerOpen]);
-
-  const handleDurationDecrease = useCallback(() => {
-    setDuration((prev) => Math.max(MIN_DURATION, prev - DURATION_STEP));
-  }, []);
-
-  const handleDurationIncrease = useCallback(() => {
-    setDuration((prev) => Math.min(MAX_DURATION, prev + DURATION_STEP));
-  }, []);
-
-  const handleParticipantsDecrease = useCallback(() => {
-    setParticipants((prev) => Math.max(MIN_PARTICIPANTS, prev - 1));
-  }, []);
-
-  const handleParticipantsIncrease = useCallback(() => {
-    setParticipants((prev) => Math.min(MAX_PARTICIPANTS, prev + 1));
-  }, []);
+  const closeDatePicker = useCallback(() => setIsDatePickerOpen(false), []);
+  useClickOutside(datePickerContainerRef, closeDatePicker, isDatePickerOpen);
 
   // 이미지 미리보기 URL 생성
   const imagePreviewUrl = useMemo(() => {
@@ -105,8 +78,69 @@ export function SessionCreateForm() {
     setSelectedImage(null);
   }, []);
 
+  // validation / API 연동 상태
+  const [formErrors, setFormErrors] = useState<SessionFormErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
+  const router = useRouter();
+  const { mutate: createSession, isPending } = useCreateSession();
+
+  const clearFieldError = useCallback((field: keyof SessionFormErrors) => {
+    setFormErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setServerError(null);
+
+    // useState 값 → zod 스키마 형태로 매핑
+    const validation = validateSessionForm({
+      title: roomName,
+      summary: roomDescription,
+      notice,
+      category: selectedCategory ?? undefined,
+      startTime: startDateTime ?? undefined,
+      sessionDurationMinutes: duration,
+      maxParticipants: participants,
+      requiredAchievementRate: achievementRange,
+    });
+
+    if (!validation.success) {
+      setFormErrors(validation.errors);
+      return;
+    }
+
+    // CreateSessionRequest 구성 (Date → ISO 문자열 변환)
+    const body: CreateSessionRequest = {
+      title: validation.data.title,
+      summary: validation.data.summary,
+      notice: validation.data.notice,
+      category: validation.data.category,
+      startTime: formatLocalDateTime(validation.data.startTime),
+      sessionDurationMinutes: validation.data.sessionDurationMinutes,
+      maxParticipants: validation.data.maxParticipants,
+      requiredFocusRate: 0,
+      requiredAchievementRate: validation.data.requiredAchievementRate,
+    };
+
+    createSession(
+      { body, image: selectedImage ?? undefined },
+      {
+        onSuccess: () => router.push("/"),
+        onError: (error) => {
+          const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+          setServerError(message);
+        },
+      }
+    );
+  };
+
   return (
-    <form className="gap-xl flex w-full flex-col">
+    <form className="gap-xl flex w-full flex-col" onSubmit={handleSubmit}>
       {/* 방 이름 */}
       <Input
         label="방 이름*"
@@ -114,8 +148,13 @@ export function SessionCreateForm() {
         maxLength={20}
         showCharacterCount
         value={roomName}
-        onChange={(e) => setRoomName(e.target.value)}
+        onChange={(e) => {
+          setRoomName(e.target.value);
+          clearFieldError("title");
+        }}
         onClear={() => setRoomName("")}
+        error={!!formErrors.title}
+        errorMessage={formErrors.title}
         containerClassName="max-w-full"
         className="max-w-full"
       />
@@ -127,20 +166,30 @@ export function SessionCreateForm() {
         maxLength={50}
         showCharacterCount
         value={roomDescription}
-        onChange={(e) => setRoomDescription(e.target.value)}
+        onChange={(e) => {
+          setRoomDescription(e.target.value);
+          clearFieldError("summary");
+        }}
         onClear={() => setRoomDescription("")}
+        error={!!formErrors.summary}
+        errorMessage={formErrors.summary}
         containerClassName="max-w-full"
         className="max-w-full"
       />
 
       {/* 공지사항 */}
       <Textarea
-        label="공지사항"
+        label="공지사항*"
         placeholder="예) 세션의 규칙, 공지사항을 작성해주세요"
         maxLength={100}
         showCharacterCount
         value={notice}
-        onChange={(e) => setNotice(e.target.value)}
+        onChange={(e) => {
+          setNotice(e.target.value);
+          clearFieldError("notice");
+        }}
+        error={!!formErrors.notice}
+        errorMessage={formErrors.notice}
         containerClassName="max-w-full"
         className="h-[260px] max-w-full"
       />
@@ -150,9 +199,12 @@ export function SessionCreateForm() {
         <span className="text-text-secondary text-base">대표 이미지</span>
         {imagePreviewUrl ? (
           <div className="relative max-w-95">
-            <img
+            <Image
               src={imagePreviewUrl}
               alt="대표 이미지 미리보기"
+              width={380}
+              height={144}
+              unoptimized
               className="h-36 w-full rounded-lg object-cover"
             />
             <Button
@@ -185,13 +237,19 @@ export function SessionCreateForm() {
             <CategoryFilterButton
               key={category}
               isSelected={selectedCategory === category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => {
+                setSelectedCategory(category);
+                clearFieldError("category");
+              }}
               type="button"
             >
               {MEMBER_INTEREST_CATEGORY_LABELS[category]}
             </CategoryFilterButton>
           ))}
         </div>
+        {formErrors.category && (
+          <span className="text-status-error text-sm">{formErrors.category}</span>
+        )}
       </div>
 
       {/* 세션 세부 설정 */}
@@ -232,83 +290,43 @@ export function SessionCreateForm() {
                   mode="single"
                   showTimePicker
                   value={startDateTime}
-                  onChange={setStartDateTime}
+                  onChange={(date) => {
+                    setStartDateTime(date);
+                    clearFieldError("startTime");
+                  }}
                 />
               </div>
+            )}
+            {formErrors.startTime && (
+              <span className="text-status-error text-sm">{formErrors.startTime}</span>
             )}
           </div>
 
           {/* 진행시간 */}
-          <div className="w-45 shrink-0 rounded-sm border border-gray-700 p-4">
-            <div className="flex h-full flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-text-secondary text-base">진행시간</span>
-                <span className="text-text-muted text-[10px]">5분 단위로 설정</span>
-              </div>
-              <div className="flex items-center justify-center gap-3">
-                <Button
-                  type="button"
-                  variant={duration <= MIN_DURATION ? "solid" : "outlined"}
-                  colorScheme="secondary"
-                  size="xsmall"
-                  iconOnly
-                  leftIcon={<MinusIcon size="xsmall" />}
-                  onClick={handleDurationDecrease}
-                  disabled={duration <= MIN_DURATION}
-                  className="h-7 w-7 rounded-xs"
-                />
-                <span className="text-text-secondary text-center text-sm">
-                  {formatDurationKorean(duration)}
-                </span>
-                <Button
-                  type="button"
-                  variant={duration >= MAX_DURATION ? "solid" : "outlined"}
-                  colorScheme="secondary"
-                  size="xsmall"
-                  iconOnly
-                  leftIcon={<PlusIcon size="xsmall" />}
-                  onClick={handleDurationIncrease}
-                  disabled={duration >= MAX_DURATION}
-                  className="h-7 w-7 rounded-xs"
-                />
-              </div>
-            </div>
-          </div>
+          <NumericStepper
+            label="진행시간"
+            hint="5분 단위로 설정"
+            value={duration}
+            displayValue={formatDurationKorean(duration)}
+            min={MIN_DURATION}
+            max={MAX_DURATION}
+            step={DURATION_STEP}
+            onChange={setDuration}
+            className="w-45"
+          />
 
           {/* 참여인원 */}
-          <div className="w-45 shrink-0 rounded-sm border border-gray-700 p-4">
-            <div className="flex h-full flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-text-secondary text-base">참여인원</span>
-                <span className="text-text-muted text-[10px]">최대 10명까지 가능</span>
-              </div>
-              <div className="flex items-center justify-center gap-3">
-                <Button
-                  type="button"
-                  variant={participants <= MIN_PARTICIPANTS ? "solid" : "outlined"}
-                  colorScheme="secondary"
-                  size="xsmall"
-                  iconOnly
-                  leftIcon={<MinusIcon size="xsmall" />}
-                  onClick={handleParticipantsDecrease}
-                  disabled={participants <= MIN_PARTICIPANTS}
-                  className="h-7 w-7 rounded-xs"
-                />
-                <span className="text-text-secondary text-center text-sm">{participants}명</span>
-                <Button
-                  type="button"
-                  variant={participants >= MAX_PARTICIPANTS ? "solid" : "outlined"}
-                  colorScheme="secondary"
-                  size="xsmall"
-                  iconOnly
-                  leftIcon={<PlusIcon size="xsmall" />}
-                  onClick={handleParticipantsIncrease}
-                  disabled={participants >= MAX_PARTICIPANTS}
-                  className="h-7 w-7 rounded-xs"
-                />
-              </div>
-            </div>
-          </div>
+          <NumericStepper
+            label="참여인원"
+            hint="최대 10명까지 가능"
+            value={participants}
+            displayValue={`${participants}명`}
+            min={MIN_PARTICIPANTS}
+            max={MAX_PARTICIPANTS}
+            step={1}
+            onChange={setParticipants}
+            className="w-45"
+          />
         </div>
       </div>
 
@@ -343,6 +361,13 @@ export function SessionCreateForm() {
         <div className="w-45 shrink-0" aria-hidden="true" />
       </div>
 
+      {/* 서버 에러 배너 */}
+      {serverError && (
+        <div className="bg-status-error/10 text-status-error rounded-sm px-4 py-3 text-sm">
+          {serverError}
+        </div>
+      )}
+
       {/* 버튼 그룹 */}
       <div className="mt-20 mb-20 flex justify-center gap-4">
         <Button
@@ -351,6 +376,8 @@ export function SessionCreateForm() {
           colorScheme="tertiary"
           size="large"
           className="w-full max-w-70.5"
+          disabled={isPending}
+          onClick={() => router.back()}
         >
           그만두기
         </Button>
@@ -360,8 +387,9 @@ export function SessionCreateForm() {
           colorScheme="primary"
           size="large"
           className="w-full max-w-70.5"
+          disabled={isPending}
         >
-          세션 만들기
+          {isPending ? "생성 중..." : "세션 만들기"}
         </Button>
       </div>
     </form>
