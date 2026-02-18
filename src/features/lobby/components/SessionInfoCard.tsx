@@ -16,7 +16,7 @@ const MOCK_SESSION = {
   currentParticipants: 3,
   maxParticipants: 6,
   durationMinutes: 90,
-  startTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+  startTime: "2025-12-31T23:59:59.000Z",
   requiredAchievementRate: 70,
   requiredFocusRate: 80,
 };

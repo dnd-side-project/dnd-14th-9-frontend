@@ -8,7 +8,7 @@ interface CountdownBannerProps {
   targetTime?: Date;
 }
 
-const TEST_TARGET = new Date(Date.now() + 60 * 60 * 1000);
+const TEST_TARGET = new Date("2025-12-31T23:59:59");
 
 export function CountdownBanner({ targetTime = TEST_TARGET }: CountdownBannerProps) {
   const { formatted, isExpired } = useCountdown(targetTime);
