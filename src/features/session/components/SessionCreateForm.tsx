@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/Button/Button";
@@ -198,9 +199,12 @@ export function SessionCreateForm() {
         <span className="text-text-secondary text-base">대표 이미지</span>
         {imagePreviewUrl ? (
           <div className="relative max-w-95">
-            <img
+            <Image
               src={imagePreviewUrl}
               alt="대표 이미지 미리보기"
+              width={380}
+              height={144}
+              unoptimized
               className="h-36 w-full rounded-lg object-cover"
             />
             <Button
