@@ -771,4 +771,122 @@ describe("Proxy Middleware", () => {
       expectRedirectAfterLoginCookie(response, "/dashboard");
     });
   });
+
+  describe("/api/* 경로 토큰 재발급", () => {
+    it("/api/* 에 토큰이 없으면 재발급 없이 통과해야 함", async () => {
+      // Given: 토큰 없음
+      const request = new NextRequest("http://localhost:3000/api/members/me/profile");
+
+      // When
+      const response = await proxy(request);
+
+      // Then: 재발급 시도 없이 통과
+      expect(response.status).toBe(200);
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("/api/* 에 유효한 토큰이 있으면 재발급 없이 통과해야 함", async () => {
+      // Given: 충분히 유효한 토큰
+      const accessToken = createMockToken(30 * 60); // 30분
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+
+      const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
+        headers: { cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}` },
+      });
+
+      // When
+      const response = await proxy(request);
+
+      // Then: 재발급 시도 없이 통과
+      expect(response.status).toBe(200);
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("/api/* 에서 토큰이 만료 임박하면 재발급을 시도해야 함", async () => {
+      // Given: 3분 후 만료 토큰
+      const accessToken = createMockToken(3 * 60);
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+
+      const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
+        headers: { cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}` },
+      });
+
+      mockFetch.mockResolvedValueOnce(createRefreshSuccessResponse("new_access", "new_refresh"));
+
+      // When
+      const response = await proxy(request);
+
+      // Then: 재발급 API 호출
+      expect(mockFetch).toHaveBeenCalledWith(
+        "http://localhost:8080/auth/refresh",
+        expect.objectContaining({ method: "POST" })
+      );
+      expect(response.status).toBe(200);
+    });
+
+    it("/api/* 에서 재발급 성공 시 response cookies와 request header 모두에 새 토큰을 설정해야 함", async () => {
+      // Given: 만료된 토큰
+      const accessToken = createMockToken(-60);
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+
+      const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
+        headers: { cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}` },
+      });
+
+      const newAccessToken = "new_access_token";
+      const newRefreshToken = "new_refresh_token";
+      mockFetch.mockResolvedValueOnce(
+        createRefreshSuccessResponse(newAccessToken, newRefreshToken)
+      );
+
+      // When
+      const response = await proxy(request);
+
+      // Then: response cookies에 새 토큰 설정 (브라우저용)
+      expect(response.status).toBe(200);
+      const setCookies = response.headers.getSetCookie();
+      expect(setCookies.some((c) => c.includes(newAccessToken))).toBe(true);
+      expect(setCookies.some((c) => c.includes(newRefreshToken))).toBe(true);
+    });
+
+    it("/api/* 에서 재발급 실패해도 로그인 리다이렉트 없이 통과해야 함", async () => {
+      // Given: 만료된 토큰
+      const accessToken = createMockToken(-60);
+      const refreshToken = createMockToken(-60);
+
+      const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
+        headers: { cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}` },
+      });
+
+      mockFetch.mockResolvedValueOnce({ ok: false, status: 401 });
+
+      // When
+      const response = await proxy(request);
+
+      // Then: 리다이렉트 없이 통과 (클라이언트가 401 수신)
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
+    });
+
+    it("/api/* 에서 재발급 네트워크 에러가 나도 리다이렉트 없이 통과해야 함", async () => {
+      // Given
+      const accessToken = createMockToken(-60);
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+
+      const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
+        headers: { cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}` },
+      });
+
+      mockFetch.mockRejectedValueOnce(new Error("Network error"));
+
+      // When
+      const response = await proxy(request);
+
+      // Then: 네트워크 에러도 리다이렉트 없이 통과
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+    });
+  });
 });

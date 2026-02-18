@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
-import { REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
-import {
-  buildRefreshCookieHeader,
-  getCookieValue,
-  mergeCookieHeaderWithAuthTokens,
-} from "@/lib/auth/cookie-header-utils";
-import { parseRefreshTokenPair, type RefreshTokenPair } from "@/lib/auth/token-refresh-utils";
+import { clearAuthCookies } from "@/lib/auth/auth-cookies";
 
 import { api } from "./api";
 
@@ -21,12 +14,6 @@ interface ForwardToBackendOptions {
   includeRequestBody?: "json" | "formData" | false;
   clearAuthCookiesOnSuccess?: boolean;
   forwardRequestCookies?: boolean;
-}
-
-interface AuthRetryResult {
-  response: Response;
-  refreshedTokens: RefreshTokenPair | null;
-  shouldClearAuthCookies: boolean;
 }
 
 function getDefaultErrorResponse(status: number, statusText: string) {
@@ -83,97 +70,12 @@ async function sendBackendRequest(
   });
 }
 
-async function refreshTokens(refreshToken: string): Promise<RefreshTokenPair | null> {
-  const refreshResponse = await api.server.request("POST", "/auth/refresh", undefined, {
-    headers: { Cookie: buildRefreshCookieHeader(refreshToken) },
-    throwOnHttpError: false,
-    skipAuth: true,
-  });
-
-  if (!refreshResponse.ok) {
-    return null;
-  }
-
-  const responseBody: unknown = await refreshResponse.json().catch(() => null);
-  return parseRefreshTokenPair(responseBody);
-}
-
-function canRetryWithRefresh(response: Response, options: ForwardToBackendOptions): boolean {
-  return (
-    response.status === 401 &&
-    Boolean(options.forwardRequestCookies) &&
-    Boolean(options.request) &&
-    options.pathWithQuery !== "/auth/refresh"
-  );
-}
-
-async function resolveResponseWithAuthRetry(
-  options: ForwardToBackendOptions,
-  body: unknown,
-  originalCookieHeader: string | null,
-  initialResponse: Response
-): Promise<AuthRetryResult> {
-  if (!canRetryWithRefresh(initialResponse, options)) {
-    return {
-      response: initialResponse,
-      refreshedTokens: null,
-      shouldClearAuthCookies: false,
-    };
-  }
-
-  const refreshToken = getCookieValue(originalCookieHeader, REFRESH_TOKEN_COOKIE);
-  if (!refreshToken) {
-    return {
-      response: initialResponse,
-      refreshedTokens: null,
-      shouldClearAuthCookies: true,
-    };
-  }
-
-  const refreshedTokens = await refreshTokens(refreshToken);
-  if (!refreshedTokens) {
-    return {
-      response: initialResponse,
-      refreshedTokens: null,
-      shouldClearAuthCookies: true,
-    };
-  }
-
-  const retryCookieHeader = mergeCookieHeaderWithAuthTokens(originalCookieHeader, refreshedTokens);
-  const retriedResponse = await sendBackendRequest(options, body, retryCookieHeader);
-
-  if (retriedResponse.status === 401 || retriedResponse.status === 403) {
-    return {
-      response: retriedResponse,
-      refreshedTokens: null,
-      shouldClearAuthCookies: true,
-    };
-  }
-
-  return {
-    response: retriedResponse,
-    refreshedTokens,
-    shouldClearAuthCookies: false,
-  };
-}
-
 function applyAuthCookies(
   nextResponse: NextResponse,
   options: ForwardToBackendOptions,
-  response: Response,
-  refreshedTokens: RefreshTokenPair | null,
-  shouldClearAuthCookies: boolean
+  response: Response
 ) {
   if (options.clearAuthCookiesOnSuccess && response.ok) {
-    clearAuthCookies(nextResponse.cookies);
-    return;
-  }
-
-  if (refreshedTokens) {
-    setAuthCookies(nextResponse.cookies, refreshedTokens);
-  }
-
-  if (shouldClearAuthCookies) {
     clearAuthCookies(nextResponse.cookies);
   }
 }
@@ -196,19 +98,11 @@ export async function forwardToBackend(options: ForwardToBackendOptions) {
   const originalCookieHeader = options.request?.headers.get("cookie") ?? null;
 
   try {
-    const initialResponse = await sendBackendRequest(options, body, originalCookieHeader);
-    const { response, refreshedTokens, shouldClearAuthCookies } =
-      await resolveResponseWithAuthRetry(options, body, originalCookieHeader, initialResponse);
+    const response = await sendBackendRequest(options, body, originalCookieHeader);
 
     if (response.status === 204) {
       const noContentResponse = new NextResponse(null, { status: 204 });
-      applyAuthCookies(
-        noContentResponse,
-        options,
-        response,
-        refreshedTokens,
-        shouldClearAuthCookies
-      );
+      applyAuthCookies(noContentResponse, options, response);
       return noContentResponse;
     }
 
@@ -219,7 +113,7 @@ export async function forwardToBackend(options: ForwardToBackendOptions) {
       { status: response.status }
     );
 
-    applyAuthCookies(nextResponse, options, response, refreshedTokens, shouldClearAuthCookies);
+    applyAuthCookies(nextResponse, options, response);
 
     return nextResponse;
   } catch (error) {

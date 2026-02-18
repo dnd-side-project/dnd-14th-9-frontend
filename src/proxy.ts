@@ -4,7 +4,10 @@ import { NextResponse } from "next/server";
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
 import { buildLoginRedirectUrl, setRedirectAfterLoginCookie } from "@/lib/auth/auth-route-utils";
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
-import { buildRefreshCookieHeader } from "@/lib/auth/cookie-header-utils";
+import {
+  buildRefreshCookieHeader,
+  mergeCookieHeaderWithAuthTokens,
+} from "@/lib/auth/cookie-header-utils";
 import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 
@@ -23,10 +26,11 @@ interface TryRefreshTokenOptions {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  // /api/* 경로는 공개 라우트처럼 처리: 재발급 실패 시 로그인 리다이렉트 없이 pass-through
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || pathname.startsWith("/api");
 
-  // API 및 well-known 경로는 BFF/Route Handler에서 인증을 처리한다.
-  if (pathname.startsWith("/api") || pathname.startsWith("/.well-known")) {
+  // well-known 경로는 인증 처리 없이 통과한다.
+  if (pathname.startsWith("/.well-known")) {
     return NextResponse.next();
   }
 
@@ -202,7 +206,19 @@ async function tryRefreshToken(
       });
     }
 
-    const response = NextResponse.next();
+    // 현재 요청의 쿠키 헤더를 갱신해서 다운스트림(RSC, Route Handler)에 새 토큰을 전달한다.
+    const requestHeaders = new Headers(request.headers);
+    const updatedCookieHeader = mergeCookieHeaderWithAuthTokens(
+      request.headers.get("cookie"),
+      tokens
+    );
+    if (updatedCookieHeader) {
+      requestHeaders.set("cookie", updatedCookieHeader);
+    }
+
+    const response = NextResponse.next({
+      request: { headers: requestHeaders },
+    });
     setAuthCookies(response.cookies, {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
