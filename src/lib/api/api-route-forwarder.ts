@@ -26,26 +26,7 @@ function getDefaultErrorResponse(status: number, statusText: string) {
   };
 }
 
-async function parseForwardBody(options: ForwardToBackendOptions): Promise<unknown> {
-  if (!options.request || !options.includeRequestBody) {
-    return undefined;
-  }
-
-  if (options.includeRequestBody === "json") {
-    return options.request.json().catch(() => undefined);
-  }
-
-  if (options.includeRequestBody === "formData") {
-    return options.request.formData().catch(() => undefined);
-  }
-
-  return undefined;
-}
-
-function buildForwardHeaders(
-  options: ForwardToBackendOptions,
-  cookieHeaderOverride?: string | null
-): Record<string, string> | undefined {
+function buildForwardHeaders(options: ForwardToBackendOptions): Record<string, string> | undefined {
   if (!options.request || !options.forwardRequestCookies) {
     return undefined;
   }
@@ -91,18 +72,33 @@ export async function forwardToBackend(options: ForwardToBackendOptions) {
 
     if (response.status === 204) {
       const noContentResponse = new NextResponse(null, { status: 204 });
-      applyAuthCookies(noContentResponse, options, response);
+
+      if (options.clearAuthCookiesOnSuccess) {
+        clearAuthCookies(noContentResponse.cookies);
+      }
+
       return noContentResponse;
     }
 
-    const responsePayload = await parseBackendResponsePayload(response);
+    const responseText = await response.text();
+    let responsePayload: unknown = null;
+
+    if (responseText) {
+      try {
+        responsePayload = JSON.parse(responseText);
+      } catch {
+        responsePayload = getDefaultErrorResponse(response.status, response.statusText);
+      }
+    }
 
     const nextResponse = NextResponse.json(
       responsePayload ?? getDefaultErrorResponse(response.status, response.statusText),
       { status: response.status }
     );
 
-    applyAuthCookies(nextResponse, options, response);
+    if (options.clearAuthCookiesOnSuccess && response.ok) {
+      clearAuthCookies(nextResponse.cookies);
+    }
 
     return nextResponse;
   } catch (error) {
