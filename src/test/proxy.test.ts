@@ -119,7 +119,6 @@ describe("Proxy Middleware", () => {
     });
 
     it("인증 없이 접근 가능한 경로들은 토큰 검증을 하지 않아야 함", async () => {
-      // /api/auth/*, /api/sessions/* 는 matcher에서 제외되어 proxy를 타지 않음
       const publicPaths = ["/", "/login"];
 
       for (const path of publicPaths) {
@@ -242,6 +241,47 @@ describe("Proxy Middleware", () => {
 
       expect(response.status).toBe(200);
       expect(response.headers.get("location")).toBeNull();
+    });
+  });
+
+  describe("공개 API 예외 경로", () => {
+    it("정의된 공개 API 경로는 토큰 없이 통과해야 함", async () => {
+      const publicApiPaths = [
+        "/api/auth/login",
+        "/api/auth/callback",
+        "/api/auth/callback/google",
+        "/api/sessions",
+        "/api/sessions/123",
+      ];
+
+      for (const path of publicApiPaths) {
+        jest.clearAllMocks();
+        const request = new NextRequest(`http://localhost:3000${path}`);
+        const response = await proxy(request);
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get("location")).toBeNull();
+        expect(mockFetch).not.toHaveBeenCalled();
+      }
+    });
+
+    it("공개 API 예외가 아닌 경로는 토큰 없이 접근 시 로그인 리다이렉트해야 함", async () => {
+      const protectedApiPaths = [
+        "/api/auth/logout",
+        "/api/sessions/create",
+        "/api/sessions/update",
+        "/api/sessions/123/join",
+      ];
+
+      for (const path of protectedApiPaths) {
+        jest.clearAllMocks();
+        const request = new NextRequest(`http://localhost:3000${path}`);
+        const response = await proxy(request);
+
+        expectLoginRedirect(response, "auth_required");
+        expectRedirectAfterLoginCookie(response, path);
+        expect(mockFetch).not.toHaveBeenCalled();
+      }
     });
   });
 
@@ -745,8 +785,7 @@ describe("Proxy Middleware", () => {
   });
 
   describe("/api/* 보호된 경로 (인증 필요)", () => {
-    // /api/auth/*, /api/sessions/* 는 matcher에서 제외되어 proxy를 타지 않음
-    // 나머지 /api/* 경로는 보호된 라우트로 동작함
+    // 공개 API 예외를 제외한 모든 /api/* 경로는 보호된 라우트로 동작함
 
     it("/api/* 에 토큰이 없으면 로그인 리다이렉트해야 함", async () => {
       // Given: 토큰 없음

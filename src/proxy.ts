@@ -11,8 +11,16 @@ import {
 import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 
-// 공개 라우트 (인증 불필요)
-const PUBLIC_ROUTES = ["/", "/login"];
+// 공개 페이지 라우트 (인증 불필요)
+const PUBLIC_PAGE_ROUTES = ["/", "/login"];
+
+// 공개 API 라우트 (인증 불필요)
+const PUBLIC_API_ROUTE_PATTERNS = [
+  /^\/api\/auth\/login$/,
+  /^\/api\/auth\/callback(?:\/[^/]+)?$/,
+  /^\/api\/sessions$/,
+  /^\/api\/sessions\/\d+$/,
+];
 
 // 토큰 갱신 임계값 (5분)
 const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
@@ -26,18 +34,23 @@ interface TryRefreshTokenOptions {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  const isPublicPageRoute = PUBLIC_PAGE_ROUTES.includes(pathname);
 
   // well-known 경로는 인증 처리 없이 통과한다.
   if (pathname.startsWith("/.well-known")) {
     return NextResponse.next();
   }
 
+  // 공개 API 예외 경로는 인증 처리 없이 통과한다.
+  if (isPublicApiRoute(pathname)) {
+    return NextResponse.next();
+  }
+
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
 
-  // 공개 라우트에서는 세션 복구가 가능한 경우에만 소프트하게 갱신 시도
-  if (isPublicRoute) {
+  // 공개 페이지 라우트에서는 세션 복구가 가능한 경우에만 소프트하게 갱신 시도
+  if (isPublicPageRoute) {
     if (!refreshToken) {
       return NextResponse.next();
     }
@@ -92,6 +105,10 @@ function redirectToLoginRoute(
   }
 
   return response;
+}
+
+function isPublicApiRoute(pathname: string): boolean {
+  return PUBLIC_API_ROUTE_PATTERNS.some((pattern) => pattern.test(pathname));
 }
 
 /**
@@ -246,11 +263,12 @@ async function tryRefreshToken(
 }
 
 // Matcher: 불필요한 요청 제외 (정적 파일, 이미지, prefetch 등)
+// 공개 API 예외 처리는 matcher가 아닌 proxy 본문에서 수행한다.
 export const config = {
   matcher: [
     {
       source:
-        "/((?!_next/static|_next/image|favicon.ico|api/auth(?:/.*)?$|api/sessions(?:/[^/]+)?$|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)$).*)",
+        "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)$).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },
