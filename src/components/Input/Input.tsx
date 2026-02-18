@@ -17,7 +17,6 @@ import { ClearIcon } from "../Icon/ClearIcon";
 const inputVariants = cva(
   [
     "w-full",
-    "max-w-95",
     "h-14",
     "px-md",
     "rounded-sm",
@@ -72,6 +71,7 @@ export interface InputProps
   errorMessage?: string;
   onClear?: () => void;
   containerClassName?: string;
+  fullWidth?: boolean;
   showCharacterCount?: boolean;
 }
 
@@ -80,6 +80,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     {
       className,
       containerClassName,
+      fullWidth = false,
       label,
       error = false,
       errorMessage,
@@ -150,7 +151,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const showClearButton = hasValue && !disabled && !error;
 
     return (
-      <div className={cn("flex w-full max-w-95 flex-col gap-2", containerClassName)}>
+      <div
+        className={cn("flex w-full flex-col gap-2", !fullWidth && "max-w-95", containerClassName)}
+      >
         {label && (
           <label htmlFor={inputId} className="text-text-secondary text-base">
             {label}

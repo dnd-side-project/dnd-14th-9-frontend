@@ -3,7 +3,8 @@
 import { useState } from "react";
 
 import { Button } from "@/components/Button/Button";
-import { CheckIcon } from "@/components/Icon/CheckIcon";
+import { MinusIcon } from "@/components/Icon/MinusIcon";
+import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { Input } from "@/components/Input/Input";
 import type { ReportTodoItem } from "@/features/session/types";
 
@@ -55,7 +56,7 @@ export function GoalAndTodoCard() {
   const displayTodos = isEditing ? draftTodos : todos;
 
   return (
-    <div className="gap-lg flex flex-1 flex-col">
+    <div className="gap-lg border-gray p-lg flex flex-1 flex-col rounded-lg border">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
@@ -70,7 +71,7 @@ export function GoalAndTodoCard() {
       </div>
 
       {/* 목표 */}
-      <div className="flex flex-col gap-2">
+      <div className="flex w-full flex-col gap-2">
         <span className="text-text-secondary text-[14px] font-semibold">목표</span>
         {isEditing ? (
           <Input
@@ -78,10 +79,13 @@ export function GoalAndTodoCard() {
             onChange={(e) => setDraftGoal(e.target.value)}
             onClear={() => setDraftGoal("")}
             placeholder="목표를 입력하세요"
-            containerClassName="max-w-none"
+            className="text-text-muted"
+            fullWidth
+            showCharacterCount
+            maxLength={50}
           />
         ) : (
-          <div className="bg-surface-strong p-xs text-text-muted rounded-sm text-[16px]">
+          <div className="bg-surface-strong border-border-subtle p-xs text-text-muted flex h-13.5 items-center rounded-sm border text-[16px]">
             {goal}
           </div>
         )}
@@ -93,69 +97,103 @@ export function GoalAndTodoCard() {
       {/* Todo */}
       <div className="gap-sm flex flex-col">
         <span className="text-text-secondary text-[14px] font-semibold">
-          To do ({displayTodos.length})
+          To do <span className="text-green-600">{displayTodos.length}</span>
         </span>
 
-        {displayTodos.length === 0 ? (
-          <p className="text-text-muted py-md text-center text-[14px]">등록된 할 일이 없습니다</p>
-        ) : isEditing ? (
-          <ul className="flex flex-col gap-2">
-            {draftTodos.map((todo, index) => (
-              <li key={todo.todoId} className="flex items-center gap-2">
-                <Input
-                  value={todo.content}
-                  onChange={(e) => handleTodoChange(index, e.target.value)}
-                  onClear={() => handleRemoveTodo(index)}
-                  placeholder="할 일을 입력하세요"
-                  containerClassName="max-w-none"
+        {isEditing ? (
+          <>
+            {draftTodos.length === 0 ? (
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-text-muted py-md text-center text-[14px]">
+                  등록된 할 일이 없습니다
+                </p>
+                <Button
+                  iconOnly
+                  size="large"
+                  variant="ghost"
+                  colorScheme="secondary"
+                  leftIcon={<PlusIcon className="text-border-primary-default" />}
+                  onClick={handleAddTodo}
                 />
-              </li>
-            ))}
-          </ul>
+              </div>
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {draftTodos.map((todo, index) => {
+                  const isFirst = index === 0;
+                  const canAdd = draftTodos.length < 5;
+                  return (
+                    <li key={todo.todoId} className="flex items-start gap-2">
+                      <Input
+                        value={todo.content}
+                        onChange={(e) => handleTodoChange(index, e.target.value)}
+                        onClear={() => handleTodoChange(index, "")}
+                        placeholder="할 일을 입력하세요"
+                        className="text-text-muted"
+                        fullWidth
+                        containerClassName="flex-1"
+                        showCharacterCount
+                        maxLength={50}
+                      />
+                      {isFirst && canAdd ? (
+                        <Button
+                          iconOnly
+                          size="large"
+                          variant="outlined"
+                          colorScheme="primary"
+                          leftIcon={<PlusIcon className="text-border-primary-default" />}
+                          onClick={handleAddTodo}
+                        />
+                      ) : (
+                        <Button
+                          iconOnly
+                          size="large"
+                          variant="outlined"
+                          colorScheme="secondary"
+                          leftIcon={<MinusIcon />}
+                          onClick={() => handleRemoveTodo(index)}
+                        />
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
+        ) : displayTodos.length === 0 ? (
+          <p className="text-text-muted py-md text-center text-[14px]">등록된 할 일이 없습니다</p>
         ) : (
           <ul className="flex flex-col gap-2">
             {todos.map((todo) => (
-              <li key={todo.todoId} className="flex items-center gap-2">
-                <button
-                  type="button"
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border ${
-                    todo.isCompleted
-                      ? "border-green-500 bg-green-500"
-                      : "border-border-default bg-transparent"
-                  }`}
-                >
-                  {todo.isCompleted && <CheckIcon size="xsmall" className="text-common-white" />}
-                </button>
-                <span
-                  className={`text-[16px] ${
-                    todo.isCompleted ? "text-text-disabled line-through" : "text-text-primary"
-                  }`}
-                >
-                  {todo.content}
-                </span>
+              <li
+                key={todo.todoId}
+                className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-[16px]"
+              >
+                {todo.content}
               </li>
             ))}
           </ul>
-        )}
-
-        {isEditing && draftTodos.length < 5 && (
-          <button
-            type="button"
-            onClick={handleAddTodo}
-            className="text-text-brand-subtle text-[14px] font-semibold"
-          >
-            + 할 일 추가
-          </button>
         )}
       </div>
 
       {/* 하단 버튼 (수정 모드) */}
       {isEditing && (
-        <div className="flex justify-end gap-2">
-          <Button variant="outlined" colorScheme="secondary" size="medium" onClick={handleCancel}>
+        <div className="flex gap-2">
+          <Button
+            variant="outlined"
+            colorScheme="secondary"
+            size="medium"
+            className="flex-1"
+            onClick={handleCancel}
+          >
             그만두기
           </Button>
-          <Button variant="solid" colorScheme="primary" size="medium" onClick={handleSave}>
+          <Button
+            variant="solid"
+            colorScheme="primary"
+            size="medium"
+            className="flex-1"
+            onClick={handleSave}
+          >
             저장하기
           </Button>
         </div>
