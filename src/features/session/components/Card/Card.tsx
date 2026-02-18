@@ -32,6 +32,10 @@ export function Card({
   durationMinutes,
   sessionDate,
 }: CardProps) {
+  const relativeTime = formatRelativeTime(createdAt);
+  const isClosing = relativeTime === "마감임박" || relativeTime === "마감 임박";
+  const displayRelativeTime = isClosing ? "마감임박" : relativeTime;
+
   return (
     <div className={cn("flex w-full max-w-69 flex-col gap-4", className)}>
       <Thumbnail src={thumbnailSrc} alt={title} />
@@ -41,7 +45,9 @@ export function Card({
           <Badge radius="xs" className="border-0">
             {category}
           </Badge>
-          <Badge radius="max">{formatRelativeTime(createdAt)}</Badge>
+          <Badge radius="max" status={isClosing ? "closing" : "recruiting"}>
+            {displayRelativeTime}
+          </Badge>
         </div>
 
         <h3 className="text-text-primary truncate text-lg font-bold">{title}</h3>
