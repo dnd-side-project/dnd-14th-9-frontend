@@ -79,7 +79,7 @@ export function SearchFilterSection() {
   );
 
   return (
-    <section className="gap-lg flex flex-col items-center">
+    <section className="gap-xl flex flex-col items-center">
       <form onSubmit={handleSearch} className="flex w-full justify-center">
         <SearchInput
           name="q"
