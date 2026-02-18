@@ -79,8 +79,8 @@ export function SearchFilterSection() {
   );
 
   return (
-    <section className="gap-lg flex flex-col">
-      <form onSubmit={handleSearch}>
+    <section className="gap-lg flex flex-col items-center">
+      <form onSubmit={handleSearch} className="flex w-full justify-center">
         <SearchInput
           name="q"
           defaultValue={currentQuery}
@@ -88,7 +88,7 @@ export function SearchFilterSection() {
         />
       </form>
 
-      <div className="gap-xs flex flex-wrap">
+      <div className="gap-xs flex flex-wrap justify-center">
         {CATEGORY_FILTERS.map(({ value, label }) => {
           const isSelected = currentCategory === value;
           return (

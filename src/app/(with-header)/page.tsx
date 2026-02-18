@@ -47,14 +47,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const queryClient = new QueryClient();
 
   // 모집 중 세션 목록 prefetch (첫 페이지 로드 성능 최적화)
-  const listParams = { keyword: q, category, sort, page, size: 12 };
+  const listParams = { keyword: q, category, sort, page, size: 8 };
   await queryClient.prefetchQuery({
     queryKey: sessionKeys.list(listParams),
     queryFn: () => sessionApi.getList(listParams),
   });
 
   return (
-    <div className="my-[64px] flex flex-col gap-[48px] px-[54px]">
+    <div className="my-[64px] flex flex-col justify-center gap-[48px] px-[54px]">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense fallback={<SearchFilterSectionSkeleton />}>
           <SearchFilterSection />
