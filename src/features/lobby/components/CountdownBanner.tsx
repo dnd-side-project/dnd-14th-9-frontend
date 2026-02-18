@@ -5,7 +5,7 @@ import { ClockIcon } from "@/components/Icon/ClockIcon";
 import { useCountdown } from "../hooks/useCountdown";
 
 interface CountdownBannerProps {
-  targetTime: Date;
+  targetTime?: Date;
 }
 
 const TEST_TARGET = new Date(Date.now() + 60 * 60 * 1000);
