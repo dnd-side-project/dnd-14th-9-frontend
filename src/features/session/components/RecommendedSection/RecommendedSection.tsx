@@ -1,38 +1,129 @@
 "use client";
 
-import { useMe } from "@/features/member/hooks/useMemberHooks";
+import { useMemo } from "react";
+
+import { PaginationFraction } from "@/components/Pagination/PaginationFraction";
+import { useMeForEdit } from "@/features/member/hooks/useMemberHooks";
 import { useAuthStore } from "@/stores/authStore";
+import { getMemberInterestCategoryLabel } from "@/types/shared/member-interest-category";
+import type { MemberInterestCategory } from "@/types/shared/member-interest-category";
+
+import { useRecommendedCarousel } from "../../hooks/useRecommendedCarousel";
+import { useSessionList } from "../../hooks/useSessionHooks";
+import { Card } from "../Card/Card";
 
 /**
- * RecommendedSection - 추천 세션
+ * RecommendedSection - 맞춤 추천 세션
  *
  * 역할:
  * - 로그인 사용자에게만 표시 (조건부 렌더링)
- * - useSuspenseQuery로 추천 세션 데이터 사용
- * - URL searchParams와 무관 (독립적 데이터)
- *
- * TODO(이경환): API 스펙 확정 후 구현
- * - useSuspenseQuery + Query Options
- * - 로그인 상태 확인 로직
- *
- * TODO(이경환): 팀 논의 필요
- * - 비로그인 시 빈 공간 vs 대체 콘텐츠
+ * - member/me/edit의 관심 카테고리 기반 추천
+ * - firstInterestCategory → 1페이지 (4개)
+ * - secondInterestCategory → 2페이지 (4개)
+ * - thirdInterestCategory → 3페이지 (4개)
  */
 export function RecommendedSection() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const title = isAuthenticated ? <AuthenticatedTitle /> : "맞춤 추천 세션";
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return <RecommendedContent />;
+}
+
+function RecommendedContent() {
+  const { data: editData } = useMeForEdit();
+
+  const interestCategories = useMemo(() => {
+    if (!editData?.result) return [];
+
+    const categories: MemberInterestCategory[] = [];
+    const { firstInterestCategory, secondInterestCategory, thirdInterestCategory } =
+      editData.result;
+
+    if (firstInterestCategory) categories.push(firstInterestCategory);
+    if (secondInterestCategory) categories.push(secondInterestCategory);
+    if (thirdInterestCategory) categories.push(thirdInterestCategory);
+
+    return categories;
+  }, [editData]);
+
+  const { currentPage, totalPages, handlePageChange } = useRecommendedCarousel(
+    interestCategories.length
+  );
+
+  const currentCategory = interestCategories[currentPage - 1];
+
+  if (interestCategories.length === 0) {
+    return null;
+  }
 
   return (
-    <section>
-      <h2>{title}</h2>
-      <div>RecommendedSection placeholder</div>
+    <section className="gap-xl flex flex-col">
+      <div className="flex items-center justify-between">
+        <div className="gap-xs flex flex-col">
+          <h2 className="text-text-primary text-xl font-bold">
+            {editData?.result.nickname}님을 위한 추천 세션
+          </h2>
+          {currentCategory && (
+            <p className="text-text-secondary text-sm">
+              {getMemberInterestCategoryLabel(currentCategory)} 카테고리
+            </p>
+          )}
+        </div>
+
+        <PaginationFraction
+          currentPage={currentPage}
+          totalPage={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
+
+      {currentCategory && <RecommendedGrid category={currentCategory} />}
     </section>
   );
 }
 
-function AuthenticatedTitle() {
-  const { data } = useMe();
-  const nickname = data?.result.nickname ?? "회원";
+function RecommendedGrid({ category }: { category: MemberInterestCategory }) {
+  const { data, isPending } = useSessionList({ category, size: 4 });
 
-  return <>{nickname}님을 위한 맞춤 추천 세션</>;
+  if (isPending) {
+    return (
+      <div className="gap-md grid grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="bg-surface-strong aspect-[4/3] animate-pulse rounded-lg" />
+        ))}
+      </div>
+    );
+  }
+
+  const sessions = data?.result?.sessions ?? [];
+
+  if (sessions.length === 0) {
+    return (
+      <div className="text-text-muted flex h-40 items-center justify-center text-sm">
+        해당 카테고리에 모집 중인 세션이 없습니다
+      </div>
+    );
+  }
+
+  return (
+    <div className="gap-md grid grid-cols-4">
+      {sessions.map((session) => (
+        <Card
+          key={session.title + session.startTime}
+          thumbnailSrc={session.imageUrl}
+          category={session.category}
+          createdAt={session.startTime}
+          title={session.title}
+          nickname={session.hostNickname}
+          currentParticipants={session.currentParticipants}
+          maxParticipants={session.maxParticipants}
+          durationMinutes={session.sessionDurationMinutes}
+          sessionDate={session.startTime}
+        />
+      ))}
+    </div>
+  );
 }
