@@ -112,66 +112,51 @@ export function SessionCreateForm() {
     });
   }, []);
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      setServerError(null);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setServerError(null);
 
-      // useState 값 → zod 스키마 형태로 매핑
-      const validation = validateSessionForm({
-        title: roomName,
-        summary: roomDescription,
-        notice,
-        category: selectedCategory ?? undefined,
-        startTime: startDateTime ?? undefined,
-        sessionDurationMinutes: duration,
-        maxParticipants: participants,
-        requiredAchievementRate: achievementRange,
-      });
-
-      if (!validation.success) {
-        setFormErrors(validation.errors);
-        return;
-      }
-
-      // CreateSessionRequest 구성 (Date → ISO 문자열 변환)
-      const body: CreateSessionRequest = {
-        title: validation.data.title,
-        summary: validation.data.summary,
-        notice: validation.data.notice,
-        category: validation.data.category,
-        startTime: formatLocalDateTime(validation.data.startTime),
-        sessionDurationMinutes: validation.data.sessionDurationMinutes,
-        maxParticipants: validation.data.maxParticipants,
-        requiredFocusRate: 0,
-        requiredAchievementRate: validation.data.requiredAchievementRate,
-      };
-
-      createSession(
-        { body, image: selectedImage ?? undefined },
-        {
-          onSuccess: () => router.push("/"),
-          onError: (error) => {
-            const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
-            setServerError(message);
-          },
-        }
-      );
-    },
-    [
-      roomName,
-      roomDescription,
+    // useState 값 → zod 스키마 형태로 매핑
+    const validation = validateSessionForm({
+      title: roomName,
+      summary: roomDescription,
       notice,
-      selectedCategory,
-      startDateTime,
-      duration,
-      participants,
-      achievementRange,
-      selectedImage,
-      createSession,
-      router,
-    ]
-  );
+      category: selectedCategory ?? undefined,
+      startTime: startDateTime ?? undefined,
+      sessionDurationMinutes: duration,
+      maxParticipants: participants,
+      requiredAchievementRate: achievementRange,
+    });
+
+    if (!validation.success) {
+      setFormErrors(validation.errors);
+      return;
+    }
+
+    // CreateSessionRequest 구성 (Date → ISO 문자열 변환)
+    const body: CreateSessionRequest = {
+      title: validation.data.title,
+      summary: validation.data.summary,
+      notice: validation.data.notice,
+      category: validation.data.category,
+      startTime: formatLocalDateTime(validation.data.startTime),
+      sessionDurationMinutes: validation.data.sessionDurationMinutes,
+      maxParticipants: validation.data.maxParticipants,
+      requiredFocusRate: 0,
+      requiredAchievementRate: validation.data.requiredAchievementRate,
+    };
+
+    createSession(
+      { body, image: selectedImage ?? undefined },
+      {
+        onSuccess: () => router.push("/"),
+        onError: (error) => {
+          const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+          setServerError(message);
+        },
+      }
+    );
+  };
 
   return (
     <form className="gap-xl flex w-full flex-col" onSubmit={handleSubmit}>
