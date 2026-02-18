@@ -6,10 +6,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import {
   DURATION_OPTIONS,
-  getNextOptionValue,
-  PARTICIPANTS_OPTIONS,
   SORT_OPTIONS,
 } from "../components/RecruitingSection/recruitingFilter.types";
+import { parseParticipantsFilterValue } from "../components/RecruitingSection/recruitingFilter.utils";
+import { SESSION_PARTICIPANTS_MAX, SESSION_PARTICIPANTS_MIN } from "../constants/sessionLimits";
 import { formatTimeSlotsParam, parseTimeSlotsParam } from "../utils/timeSlots";
 
 import type { DurationRange, SessionSort, TimeSlot } from "../types";
@@ -46,6 +46,10 @@ function formatDateParam(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
+function clampParticipants(value: number) {
+  return Math.min(SESSION_PARTICIPANTS_MAX, Math.max(SESSION_PARTICIPANTS_MIN, value));
+}
+
 export function useRecruitingFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -59,7 +63,7 @@ export function useRecruitingFilters() {
       endDate: searchParams.get("endDate"),
       timeSlots: parseTimeSlotsParam(searchParams.get("timeSlots")),
       durationRange: isDurationRangeValue(durationRangeParam) ? durationRangeParam : null,
-      participants: searchParams.get("participants"),
+      participants: parseParticipantsFilterValue(searchParams.get("participants")),
       sort: isSessionSortValue(sortParam) ? sortParam : "LATEST",
     };
   }, [searchParams]);
@@ -124,11 +128,16 @@ export function useRecruitingFilters() {
     [updateFilters]
   );
 
-  const cycleParticipants = useCallback(() => {
-    updateFilters({
-      participants: getNextOptionValue(PARTICIPANTS_OPTIONS, values.participants),
-    });
-  }, [updateFilters, values.participants]);
+  const setParticipantsCount = useCallback(
+    (participants: number) => {
+      const nextParticipants = String(clampParticipants(Math.trunc(participants)));
+
+      updateFilters({
+        participants: nextParticipants,
+      });
+    },
+    [updateFilters]
+  );
 
   const toggleSort = useCallback(() => {
     updateFilters({
@@ -154,7 +163,7 @@ export function useRecruitingFilters() {
     setDateRange,
     toggleTimeSlot,
     setDurationRange,
-    cycleParticipants,
+    setParticipantsCount,
     toggleSort,
     setPage,
   };

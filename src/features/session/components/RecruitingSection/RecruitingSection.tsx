@@ -28,7 +28,7 @@ export function RecruitingSection() {
     setDateRange,
     toggleTimeSlot,
     setDurationRange,
-    cycleParticipants,
+    setParticipantsCount,
     toggleSort,
     setPage,
   } = useRecruitingFilters();
@@ -68,7 +68,7 @@ export function RecruitingSection() {
             onSetDateRange={setDateRange}
             onToggleTimeSlot={toggleTimeSlot}
             onSetDurationRange={setDurationRange}
-            onCycleParticipants={cycleParticipants}
+            onSetParticipants={setParticipantsCount}
             onToggleSort={toggleSort}
           />
         </div>

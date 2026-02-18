@@ -4,11 +4,11 @@ import { useCallback, useMemo, useState } from "react";
 
 import type { DateRange } from "@/components/DatePicker/DatePicker.types";
 import { Filter } from "@/components/Filter/Filter";
-import { cn } from "@/lib/utils/utils";
 
 import { DateRangeFilter } from "./DateRangeFilter";
 import { DurationFilter } from "./DurationFilter";
-import { getOptionLabel, PARTICIPANTS_OPTIONS, SORT_OPTIONS } from "./recruitingFilter.types";
+import { ParticipantsFilter } from "./ParticipantsFilter";
+import { getOptionLabel, SORT_OPTIONS } from "./recruitingFilter.types";
 import { formatDateRangeFilterLabel, parseDateParam } from "./recruitingFilter.utils";
 import { StartTimeFilter } from "./StartTimeFilter";
 
@@ -20,24 +20,25 @@ interface RecruitingFilterBarProps {
   onSetDateRange: (startDate: Date | null, endDate: Date | null) => void;
   onToggleTimeSlot: (timeSlot: TimeSlot) => void;
   onSetDurationRange: (durationRange: DurationRange) => void;
-  onCycleParticipants: () => void;
+  onSetParticipants: (participants: number) => void;
   onToggleSort: () => void;
 }
 
-type OpenFilterKey = "date" | "timeSlot" | "duration" | null;
+type OpenFilterKey = "date" | "timeSlot" | "duration" | "participants" | null;
 
 export function RecruitingFilterBar({
   values,
   onSetDateRange,
   onToggleTimeSlot,
   onSetDurationRange,
-  onCycleParticipants,
+  onSetParticipants,
   onToggleSort,
 }: RecruitingFilterBarProps) {
   const [openFilter, setOpenFilter] = useState<OpenFilterKey>(null);
   const isDatePickerOpen = openFilter === "date";
   const isTimeSlotOpen = openFilter === "timeSlot";
   const isDurationOpen = openFilter === "duration";
+  const isParticipantsOpen = openFilter === "participants";
 
   const selectedDateRange = useMemo<DateRange>(
     () => ({
@@ -51,7 +52,6 @@ export function RecruitingFilterBar({
   const hasDateSelection = Boolean(selectedDateRange.startDate);
 
   const sortLabel = getOptionLabel(SORT_OPTIONS, values.sort, "정렬");
-  const participantsLabel = getOptionLabel(PARTICIPANTS_OPTIONS, values.participants, "인원");
 
   const handleDateRangeChange = useCallback(
     (range: DateRange) => {
@@ -74,6 +74,10 @@ export function RecruitingFilterBar({
 
   const handleDurationOpenChange = useCallback((isOpen: boolean) => {
     setOpenFilter(isOpen ? "duration" : null);
+  }, []);
+
+  const handleParticipantsOpenChange = useCallback((isOpen: boolean) => {
+    setOpenFilter(isOpen ? "participants" : null);
   }, []);
 
   return (
@@ -102,14 +106,12 @@ export function RecruitingFilterBar({
           onSelect={onSetDurationRange}
         />
 
-        <Filter
-          size="large"
-          radius="sm"
-          onClick={onCycleParticipants}
-          className={cn("w-auto shrink-0", values.participants && "text-text-primary")}
-        >
-          {participantsLabel}
-        </Filter>
+        <ParticipantsFilter
+          isOpen={isParticipantsOpen}
+          participants={values.participants}
+          onOpenChange={handleParticipantsOpenChange}
+          onChange={onSetParticipants}
+        />
       </div>
 
       <Filter

@@ -27,16 +27,19 @@ import {
   type MemberInterestCategory,
 } from "@/types/shared/member-interest-category";
 
+import {
+  SESSION_DURATION_MINUTES_DEFAULT,
+  SESSION_DURATION_MINUTES_MAX,
+  SESSION_DURATION_MINUTES_MIN,
+  SESSION_DURATION_MINUTES_STEP,
+  SESSION_PARTICIPANTS_DEFAULT,
+  SESSION_PARTICIPANTS_MAX,
+  SESSION_PARTICIPANTS_MIN,
+} from "../constants/sessionLimits";
 import { useCreateSession } from "../hooks/useSessionHooks";
 import { validateSessionForm, type SessionFormErrors } from "../utils/validateSessionForm";
 
 import type { CreateSessionRequest } from "../types";
-
-const MIN_DURATION = 30;
-const MAX_DURATION = 180;
-const DURATION_STEP = 5;
-const MIN_PARTICIPANTS = 1;
-const MAX_PARTICIPANTS = 10;
 
 export function SessionCreateForm() {
   const [roomName, setRoomName] = useState("");
@@ -47,8 +50,8 @@ export function SessionCreateForm() {
 
   // 세부 설정 상태
   const [startDateTime, setStartDateTime] = useState<Date | null>(null);
-  const [duration, setDuration] = useState(90); // 기본값 1시간 30분
-  const [participants, setParticipants] = useState(5); // 기본값 5명
+  const [duration, setDuration] = useState(SESSION_DURATION_MINUTES_DEFAULT); // 기본값 1시간 30분
+  const [participants, setParticipants] = useState(SESSION_PARTICIPANTS_DEFAULT); // 기본값 5명
   const [achievementRange, setAchievementRange] = useState(50); // To do 달성도 범위
 
   // DatePicker 팝업 상태
@@ -308,9 +311,9 @@ export function SessionCreateForm() {
             hint="5분 단위로 설정"
             value={duration}
             displayValue={formatDurationKorean(duration)}
-            min={MIN_DURATION}
-            max={MAX_DURATION}
-            step={DURATION_STEP}
+            min={SESSION_DURATION_MINUTES_MIN}
+            max={SESSION_DURATION_MINUTES_MAX}
+            step={SESSION_DURATION_MINUTES_STEP}
             onChange={setDuration}
             className="w-45"
           />
@@ -321,8 +324,8 @@ export function SessionCreateForm() {
             hint="최대 10명까지 가능"
             value={participants}
             displayValue={`${participants}명`}
-            min={MIN_PARTICIPANTS}
-            max={MAX_PARTICIPANTS}
+            min={SESSION_PARTICIPANTS_MIN}
+            max={SESSION_PARTICIPANTS_MAX}
             step={1}
             onChange={setParticipants}
             className="w-45"

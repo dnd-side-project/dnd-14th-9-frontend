@@ -1,6 +1,8 @@
 import type { DateRange } from "@/components/DatePicker/DatePicker.types";
 import { formatDateRangeDisplay, getKoreanDayOfWeek } from "@/lib/utils/date";
 
+import { SESSION_PARTICIPANTS_MAX, SESSION_PARTICIPANTS_MIN } from "../../constants/sessionLimits";
+
 import { TIME_SLOT_OPTIONS } from "./recruitingFilter.types";
 
 import type { DurationRange, TimeSlot } from "../../types";
@@ -57,4 +59,22 @@ const DURATION_TRIGGER_LABEL_MAP: Record<DurationRange, string> = {
 export function getDurationFilterLabel(durationRange: DurationRange | null) {
   if (!durationRange) return "진행시간";
   return DURATION_TRIGGER_LABEL_MAP[durationRange];
+}
+
+function clampParticipantsFilterValue(value: number) {
+  return Math.min(SESSION_PARTICIPANTS_MAX, Math.max(SESSION_PARTICIPANTS_MIN, value));
+}
+
+export function parseParticipantsFilterValue(value: string | null) {
+  if (!value) return null;
+
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+
+  return String(clampParticipantsFilterValue(Math.trunc(parsed)));
+}
+
+export function getParticipantsFilterLabel(participants: string | null) {
+  if (!participants) return "인원";
+  return `${participants}명`;
 }
