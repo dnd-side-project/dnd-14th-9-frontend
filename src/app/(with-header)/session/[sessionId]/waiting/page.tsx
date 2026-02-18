@@ -14,8 +14,10 @@ export default async function WaitingRoomPage({ params }: WaitingRoomPageProps) 
       <div className="relative left-1/2 ml-[-50vw] w-screen">
         <CountdownBanner />
       </div>
-      <LobbyHeader />
-      <SessionInfoCard />
+      <div className="gap-3xl p-3xl flex flex-col">
+        <LobbyHeader />
+        <SessionInfoCard />
+      </div>
     </>
   );
 }

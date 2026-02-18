@@ -23,7 +23,7 @@ const MOCK_SESSION = {
 
 export function SessionInfoCard() {
   return (
-    <section className="gap-lg p-lg border-gra flex flex-col rounded-lg border">
+    <section className="gap-lg p-lg border-gray flex flex-col rounded-lg border">
       <div className="gap-lg flex">
         <div className="gap-sm flex flex-1 flex-col">
           <h2 className="text-[24px] font-bold text-gray-50">{MOCK_SESSION.title}</h2>
@@ -64,21 +64,35 @@ export function SessionInfoCard() {
       </div>
 
       <div className="gap-lg flex">
-        <div className="flex flex-1 flex-col gap-2">
-          <p className="text-sm font-semibold text-gray-400">To do 달성도 범위 기준</p>
-          <p className="text-xs text-gray-500">해당 달성도의 사용자만 참여할 수 있어요</p>
-          <ProgressBar progress={MOCK_SESSION.requiredAchievementRate} />
-          <span className="text-[15px] font-bold text-green-100">
-            {MOCK_SESSION.requiredAchievementRate}%
-          </span>
+        <div className="px-lg py-lg flex flex-1 items-center justify-between rounded-lg bg-gray-900">
+          <div className="flex flex-col gap-1">
+            <p className="text-[16px] font-semibold text-gray-50">To do 달성도 범위 기준</p>
+            <p className="text-[16px] text-gray-500">해당 달성도의 사용자만 참여할 수 있어요</p>
+          </div>
+          <div className="flex w-50 shrink-0 flex-col items-end gap-1">
+            <span className="text-common-white text-[15px] font-bold">
+              {MOCK_SESSION.requiredAchievementRate}%
+            </span>
+            <ProgressBar
+              progress={MOCK_SESSION.requiredAchievementRate}
+              indicatorClassName="bg-green-600"
+            />
+          </div>
         </div>
-        <div className="flex flex-1 flex-col gap-2">
-          <p className="text-sm font-semibold text-gray-400">세션 집중도 범위 기준</p>
-          <p className="text-xs text-gray-500">해당 집중도의 사용자만 참여할 수 있어요</p>
-          <ProgressBar progress={MOCK_SESSION.requiredFocusRate} />
-          <span className="text-[15px] font-bold text-green-100">
-            {MOCK_SESSION.requiredFocusRate}%
-          </span>
+        <div className="px-lg py-lg flex flex-1 items-center justify-between rounded-lg bg-gray-900">
+          <div className="flex flex-col gap-1">
+            <p className="text-[16px] font-semibold text-gray-50">세션 집중도 범위 기준</p>
+            <p className="text-[16px] text-gray-500">해당 집중도의 사용자만 참여할 수 있어요</p>
+          </div>
+          <div className="flex w-50 shrink-0 flex-col items-end gap-1">
+            <span className="text-common-white text-[15px] font-bold">
+              {MOCK_SESSION.requiredFocusRate}%
+            </span>
+            <ProgressBar
+              progress={MOCK_SESSION.requiredFocusRate}
+              indicatorClassName="bg-green-600"
+            />
+          </div>
         </div>
       </div>
     </section>
