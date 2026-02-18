@@ -15,6 +15,7 @@ import { Input } from "@/components/Input/Input";
 import { NumericStepper } from "@/components/NumericStepper/NumericStepper";
 import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
 import { Textarea } from "@/components/Textarea/Textarea";
+import { useClickOutside } from "@/hooks/useClickOutside";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { formatDateTimeDisplay, formatDurationKorean, formatLocalDateTime } from "@/lib/utils/date";
@@ -54,29 +55,8 @@ export function SessionCreateForm() {
   const datePickerContainerRef = useRef<HTMLDivElement>(null);
 
   // 외부 클릭 시 DatePicker 닫기
-  useEffect(() => {
-    if (!isDatePickerOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!datePickerContainerRef.current?.contains(event.target as Node)) {
-        setIsDatePickerOpen(false);
-      }
-    };
-
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsDatePickerOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscapeKey);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscapeKey);
-    };
-  }, [isDatePickerOpen]);
+  const closeDatePicker = useCallback(() => setIsDatePickerOpen(false), []);
+  useClickOutside(datePickerContainerRef, closeDatePicker, isDatePickerOpen);
 
   // 이미지 미리보기 URL 생성
   const imagePreviewUrl = useMemo(() => {
