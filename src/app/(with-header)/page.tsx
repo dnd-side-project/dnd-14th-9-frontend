@@ -2,13 +2,13 @@ import { Suspense } from "react";
 
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 
-import { Banner } from "@/features/home/components/Banner/Banner";
-import { RecommendedSection } from "@/features/home/components/RecommendedSection/RecommendedSection";
-import { RecommendedSectionSkeleton } from "@/features/home/components/RecommendedSection/RecommendedSectionSkeleton";
-import { RecruitingSection } from "@/features/home/components/RecruitingSection/RecruitingSection";
-import { RecruitingSectionSkeleton } from "@/features/home/components/RecruitingSection/RecruitingSectionSkeleton";
-import { SearchFilterSection } from "@/features/home/components/SearchFilterSection/SearchFilterSection";
-import { SearchFilterSectionSkeleton } from "@/features/home/components/SearchFilterSection/SearchFilterSectionSkeleton";
+import { Banner } from "@/features/session/components/Banner/Banner";
+import { RecommendedSection } from "@/features/session/components/RecommendedSection/RecommendedSection";
+import { RecommendedSectionSkeleton } from "@/features/session/components/RecommendedSection/RecommendedSectionSkeleton";
+import { RecruitingSection } from "@/features/session/components/RecruitingSection/RecruitingSection";
+import { RecruitingSectionSkeleton } from "@/features/session/components/RecruitingSection/RecruitingSectionSkeleton";
+import { SearchFilterSection } from "@/features/session/components/SearchFilterSection/SearchFilterSection";
+import { SearchFilterSectionSkeleton } from "@/features/session/components/SearchFilterSection/SearchFilterSectionSkeleton";
 
 /**
  * 홈 화면 (메인 페이지)
