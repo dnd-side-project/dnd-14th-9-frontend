@@ -17,7 +17,7 @@ export const SORT_OPTIONS: FilterOption<SessionSort>[] = [
 ];
 
 export const DURATION_OPTIONS: FilterOption<DurationRange>[] = [
-  { value: "HALF_TO_ONE_HOUR", label: "30분 ~ 1시간" },
+  { value: "HALF_TO_ONE_HOUR", label: "30분 ~1시간" },
   { value: "TWO_TO_FOUR_HOURS", label: "2시간 ~ 4시간" },
   { value: "FIVE_TO_EIGHT_HOURS", label: "5시간 ~ 8시간" },
   { value: "TEN_PLUS_HOURS", label: "10시간 이상" },

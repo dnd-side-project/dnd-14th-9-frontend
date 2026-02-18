@@ -117,11 +117,12 @@ export function useRecruitingFilters() {
     [updateFilters, values.timeSlots]
   );
 
-  const cycleDurationRange = useCallback(() => {
-    updateFilters({
-      durationRange: getNextOptionValue(DURATION_OPTIONS, values.durationRange),
-    });
-  }, [updateFilters, values.durationRange]);
+  const setDurationRange = useCallback(
+    (durationRange: DurationRange) => {
+      updateFilters({ durationRange });
+    },
+    [updateFilters]
+  );
 
   const cycleParticipants = useCallback(() => {
     updateFilters({
@@ -152,7 +153,7 @@ export function useRecruitingFilters() {
     updateFilters,
     setDateRange,
     toggleTimeSlot,
-    cycleDurationRange,
+    setDurationRange,
     cycleParticipants,
     toggleSort,
     setPage,

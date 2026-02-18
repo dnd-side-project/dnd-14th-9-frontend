@@ -7,40 +7,37 @@ import { Filter } from "@/components/Filter/Filter";
 import { cn } from "@/lib/utils/utils";
 
 import { DateRangeFilter } from "./DateRangeFilter";
-import {
-  DURATION_OPTIONS,
-  getOptionLabel,
-  PARTICIPANTS_OPTIONS,
-  SORT_OPTIONS,
-} from "./recruitingFilter.types";
+import { DurationFilter } from "./DurationFilter";
+import { getOptionLabel, PARTICIPANTS_OPTIONS, SORT_OPTIONS } from "./recruitingFilter.types";
 import { formatDateRangeFilterLabel, parseDateParam } from "./recruitingFilter.utils";
 import { StartTimeFilter } from "./StartTimeFilter";
 
 import type { RecruitingFilterValues } from "../../hooks/useRecruitingFilters";
-import type { TimeSlot } from "../../types";
+import type { DurationRange, TimeSlot } from "../../types";
 
 interface RecruitingFilterBarProps {
   values: RecruitingFilterValues;
   onSetDateRange: (startDate: Date | null, endDate: Date | null) => void;
   onToggleTimeSlot: (timeSlot: TimeSlot) => void;
-  onCycleDurationRange: () => void;
+  onSetDurationRange: (durationRange: DurationRange) => void;
   onCycleParticipants: () => void;
   onToggleSort: () => void;
 }
 
-type OpenFilterKey = "date" | "timeSlot" | null;
+type OpenFilterKey = "date" | "timeSlot" | "duration" | null;
 
 export function RecruitingFilterBar({
   values,
   onSetDateRange,
   onToggleTimeSlot,
-  onCycleDurationRange,
+  onSetDurationRange,
   onCycleParticipants,
   onToggleSort,
 }: RecruitingFilterBarProps) {
   const [openFilter, setOpenFilter] = useState<OpenFilterKey>(null);
   const isDatePickerOpen = openFilter === "date";
   const isTimeSlotOpen = openFilter === "timeSlot";
+  const isDurationOpen = openFilter === "duration";
 
   const selectedDateRange = useMemo<DateRange>(
     () => ({
@@ -54,7 +51,6 @@ export function RecruitingFilterBar({
   const hasDateSelection = Boolean(selectedDateRange.startDate);
 
   const sortLabel = getOptionLabel(SORT_OPTIONS, values.sort, "정렬");
-  const durationLabel = getOptionLabel(DURATION_OPTIONS, values.durationRange, "진행 시간");
   const participantsLabel = getOptionLabel(PARTICIPANTS_OPTIONS, values.participants, "인원");
 
   const handleDateRangeChange = useCallback(
@@ -76,6 +72,10 @@ export function RecruitingFilterBar({
     setOpenFilter(isOpen ? "timeSlot" : null);
   }, []);
 
+  const handleDurationOpenChange = useCallback((isOpen: boolean) => {
+    setOpenFilter(isOpen ? "duration" : null);
+  }, []);
+
   return (
     <div className="gap-md flex flex-col">
       <div className="flex items-center gap-[15px]">
@@ -95,14 +95,12 @@ export function RecruitingFilterBar({
           onToggleTimeSlot={onToggleTimeSlot}
         />
 
-        <Filter
-          size="large"
-          radius="sm"
-          onClick={onCycleDurationRange}
-          className={cn("w-auto shrink-0", values.durationRange && "text-text-primary")}
-        >
-          {durationLabel}
-        </Filter>
+        <DurationFilter
+          isOpen={isDurationOpen}
+          value={values.durationRange}
+          onOpenChange={handleDurationOpenChange}
+          onSelect={onSetDurationRange}
+        />
 
         <Filter
           size="large"

@@ -3,7 +3,7 @@ import { formatDateRangeDisplay, getKoreanDayOfWeek } from "@/lib/utils/date";
 
 import { TIME_SLOT_OPTIONS } from "./recruitingFilter.types";
 
-import type { TimeSlot } from "../../types";
+import type { DurationRange, TimeSlot } from "../../types";
 
 export function parseDateParam(value: string | null) {
   if (!value) return null;
@@ -45,4 +45,16 @@ export function getTimeSlotFilterLabel(selectedTimeSlots: TimeSlot[]) {
   }
 
   return `${selectedLabels[0]} 외 ${selectedLabels.length - 1}`;
+}
+
+const DURATION_TRIGGER_LABEL_MAP: Record<DurationRange, string> = {
+  HALF_TO_ONE_HOUR: "30분-1시간",
+  TWO_TO_FOUR_HOURS: "2시간-4시간",
+  FIVE_TO_EIGHT_HOURS: "5시간-8시간",
+  TEN_PLUS_HOURS: "10시간 이상",
+};
+
+export function getDurationFilterLabel(durationRange: DurationRange | null) {
+  if (!durationRange) return "진행시간";
+  return DURATION_TRIGGER_LABEL_MAP[durationRange];
 }
