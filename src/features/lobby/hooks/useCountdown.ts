@@ -34,11 +34,7 @@ export function useCountdown(targetTime: Date): CountdownResult {
   const seconds = totalSeconds % 60;
   const isExpired = totalSeconds <= 0;
 
-  const parts: string[] = [];
-  if (hours > 0) parts.push(`${hours}시간`);
-  if (minutes > 0 || hours > 0) parts.push(`${String(minutes).padStart(2, "0")}분`);
-  parts.push(`${String(seconds).padStart(2, "0")}초`);
-  const formatted = parts.join(" ");
+  const formatted = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
   return { hours, minutes, seconds, isExpired, formatted };
 }
