@@ -9,6 +9,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { createCrudHooks } from "@/hooks/createCrudHooks";
+import { ApiError } from "@/lib/api/api-client";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
 import { sessionApi } from "../api";
@@ -49,7 +50,25 @@ export const sessionKeys = {
 
 export const useSessionList = sessionCrud.useList;
 export const useSessionDetail = sessionCrud.useDetail!;
-export const useCreateSession = sessionCrud.useCreate!;
+/**
+ * 세션 생성 mutation 훅
+ *
+ * CRUD 팩토리의 useCreate는 단일 인자만 전달하여 image 파라미터가 누락되므로,
+ * body와 image를 함께 전달할 수 있도록 커스텀 mutation으로 구현합니다.
+ */
+export function useCreateSession() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ApiSuccessResponse<CreateSessionResponse>,
+    ApiError,
+    { body: CreateSessionRequest; image?: File }
+  >({
+    mutationFn: ({ body, image }) => sessionApi.createSession(body, image),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+    },
+  });
+}
 export const prefetchSessionList = sessionCrud.prefetch;
 
 export function useSessionReport(sessionId: string) {
