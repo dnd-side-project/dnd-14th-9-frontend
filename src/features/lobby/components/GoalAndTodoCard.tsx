@@ -18,8 +18,8 @@ export function GoalAndTodoCard() {
   const [isEditing, setIsEditing] = useState(false);
   const [goal, setGoal] = useState(MOCK_GOAL);
   const [todos, setTodos] = useState(MOCK_TODOS);
-  const [draftGoal, setDraftGoal] = useState(MOCK_GOAL);
-  const [draftTodos, setDraftTodos] = useState(MOCK_TODOS);
+  const [draftGoal, setDraftGoal] = useState("");
+  const [draftTodos, setDraftTodos] = useState<ReportTodoItem[]>([]);
 
   const handleEdit = () => {
     setDraftGoal(goal);
