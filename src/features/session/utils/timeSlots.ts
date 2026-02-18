@@ -2,16 +2,6 @@ import type { TimeSlot } from "../types";
 
 export const TIME_SLOT_ORDER: TimeSlot[] = ["MORNING", "AFTERNOON", "EVENING"];
 
-export const TIME_SLOT_OPTIONS: Array<{
-  value: TimeSlot;
-  triggerLabel: string;
-  panelLabel: string;
-}> = [
-  { value: "MORNING", triggerLabel: "오전(6-12시)", panelLabel: "오전 (6 ~ 12시)" },
-  { value: "AFTERNOON", triggerLabel: "오후(12-18시)", panelLabel: "오후 (12 ~ 18시)" },
-  { value: "EVENING", triggerLabel: "저녁(18-24시)", panelLabel: "저녁 (18 ~ 24시)" },
-];
-
 const TIME_SLOT_SET = new Set<TimeSlot>(TIME_SLOT_ORDER);
 
 export function parseTimeSlotsParam(value: string | null): TimeSlot[] {
