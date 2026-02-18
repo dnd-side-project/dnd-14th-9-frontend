@@ -14,7 +14,7 @@ export function CountdownBanner({ targetTime = TEST_TARGET }: CountdownBannerPro
   const { formatted, isExpired } = useCountdown(targetTime);
 
   return (
-    <div className="mb-2xl bg-surface-strong px-md py-sm rounded-md text-center">
+    <div className="bg-surface-strong px-md py-sm text-center">
       {isExpired ? (
         <p className="text-text-status-negative-default text-base font-semibold">
           세션이 곧 시작됩니다

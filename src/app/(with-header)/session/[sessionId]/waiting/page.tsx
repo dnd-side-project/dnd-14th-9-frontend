@@ -9,9 +9,13 @@ export default async function WaitingRoomPage({ params }: WaitingRoomPageProps) 
   const { sessionId } = await params;
 
   return (
-    <main className="p-3xl mx-auto w-full max-w-7xl">
-      <CountdownBanner />
-      <LobbyHeader />
-    </main>
+    <>
+      <div className="relative left-1/2 ml-[-50vw] w-screen">
+        <CountdownBanner />
+      </div>
+      <div className="p-3xl">
+        <LobbyHeader />
+      </div>
+    </>
   );
 }

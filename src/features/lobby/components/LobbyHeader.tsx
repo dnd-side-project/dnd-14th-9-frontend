@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/Button/Button";
-import { ArrowLeftIcon } from "@/components/Icon/ArrowLeftIcon";
+import { ChevronLeftIcon } from "@/components/Icon/ChevronLeftIcon";
 
 export function LobbyHeader() {
   const router = useRouter();
@@ -14,14 +14,14 @@ export function LobbyHeader() {
 
   return (
     <header className="mb-2xl flex items-start justify-between">
-      <div className="gap-sm flex items-start">
+      <div className="gap-lg flex items-start">
         <button
           type="button"
           onClick={handleBack}
           aria-label="뒤로 가기"
           className="text-text-muted hover:text-text-secondary mt-1 shrink-0 cursor-pointer transition-colors"
         >
-          <ArrowLeftIcon size="medium" />
+          <ChevronLeftIcon size="medium" />
         </button>
 
         <div>
