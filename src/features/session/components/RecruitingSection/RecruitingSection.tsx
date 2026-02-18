@@ -1,27 +1,125 @@
 "use client";
 
+import { useCallback } from "react";
+
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { PaginationList } from "@/components/Pagination/PaginationList";
+
+import { useSessionList } from "../../hooks/useSessionHooks";
+import { Card } from "../Card/Card";
+
+import { RecruitingFilterBar } from "./RecruitingFilterBar";
+
+import type { SessionSort, SessionCategoryFilter } from "../../types";
+
+const DEFAULT_PAGE_SIZE = 12;
+
 /**
- * RecruitingSection - 모집 중 세션
+ * RecruitingSection - 모집 중 세션 목록
  *
  * 역할:
  * - URL searchParams 기반 필터링/페이지네이션
- * - useSuspenseQuery로 모집 중 세션 데이터 사용
- * - SearchFilterSection의 검색/카테고리 변경에 반응
- *
- * TODO(이경환): API 스펙 확정 후 구현
- * - useSuspenseQuery + Query Options
- * - 필터 UI (정렬, 진행시간, 시작시간, 인원)
- * - 페이지네이션 UI
+ * - SearchFilterSection의 검색어/카테고리 변경에 반응
+ * - 정렬 드롭다운 + 카드 그리드 + PaginationList
  */
 export function RecruitingSection() {
-  // TODO(이경환): API 스펙 확정 후 구현
-  // const searchParams = useSearchParams();
-  // const params = Object.fromEntries(searchParams.entries());
-  // const { data } = useSuspenseQuery(homeQueries.recruiting(params));
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const keyword = searchParams.get("q") ?? undefined;
+  const category = (searchParams.get("category") as SessionCategoryFilter) ?? undefined;
+  const sort = (searchParams.get("sort") as SessionSort) ?? "LATEST";
+  const page = Number(searchParams.get("page") ?? "1");
+
+  const { data, isPending } = useSessionList({
+    keyword,
+    category,
+    sort,
+    page,
+    size: DEFAULT_PAGE_SIZE,
+  });
+
+  const updateSearchParams = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === null || value === "") {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+      }
+
+      const queryString = params.toString();
+      router.push(queryString ? `?${queryString}` : "/", { scroll: false });
+    },
+    [router, searchParams]
+  );
+
+  const handleSortChange = useCallback(
+    (newSort: string) => {
+      updateSearchParams({ sort: newSort, page: null });
+    },
+    [updateSearchParams]
+  );
+
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      updateSearchParams({ page: newPage === 1 ? null : String(newPage) });
+    },
+    [updateSearchParams]
+  );
+
+  const sessions = data?.result?.sessions ?? [];
+  const totalPage = data?.result?.totalPage ?? 0;
 
   return (
-    <section>
-      <div>RecruitingSection placeholder</div>
+    <section className="gap-xl flex flex-col">
+      <div className="flex items-center justify-between">
+        <h2 className="text-text-primary text-xl font-bold">모집 중인 세션</h2>
+        <RecruitingFilterBar sort={sort} onSortChange={handleSortChange} />
+      </div>
+
+      {isPending ? (
+        <div className="gap-md grid grid-cols-4">
+          {Array.from({ length: DEFAULT_PAGE_SIZE }).map((_, i) => (
+            <div key={i} className="bg-surface-strong aspect-[4/3] animate-pulse rounded-lg" />
+          ))}
+        </div>
+      ) : sessions.length === 0 ? (
+        <div className="text-text-muted flex h-60 items-center justify-center text-sm">
+          모집 중인 세션이 없습니다
+        </div>
+      ) : (
+        <div className="gap-md grid grid-cols-4">
+          {sessions.map((session) => (
+            <Card
+              key={session.title + session.startTime}
+              thumbnailSrc={session.imageUrl}
+              category={session.category}
+              createdAt={session.startTime}
+              title={session.title}
+              nickname={session.hostNickname}
+              currentParticipants={session.currentParticipants}
+              maxParticipants={session.maxParticipants}
+              durationMinutes={session.sessionDurationMinutes}
+              sessionDate={session.startTime}
+            />
+          ))}
+        </div>
+      )}
+
+      {totalPage > 1 && (
+        <div className="flex justify-center">
+          <PaginationList
+            totalPage={totalPage}
+            currentPage={page}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </section>
   );
 }
