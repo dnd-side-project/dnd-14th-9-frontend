@@ -63,12 +63,12 @@ function RecommendedContent() {
     <section className="gap-xl flex flex-col">
       <div className="flex items-center justify-between">
         <div className="gap-xs flex flex-col">
-          <h2 className="text-text-primary text-xl font-bold">
+          <h2 className="text-text-primary text-2xl font-bold">
             {editData?.result.nickname}님을 위한 추천 세션
           </h2>
           {currentCategory && (
-            <p className="text-text-secondary text-sm">
-              {getMemberInterestCategoryLabel(currentCategory)} 카테고리
+            <p className="text-text-disabled text-base">
+              마이페이지에서 설정한 카테고리를 기반해서 방을 추천해드려요
             </p>
           )}
         </div>
