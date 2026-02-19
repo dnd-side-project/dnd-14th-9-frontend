@@ -1,52 +1,29 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/Button/Button";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
+import { useDialog } from "@/hooks/useDialog";
 
 import { useSessionDetail } from "../../hooks/useSessionHooks";
 import { Card } from "../Card/Card";
 
 import { getSessionStatusDisplay } from "./utils";
 
-interface JoinSessionModalProps {
+interface SessionDetailModalProps {
   sessionId: string;
 }
 
-export function JoinSessionModal({ sessionId }: JoinSessionModalProps) {
+export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
   const router = useRouter();
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const { dialogRef, handleClose, handleBackdropClick } = useDialog("/");
   const { data } = useSessionDetail(sessionId);
 
   const session = data?.result;
 
-  const handleClose = () => {
-    if (window.history.length > 1) {
-      router.back();
-      return;
-    }
-
-    router.replace("/");
-  };
-
   const handleLogin = () => {
     router.push(`/login?next=/session/${sessionId}/waiting`);
-  };
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    dialog.showModal();
-    return () => dialog.close();
-  }, []);
-
-  const handleBackdropClick = (event: React.MouseEvent<HTMLDialogElement>) => {
-    if (event.target !== dialogRef.current) return;
-    handleClose();
   };
 
   const statusDisplay = session ? getSessionStatusDisplay(session.status) : null;
