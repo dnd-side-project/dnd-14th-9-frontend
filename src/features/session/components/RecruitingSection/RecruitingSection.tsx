@@ -1,18 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { useSearchParams } from "next/navigation";
 
 import { PaginationList } from "@/components/Pagination/PaginationList";
 
+import { RECRUITING_PAGE_SIZE } from "../../constants/pagination";
 import { useRecruitingFilters } from "../../hooks/useRecruitingFilters";
 import { useSessionList } from "../../hooks/useSessionHooks";
+import { parsePageParam } from "../../utils/pagination";
 import { Card } from "../Card/Card";
 
 import { RecruitingFilterBar } from "./RecruitingFilterBar";
 
 import type { SessionCategoryFilter } from "../../types";
-
-const DEFAULT_PAGE_SIZE = 12;
 
 /**
  * RecruitingSection - 모집 중 세션 목록
@@ -37,14 +39,14 @@ export function RecruitingSection() {
   // URL 파라미터 파싱
   const keyword = searchParams.get("q") ?? undefined;
   const category = (searchParams.get("category") as SessionCategoryFilter) ?? undefined;
-  const page = Number(searchParams.get("page") ?? "1");
+  const page = parsePageParam(searchParams.get("page"));
 
   const { data, isPending } = useSessionList({
     keyword,
     category,
     sort: values.sort,
     page,
-    size: DEFAULT_PAGE_SIZE,
+    size: RECRUITING_PAGE_SIZE,
     startDate: values.startDate ?? undefined,
     endDate: values.endDate ?? undefined,
     timeSlots: values.timeSlots.length > 0 ? values.timeSlots : undefined,
@@ -54,6 +56,12 @@ export function RecruitingSection() {
 
   const sessions = data?.result?.sessions ?? [];
   const totalPage = data?.result?.totalPage ?? 0;
+
+  useEffect(() => {
+    if (!isPending && totalPage > 0 && page > totalPage) {
+      setPage(totalPage);
+    }
+  }, [isPending, page, setPage, totalPage]);
 
   return (
     <section className="flex flex-col gap-[10px]">
@@ -76,7 +84,7 @@ export function RecruitingSection() {
 
       {isPending ? (
         <div className="grid grid-cols-4 gap-x-[24px] gap-y-[48px]">
-          {Array.from({ length: DEFAULT_PAGE_SIZE }).map((_, i) => (
+          {Array.from({ length: RECRUITING_PAGE_SIZE }).map((_, i) => (
             <div key={i} className="bg-surface-strong aspect-[320/170] animate-pulse rounded-lg" />
           ))}
         </div>

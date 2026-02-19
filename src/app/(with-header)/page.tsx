@@ -10,8 +10,10 @@ import { RecruitingSection } from "@/features/session/components/RecruitingSecti
 import { RecruitingSectionSkeleton } from "@/features/session/components/RecruitingSection/RecruitingSectionSkeleton";
 import { SearchFilterSection } from "@/features/session/components/SearchFilterSection/SearchFilterSection";
 import { SearchFilterSectionSkeleton } from "@/features/session/components/SearchFilterSection/SearchFilterSectionSkeleton";
+import { RECRUITING_PAGE_SIZE } from "@/features/session/constants/pagination";
 import { sessionKeys } from "@/features/session/hooks/useSessionHooks";
 import type { SessionCategoryFilter, SessionSort } from "@/features/session/types";
+import { parsePageParam } from "@/features/session/utils/pagination";
 
 /**
  * 홈 화면 (메인 페이지)
@@ -41,13 +43,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     | SessionCategoryFilter
     | undefined;
   const sort = (typeof params["sort"] === "string" ? params["sort"] : "LATEST") as SessionSort;
-  const page = typeof params["page"] === "string" ? Number(params["page"]) : 1;
+  const page = parsePageParam(typeof params["page"] === "string" ? params["page"] : undefined);
   const isSearchMode = !!q;
 
   const queryClient = new QueryClient();
 
   // 모집 중 세션 목록 prefetch (첫 페이지 로드 성능 최적화)
-  const listParams = { keyword: q, category, sort, page, size: 8 };
+  const listParams = { keyword: q, category, sort, page, size: RECRUITING_PAGE_SIZE };
   await queryClient.prefetchQuery({
     queryKey: sessionKeys.list(listParams),
     queryFn: () => sessionApi.getList(listParams),
