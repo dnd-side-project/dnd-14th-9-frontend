@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { PaginationList } from "@/components/Pagination/PaginationList";
@@ -85,18 +86,19 @@ export function SessionList() {
       ) : (
         <div className="grid grid-cols-4 gap-x-[24px] gap-y-[48px]">
           {sessions.map((session) => (
-            <Card
-              key={session.sessionId}
-              thumbnailSrc={session.imageUrl}
-              category={session.category}
-              createdAt={session.startTime}
-              title={session.title}
-              nickname={session.hostNickname}
-              currentParticipants={session.currentParticipants}
-              maxParticipants={session.maxParticipants}
-              durationMinutes={session.sessionDurationMinutes}
-              sessionDate={session.startTime}
-            />
+            <Link key={session.sessionId} href={`/session/${session.sessionId}`}>
+              <Card
+                thumbnailSrc={session.imageUrl}
+                category={session.category}
+                createdAt={session.startTime}
+                title={session.title}
+                nickname={session.hostNickname}
+                currentParticipants={session.currentParticipants}
+                maxParticipants={session.maxParticipants}
+                durationMinutes={session.sessionDurationMinutes}
+                sessionDate={session.startTime}
+              />
+            </Link>
           ))}
         </div>
       )}

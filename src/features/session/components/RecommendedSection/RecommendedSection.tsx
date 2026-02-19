@@ -2,6 +2,8 @@
 
 import { useMemo } from "react";
 
+import Link from "next/link";
+
 import { PaginationFraction } from "@/components/Pagination/PaginationFraction";
 import { useIsAuthenticated, useSuspenseMeForEdit } from "@/features/member/hooks/useMemberHooks";
 import type { Category } from "@/lib/constants/category";
@@ -101,18 +103,19 @@ function RecommendedGrid({ category }: { category: Category }) {
   return (
     <div className={gridClassName}>
       {sessions.map((session) => (
-        <Card
-          key={session.sessionId}
-          thumbnailSrc={session.imageUrl}
-          category={session.category}
-          createdAt={session.startTime}
-          title={session.title}
-          nickname={session.hostNickname}
-          currentParticipants={session.currentParticipants}
-          maxParticipants={session.maxParticipants}
-          durationMinutes={session.sessionDurationMinutes}
-          sessionDate={session.startTime}
-        />
+        <Link key={session.sessionId} href={`/session/${session.sessionId}`}>
+          <Card
+            thumbnailSrc={session.imageUrl}
+            category={session.category}
+            createdAt={session.startTime}
+            title={session.title}
+            nickname={session.hostNickname}
+            currentParticipants={session.currentParticipants}
+            maxParticipants={session.maxParticipants}
+            durationMinutes={session.sessionDurationMinutes}
+            sessionDate={session.startTime}
+          />
+        </Link>
       ))}
     </div>
   );
