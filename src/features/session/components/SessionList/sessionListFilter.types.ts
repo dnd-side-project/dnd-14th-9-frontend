@@ -12,8 +12,9 @@ export type TimeSlotFilterOption = {
 };
 
 export const SORT_OPTIONS: FilterOption<SessionSort>[] = [
-  { value: "LATEST", label: "최신순" },
   { value: "POPULAR", label: "인기순" },
+  { value: "LATEST", label: "최신순" },
+  { value: "DEADLINE_APPROACHING", label: "마감순" },
 ];
 
 export const DURATION_OPTIONS: FilterOption<DurationRange>[] = [

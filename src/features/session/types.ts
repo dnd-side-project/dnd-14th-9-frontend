@@ -53,7 +53,7 @@ export type SessionCategory = Category;
 // 필터용 카테고리 (ALL 포함)
 export type SessionCategoryFilter = CategoryFilter;
 
-export type SessionSort = "POPULAR" | "LATEST";
+export type SessionSort = "POPULAR" | "LATEST" | "DEADLINE_APPROACHING";
 
 export type TimeSlot = "MORNING" | "AFTERNOON" | "EVENING";
 

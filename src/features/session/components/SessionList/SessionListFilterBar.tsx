@@ -3,17 +3,16 @@
 import { useState } from "react";
 
 import type { DateRange } from "@/components/DatePicker/DatePicker.types";
-import { Filter } from "@/components/Filter/Filter";
 
 import { DateRangeFilter } from "./DateRangeFilter";
 import { DurationFilter } from "./DurationFilter";
 import { ParticipantsFilter } from "./ParticipantsFilter";
-import { getOptionLabel, SORT_OPTIONS } from "./sessionListFilter.types";
 import { formatDateRangeFilterLabel, parseDateParam } from "./sessionListFilter.utils";
+import { SortFilter } from "./SortFilter";
 import { StartTimeFilter } from "./StartTimeFilter";
 
 import type { SessionListFilterValues } from "../../hooks/useSessionListFilters";
-import type { DurationRange, TimeSlot } from "../../types";
+import type { DurationRange, SessionSort, TimeSlot } from "../../types";
 
 interface SessionListFilterBarProps {
   values: SessionListFilterValues;
@@ -21,10 +20,10 @@ interface SessionListFilterBarProps {
   onToggleTimeSlot: (timeSlot: TimeSlot) => void;
   onSetDurationRange: (durationRange: DurationRange) => void;
   onSetParticipants: (participants: number) => void;
-  onToggleSort: () => void;
+  onSetSort: (sort: SessionSort) => void;
 }
 
-type OpenFilterKey = "date" | "timeSlot" | "duration" | "participants" | null;
+type OpenFilterKey = "date" | "timeSlot" | "duration" | "participants" | "sort" | null;
 
 export function SessionListFilterBar({
   values,
@@ -32,13 +31,14 @@ export function SessionListFilterBar({
   onToggleTimeSlot,
   onSetDurationRange,
   onSetParticipants,
-  onToggleSort,
+  onSetSort,
 }: SessionListFilterBarProps) {
   const [openFilter, setOpenFilter] = useState<OpenFilterKey>(null);
   const isDatePickerOpen = openFilter === "date";
   const isTimeSlotOpen = openFilter === "timeSlot";
   const isDurationOpen = openFilter === "duration";
   const isParticipantsOpen = openFilter === "participants";
+  const isSortOpen = openFilter === "sort";
 
   const selectedDateRange: DateRange = {
     startDate: parseDateParam(values.startDate),
@@ -47,8 +47,6 @@ export function SessionListFilterBar({
 
   const dateFilterLabel = formatDateRangeFilterLabel(selectedDateRange);
   const hasDateSelection = Boolean(selectedDateRange.startDate);
-
-  const sortLabel = getOptionLabel(SORT_OPTIONS, values.sort, "정렬");
 
   const handleDateRangeChange = (range: DateRange) => {
     onSetDateRange(range.startDate, range.endDate);
@@ -72,6 +70,10 @@ export function SessionListFilterBar({
 
   const handleParticipantsOpenChange = (isOpen: boolean) => {
     setOpenFilter(isOpen ? "participants" : null);
+  };
+
+  const handleSortOpenChange = (isOpen: boolean) => {
+    setOpenFilter(isOpen ? "sort" : null);
   };
 
   return (
@@ -108,15 +110,13 @@ export function SessionListFilterBar({
         />
       </div>
 
-      <Filter
-        size="medium"
-        radius="sm"
-        bordered={false}
-        onClick={onToggleSort}
-        className="ml-auto min-w-[80px]"
-      >
-        {sortLabel}
-      </Filter>
+      <SortFilter
+        isOpen={isSortOpen}
+        value={values.sort}
+        onOpenChange={handleSortOpenChange}
+        onSelect={onSetSort}
+        className="self-end"
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useCallback } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { SORT_OPTIONS } from "../components/SessionList/sessionListFilter.types";
 import { SESSION_PARTICIPANTS_MAX, SESSION_PARTICIPANTS_MIN } from "../constants/sessionLimits";
 import { parseSessionListSearchParams } from "../utils/parseSessionListSearchParams";
 import { formatTimeSlotsParam } from "../utils/timeSlots";
@@ -102,10 +103,15 @@ export function useSessionListFilters() {
     });
   };
 
+  const setSort = (sort: SessionSort) => {
+    updateFilters({ sort });
+  };
+
   const toggleSort = () => {
-    updateFilters({
-      sort: values.sort === "LATEST" ? "POPULAR" : "LATEST",
-    });
+    const sortValues = SORT_OPTIONS.map((o) => o.value);
+    const currentIndex = sortValues.indexOf(values.sort);
+    const nextSort = sortValues[(currentIndex + 1) % sortValues.length];
+    updateFilters({ sort: nextSort });
   };
 
   const setPage = useCallback(
@@ -127,6 +133,7 @@ export function useSessionListFilters() {
     toggleTimeSlot,
     setDurationRange,
     setParticipantsCount,
+    setSort,
     toggleSort,
     setPage,
   };

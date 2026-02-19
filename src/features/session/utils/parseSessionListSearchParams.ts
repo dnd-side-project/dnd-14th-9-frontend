@@ -75,7 +75,7 @@ export function parseSessionListSearchParams(
   return {
     keyword,
     category: isSessionCategoryFilterValue(categoryParam) ? categoryParam : undefined,
-    sort: isSessionSortValue(sortParam) ? sortParam : "LATEST",
+    sort: isSessionSortValue(sortParam) ? sortParam : "POPULAR",
     startDate: getParam(searchParams, "startDate"),
     endDate: getParam(searchParams, "endDate"),
     durationRange: isDurationRangeValue(durationRangeParam) ? durationRangeParam : undefined,

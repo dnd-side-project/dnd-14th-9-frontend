@@ -29,7 +29,7 @@ export function SessionList() {
     toggleTimeSlot,
     setDurationRange,
     setParticipantsCount,
-    toggleSort,
+    setSort,
     setPage,
   } = useSessionListFilters();
   const searchParams = useSearchParams();
@@ -73,7 +73,7 @@ export function SessionList() {
             onToggleTimeSlot={toggleTimeSlot}
             onSetDurationRange={setDurationRange}
             onSetParticipants={setParticipantsCount}
-            onToggleSort={toggleSort}
+            onSetSort={setSort}
           />
         </div>
       </div>
