@@ -61,7 +61,7 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
       ref={dialogRef}
       onCancel={onClose}
       onClick={handleBackdropClick}
-      className="bg-surface-default gap-lg p-3xl fixed inset-0 m-auto flex w-full max-w-110 flex-col rounded-lg border-0 backdrop:bg-(--color-overlay-default)"
+      className="bg-surface-default gap-lg p-3xl fixed inset-0 m-auto flex w-full max-w-110 flex-col rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default)"
     >
       {/* 헤더 */}
       <div className="flex flex-col gap-1">
@@ -89,7 +89,7 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
       </div>
 
       {/* 구분선 */}
-      <div className="bg-divider-default h-px w-full" />
+      <div className="h-px w-full bg-gray-600" />
 
       {/* Todo */}
       <div className="gap-sm flex flex-col">
@@ -155,15 +155,26 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
       </div>
 
       {/* 하단 버튼 */}
-      <Button
-        variant="solid"
-        colorScheme="primary"
-        size="medium"
-        className="w-full"
-        onClick={handleJoin}
-      >
-        세션 참여하기
-      </Button>
+      <div className="flex w-full gap-2">
+        <Button
+          variant="outlined"
+          colorScheme="secondary"
+          size="medium"
+          className="flex-1"
+          onClick={onClose}
+        >
+          그만두기
+        </Button>
+        <Button
+          variant="solid"
+          colorScheme="primary"
+          size="medium"
+          className="flex-1"
+          onClick={handleJoin}
+        >
+          세션 참여하기
+        </Button>
+      </div>
     </dialog>
   );
 }
