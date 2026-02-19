@@ -10,6 +10,8 @@ import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { Input } from "@/components/Input/Input";
 import type { ReportTodoItem } from "@/features/session/types";
 
+const MAX_TODOS = 5;
+
 interface SessionJoinModalProps {
   sessionId: string;
   onClose: () => void;
@@ -45,7 +47,7 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
   };
 
   const handleAddTodo = () => {
-    if (todos.length >= 5) return;
+    if (todos.length >= MAX_TODOS) return;
     setTodos((prev) => [...prev, { todoId: String(Date.now()), content: "", isCompleted: false }]);
   };
 
@@ -112,7 +114,7 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
           <ul className="flex flex-col gap-2">
             {todos.map((todo, index) => {
               const isFirst = index === 0;
-              const canAdd = todos.length < 5;
+              const canAdd = todos.length < MAX_TODOS;
               return (
                 <li key={todo.todoId} className="flex items-start gap-2">
                   <Input
