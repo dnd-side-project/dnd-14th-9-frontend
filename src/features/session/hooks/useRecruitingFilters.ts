@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -41,19 +41,16 @@ function clampParticipants(value: number) {
 export function useRecruitingFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const parsedParams = parseSessionListSearchParams(searchParams);
 
-  const values = useMemo<RecruitingFilterValues>(() => {
-    const parsedParams = parseSessionListSearchParams(searchParams);
-
-    return {
-      startDate: parsedParams.startDate ?? null,
-      endDate: parsedParams.endDate ?? null,
-      timeSlots: parsedParams.timeSlots,
-      durationRange: parsedParams.durationRange ?? null,
-      participants: parsedParams.participants ? String(parsedParams.participants) : null,
-      sort: parsedParams.sort,
-    };
-  }, [searchParams]);
+  const values: RecruitingFilterValues = {
+    startDate: parsedParams.startDate ?? null,
+    endDate: parsedParams.endDate ?? null,
+    timeSlots: parsedParams.timeSlots,
+    durationRange: parsedParams.durationRange ?? null,
+    participants: parsedParams.participants ? String(parsedParams.participants) : null,
+    sort: parsedParams.sort,
+  };
 
   const updateFilters = useCallback(
     (
@@ -81,56 +78,44 @@ export function useRecruitingFilters() {
     [router, searchParams]
   );
 
-  const setDateRange = useCallback(
-    (startDate: Date | null, endDate: Date | null) => {
-      updateFilters({
-        startDate: startDate ? formatDateParam(startDate) : null,
-        endDate: endDate ? formatDateParam(endDate) : null,
-      });
-    },
-    [updateFilters]
-  );
+  const setDateRange = (startDate: Date | null, endDate: Date | null) => {
+    updateFilters({
+      startDate: startDate ? formatDateParam(startDate) : null,
+      endDate: endDate ? formatDateParam(endDate) : null,
+    });
+  };
 
-  const toggleTimeSlot = useCallback(
-    (timeSlot: TimeSlot) => {
-      const selectedTimeSlotsSet = new Set<TimeSlot>(values.timeSlots);
+  const toggleTimeSlot = (timeSlot: TimeSlot) => {
+    const selectedTimeSlotsSet = new Set<TimeSlot>(values.timeSlots);
 
-      if (selectedTimeSlotsSet.has(timeSlot)) {
-        selectedTimeSlotsSet.delete(timeSlot);
-      } else {
-        selectedTimeSlotsSet.add(timeSlot);
-      }
+    if (selectedTimeSlotsSet.has(timeSlot)) {
+      selectedTimeSlotsSet.delete(timeSlot);
+    } else {
+      selectedTimeSlotsSet.add(timeSlot);
+    }
 
-      updateFilters({
-        timeSlots: formatTimeSlotsParam(Array.from(selectedTimeSlotsSet)),
-      });
-    },
-    [updateFilters, values.timeSlots]
-  );
+    updateFilters({
+      timeSlots: formatTimeSlotsParam(Array.from(selectedTimeSlotsSet)),
+    });
+  };
 
-  const setDurationRange = useCallback(
-    (durationRange: DurationRange) => {
-      updateFilters({ durationRange });
-    },
-    [updateFilters]
-  );
+  const setDurationRange = (durationRange: DurationRange) => {
+    updateFilters({ durationRange });
+  };
 
-  const setParticipantsCount = useCallback(
-    (participants: number) => {
-      const nextParticipants = String(clampParticipants(Math.trunc(participants)));
+  const setParticipantsCount = (participants: number) => {
+    const nextParticipants = String(clampParticipants(Math.trunc(participants)));
 
-      updateFilters({
-        participants: nextParticipants,
-      });
-    },
-    [updateFilters]
-  );
+    updateFilters({
+      participants: nextParticipants,
+    });
+  };
 
-  const toggleSort = useCallback(() => {
+  const toggleSort = () => {
     updateFilters({
       sort: values.sort === "LATEST" ? "POPULAR" : "LATEST",
     });
-  }, [updateFilters, values.sort]);
+  };
 
   const setPage = useCallback(
     (page: number) => {

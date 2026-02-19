@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
-
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
@@ -36,47 +34,38 @@ export function SearchFilterSection() {
   const currentCategory = (searchParams.get("category") as SessionCategoryFilter) ?? "ALL";
   const currentQuery = searchParams.get("q") ?? "";
 
-  const updateSearchParams = useCallback(
-    (updates: Record<string, string | null>) => {
-      const params = new URLSearchParams(searchParams.toString());
+  const updateSearchParams = (updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
 
-      for (const [key, value] of Object.entries(updates)) {
-        if (value === null || value === "") {
-          params.delete(key);
-        } else {
-          params.set(key, value);
-        }
+    for (const [key, value] of Object.entries(updates)) {
+      if (value === null || value === "") {
+        params.delete(key);
+      } else {
+        params.set(key, value);
       }
+    }
 
-      // 필터 변경 시 페이지를 1로 리셋
-      if (!("page" in updates)) {
-        params.delete("page");
-      }
+    // 필터 변경 시 페이지를 1로 리셋
+    if (!("page" in updates)) {
+      params.delete("page");
+    }
 
-      const queryString = params.toString();
-      router.push(queryString ? `?${queryString}` : "/", { scroll: false });
-    },
-    [router, searchParams]
-  );
+    const queryString = params.toString();
+    router.push(queryString ? `?${queryString}` : "/", { scroll: false });
+  };
 
-  const handleSearch = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const formData = new FormData(e.currentTarget);
-      const query = formData.get("q") as string;
-      updateSearchParams({ q: query || null });
-    },
-    [updateSearchParams]
-  );
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const query = formData.get("q") as string;
+    updateSearchParams({ q: query || null });
+  };
 
-  const handleCategoryChange = useCallback(
-    (category: SessionCategoryFilter) => {
-      updateSearchParams({
-        category: category === "ALL" ? null : category,
-      });
-    },
-    [updateSearchParams]
-  );
+  const handleCategoryChange = (category: SessionCategoryFilter) => {
+    updateSearchParams({
+      category: category === "ALL" ? null : category,
+    });
+  };
 
   return (
     <section className="gap-xl flex flex-col items-center">

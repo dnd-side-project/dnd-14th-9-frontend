@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 
 import type { DateRange } from "@/components/DatePicker/DatePicker.types";
 import { Filter } from "@/components/Filter/Filter";
@@ -40,45 +40,39 @@ export function RecruitingFilterBar({
   const isDurationOpen = openFilter === "duration";
   const isParticipantsOpen = openFilter === "participants";
 
-  const selectedDateRange = useMemo<DateRange>(
-    () => ({
-      startDate: parseDateParam(values.startDate),
-      endDate: parseDateParam(values.endDate),
-    }),
-    [values.endDate, values.startDate]
-  );
+  const selectedDateRange: DateRange = {
+    startDate: parseDateParam(values.startDate),
+    endDate: parseDateParam(values.endDate),
+  };
 
   const dateFilterLabel = formatDateRangeFilterLabel(selectedDateRange);
   const hasDateSelection = Boolean(selectedDateRange.startDate);
 
   const sortLabel = getOptionLabel(SORT_OPTIONS, values.sort, "정렬");
 
-  const handleDateRangeChange = useCallback(
-    (range: DateRange) => {
-      onSetDateRange(range.startDate, range.endDate);
+  const handleDateRangeChange = (range: DateRange) => {
+    onSetDateRange(range.startDate, range.endDate);
 
-      if (range.startDate && range.endDate) {
-        setOpenFilter(null);
-      }
-    },
-    [onSetDateRange]
-  );
+    if (range.startDate && range.endDate) {
+      setOpenFilter(null);
+    }
+  };
 
-  const handleDateOpenChange = useCallback((isOpen: boolean) => {
+  const handleDateOpenChange = (isOpen: boolean) => {
     setOpenFilter(isOpen ? "date" : null);
-  }, []);
+  };
 
-  const handleTimeSlotOpenChange = useCallback((isOpen: boolean) => {
+  const handleTimeSlotOpenChange = (isOpen: boolean) => {
     setOpenFilter(isOpen ? "timeSlot" : null);
-  }, []);
+  };
 
-  const handleDurationOpenChange = useCallback((isOpen: boolean) => {
+  const handleDurationOpenChange = (isOpen: boolean) => {
     setOpenFilter(isOpen ? "duration" : null);
-  }, []);
+  };
 
-  const handleParticipantsOpenChange = useCallback((isOpen: boolean) => {
+  const handleParticipantsOpenChange = (isOpen: boolean) => {
     setOpenFilter(isOpen ? "participants" : null);
-  }, []);
+  };
 
   return (
     <div className="gap-md flex flex-col">
