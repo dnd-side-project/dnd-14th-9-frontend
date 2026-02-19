@@ -369,4 +369,74 @@ describe("useWaitingMembersSSE", () => {
       expect(mockDisconnect).toHaveBeenCalled();
     });
   });
+
+  describe("에러 상태 초기화", () => {
+    it("새로운 연결 시작 시 이전 에러 상태가 초기화되어야 합니다", () => {
+      const { result, rerender } = renderHook(
+        ({ sessionId }) =>
+          useWaitingMembersSSE({
+            sessionId,
+            enabled: true,
+          }),
+        {
+          initialProps: { sessionId: "session-1" },
+        }
+      );
+
+      // 에러 발생
+      const mockError: SSEError = {
+        code: "CONNECTION_FAILED",
+        message: "연결 실패",
+      };
+
+      act(() => {
+        simulateSSEEvent("error", mockError);
+      });
+
+      expect(result.current.error).toEqual(mockError);
+
+      // sessionId 변경으로 재연결
+      rerender({ sessionId: "session-2" });
+
+      // 새로운 연결 시작 시 (connecting 상태) 에러가 초기화되어야 함
+      act(() => {
+        simulateStatusChange("connecting");
+      });
+
+      expect(result.current.error).toBeNull();
+    });
+
+    it("reconnect 호출 시 이전 에러 상태가 초기화되어야 합니다", () => {
+      const { result } = renderHook(() =>
+        useWaitingMembersSSE({
+          sessionId: "test-session",
+          enabled: true,
+        })
+      );
+
+      // 에러 발생
+      const mockError: SSEError = {
+        code: "CONNECTION_FAILED",
+        message: "연결 실패",
+      };
+
+      act(() => {
+        simulateSSEEvent("error", mockError);
+      });
+
+      expect(result.current.error).toEqual(mockError);
+
+      // reconnect 호출
+      act(() => {
+        result.current.reconnect();
+      });
+
+      // connecting 상태 전환 시 에러 초기화
+      act(() => {
+        simulateStatusChange("connecting");
+      });
+
+      expect(result.current.error).toBeNull();
+    });
+  });
 });

@@ -92,9 +92,12 @@ export function useWaitingMembersSSE({
     const client = new SSEClient();
     clientRef.current = client;
 
-    // 상태 변경 리스너
+    // 상태 변경 리스너 - 연결 시작 시 이전 에러 초기화
     const unsubscribeStatus = client.onStatusChange((newStatus) => {
       setStatus(newStatus);
+      if (newStatus === "connecting") {
+        setError(null);
+      }
     });
 
     // 이벤트 리스너 등록
