@@ -7,6 +7,31 @@ import type { SSEConnectionStatus, SSEError } from "@/lib/sse/types";
 
 import type { WaitingMembersEventData } from "../types";
 
+/**
+ * 대기방 참여자 목록을 SSE로 실시간 수신하는 훅
+ *
+ * @example
+ * ```tsx
+ * function ParticipantList({ sessionId }: { sessionId: string }) {
+ *   const { data, status, error, reconnect } = useWaitingMembersSSE({
+ *     sessionId,
+ *     enabled: true,
+ *     onError: (err) => console.error("SSE 에러:", err),
+ *   });
+ *
+ *   if (status === "connecting") return <div>연결 중...</div>;
+ *   if (error) return <button onClick={reconnect}>재연결</button>;
+ *
+ *   return (
+ *     <ul>
+ *       {data?.members.map((member) => (
+ *         <li key={member.memberId}>{member.nickname}</li>
+ *       ))}
+ *     </ul>
+ *   );
+ * }
+ * ```
+ */
 interface UseWaitingMembersSSEOptions {
   sessionId: string;
   enabled?: boolean;
