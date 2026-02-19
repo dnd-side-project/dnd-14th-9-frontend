@@ -3,12 +3,11 @@
 import { useMemo } from "react";
 
 import { PaginationFraction } from "@/components/Pagination/PaginationFraction";
-import { useIsAuthenticated, useMeForEdit } from "@/features/member/hooks/useMemberHooks";
-import { getMemberInterestCategoryLabel } from "@/types/shared/member-interest-category";
+import { useIsAuthenticated, useSuspenseMeForEdit } from "@/features/member/hooks/useMemberHooks";
 import type { MemberInterestCategory } from "@/types/shared/member-interest-category";
 
 import { useRecommendedCarousel } from "../../hooks/useRecommendedCarousel";
-import { useSessionList } from "../../hooks/useSessionHooks";
+import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
 import { Card } from "../Card/Card";
 
 /**
@@ -32,7 +31,7 @@ export function RecommendedSection() {
 }
 
 function RecommendedContent() {
-  const { data: editData } = useMeForEdit();
+  const { data: editData } = useSuspenseMeForEdit();
 
   const interestCategories = useMemo(() => {
     if (!editData?.result) return [];
@@ -85,20 +84,9 @@ function RecommendedContent() {
 }
 
 function RecommendedGrid({ category }: { category: MemberInterestCategory }) {
-  const { data, isPending } = useSessionList({ category, size: 4 });
+  const { data } = useSuspenseSessionList({ category, size: 4 });
   const gridClassName = "gap-md grid min-h-[300px] grid-cols-4";
-
-  if (isPending) {
-    return (
-      <div className={gridClassName}>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-surface-strong aspect-[4/3] animate-pulse rounded-lg" />
-        ))}
-      </div>
-    );
-  }
-
-  const sessions = data?.result?.sessions ?? [];
+  const sessions = data.result.sessions;
 
   if (sessions.length === 0) {
     return (

@@ -9,6 +9,7 @@
 import {
   useMutation,
   useQuery,
+  useSuspenseQuery,
   useQueryClient,
   QueryClient,
   dehydrate,
@@ -94,6 +95,9 @@ export async function prefetchMe() {
 
 export function useMeForEdit() {
   return useQuery(memberQueries.edit());
+}
+export function useSuspenseMeForEdit() {
+  return useSuspenseQuery(memberQueries.edit());
 }
 
 export async function prefetchMeForEdit() {

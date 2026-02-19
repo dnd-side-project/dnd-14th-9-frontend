@@ -8,7 +8,7 @@ import { PaginationList } from "@/components/Pagination/PaginationList";
 
 import { RECRUITING_PAGE_SIZE } from "../../constants/pagination";
 import { useRecruitingFilters } from "../../hooks/useRecruitingFilters";
-import { useSessionList } from "../../hooks/useSessionHooks";
+import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
 import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
 import { Card } from "../Card/Card";
 
@@ -37,7 +37,7 @@ export function RecruitingSection() {
   // URL 파라미터 파싱
   const { keyword, category, page } = parseSessionListSearchParams(searchParams);
 
-  const { data, isPending } = useSessionList({
+  const { data } = useSuspenseSessionList({
     keyword,
     category,
     sort: values.sort,
@@ -50,14 +50,14 @@ export function RecruitingSection() {
     participants: values.participants ? Number(values.participants) : undefined,
   });
 
-  const sessions = data?.result?.sessions ?? [];
-  const totalPage = data?.result?.totalPage ?? 0;
+  const sessions = data.result.sessions;
+  const totalPage = data.result.totalPage;
 
   useEffect(() => {
-    if (!isPending && totalPage > 0 && page > totalPage) {
+    if (totalPage > 0 && page > totalPage) {
       setPage(totalPage);
     }
-  }, [isPending, page, setPage, totalPage]);
+  }, [page, setPage, totalPage]);
 
   return (
     <section className="gap-lg flex flex-col">
@@ -78,13 +78,7 @@ export function RecruitingSection() {
         </div>
       </div>
 
-      {isPending ? (
-        <div className="grid grid-cols-4 gap-x-[24px] gap-y-[48px]">
-          {Array.from({ length: RECRUITING_PAGE_SIZE }).map((_, i) => (
-            <div key={i} className="bg-surface-strong aspect-[320/170] animate-pulse rounded-lg" />
-          ))}
-        </div>
-      ) : sessions.length === 0 ? (
+      {sessions.length === 0 ? (
         <div className="text-text-muted flex h-60 items-center justify-center text-sm">
           모집 중인 세션이 없습니다
         </div>
