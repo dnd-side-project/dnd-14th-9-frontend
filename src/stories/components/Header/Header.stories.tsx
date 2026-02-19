@@ -1,10 +1,20 @@
 import Link from "next/link";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { ButtonLink } from "@/components/Button/ButtonLink";
 import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { Viewport } from "storybook/viewport";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 function HeaderStory({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
@@ -102,6 +112,13 @@ const meta = {
       },
     },
   },
+  decorators: [
+    (Story) => (
+      <QueryClientProvider client={queryClient}>
+        <Story />
+      </QueryClientProvider>
+    ),
+  ],
 } satisfies Meta<typeof HeaderStory>;
 
 export default meta;
