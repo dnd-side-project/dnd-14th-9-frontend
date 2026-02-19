@@ -7,6 +7,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SESSION_PARTICIPANTS_MAX, SESSION_PARTICIPANTS_MIN } from "../constants/sessionLimits";
 import { parseSessionListSearchParams } from "../utils/parseSessionListSearchParams";
 import { formatTimeSlotsParam } from "../utils/timeSlots";
+import {
+  buildUpdatedSessionSearchHref,
+  type SessionSearchParamUpdates,
+} from "../utils/updateSessionSearchParams";
 
 import type { DurationRange, SessionSort, TimeSlot } from "../types";
 
@@ -54,26 +58,13 @@ export function useRecruitingFilters() {
 
   const updateFilters = useCallback(
     (
-      updates: Record<string, string | null>,
+      updates: SessionSearchParamUpdates,
       options: UpdateFiltersOptions = DEFAULT_UPDATE_OPTIONS
     ) => {
-      const mergedOptions = { ...DEFAULT_UPDATE_OPTIONS, ...options };
-      const params = new URLSearchParams(searchParams.toString());
-
-      for (const [key, value] of Object.entries(updates)) {
-        if (value === null || value === "") {
-          params.delete(key);
-        } else {
-          params.set(key, value);
-        }
-      }
-
-      if (mergedOptions.resetPage) {
-        params.delete("page");
-      }
-
-      const queryString = params.toString();
-      router.push(queryString ? `?${queryString}` : "/", { scroll: false });
+      const href = buildUpdatedSessionSearchHref(searchParams, updates, {
+        resetPage: options.resetPage,
+      });
+      router.push(href, { scroll: false });
     },
     [router, searchParams]
   );

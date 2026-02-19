@@ -6,6 +6,7 @@ import { CategoryFilterButton } from "@/components/CategoryFilterButton/Category
 import { SearchInput } from "@/components/SearchInput/SearchInput";
 
 import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
+import { buildUpdatedSessionSearchHref } from "../../utils/updateSessionSearchParams";
 
 import type { SessionCategoryFilter } from "../../types";
 
@@ -38,23 +39,8 @@ export function SearchFilterSection() {
   const currentQuery = parsedParams.keyword ?? "";
 
   const updateSearchParams = (updates: Record<string, string | null>) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    for (const [key, value] of Object.entries(updates)) {
-      if (value === null || value === "") {
-        params.delete(key);
-      } else {
-        params.set(key, value);
-      }
-    }
-
-    // 필터 변경 시 페이지를 1로 리셋
-    if (!("page" in updates)) {
-      params.delete("page");
-    }
-
-    const queryString = params.toString();
-    router.push(queryString ? `?${queryString}` : "/", { scroll: false });
+    const href = buildUpdatedSessionSearchHref(searchParams, updates);
+    router.push(href, { scroll: false });
   };
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
