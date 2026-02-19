@@ -10,7 +10,7 @@ import { type IconProps } from "@/components/Icon/Icon";
 import { cn } from "@/lib/utils/utils";
 
 const AVATAR_VARIANTS = cva(
-  "relative inline-flex items-center justify-center overflow-hidden rounded-full bg-surface-subtle border border-border-strong box-border",
+  "relative inline-flex items-center justify-center overflow-hidden rounded-full bg-surface-subtle border border-border-subtle box-border",
   {
     variants: {
       size: {
@@ -78,7 +78,7 @@ export const Avatar = ({
       ) : (
         <DefaultProfileIcon
           size={iconSize}
-          className={cn("text-text-primary", isSmall && "size-3")}
+          className={cn("text-text-muted", isSmall && "size-3")}
         />
       )}
       {edit && (

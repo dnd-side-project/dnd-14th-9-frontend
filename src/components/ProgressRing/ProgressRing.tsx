@@ -70,7 +70,6 @@ export const ProgressRing = forwardRef<HTMLDivElement, ProgressRingProps>(
             r={radius}
             fill="none"
             strokeWidth={strokeWidth}
-            strokeLinecap="round"
             className={cn(progressClassName, "transition-all duration-300")}
             style={{
               strokeDasharray: circumference,
