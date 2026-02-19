@@ -157,7 +157,7 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
       {/* 하단 버튼 */}
       <div className="flex w-full gap-2">
         <Button
-          variant="outlined"
+          variant="ghost"
           colorScheme="secondary"
           size="medium"
           className="flex-1"
