@@ -88,7 +88,7 @@ export function ProfilePopup({
   return (
     <div
       className={cn(
-        "flex h-[603px] w-[386px] flex-col items-center overflow-hidden rounded-xl bg-gray-900 shadow-md",
+        "bg-background-subtle flex h-[603px] w-[386px] flex-col items-center overflow-hidden rounded-xl shadow-md",
         className
       )}
     >
@@ -100,7 +100,7 @@ export function ProfilePopup({
       />
 
       <div className="flex h-[512px] w-full flex-col items-start justify-center gap-0 p-6">
-        <div className="flex w-full flex-col items-start gap-3">
+        <div className="gap-sm flex w-full flex-col items-start">
           <FocusStatusItem
             focusedTime={focusedTime}
             totalParticipationTime={totalParticipationTime}
