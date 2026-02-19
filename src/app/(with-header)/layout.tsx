@@ -2,8 +2,7 @@ import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query
 
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
-import { memberQueries } from "@/features/member/hooks/useMemberHooks";
-import { getServerAuthState } from "@/lib/auth/server";
+import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
 
 /**
  * WithHeader Layout
@@ -14,11 +13,14 @@ import { getServerAuthState } from "@/lib/auth/server";
  * - Footer: 공통 푸터
  */
 export default async function Layout({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = await getServerAuthState();
   const queryClient = new QueryClient();
+  let isAuthenticated = false;
 
-  if (isAuthenticated) {
-    await queryClient.prefetchQuery(memberQueries.me());
+  try {
+    await queryClient.fetchQuery(memberQueries.me());
+    isAuthenticated = true;
+  } catch {
+    queryClient.removeQueries({ queryKey: memberKeys.me(), exact: true });
   }
 
   return (

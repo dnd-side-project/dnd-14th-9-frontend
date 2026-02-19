@@ -2,16 +2,25 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
+import { buildLoginRedirectUrl, setRedirectAfterLoginCookie } from "@/lib/auth/auth-route-utils";
+import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 import {
-  ACCESS_TOKEN_COOKIE,
-  REDIRECT_AFTER_LOGIN_COOKIE,
-  REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
-  REFRESH_TOKEN_COOKIE,
-} from "@/lib/auth/cookie-constants";
+  buildRefreshCookieHeader,
+  mergeCookieHeaderWithAuthTokens,
+} from "@/lib/auth/cookie-header-utils";
+import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 
-// 공개 라우트 (인증 불필요)
-const PUBLIC_ROUTES = ["/", "/login"];
+// 공개 페이지 라우트 (인증 불필요)
+const PUBLIC_PAGE_ROUTES = ["/", "/login"];
+
+// 공개 API 라우트 (인증 불필요)
+const PUBLIC_API_ROUTE_PATTERNS = [
+  /^\/api\/auth\/login$/,
+  /^\/api\/auth\/callback(?:\/[^/]+)?$/,
+  /^\/api\/sessions$/,
+  /^\/api\/sessions\/\d+$/,
+];
 
 // 토큰 갱신 임계값 (5분)
 const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
@@ -19,71 +28,29 @@ const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
 // 토큰 갱신 API 타임아웃 (10초)
 const REFRESH_TIMEOUT_MS = 10000;
 
-interface RefreshTokenPair {
-  accessToken: string;
-  refreshToken: string;
-}
-
-interface RefreshResponseBody {
-  result: RefreshTokenPair;
-}
-
 interface TryRefreshTokenOptions {
   allowPassThroughOnFailure?: boolean;
 }
 
-interface ErrorCodeResponseBody {
-  code: string;
-}
-
-function isRefreshResponseBody(data: unknown): data is RefreshResponseBody {
-  if (!data || typeof data !== "object" || !("result" in data)) {
-    return false;
-  }
-
-  const result = (data as { result?: unknown }).result;
-  if (!result || typeof result !== "object") {
-    return false;
-  }
-
-  const tokenPair = result as Record<string, unknown>;
-  return typeof tokenPair.accessToken === "string" && typeof tokenPair.refreshToken === "string";
-}
-
-function isErrorCodeResponseBody(data: unknown): data is ErrorCodeResponseBody {
-  if (!data || typeof data !== "object") {
-    return false;
-  }
-
-  return typeof (data as { code?: unknown }).code === "string";
-}
-
-async function getErrorCodeFromResponse(response: Response): Promise<string | null> {
-  try {
-    const data: unknown = await response.json();
-    if (!isErrorCodeResponseBody(data)) {
-      return null;
-    }
-    return data.code;
-  } catch {
-    return null;
-  }
-}
-
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  const isPublicPageRoute = PUBLIC_PAGE_ROUTES.includes(pathname);
 
-  // API 관련 경로는 패스
-  if (pathname.startsWith("/api") || pathname.startsWith("/.well-known")) {
+  // well-known 경로는 인증 처리 없이 통과한다.
+  if (pathname.startsWith("/.well-known")) {
+    return NextResponse.next();
+  }
+
+  // 공개 API 예외 경로는 인증 처리 없이 통과한다.
+  if (isPublicApiRoute(pathname)) {
     return NextResponse.next();
   }
 
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
 
-  // 공개 라우트에서는 세션 복구가 가능한 경우에만 소프트하게 갱신 시도
-  if (isPublicRoute) {
+  // 공개 페이지 라우트에서는 세션 복구가 가능한 경우에만 소프트하게 갱신 시도
+  if (isPublicPageRoute) {
     if (!refreshToken) {
       return NextResponse.next();
     }
@@ -127,30 +94,21 @@ function redirectToLoginRoute(
     reason?: string;
   }
 ): NextResponse {
-  const loginUrl = new URL("/login", request.url);
-  if (options?.reason) {
-    loginUrl.searchParams.set("reason", options.reason);
-  }
-
+  const loginUrl = options?.reason
+    ? buildLoginRedirectUrl(request, options.reason)
+    : new URL("/login", request.url);
   const response = NextResponse.redirect(loginUrl);
-
-  // 로그인 후 복귀할 경로 저장 (Open Redirect 방지)
-  const returnPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
-  const safeReturnPath =
-    returnPath.startsWith("/") && !returnPath.startsWith("//") ? returnPath : "/";
-
-  response.cookies.set(REDIRECT_AFTER_LOGIN_COOKIE, safeReturnPath, {
-    path: "/",
-    maxAge: REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
+  setRedirectAfterLoginCookie(response, `${request.nextUrl.pathname}${request.nextUrl.search}`);
 
   if (options?.clearAuth) {
     clearAuthCookies(response.cookies);
   }
 
   return response;
+}
+
+function isPublicApiRoute(pathname: string): boolean {
+  return PUBLIC_API_ROUTE_PATTERNS.some((pattern) => pattern.test(pathname));
 }
 
 /**
@@ -223,7 +181,7 @@ async function tryRefreshToken(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Cookie: `${REFRESH_TOKEN_COOKIE}=${refreshToken}`,
+          Cookie: buildRefreshCookieHeader(refreshToken),
         },
         credentials: "include",
         signal: controller.signal,
@@ -250,9 +208,10 @@ async function tryRefreshToken(
     }
 
     const data: unknown = await reissueResponse.json();
+    const tokens = parseRefreshTokenPair(data);
 
     // API 응답 검증 (필수 버그 픽스)
-    if (!isRefreshResponseBody(data)) {
+    if (!tokens) {
       console.error("Proxy: Invalid refresh response format");
       if (allowPassThroughOnFailure) {
         return NextResponse.next();
@@ -263,10 +222,22 @@ async function tryRefreshToken(
       });
     }
 
-    const response = NextResponse.next();
+    // 현재 요청의 쿠키 헤더를 갱신해서 다운스트림(RSC, Route Handler)에 새 토큰을 전달한다.
+    const requestHeaders = new Headers(request.headers);
+    const updatedCookieHeader = mergeCookieHeaderWithAuthTokens(
+      request.headers.get("cookie"),
+      tokens
+    );
+    if (updatedCookieHeader) {
+      requestHeaders.set("cookie", updatedCookieHeader);
+    }
+
+    const response = NextResponse.next({
+      request: { headers: requestHeaders },
+    });
     setAuthCookies(response.cookies, {
-      accessToken: data.result.accessToken,
-      refreshToken: data.result.refreshToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     });
 
     if (process.env.NODE_ENV !== "production") {
@@ -292,6 +263,7 @@ async function tryRefreshToken(
 }
 
 // Matcher: 불필요한 요청 제외 (정적 파일, 이미지, prefetch 등)
+// 공개 API 예외 처리는 matcher가 아닌 proxy 본문에서 수행한다.
 export const config = {
   matcher: [
     {

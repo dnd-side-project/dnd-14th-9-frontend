@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 
-import { getServerAuthState } from "@/lib/auth/server";
-import { AuthStoreProvider } from "@/providers/AuthStoreProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
 
 import { geistMono, geistSans, pretendard } from "./fonts";
@@ -19,22 +17,15 @@ export default async function RootLayout({
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
-  // TODO(이경환): /api/members/me/profile 서버 prefetch + hydrate 전환 후 제거 검토.
-  // 현재는 새로고침 시 로그인/로그아웃 UI 깜빡임을 줄이기 위한 임시 초기 auth 힌트다.
-  // 서버에서 쿠키를 읽어 초기 인증 상태 확인
-  const initialAuth = await getServerAuthState();
-
   return (
     <html lang="en" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${pretendard.variable} font-sans antialiased`}
       >
-        <AuthStoreProvider initialAuth={initialAuth}>
-          <QueryProvider>
-            {children}
-            {modal}
-          </QueryProvider>
-        </AuthStoreProvider>
+        <QueryProvider>
+          {children}
+          {modal}
+        </QueryProvider>
       </body>
     </html>
   );
