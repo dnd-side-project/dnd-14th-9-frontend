@@ -18,6 +18,7 @@ export class SSEClient<TEventType extends string = string> {
   private eventSource: EventSource | null = null;
   private listeners = new Map<string, Set<SSEEventCallback<unknown>>>();
   private statusListeners = new Set<(status: SSEConnectionStatus) => void>();
+  private registeredEvents = new Set<string>(); // EventSource에 등록된 이벤트 타입 추적
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private options: Required<SSEClientOptions>;
@@ -75,6 +76,7 @@ export class SSEClient<TEventType extends string = string> {
     }
 
     this.eventSource = new EventSource(this.url);
+    this.registeredEvents.clear(); // 새 EventSource 생성 시 등록 이벤트 초기화
 
     this.eventSource.onopen = () => {
       this.log("Connected");
@@ -134,24 +136,32 @@ export class SSEClient<TEventType extends string = string> {
     }, delay);
   }
 
+  private registerEventOnSource(eventName: string): void {
+    if (!this.eventSource) return;
+    if (this.registeredEvents.has(eventName)) return; // 이미 등록된 이벤트는 스킵
+
+    this.eventSource.addEventListener(eventName, (event: Event) => {
+      const messageEvent = event as MessageEvent;
+      try {
+        const data = JSON.parse(messageEvent.data);
+        this.log(`Received ${eventName}: ${JSON.stringify(data)}`);
+        this.emit(eventName, data);
+      } catch {
+        this.log(`Failed to parse ${eventName} event: ${messageEvent.data}`, "error");
+        this.emitError("PARSE_ERROR", `Failed to parse ${eventName} event`);
+      }
+    });
+
+    this.registeredEvents.add(eventName);
+  }
+
   private reattachEventListeners(): void {
     if (!this.eventSource) return;
 
     // 등록된 모든 named event 리스너를 EventSource에 다시 연결
-    this.listeners.forEach((callbacks, eventName) => {
+    this.listeners.forEach((_, eventName) => {
       if (eventName === "error" || eventName === "message") return;
-
-      this.eventSource!.addEventListener(eventName, (event: Event) => {
-        const messageEvent = event as MessageEvent;
-        try {
-          const data = JSON.parse(messageEvent.data);
-          this.log(`Received ${eventName}: ${JSON.stringify(data)}`);
-          this.emit(eventName, data);
-        } catch {
-          this.log(`Failed to parse ${eventName} event: ${messageEvent.data}`, "error");
-          this.emitError("PARSE_ERROR", `Failed to parse ${eventName} event`);
-        }
-      });
+      this.registerEventOnSource(eventName);
     });
   }
 
@@ -209,19 +219,9 @@ export class SSEClient<TEventType extends string = string> {
 
     this.listeners.get(eventName)!.add(callback as SSEEventCallback<unknown>);
 
-    // 이미 연결된 상태라면 EventSource에 리스너 추가
+    // 이미 연결된 상태라면 EventSource에 리스너 등록 (중복 등록 방지)
     if (this.eventSource && eventName !== "error" && eventName !== "message") {
-      this.eventSource.addEventListener(eventName, (event: Event) => {
-        const messageEvent = event as MessageEvent;
-        try {
-          const data = JSON.parse(messageEvent.data);
-          this.log(`Received ${eventName}: ${JSON.stringify(data)}`);
-          this.emit(eventName, data);
-        } catch {
-          this.log(`Failed to parse ${eventName} event: ${messageEvent.data}`, "error");
-          this.emitError("PARSE_ERROR", `Failed to parse ${eventName} event`);
-        }
-      });
+      this.registerEventOnSource(eventName);
     }
 
     return () => this.listeners.get(eventName)?.delete(callback as SSEEventCallback<unknown>);

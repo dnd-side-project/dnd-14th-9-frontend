@@ -64,6 +64,11 @@ class MockEventSource {
     });
     this.listeners.get(eventName)?.forEach((listener) => listener(event));
   }
+
+  // 테스트용: 특정 이벤트에 등록된 리스너 수 반환
+  getListenerCount(eventName: string): number {
+    return this.listeners.get(eventName)?.length ?? 0;
+  }
 }
 
 // Global EventSource Mock
@@ -355,6 +360,112 @@ describe("SSEClient", () => {
       expect(callback1).not.toHaveBeenCalled();
       expect(callback2).not.toHaveBeenCalled();
       expect(statusCallback).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("중복 리스너 등록 방지", () => {
+    it("같은 이벤트에 여러 콜백을 등록해도 EventSource에는 하나의 리스너만 등록되어야 합니다", () => {
+      const client = new SSEClient();
+      const callback1 = jest.fn();
+      const callback2 = jest.fn();
+      const callback3 = jest.fn();
+
+      client.on("waiting-members-updated", callback1);
+      client.on("waiting-members-updated", callback2);
+      client.on("waiting-members-updated", callback3);
+      client.connect("/api/sse/test");
+      mockEventSourceInstance!.simulateOpen();
+
+      // EventSource에는 하나의 리스너만 등록되어야 함
+      expect(mockEventSourceInstance!.getListenerCount("waiting-members-updated")).toBe(1);
+
+      // 하지만 모든 콜백은 호출되어야 함
+      mockEventSourceInstance!.simulateNamedEvent("waiting-members-updated", { data: "test" });
+
+      expect(callback1).toHaveBeenCalledTimes(1);
+      expect(callback2).toHaveBeenCalledTimes(1);
+      expect(callback3).toHaveBeenCalledTimes(1);
+    });
+
+    it("연결된 상태에서 on 호출 시 EventSource에 중복 리스너가 등록되지 않아야 합니다", () => {
+      const client = new SSEClient();
+      const callback1 = jest.fn();
+      const callback2 = jest.fn();
+
+      client.connect("/api/sse/test");
+      mockEventSourceInstance!.simulateOpen();
+
+      client.on("test-event", callback1);
+      client.on("test-event", callback2);
+
+      // EventSource에는 하나의 리스너만 등록되어야 함
+      expect(mockEventSourceInstance!.getListenerCount("test-event")).toBe(1);
+
+      // 이벤트 발생 시 모든 콜백은 정확히 한 번씩 호출되어야 함
+      mockEventSourceInstance!.simulateNamedEvent("test-event", { data: "test" });
+
+      expect(callback1).toHaveBeenCalledTimes(1);
+      expect(callback2).toHaveBeenCalledTimes(1);
+    });
+
+    it("재연결 시 EventSource에 중복 리스너가 등록되지 않아야 합니다", () => {
+      jest.useFakeTimers();
+
+      const client = new SSEClient({
+        maxReconnectAttempts: 3,
+        reconnectInterval: 1000,
+      });
+      const callback = jest.fn();
+
+      client.on("test-event", callback);
+      client.connect("/api/sse/test");
+      mockEventSourceInstance!.simulateOpen();
+
+      // 연결 끊김 및 재연결
+      mockEventSourceInstance!.simulateError();
+      jest.advanceTimersByTime(1000);
+      mockEventSourceInstance!.simulateOpen();
+
+      // 재연결 후에도 EventSource에는 하나의 리스너만 등록되어야 함
+      expect(mockEventSourceInstance!.getListenerCount("test-event")).toBe(1);
+
+      // 이벤트 발생 시 콜백은 정확히 한 번만 호출되어야 함
+      mockEventSourceInstance!.simulateNamedEvent("test-event", { data: "test" });
+
+      expect(callback).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+
+    it("여러 번 재연결 후에도 콜백은 이벤트당 한 번만 호출되어야 합니다", () => {
+      jest.useFakeTimers();
+
+      const client = new SSEClient({
+        maxReconnectAttempts: 5,
+        reconnectInterval: 1000,
+      });
+      const callback = jest.fn();
+
+      client.on("test-event", callback);
+      client.connect("/api/sse/test");
+      mockEventSourceInstance!.simulateOpen();
+
+      // 3번 재연결 시뮬레이션
+      for (let i = 0; i < 3; i++) {
+        mockEventSourceInstance!.simulateError();
+        jest.advanceTimersByTime(1000 * Math.pow(2, i));
+        mockEventSourceInstance!.simulateOpen();
+      }
+
+      // EventSource에는 여전히 하나의 리스너만 등록되어야 함
+      expect(mockEventSourceInstance!.getListenerCount("test-event")).toBe(1);
+
+      // 이벤트 발생 시 콜백은 정확히 한 번만 호출되어야 함
+      mockEventSourceInstance!.simulateNamedEvent("test-event", { data: "test" });
+
+      expect(callback).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
     });
   });
 });
