@@ -265,7 +265,7 @@ describe("Proxy Middleware", () => {
       }
     });
 
-    it("공개 API 예외가 아닌 경로는 토큰 없이 접근 시 로그인 리다이렉트해야 함", async () => {
+    it("공개 API 예외가 아닌 경로는 토큰 없이 접근 시 로그인 리다이렉트하되 복귀 쿠키는 남기지 않아야 함", async () => {
       const protectedApiPaths = [
         "/api/auth/logout",
         "/api/sessions/create",
@@ -279,7 +279,9 @@ describe("Proxy Middleware", () => {
         const response = await proxy(request);
 
         expectLoginRedirect(response, "auth_required");
-        expectRedirectAfterLoginCookie(response, path);
+        expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
+          false
+        );
         expect(mockFetch).not.toHaveBeenCalled();
       }
     });
@@ -796,6 +798,9 @@ describe("Proxy Middleware", () => {
 
       // Then: 로그인 리다이렉트
       expectLoginRedirect(response, "auth_required");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
+        false
+      );
       expect(mockFetch).not.toHaveBeenCalled();
     });
 

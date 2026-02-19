@@ -98,7 +98,9 @@ function redirectToLoginRoute(
     ? buildLoginRedirectUrl(request, options.reason)
     : new URL("/login", request.url);
   const response = NextResponse.redirect(loginUrl);
-  setRedirectAfterLoginCookie(response, `${request.nextUrl.pathname}${request.nextUrl.search}`);
+  if (shouldPersistRedirectAfterLogin(request.nextUrl.pathname)) {
+    setRedirectAfterLoginCookie(response, `${request.nextUrl.pathname}${request.nextUrl.search}`);
+  }
 
   if (options?.clearAuth) {
     clearAuthCookies(response.cookies);
@@ -109,6 +111,10 @@ function redirectToLoginRoute(
 
 function isPublicApiRoute(pathname: string): boolean {
   return PUBLIC_API_ROUTE_PATTERNS.some((pattern) => pattern.test(pathname));
+}
+
+function shouldPersistRedirectAfterLogin(pathname: string): boolean {
+  return !pathname.startsWith("/api/");
 }
 
 /**
