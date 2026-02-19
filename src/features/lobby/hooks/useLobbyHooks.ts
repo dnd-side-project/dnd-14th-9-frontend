@@ -95,9 +95,12 @@ export function useWaitingRoomData({
   // SSE 데이터 우선, 없으면 초기 HTTP 응답 사용
   const data = sseData ?? initialData?.result ?? null;
 
+  // HTTP 로딩 중이면서 SSE 데이터도 아직 없는 경우에만 로딩 표시
+  const isInitialLoading = isLoading && !sseData;
+
   return {
     data,
-    isLoading,
+    isLoading: isInitialLoading,
     sseStatus,
     sseError,
     reconnect,
