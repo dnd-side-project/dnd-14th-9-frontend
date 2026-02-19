@@ -1724,6 +1724,15 @@
             }
           },
           "subtle": {
+            "value": "{color.green.400}",
+            "type": "color",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          },
+          "subtler": {
             "value": "{color.green.300}",
             "type": "color",
             "$extensions": {
@@ -2710,6 +2719,15 @@
             }
           },
           "subtle": {
+            "value": "{color.green.400}",
+            "type": "color",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          },
+          "subtler": {
             "value": "{color.green.300}",
             "type": "color",
             "$extensions": {
