@@ -8,15 +8,15 @@ import { Filter } from "@/components/Filter/Filter";
 import { DateRangeFilter } from "./DateRangeFilter";
 import { DurationFilter } from "./DurationFilter";
 import { ParticipantsFilter } from "./ParticipantsFilter";
-import { getOptionLabel, SORT_OPTIONS } from "./recruitingFilter.types";
-import { formatDateRangeFilterLabel, parseDateParam } from "./recruitingFilter.utils";
+import { getOptionLabel, SORT_OPTIONS } from "./sessionListFilter.types";
+import { formatDateRangeFilterLabel, parseDateParam } from "./sessionListFilter.utils";
 import { StartTimeFilter } from "./StartTimeFilter";
 
-import type { RecruitingFilterValues } from "../../hooks/useRecruitingFilters";
+import type { SessionListFilterValues } from "../../hooks/useSessionListFilters";
 import type { DurationRange, TimeSlot } from "../../types";
 
-interface RecruitingFilterBarProps {
-  values: RecruitingFilterValues;
+interface SessionListFilterBarProps {
+  values: SessionListFilterValues;
   onSetDateRange: (startDate: Date | null, endDate: Date | null) => void;
   onToggleTimeSlot: (timeSlot: TimeSlot) => void;
   onSetDurationRange: (durationRange: DurationRange) => void;
@@ -26,14 +26,14 @@ interface RecruitingFilterBarProps {
 
 type OpenFilterKey = "date" | "timeSlot" | "duration" | "participants" | null;
 
-export function RecruitingFilterBar({
+export function SessionListFilterBar({
   values,
   onSetDateRange,
   onToggleTimeSlot,
   onSetDurationRange,
   onSetParticipants,
   onToggleSort,
-}: RecruitingFilterBarProps) {
+}: SessionListFilterBarProps) {
   const [openFilter, setOpenFilter] = useState<OpenFilterKey>(null);
   const isDatePickerOpen = openFilter === "date";
   const isTimeSlotOpen = openFilter === "timeSlot";

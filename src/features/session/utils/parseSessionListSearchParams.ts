@@ -1,10 +1,7 @@
 import { CATEGORIES } from "@/lib/constants/category";
 
-import {
-  DURATION_OPTIONS,
-  SORT_OPTIONS,
-} from "../components/RecruitingSection/recruitingFilter.types";
-import { parseParticipantsFilterValue } from "../components/RecruitingSection/recruitingFilter.utils";
+import { DURATION_OPTIONS, SORT_OPTIONS } from "../components/SessionList/sessionListFilter.types";
+import { parseParticipantsFilterValue } from "../components/SessionList/sessionListFilter.utils";
 
 import { parsePageParam } from "./pagination";
 import { parseTimeSlotsParam } from "./timeSlots";

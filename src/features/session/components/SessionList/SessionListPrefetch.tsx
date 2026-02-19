@@ -4,15 +4,13 @@ import { sessionApi } from "@/features/session/api";
 import { sessionKeys } from "@/features/session/hooks/useSessionHooks";
 import type { SessionListParams } from "@/features/session/types";
 
-import { RecruitingSection } from "./RecruitingSection";
+import { SessionList } from "./SessionList";
 
-interface RecruitingSectionPrefetchedProps {
+interface SessionListPrefetchProps {
   listParams: SessionListParams;
 }
 
-export async function RecruitingSectionPrefetched({
-  listParams,
-}: RecruitingSectionPrefetchedProps) {
+export async function SessionListPrefetch({ listParams }: SessionListPrefetchProps) {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
@@ -22,7 +20,7 @@ export async function RecruitingSectionPrefetched({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <RecruitingSection />
+      <SessionList />
     </HydrationBoundary>
   );
 }

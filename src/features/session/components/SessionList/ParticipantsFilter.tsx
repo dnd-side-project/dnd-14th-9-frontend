@@ -13,7 +13,10 @@ import {
   SESSION_PARTICIPANTS_MIN,
 } from "../../constants/sessionLimits";
 
-import { getParticipantsFilterLabel, parseParticipantsFilterValue } from "./recruitingFilter.utils";
+import {
+  getParticipantsFilterLabel,
+  parseParticipantsFilterValue,
+} from "./sessionListFilter.utils";
 
 interface ParticipantsFilterProps {
   isOpen: boolean;

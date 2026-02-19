@@ -7,8 +7,8 @@ import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { cn } from "@/lib/utils/utils";
 
-import { DURATION_OPTIONS } from "./recruitingFilter.types";
-import { getDurationFilterLabel } from "./recruitingFilter.utils";
+import { DURATION_OPTIONS } from "./sessionListFilter.types";
+import { getDurationFilterLabel } from "./sessionListFilter.utils";
 
 import type { DurationRange } from "../../types";
 

@@ -16,7 +16,7 @@ import type { SessionCategoryFilter } from "../../types";
  *
  * 역할:
  * - URL searchParams 제어 (검색어, 카테고리)
- * - 사용자 입력 → URL 업데이트 → RecruitingSection 반응
+ * - 사용자 입력 → URL 업데이트 → SessionList 반응
  */
 
 const CATEGORY_FILTERS: { value: SessionCategoryFilter; label: string }[] = [

@@ -7,8 +7,8 @@ import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { cn } from "@/lib/utils/utils";
 
-import { TIME_SLOT_OPTIONS } from "./recruitingFilter.types";
-import { getTimeSlotFilterLabel } from "./recruitingFilter.utils";
+import { TIME_SLOT_OPTIONS } from "./sessionListFilter.types";
+import { getTimeSlotFilterLabel } from "./sessionListFilter.utils";
 
 import type { TimeSlot } from "../../types";
 

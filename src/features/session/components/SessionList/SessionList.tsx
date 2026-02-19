@@ -6,23 +6,23 @@ import { useSearchParams } from "next/navigation";
 
 import { PaginationList } from "@/components/Pagination/PaginationList";
 
-import { RECRUITING_PAGE_SIZE } from "../../constants/pagination";
-import { useRecruitingFilters } from "../../hooks/useRecruitingFilters";
+import { SESSION_LIST_PAGE_SIZE } from "../../constants/pagination";
 import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
+import { useSessionListFilters } from "../../hooks/useSessionListFilters";
 import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
 import { Card } from "../Card/Card";
 
-import { RecruitingFilterBar } from "./RecruitingFilterBar";
+import { SessionListFilterBar } from "./SessionListFilterBar";
 
 /**
- * RecruitingSection - 모집 중 세션 목록
+ * SessionList - 모집 중 세션 목록
  *
  * 역할:
  * - URL searchParams 기반 필터링/페이지네이션
  * - SearchFilterSection의 검색어/카테고리 변경에 반응
  * - 정렬 드롭다운 + 카드 그리드 + PaginationList
  */
-export function RecruitingSection() {
+export function SessionList() {
   const {
     values,
     setDateRange,
@@ -31,7 +31,7 @@ export function RecruitingSection() {
     setParticipantsCount,
     toggleSort,
     setPage,
-  } = useRecruitingFilters();
+  } = useSessionListFilters();
   const searchParams = useSearchParams();
 
   // URL 파라미터 파싱
@@ -42,7 +42,7 @@ export function RecruitingSection() {
     category,
     sort: values.sort,
     page,
-    size: RECRUITING_PAGE_SIZE,
+    size: SESSION_LIST_PAGE_SIZE,
     startDate: values.startDate ?? undefined,
     endDate: values.endDate ?? undefined,
     timeSlots: values.timeSlots.length > 0 ? values.timeSlots : undefined,
@@ -67,7 +67,7 @@ export function RecruitingSection() {
           <p className="text-text-disabled text-base">
             마이페이지에서 설정한 카테고리를 기반해서 방을 추천해드려요
           </p>
-          <RecruitingFilterBar
+          <SessionListFilterBar
             values={values}
             onSetDateRange={setDateRange}
             onToggleTimeSlot={toggleTimeSlot}

@@ -1,7 +1,7 @@
 /**
- * RecruitingSectionSkeleton - 모집 중 세션 로딩 스켈레톤
+ * SessionListSkeleton - 모집 중 세션 로딩 스켈레톤
  */
-export function RecruitingSectionSkeleton() {
+export function SessionListSkeleton() {
   return (
     <section className="gap-xl flex flex-col">
       {/* 헤더 + 필터 스켈레톤 */}

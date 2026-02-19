@@ -3,7 +3,7 @@ import { formatDateRangeDisplay, getKoreanDayOfWeek } from "@/lib/utils/date";
 
 import { SESSION_PARTICIPANTS_MAX, SESSION_PARTICIPANTS_MIN } from "../../constants/sessionLimits";
 
-import { TIME_SLOT_OPTIONS } from "./recruitingFilter.types";
+import { TIME_SLOT_OPTIONS } from "./sessionListFilter.types";
 
 import type { DurationRange, TimeSlot } from "../../types";
 

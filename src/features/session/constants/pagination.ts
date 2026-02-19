@@ -1,1 +1,1 @@
-export const RECRUITING_PAGE_SIZE = 8;
+export const SESSION_LIST_PAGE_SIZE = 8;

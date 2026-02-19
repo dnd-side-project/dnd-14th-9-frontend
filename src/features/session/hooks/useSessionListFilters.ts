@@ -14,7 +14,7 @@ import {
 
 import type { DurationRange, SessionSort, TimeSlot } from "../types";
 
-export interface RecruitingFilterValues {
+export interface SessionListFilterValues {
   startDate: string | null;
   endDate: string | null;
   timeSlots: TimeSlot[];
@@ -42,12 +42,12 @@ function clampParticipants(value: number) {
   return Math.min(SESSION_PARTICIPANTS_MAX, Math.max(SESSION_PARTICIPANTS_MIN, value));
 }
 
-export function useRecruitingFilters() {
+export function useSessionListFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const parsedParams = parseSessionListSearchParams(searchParams);
 
-  const values: RecruitingFilterValues = {
+  const values: SessionListFilterValues = {
     startDate: parsedParams.startDate ?? null,
     endDate: parsedParams.endDate ?? null,
     timeSlots: parsedParams.timeSlots,
