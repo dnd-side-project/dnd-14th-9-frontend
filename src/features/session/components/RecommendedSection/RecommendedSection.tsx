@@ -86,10 +86,11 @@ function RecommendedContent() {
 
 function RecommendedGrid({ category }: { category: MemberInterestCategory }) {
   const { data, isPending } = useSessionList({ category, size: 4 });
+  const gridClassName = "gap-md grid min-h-[300px] grid-cols-4";
 
   if (isPending) {
     return (
-      <div className="gap-md grid grid-cols-4">
+      <div className={gridClassName}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="bg-surface-strong aspect-[4/3] animate-pulse rounded-lg" />
         ))}
@@ -101,14 +102,16 @@ function RecommendedGrid({ category }: { category: MemberInterestCategory }) {
 
   if (sessions.length === 0) {
     return (
-      <div className="text-text-muted flex h-40 items-center justify-center text-sm">
-        해당 카테고리에 모집 중인 세션이 없습니다
+      <div className={gridClassName}>
+        <div className="text-text-muted col-span-4 flex items-center justify-center text-sm">
+          해당 카테고리에 모집 중인 세션이 없습니다
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="gap-md grid grid-cols-4">
+    <div className={gridClassName}>
       {sessions.map((session) => (
         <Card
           key={session.title + session.startTime}
