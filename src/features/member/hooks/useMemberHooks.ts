@@ -68,8 +68,20 @@ export const memberQueries = {
 };
 
 // Query Hooks
-export function useMe() {
-  return useQuery(memberQueries.me());
+interface UseMeOptions {
+  enabled?: boolean;
+}
+
+export function useMe(options?: UseMeOptions) {
+  return useQuery({
+    ...memberQueries.me(),
+    ...options,
+  });
+}
+
+export function useIsAuthenticated() {
+  const { data, isError } = useMe();
+  return !isError && Boolean(data?.result);
 }
 
 export const useDeleteMe = memberCore.useDelete!;
