@@ -64,7 +64,7 @@ export function RecruitingSection() {
   }, [isPending, page, setPage, totalPage]);
 
   return (
-    <section className="flex flex-col gap-[10px]">
+    <section className="gap-lg flex flex-col">
       <div className="flex flex-col gap-[10px]">
         <h2 className="text-text-primary text-2xl font-bold">지금 모집 중인 세션</h2>
         <div className="flex justify-between">
@@ -111,8 +111,8 @@ export function RecruitingSection() {
         </div>
       )}
 
-      {totalPage > 1 && (
-        <div className="flex justify-center">
+      {totalPage > 0 && (
+        <div className="py-3xl flex justify-center">
           <PaginationList totalPage={totalPage} currentPage={page} onPageChange={setPage} />
         </div>
       )}
