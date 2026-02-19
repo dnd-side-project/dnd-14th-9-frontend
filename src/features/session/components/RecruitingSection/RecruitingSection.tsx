@@ -86,7 +86,7 @@ export function RecruitingSection() {
         <div className="grid grid-cols-4 gap-x-[24px] gap-y-[48px]">
           {sessions.map((session) => (
             <Card
-              key={session.title + session.startTime}
+              key={session.sessionId}
               thumbnailSrc={session.imageUrl}
               category={session.category}
               createdAt={session.startTime}

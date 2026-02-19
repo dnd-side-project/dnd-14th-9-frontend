@@ -91,6 +91,7 @@ export interface SessionListParams {
 
 // 목록 아이템
 export interface SessionListItem {
+  sessionId: number;
   category: SessionCategory;
   title: string;
   hostNickname: string;

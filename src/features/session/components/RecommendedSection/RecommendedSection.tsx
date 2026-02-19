@@ -102,7 +102,7 @@ function RecommendedGrid({ category }: { category: MemberInterestCategory }) {
     <div className={gridClassName}>
       {sessions.map((session) => (
         <Card
-          key={session.title + session.startTime}
+          key={session.sessionId}
           thumbnailSrc={session.imageUrl}
           category={session.category}
           createdAt={session.startTime}
