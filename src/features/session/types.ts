@@ -1,4 +1,4 @@
-import type { MemberInterestCategory } from "@/types/shared/member-interest-category";
+import type { Category, CategoryFilter } from "@/lib/constants/category";
 
 // TODO(장근호) - 서버 구성 확인 후 수정 작업 진행.
 export type ParticipantStatus =
@@ -12,7 +12,7 @@ export interface Participant {
   nickname: string;
   profileImageUrl?: string;
   bio?: string; // 자기소개
-  interest_category: MemberInterestCategory;
+  interest_category: Category;
   socialProvider: "google" | "kakao";
   providerId: string;
   created_at: string;
@@ -48,18 +48,10 @@ export interface Session {
 // ============================================
 
 // Enum 타입들
-export type SessionCategory =
-  | "DEVELOPMENT"
-  | "DESIGN"
-  | "PLANNING_PM"
-  | "CAREER_SELF_DEVELOPMENT"
-  | "STUDY_READING"
-  | "CREATIVE"
-  | "TEAM_PROJECT"
-  | "FREE";
+export type SessionCategory = Category;
 
 // 필터용 카테고리 (ALL 포함)
-export type SessionCategoryFilter = "ALL" | SessionCategory;
+export type SessionCategoryFilter = CategoryFilter;
 
 export type SessionSort = "POPULAR" | "LATEST";
 

@@ -18,14 +18,10 @@ import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
 import { Textarea } from "@/components/Textarea/Textarea";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { ApiError } from "@/lib/api/api-client";
+import { ONBOARDING_CATEGORIES, CATEGORY_LABELS, type Category } from "@/lib/constants/category";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { formatDateTimeDisplay, formatDurationKorean, formatLocalDateTime } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
-import {
-  MEMBER_INTEREST_CATEGORIES,
-  MEMBER_INTEREST_CATEGORY_LABELS,
-  type MemberInterestCategory,
-} from "@/types/shared/member-interest-category";
 
 import {
   SESSION_DURATION_MINUTES_DEFAULT,
@@ -46,7 +42,7 @@ export function SessionCreateForm() {
   const [roomDescription, setRoomDescription] = useState("");
   const [notice, setNotice] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<MemberInterestCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   // 세부 설정 상태
   const [startDateTime, setStartDateTime] = useState<Date | null>(null);
@@ -236,7 +232,7 @@ export function SessionCreateForm() {
       <div className="flex flex-col gap-2">
         <span className="text-text-secondary text-base">카테고리</span>
         <div className="flex flex-wrap gap-3">
-          {MEMBER_INTEREST_CATEGORIES.map((category) => (
+          {ONBOARDING_CATEGORIES.map((category) => (
             <CategoryFilterButton
               key={category}
               isSelected={selectedCategory === category}
@@ -246,7 +242,7 @@ export function SessionCreateForm() {
               }}
               type="button"
             >
-              {MEMBER_INTEREST_CATEGORY_LABELS[category]}
+              {CATEGORY_LABELS[category]}
             </CategoryFilterButton>
           ))}
         </div>

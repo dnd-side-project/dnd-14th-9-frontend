@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { PaginationFraction } from "@/components/Pagination/PaginationFraction";
 import { useIsAuthenticated, useSuspenseMeForEdit } from "@/features/member/hooks/useMemberHooks";
-import type { MemberInterestCategory } from "@/types/shared/member-interest-category";
+import type { Category } from "@/lib/constants/category";
 
 import { useRecommendedCarousel } from "../../hooks/useRecommendedCarousel";
 import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
@@ -36,7 +36,7 @@ function RecommendedContent() {
   const interestCategories = useMemo(() => {
     if (!editData?.result) return [];
 
-    const categories: MemberInterestCategory[] = [];
+    const categories: Category[] = [];
     const { firstInterestCategory, secondInterestCategory, thirdInterestCategory } =
       editData.result;
 
@@ -83,7 +83,7 @@ function RecommendedContent() {
   );
 }
 
-function RecommendedGrid({ category }: { category: MemberInterestCategory }) {
+function RecommendedGrid({ category }: { category: Category }) {
   const { data } = useSuspenseSessionList({ category, size: 4 });
   const gridClassName = "gap-md grid min-h-[300px] grid-cols-4";
   const sessions = data.result.sessions;

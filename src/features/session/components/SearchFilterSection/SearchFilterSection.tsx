@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
 import { SearchInput } from "@/components/SearchInput/SearchInput";
+import { CATEGORIES, getCategoryLabel } from "@/lib/constants/category";
 
 import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
 import { buildUpdatedSessionSearchHref } from "../../utils/updateSessionSearchParams";
@@ -19,15 +20,10 @@ import type { SessionCategoryFilter } from "../../types";
  */
 
 const CATEGORY_FILTERS: { value: SessionCategoryFilter; label: string }[] = [
-  { value: "ALL", label: "전체" },
-  { value: "DEVELOPMENT", label: "개발" },
-  { value: "DESIGN", label: "디자인" },
-  { value: "PLANNING_PM", label: "기획 · PM" },
-  { value: "CAREER_SELF_DEVELOPMENT", label: "커리어 · 자기계발" },
-  { value: "STUDY_READING", label: "스터디 · 독서" },
-  { value: "CREATIVE", label: "크리에이티브" },
-  { value: "TEAM_PROJECT", label: "팀 프로젝트" },
-  { value: "FREE", label: "자유" },
+  ...CATEGORIES.map((category) => ({
+    value: category,
+    label: getCategoryLabel(category),
+  })),
 ];
 
 export function SearchFilterSection() {

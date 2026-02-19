@@ -1,3 +1,5 @@
+import { CATEGORIES } from "@/lib/constants/category";
+
 import {
   DURATION_OPTIONS,
   SORT_OPTIONS,
@@ -12,17 +14,7 @@ import type { DurationRange, SessionCategoryFilter, SessionSort } from "../types
 export type SessionListPageSearchParams = Record<string, string | string[] | undefined>;
 type SearchParamsReader = Pick<URLSearchParams, "get">;
 
-const SESSION_CATEGORY_FILTER_VALUES = [
-  "ALL",
-  "DEVELOPMENT",
-  "DESIGN",
-  "PLANNING_PM",
-  "CAREER_SELF_DEVELOPMENT",
-  "STUDY_READING",
-  "CREATIVE",
-  "TEAM_PROJECT",
-  "FREE",
-] as const satisfies readonly SessionCategoryFilter[];
+const SESSION_CATEGORY_FILTER_VALUES = CATEGORIES;
 
 function isSessionSortValue(value: string | undefined): value is SessionSort {
   if (!value) return false;

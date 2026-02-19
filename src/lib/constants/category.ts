@@ -1,4 +1,4 @@
-export const MEMBER_INTEREST_CATEGORIES = [
+export const ONBOARDING_CATEGORIES = [
   "DEVELOPMENT",
   "DESIGN",
   "PLANNING_PM",
@@ -9,9 +9,13 @@ export const MEMBER_INTEREST_CATEGORIES = [
   "FREE",
 ] as const;
 
-export type MemberInterestCategory = (typeof MEMBER_INTEREST_CATEGORIES)[number];
+export const CATEGORIES = ["ALL", ...ONBOARDING_CATEGORIES] as const;
 
-export const MEMBER_INTEREST_CATEGORY_LABELS: Record<MemberInterestCategory, string> = {
+export type Category = (typeof ONBOARDING_CATEGORIES)[number];
+export type CategoryFilter = (typeof CATEGORIES)[number];
+
+export const CATEGORY_LABELS: Record<CategoryFilter, string> = {
+  ALL: "전체",
   DEVELOPMENT: "개발",
   DESIGN: "디자인",
   PLANNING_PM: "기획 · PM",
@@ -22,6 +26,6 @@ export const MEMBER_INTEREST_CATEGORY_LABELS: Record<MemberInterestCategory, str
   FREE: "자유",
 };
 
-export function getMemberInterestCategoryLabel(category: MemberInterestCategory): string {
-  return MEMBER_INTEREST_CATEGORY_LABELS[category];
+export function getCategoryLabel(category: CategoryFilter): string {
+  return CATEGORY_LABELS[category];
 }

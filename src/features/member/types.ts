@@ -1,7 +1,7 @@
-import type { MemberInterestCategory } from "@/types/shared/member-interest-category";
+import type { Category } from "@/lib/constants/category";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
-export type { MemberInterestCategory } from "@/types/shared/member-interest-category";
+export type MemberInterestCategory = Category;
 
 export type MemberSocialProvider = "kakao" | "google";
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { MEMBER_INTEREST_CATEGORIES } from "@/types/shared/member-interest-category";
+import { ONBOARDING_CATEGORIES } from "@/lib/constants/category";
 
 import {
   SESSION_DURATION_MINUTES_MAX,
@@ -28,7 +28,7 @@ export const createSessionFormSchema = z.object({
     .min(1, "공지사항을 입력해 주세요.")
     .max(100, "공지사항은 최대 100자까지 입력 가능합니다."),
 
-  category: z.enum(MEMBER_INTEREST_CATEGORIES, {
+  category: z.enum(ONBOARDING_CATEGORIES, {
     message: "카테고리를 선택해 주세요.",
   }),
 
