@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { Button } from "@/components/Button/Button";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
@@ -34,12 +35,9 @@ export const Default: Story = {
 
     return (
       <>
-        <button
-          onClick={() => setIsOpen(true)}
-          className="rounded-lg bg-green-500 px-4 py-2 text-white"
-        >
+        <Button variant="solid" colorScheme="primary" size="medium" onClick={() => setIsOpen(true)}>
           세션 참여하기
-        </button>
+        </Button>
         {isOpen && <SessionJoinModal {...args} onClose={() => setIsOpen(false)} />}
       </>
     );
