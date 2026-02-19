@@ -10,13 +10,17 @@ const meta = {
   component: SessionJoinModal,
   tags: ["autodocs"],
   parameters: {
-    layout: "centered",
+    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
     docs: {
       description: {
         component: "세션 참여 전 목표와 할 일을 입력하는 모달 컴포넌트입니다.",
+      },
+      story: {
+        inline: false,
+        height: "720px",
       },
     },
   },
