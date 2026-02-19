@@ -1,9 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
-import { Button } from "@/components/Button/Button";
+import { ButtonLink } from "@/components/Button/ButtonLink";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
+import { useIsAuthenticated } from "@/features/member/hooks/useMemberHooks";
 import { useDialog } from "@/hooks/useDialog";
 
 import { useSessionDetail } from "../../hooks/useSessionHooks";
@@ -16,15 +15,11 @@ interface SessionDetailModalProps {
 }
 
 export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
-  const router = useRouter();
   const { dialogRef, handleClose, handleBackdropClick } = useDialog("/");
   const { data } = useSessionDetail(sessionId);
+  const isAuthenticated = useIsAuthenticated();
 
   const session = data?.result;
-
-  const handleLogin = () => {
-    router.push(`/login?next=/session/${sessionId}/waiting`);
-  };
 
   const statusDisplay = session ? getSessionStatusDisplay(session.status) : null;
 
@@ -74,15 +69,27 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
         )}
 
         {/* 버튼 영역 */}
-        <Button
-          variant="solid"
-          colorScheme="primary"
-          size="medium"
-          className="w-full"
-          onClick={handleLogin}
-        >
-          로그인하기
-        </Button>
+        {isAuthenticated ? (
+          <ButtonLink
+            href="#"
+            variant="solid"
+            colorScheme="primary"
+            size="medium"
+            className="w-full"
+          >
+            참여하기
+          </ButtonLink>
+        ) : (
+          <ButtonLink
+            href="/login"
+            variant="solid"
+            colorScheme="primary"
+            size="medium"
+            className="w-full"
+          >
+            로그인하기
+          </ButtonLink>
+        )}
       </div>
     </dialog>
   );
