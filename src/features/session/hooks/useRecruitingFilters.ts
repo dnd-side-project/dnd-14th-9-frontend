@@ -4,13 +4,9 @@ import { useCallback, useMemo } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-import {
-  DURATION_OPTIONS,
-  SORT_OPTIONS,
-} from "../components/RecruitingSection/recruitingFilter.types";
-import { parseParticipantsFilterValue } from "../components/RecruitingSection/recruitingFilter.utils";
 import { SESSION_PARTICIPANTS_MAX, SESSION_PARTICIPANTS_MIN } from "../constants/sessionLimits";
-import { formatTimeSlotsParam, parseTimeSlotsParam } from "../utils/timeSlots";
+import { parseSessionListSearchParams } from "../utils/parseSessionListSearchParams";
+import { formatTimeSlotsParam } from "../utils/timeSlots";
 
 import type { DurationRange, SessionSort, TimeSlot } from "../types";
 
@@ -31,14 +27,6 @@ const DEFAULT_UPDATE_OPTIONS: Required<UpdateFiltersOptions> = {
   resetPage: true,
 };
 
-function isDurationRangeValue(value: string | null): value is DurationRange {
-  return DURATION_OPTIONS.some((option) => option.value === value);
-}
-
-function isSessionSortValue(value: string | null): value is SessionSort {
-  return SORT_OPTIONS.some((option) => option.value === value);
-}
-
 function formatDateParam(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -55,16 +43,15 @@ export function useRecruitingFilters() {
   const searchParams = useSearchParams();
 
   const values = useMemo<RecruitingFilterValues>(() => {
-    const durationRangeParam = searchParams.get("durationRange");
-    const sortParam = searchParams.get("sort");
+    const parsedParams = parseSessionListSearchParams(searchParams);
 
     return {
-      startDate: searchParams.get("startDate"),
-      endDate: searchParams.get("endDate"),
-      timeSlots: parseTimeSlotsParam(searchParams.get("timeSlots")),
-      durationRange: isDurationRangeValue(durationRangeParam) ? durationRangeParam : null,
-      participants: parseParticipantsFilterValue(searchParams.get("participants")),
-      sort: isSessionSortValue(sortParam) ? sortParam : "LATEST",
+      startDate: parsedParams.startDate ?? null,
+      endDate: parsedParams.endDate ?? null,
+      timeSlots: parsedParams.timeSlots,
+      durationRange: parsedParams.durationRange ?? null,
+      participants: parsedParams.participants ? String(parsedParams.participants) : null,
+      sort: parsedParams.sort,
     };
   }, [searchParams]);
 

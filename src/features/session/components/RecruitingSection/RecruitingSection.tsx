@@ -9,12 +9,10 @@ import { PaginationList } from "@/components/Pagination/PaginationList";
 import { RECRUITING_PAGE_SIZE } from "../../constants/pagination";
 import { useRecruitingFilters } from "../../hooks/useRecruitingFilters";
 import { useSessionList } from "../../hooks/useSessionHooks";
-import { parsePageParam } from "../../utils/pagination";
+import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
 import { Card } from "../Card/Card";
 
 import { RecruitingFilterBar } from "./RecruitingFilterBar";
-
-import type { SessionCategoryFilter } from "../../types";
 
 /**
  * RecruitingSection - 모집 중 세션 목록
@@ -37,9 +35,7 @@ export function RecruitingSection() {
   const searchParams = useSearchParams();
 
   // URL 파라미터 파싱
-  const keyword = searchParams.get("q") ?? undefined;
-  const category = (searchParams.get("category") as SessionCategoryFilter) ?? undefined;
-  const page = parsePageParam(searchParams.get("page"));
+  const { keyword, category, page } = parseSessionListSearchParams(searchParams);
 
   const { data, isPending } = useSessionList({
     keyword,

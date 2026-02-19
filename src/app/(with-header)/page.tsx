@@ -6,20 +6,16 @@ import { sessionApi } from "@/features/session/api";
 import { Banner } from "@/features/session/components/Banner/Banner";
 import { RecommendedSection } from "@/features/session/components/RecommendedSection/RecommendedSection";
 import { RecommendedSectionSkeleton } from "@/features/session/components/RecommendedSection/RecommendedSectionSkeleton";
-import {
-  DURATION_OPTIONS,
-  SORT_OPTIONS,
-} from "@/features/session/components/RecruitingSection/recruitingFilter.types";
-import { parseParticipantsFilterValue } from "@/features/session/components/RecruitingSection/recruitingFilter.utils";
 import { RecruitingSection } from "@/features/session/components/RecruitingSection/RecruitingSection";
 import { RecruitingSectionSkeleton } from "@/features/session/components/RecruitingSection/RecruitingSectionSkeleton";
 import { SearchFilterSection } from "@/features/session/components/SearchFilterSection/SearchFilterSection";
 import { SearchFilterSectionSkeleton } from "@/features/session/components/SearchFilterSection/SearchFilterSectionSkeleton";
 import { RECRUITING_PAGE_SIZE } from "@/features/session/constants/pagination";
 import { sessionKeys } from "@/features/session/hooks/useSessionHooks";
-import type { DurationRange, SessionCategoryFilter, SessionSort } from "@/features/session/types";
-import { parsePageParam } from "@/features/session/utils/pagination";
-import { parseTimeSlotsParam } from "@/features/session/utils/timeSlots";
+import {
+  parseSessionListSearchParams,
+  toURLSearchParams,
+} from "@/features/session/utils/parseSessionListSearchParams";
 
 /**
  * 홈 화면 (메인 페이지)
@@ -41,56 +37,17 @@ interface HomePageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-function isSessionSortValue(value: string | undefined): value is SessionSort {
-  if (!value) return false;
-  return SORT_OPTIONS.some((option) => option.value === value);
-}
-
-function isDurationRangeValue(value: string | undefined): value is DurationRange {
-  if (!value) return false;
-  return DURATION_OPTIONS.some((option) => option.value === value);
-}
-
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const params = await searchParams;
-
-  const q = typeof params["q"] === "string" ? params["q"] : undefined;
-  const category = (typeof params["category"] === "string" ? params["category"] : undefined) as
-    | SessionCategoryFilter
-    | undefined;
-  const sortParam = typeof params["sort"] === "string" ? params["sort"] : undefined;
-  const sort: SessionSort = isSessionSortValue(sortParam) ? sortParam : "LATEST";
-  const startDate = typeof params["startDate"] === "string" ? params["startDate"] : undefined;
-  const endDate = typeof params["endDate"] === "string" ? params["endDate"] : undefined;
-  const durationRangeParam =
-    typeof params["durationRange"] === "string" ? params["durationRange"] : undefined;
-  const durationRange: DurationRange | undefined = isDurationRangeValue(durationRangeParam)
-    ? durationRangeParam
-    : undefined;
-  const timeSlots = parseTimeSlotsParam(
-    typeof params["timeSlots"] === "string" ? params["timeSlots"] : null
-  );
-  const participantsParam = parseParticipantsFilterValue(
-    typeof params["participants"] === "string" ? params["participants"] : null
-  );
-  const participants = participantsParam ? Number(participantsParam) : undefined;
-  const page = parsePageParam(typeof params["page"] === "string" ? params["page"] : undefined);
-  const isSearchMode = !!q;
+  const parsedParams = parseSessionListSearchParams(toURLSearchParams(await searchParams));
+  const isSearchMode = Boolean(parsedParams.keyword);
 
   const queryClient = new QueryClient();
 
   // 모집 중 세션 목록 prefetch (첫 페이지 로드 성능 최적화)
   const listParams = {
-    keyword: q,
-    category,
-    sort,
-    page,
+    ...parsedParams,
     size: RECRUITING_PAGE_SIZE,
-    startDate,
-    endDate,
-    timeSlots: timeSlots.length > 0 ? timeSlots : undefined,
-    durationRange,
-    participants,
+    timeSlots: parsedParams.timeSlots.length > 0 ? parsedParams.timeSlots : undefined,
   };
   await queryClient.prefetchQuery({
     queryKey: sessionKeys.list(listParams),
