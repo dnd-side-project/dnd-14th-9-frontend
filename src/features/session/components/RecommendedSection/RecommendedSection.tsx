@@ -3,8 +3,7 @@
 import { useMemo } from "react";
 
 import { PaginationFraction } from "@/components/Pagination/PaginationFraction";
-import { useMeForEdit } from "@/features/member/hooks/useMemberHooks";
-import { useAuthStore } from "@/stores/authStore";
+import { useIsAuthenticated, useMeForEdit } from "@/features/member/hooks/useMemberHooks";
 import { getMemberInterestCategoryLabel } from "@/types/shared/member-interest-category";
 import type { MemberInterestCategory } from "@/types/shared/member-interest-category";
 
@@ -23,7 +22,7 @@ import { Card } from "../Card/Card";
  * - thirdInterestCategory → 3페이지 (4개)
  */
 export function RecommendedSection() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthenticated = useIsAuthenticated();
 
   if (!isAuthenticated) {
     return null;
