@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ButtonLink } from "@/components/Button/ButtonLink";
 
 interface EmptyRecommendedSessionPlaceholderProps {
   nickname: string;
@@ -18,13 +18,15 @@ export function EmptyRecommendedSessionPlaceholder({
         </p>
         <p className="m-0">관련 세션을 만들어 보세요!</p>
       </div>
-      <Link href="/session/create" passHref legacyBehavior>
-        <a className="bg-surface-primary-default gap-xs px-md py-2xs flex h-[44px] shrink-0 items-center justify-center rounded-md">
-          <span className="font-pretendard text-text-inverse text-[14px] leading-[1.4] font-semibold">
-            세션 만들기
-          </span>
-        </a>
-      </Link>
+      <ButtonLink
+        href="/session/create"
+        variant="solid"
+        colorScheme="primary"
+        size="medium"
+        hardNavigate
+      >
+        세션 만들기
+      </ButtonLink>
     </div>
   );
 }
