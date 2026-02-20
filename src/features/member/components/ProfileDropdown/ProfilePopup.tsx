@@ -1,9 +1,10 @@
 "use client";
 
-import { LogOut, FileText, MessageSquare } from "lucide-react";
-
 import { ButtonLink } from "@/components/Button/ButtonLink";
-import { ProfileIcon } from "@/components/Icon/ProfileIcon";
+import { FrameIcon } from "@/components/Icon/FrameIcon";
+import { LogoutIcon } from "@/components/Icon/LogoutIcon";
+import { NoteIcon } from "@/components/Icon/NoteIcon";
+import { ProfileCircleIcon } from "@/components/Icon/ProfileCircleIcon";
 import { cn } from "@/lib/utils/utils";
 
 import { FocusStatusItem } from "./FocusStatusItem";
@@ -54,7 +55,7 @@ export function ProfilePopup({
     {
       key: "profile-settings",
       kind: "link" as const,
-      icon: <ProfileIcon className="h-[22px] w-[22px]" />,
+      icon: <ProfileCircleIcon className="h-[22px] w-[22px]" />,
       label: "프로필 설정",
       href: PROFILE_SETTINGS_PATH,
       onClick: handleMenuItemClick(onProfileSettingsClick),
@@ -62,7 +63,7 @@ export function ProfilePopup({
     {
       key: "report",
       kind: "link" as const,
-      icon: <FileText size={16} strokeWidth={1.5} />,
+      icon: <FrameIcon size="xsmall" className="h-[16px] w-[16px]" />,
       label: "기록 리포트",
       href: PROFILE_REPORT_PATH,
       onClick: handleMenuItemClick(onReportClick),
@@ -70,7 +71,7 @@ export function ProfilePopup({
     {
       key: "feedback",
       kind: "link" as const,
-      icon: <MessageSquare size={18} strokeWidth={1.5} />,
+      icon: <NoteIcon className="h-[18px] w-[18px]" />,
       label: "피드백",
       href: FEEDBACK_PATH,
       onClick: handleMenuItemClick(onFeedbackClick),
@@ -78,7 +79,7 @@ export function ProfilePopup({
     {
       key: "logout",
       kind: "action" as const,
-      icon: <LogOut size={16} strokeWidth={1.5} />,
+      icon: <LogoutIcon size="xsmall" className="h-[16px] w-[16px]" />,
       label: "로그아웃",
       onClick: handleMenuItemClick(onLogoutClick),
     },
@@ -87,7 +88,7 @@ export function ProfilePopup({
   return (
     <div
       className={cn(
-        "flex h-[603px] w-[386px] flex-col items-center overflow-hidden rounded-xl bg-gray-900 shadow-md",
+        "bg-background-subtle flex h-[603px] w-[386px] flex-col items-center overflow-hidden rounded-xl shadow-md",
         className
       )}
     >
@@ -99,7 +100,7 @@ export function ProfilePopup({
       />
 
       <div className="flex h-[512px] w-full flex-col items-start justify-center gap-0 p-6">
-        <div className="flex w-full flex-col items-start gap-3">
+        <div className="gap-sm flex w-full flex-col items-start">
           <FocusStatusItem
             focusedTime={focusedTime}
             totalParticipationTime={totalParticipationTime}
@@ -115,10 +116,9 @@ export function ProfilePopup({
                 onClick={item.onClick}
                 variant="ghost"
                 colorScheme="secondary"
-                size="small"
                 className={cn(
                   menuItemBaseClassName,
-                  "border-transparent bg-gray-800 hover:border-green-500 hover:bg-gray-800"
+                  "border-color-default hover:border-border-default hover:bg-surface-subtle"
                 )}
               >
                 <MenuItemContent icon={item.icon} label={item.label} />
