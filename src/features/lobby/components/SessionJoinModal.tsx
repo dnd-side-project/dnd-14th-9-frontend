@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { createPortal } from "react-dom";
+
 import { Button } from "@/components/Button/Button";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
@@ -15,15 +17,18 @@ const MAX_TODOS = 5;
 interface SessionJoinModalProps {
   sessionId: string;
   onClose: () => void;
+  onJoinSuccess?: () => void;
 }
 
-export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) {
+export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJoinModalProps) {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [goal, setGoal] = useState("");
   const [todos, setTodos] = useState<ReportTodoItem[]>([
     { todoId: "0", content: "", isCompleted: false },
   ]);
+  const [goalError, setGoalError] = useState(false);
+  const [todoError, setTodoError] = useState(false);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -52,11 +57,31 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
   };
 
   const handleJoin = () => {
+    const isGoalEmpty = goal.trim() === "";
+    const hasValidTodo = todos.some((todo) => todo.content.trim() !== "");
+
+    setGoalError(isGoalEmpty);
+    setTodoError(!hasValidTodo);
+
+    if (isGoalEmpty || !hasValidTodo) {
+      return;
+    }
+
     // TODO: API 연동 (useJoinSession → useSetGoal → useAddTodos)
+
+    // 1. 부모 모달(SessionDetailModal)의 dialog 닫기
+    onJoinSuccess?.();
+
+    // 2. 이 모달 unmount (showJoinModal = false)
+    onClose();
+
+    // 3. 페이지 이동
     router.push(`/session/${sessionId}/waiting`);
   };
 
-  return (
+  if (typeof window === "undefined") return null;
+
+  return createPortal(
     <dialog
       ref={dialogRef}
       onCancel={onClose}
@@ -78,13 +103,18 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
         </span>
         <Input
           value={goal}
-          onChange={(e) => setGoal(e.target.value)}
+          onChange={(e) => {
+            setGoal(e.target.value);
+            if (goalError) setGoalError(false);
+          }}
           onClear={() => setGoal("")}
           placeholder="목표를 입력하세요"
           className="text-text-muted"
           fullWidth
           showCharacterCount
           maxLength={50}
+          error={goalError}
+          errorMessage="목표를 입력해주세요"
         />
       </div>
 
@@ -119,7 +149,10 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
                 <li key={todo.todoId} className="flex items-start gap-2">
                   <Input
                     value={todo.content}
-                    onChange={(e) => handleTodoChange(index, e.target.value)}
+                    onChange={(e) => {
+                      handleTodoChange(index, e.target.value);
+                      if (todoError) setTodoError(false);
+                    }}
                     onClear={() => handleTodoChange(index, "")}
                     placeholder="할 일을 입력하세요"
                     className="text-text-muted"
@@ -127,6 +160,8 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
                     containerClassName="flex-1"
                     showCharacterCount
                     maxLength={50}
+                    error={todoError && index === 0}
+                    errorMessage="할 일을 1개 이상 입력해주세요"
                   />
                   {isFirst && canAdd ? (
                     <Button
@@ -175,6 +210,7 @@ export function SessionJoinModal({ sessionId, onClose }: SessionJoinModalProps) 
           세션 참여하기
         </Button>
       </div>
-    </dialog>
+    </dialog>,
+    document.body
   );
 }
