@@ -28,27 +28,37 @@ export function TotalTimer({
   const progress = (remainingSeconds / totalSeconds) * 100;
 
   return (
-    <div className="gap-lg flex flex-col items-center">
-      {/* Progress Ring - 시간이 줄어들면서 비는 형태 */}
-      <ProgressRing
-        progress={progress}
-        size={160}
-        strokeWidth={10}
-        trackClassName="stroke-gray-700"
-        progressClassName="stroke-green-600"
-      >
-        <span className="text-[24px] font-bold text-gray-50">{isExpired ? "종료" : formatted}</span>
-      </ProgressRing>
+    <div className="gap-xl p-xl bg-surface-strong flex h-full rounded-2xl">
+      {/* 왼쪽: 정보 영역 */}
+      <div className="flex flex-1 flex-col gap-3">
+        {/* 제목 + 시간 */}
+        <div className="flex flex-col gap-1">
+          <h2 className="text-[20px] font-bold text-gray-50">전체 타이머</h2>
+          <span className="text-[32px] font-bold text-gray-50">
+            {isExpired ? "종료" : formatted}
+          </span>
+        </div>
 
-      {/* 제목 */}
-      <h2 className="text-[20px] font-bold text-gray-50">전체 세션 시간</h2>
+        {/* 집중 인원 표시 */}
+        <span className="text-[14px] text-gray-400">
+          <span className="font-semibold text-green-600">{focusingCount}</span>
+          <span>/{totalCount}명 집중 중</span>
+        </span>
+      </div>
 
-      {/* 집중 인원 표시 */}
-      <div className="flex items-center gap-2 text-[14px] text-gray-400">
-        <span>집중 중</span>
-        <span className="font-semibold text-green-600">{focusingCount}</span>
-        <span>/</span>
-        <span>{totalCount}명</span>
+      {/* 오른쪽: Progress Ring with Time (가운데 정렬) */}
+      <div className="flex items-center">
+        <ProgressRing
+          progress={progress}
+          size={200}
+          strokeWidth={12}
+          trackClassName="stroke-border-inverse"
+          progressClassName="stroke-border-disabled"
+        >
+          <span className="text-text-disabled text-[24px] font-bold">
+            {isExpired ? "종료" : formatted}
+          </span>
+        </ProgressRing>
       </div>
     </div>
   );

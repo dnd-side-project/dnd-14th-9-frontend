@@ -7,6 +7,7 @@ import { TotalTimer } from "./TotalTimer/TotalTimer";
 
 interface SessionTimerSectionProps {
   sessionId: string;
+  className?: string;
 }
 
 // TODO: 실제 API 연동 시 제거
@@ -15,7 +16,7 @@ const MOCK_SESSION = {
   totalParticipants: 6,
 };
 
-export function SessionTimerSection({ sessionId }: SessionTimerSectionProps) {
+export function SessionTimerSection({ sessionId, className }: SessionTimerSectionProps) {
   // 세션 종료 시간 (컴포넌트 마운트 시점 + 세션 시간)
   // useState의 lazy initializer는 초기 마운트 시에만 실행됨
   const [sessionEndTime] = useState(
@@ -30,9 +31,9 @@ export function SessionTimerSection({ sessionId }: SessionTimerSectionProps) {
   }, []);
 
   return (
-    <section className="gap-3xl flex items-center justify-center">
+    <section className={`gap-lg flex items-stretch ${className ?? ""}`}>
       {/* 내 타이머 (왼쪽, 60%) */}
-      <div className="flex flex-6 justify-center">
+      <div className="flex-6">
         <MyTimer
           sessionDurationMinutes={MOCK_SESSION.durationMinutes}
           onStatusChange={handleMyStatusChange}
@@ -40,7 +41,7 @@ export function SessionTimerSection({ sessionId }: SessionTimerSectionProps) {
       </div>
 
       {/* 전체 타이머 (오른쪽, 40%) */}
-      <div className="flex flex-4 justify-center">
+      <div className="flex-4">
         <TotalTimer
           sessionEndTime={sessionEndTime}
           sessionDurationMinutes={MOCK_SESSION.durationMinutes}
