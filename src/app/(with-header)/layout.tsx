@@ -6,12 +6,10 @@ import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
 import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
 
-const OnboardingModalWrapper = dynamic(
-  () =>
-    import("@/features/member/components/Onboarding/OnboardingModalWrapper").then(
-      (mod) => mod.OnboardingModalWrapper
-    ),
-  { ssr: false }
+const OnboardingModalWrapper = dynamic(() =>
+  import("@/features/member/components/Onboarding/OnboardingModalWrapper").then(
+    (mod) => mod.OnboardingModalWrapper
+  )
 );
 
 /**
