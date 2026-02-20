@@ -10,7 +10,7 @@ export function EmptyRecommendedSessionPlaceholder({
   categoryLabel,
 }: EmptyRecommendedSessionPlaceholderProps) {
   return (
-    <div className="border-border-default gap-xl p-4xl flex w-full flex-col items-center justify-center rounded-sm border border-solid">
+    <div className="bg-alpha-white-8 border-border-gray-default gap-xl p-4xl flex w-full flex-col items-center justify-center rounded-sm border border-solid">
       <div className="font-pretendard text-text-primary text-center text-[24px] leading-[1.4] font-bold">
         <p className="m-0">
           {nickname}님, <span className="text-surface-primary-default">{categoryLabel}</span>에도
