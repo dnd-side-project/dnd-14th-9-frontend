@@ -73,3 +73,4 @@ export type UpdateNicknameResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateInterestCategoriesResponse = ApiSuccessResponse<MemberEditInfo>;
 export type GetMyReportResponse = ApiSuccessResponse<MemberReport>;
 export type DeleteMeResponse = ApiSuccessResponse<null>;
+export type DeleteProfileImageResponse = ApiSuccessResponse<null>;

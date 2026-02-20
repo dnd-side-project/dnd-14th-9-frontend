@@ -2,6 +2,7 @@ import { api } from "@/lib/api/api";
 
 import type {
   DeleteMeResponse,
+  DeleteProfileImageResponse,
   GetMeForEditResponse,
   GetMeResponse,
   GetMyReportResponse,
@@ -58,6 +59,10 @@ export const memberApi = {
     formData.append("profileImage", body.profileImage);
 
     return patchProfileImage<UpdateProfileImageResponse>("/api/members/me/profile-image", formData);
+  },
+
+  deleteProfileImage: async (): Promise<DeleteProfileImageResponse> => {
+    return api.delete<DeleteProfileImageResponse>("/api/members/me/profile-image");
   },
 
   updateNickname: async (body: UpdateNicknameRequest): Promise<UpdateNicknameResponse> => {
