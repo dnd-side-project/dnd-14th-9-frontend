@@ -1,9 +1,18 @@
+import dynamic from "next/dynamic";
+
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
-import { OnboardingModalWrapper } from "@/features/member/components/Onboarding/OnboardingModalWrapper";
 import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
+
+const OnboardingModalWrapper = dynamic(
+  () =>
+    import("@/features/member/components/Onboarding/OnboardingModalWrapper").then(
+      (mod) => mod.OnboardingModalWrapper
+    ),
+  { ssr: false }
+);
 
 /**
  * WithHeader Layout
@@ -34,12 +43,12 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <main className="mx-auto w-full max-w-7xl flex-1">{children}</main>
         <Footer />
       </div>
-      {memberProfile?.firstLogin && (
+      {memberProfile?.firstLogin ? (
         <OnboardingModalWrapper
           defaultNickname={memberProfile.nickname}
           defaultProfileImageUrl={memberProfile.profileImageUrl}
         />
-      )}
+      ) : null}
     </HydrationBoundary>
   );
 }
