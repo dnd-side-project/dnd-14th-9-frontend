@@ -42,18 +42,22 @@ export function OnboardingModal({
 
   const handleProfileNext = async (newNickname: string, profileImage?: File) => {
     try {
-      // 닉네임 업데이트
+      const promises: Promise<unknown>[] = [];
+
       if (newNickname !== defaultNickname) {
-        await updateNickname.mutateAsync({ nickname: newNickname });
+        promises.push(updateNickname.mutateAsync({ nickname: newNickname }));
+      }
+
+      if (profileImage) {
+        promises.push(updateProfileImage.mutateAsync({ profileImage }));
+      }
+
+      await Promise.all(promises);
+
+      if (newNickname !== defaultNickname) {
         setNickname(newNickname);
       }
 
-      // 이미지 업데이트 (있는 경우)
-      if (profileImage) {
-        await updateProfileImage.mutateAsync({ profileImage });
-      }
-
-      // 카테고리 단계로 이동
       setStep("category");
     } catch (error) {
       console.error("프로필 업데이트 실패:", error);
@@ -75,7 +79,7 @@ export function OnboardingModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      {step === "profile" && (
+      {step === "profile" ? (
         <OnboardingProfile
           defaultNickname={nickname}
           defaultProfileImageUrl={defaultProfileImageUrl}
@@ -83,10 +87,10 @@ export function OnboardingModal({
           onSkip={handleProfileSkip}
           onNext={handleProfileNext}
         />
-      )}
-      {step === "category" && (
+      ) : null}
+      {step === "category" ? (
         <OnboardingCategory nickname={nickname} isLoading={isLoading} onNext={handleCategoryNext} />
-      )}
+      ) : null}
     </div>
   );
 }
