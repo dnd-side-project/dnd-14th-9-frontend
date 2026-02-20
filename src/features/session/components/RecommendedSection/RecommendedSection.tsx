@@ -130,6 +130,16 @@ function RecommendedContent() {
   // 3. 검색 카테고리가 관심 카테고리가 아닌 경우: 빈 화면 컴포넌트 노출
   return (
     <section className="gap-xl flex flex-col">
+      <div className="flex items-center justify-between">
+        <div className="gap-xs flex flex-col">
+          <h2 className="text-text-primary text-2xl font-bold">
+            {editData?.result.nickname}님을 위한 추천 세션
+          </h2>
+          <p className="text-text-disabled text-base">
+            마이페이지에서 설정한 카테고리를 기반해서 방을 추천해드려요
+          </p>
+        </div>
+      </div>
       <EmptyRecommendedSessionPlaceholder
         nickname={editData?.result.nickname ?? ""}
         categoryLabel={getCategoryLabel(selectedCategory)}
