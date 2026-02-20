@@ -31,29 +31,6 @@ const validateImageFile = (file: File): string | null => {
   return null;
 };
 
-const validateImageDimensions = (file: File): Promise<string | null> => {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      if (img.width < 200 || img.height < 200) {
-        resolve("이미지는 최소 200×200px 이상이어야 해요");
-      } else {
-        resolve(null);
-      }
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      resolve("이미지를 불러올 수 없어요");
-    };
-
-    img.src = url;
-  });
-};
-
 export function OnboardingProfile({
   className,
   defaultNickname,
@@ -69,7 +46,7 @@ export function OnboardingProfile({
   const [previewUrl, setPreviewUrl] = useState<string | null>(defaultProfileImageUrl ?? null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -77,17 +54,6 @@ export function OnboardingProfile({
     const fileError = validateImageFile(file);
     if (fileError) {
       showToast("error", fileError);
-      // Input 초기화
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-      return;
-    }
-
-    // 이미지 크기 검증
-    const dimensionError = await validateImageDimensions(file);
-    if (dimensionError) {
-      showToast("error", dimensionError);
       // Input 초기화
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
