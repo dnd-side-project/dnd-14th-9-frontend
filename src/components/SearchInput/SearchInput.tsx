@@ -21,7 +21,7 @@ const searchInputContainerVariants = cva(
     "rounded-sm",
     "bg-gray-950",
     "transition-colors",
-    "focus-within:border-border-strong",
+    "focus-within:border-text-brand-default",
   ].join(" ")
 );
 
