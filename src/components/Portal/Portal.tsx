@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
 import { createPortal } from "react-dom";
 
@@ -9,15 +9,14 @@ interface PortalProps {
   container?: Element;
 }
 
-const emptySubscribe = () => () => {};
-
 export function Portal({ children, container }: PortalProps) {
-  const isMounted = useSyncExternalStore(
-    emptySubscribe,
-    () => true, // 클라이언트
-    () => false // 서버 (SSR)
-  );
+  const [mounted, setMounted] = useState(false);
 
-  if (!isMounted) return null;
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 마운트 감지를 위한 의도적 패턴
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
   return createPortal(children, container ?? document.body);
 }
