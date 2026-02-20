@@ -12,6 +12,7 @@ export async function POST(
     request,
     method: "POST",
     pathWithQuery: `/sessions/${sessionId}/join`,
+    includeRequestBody: "json",
     forwardRequestCookies: true,
   });
 }
