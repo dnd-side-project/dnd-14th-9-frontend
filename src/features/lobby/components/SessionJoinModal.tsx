@@ -9,7 +9,10 @@ import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { Input } from "@/components/Input/Input";
 import { Portal } from "@/components/Portal/Portal";
+import { useJoinSession } from "@/features/session/hooks/useSessionHooks";
 import type { ReportTodoItem } from "@/features/session/types";
+import { ApiError } from "@/lib/api/api-client";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 
 const MAX_TODOS = 5;
 
@@ -28,6 +31,9 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
   ]);
   const [goalError, setGoalError] = useState(false);
   const [todoError, setTodoError] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  const joinSessionMutation = useJoinSession();
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -55,27 +61,36 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
     setTodos((prev) => [...prev, { todoId: String(Date.now()), content: "", isCompleted: false }]);
   };
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     const isGoalEmpty = goal.trim() === "";
     const hasValidTodo = todos.some((todo) => todo.content.trim() !== "");
 
     setGoalError(isGoalEmpty);
     setTodoError(!hasValidTodo);
+    setServerError(null);
 
     if (isGoalEmpty || !hasValidTodo) {
       return;
     }
 
-    // TODO: API 연동 (useJoinSession → useSetGoal → useAddTodos)
+    const validTodos = todos
+      .filter((todo) => todo.content.trim() !== "")
+      .map((todo) => todo.content.trim());
 
-    // 1. 부모 모달(SessionDetailModal)의 dialog 닫기
-    onJoinSuccess?.();
+    try {
+      await joinSessionMutation.mutateAsync({
+        sessionRoomId: sessionId,
+        body: { goal: goal.trim(), todos: validTodos },
+      });
 
-    // 2. 이 모달 unmount (showJoinModal = false)
-    onClose();
-
-    // 3. 페이지 이동
-    router.push(`/session/${sessionId}/waiting`);
+      // 성공 시: 모달 닫고 대기방으로 이동
+      onJoinSuccess?.();
+      onClose();
+      router.push(`/session/${sessionId}/waiting`);
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+      setServerError(message);
+    }
   };
 
   return (
@@ -189,6 +204,13 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
           )}
         </div>
 
+        {/* 서버 에러 메시지 */}
+        {serverError && (
+          <div className="rounded-sm bg-red-500/10 px-4 py-3 text-sm text-red-500">
+            {serverError}
+          </div>
+        )}
+
         {/* 하단 버튼 */}
         <div className="flex w-full gap-2">
           <Button
@@ -197,6 +219,7 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
             size="medium"
             className="flex-1"
             onClick={onClose}
+            disabled={joinSessionMutation.isPending}
           >
             그만두기
           </Button>
@@ -206,8 +229,9 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
             size="medium"
             className="flex-1"
             onClick={handleJoin}
+            disabled={joinSessionMutation.isPending}
           >
-            세션 참여하기
+            {joinSessionMutation.isPending ? "참여 중..." : "세션 참여하기"}
           </Button>
         </div>
       </dialog>
