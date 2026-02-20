@@ -1,5 +1,7 @@
 import { SessionDetailSection } from "@/features/session/components/SessionDetailSection";
+import { SessionGoalAndTodoCard } from "@/features/session/components/SessionGoalAndTodoCard";
 import { SessionHeader } from "@/features/session/components/SessionHeader";
+import { SessionParticipantListCard } from "@/features/session/components/SessionParticipantListCard";
 import { SessionTimerSection } from "@/features/session/components/SessionTimerSection";
 
 interface SessionPageProps {
@@ -27,6 +29,10 @@ export default async function SessionPage({ params }: SessionPageProps) {
       <SessionHeader />
       <SessionTimerSection sessionId={sessionId} className="mt-xl" />
       <SessionDetailSection className="mt-xl" {...MOCK_SESSION_DETAIL} />
+      <div className="gap-lg mt-xl flex">
+        <SessionGoalAndTodoCard />
+        <SessionParticipantListCard />
+      </div>
     </div>
   );
 }
