@@ -40,8 +40,8 @@ const meta = {
   argTypes: {
     size: {
       control: "select",
-      options: ["full", "large", "small"],
-      description: "드롭다운 크기 (full: 100%, large: 89px, small: 74px)",
+      options: ["full", "large", "medium"],
+      description: "드롭다운 크기 (full: 100%, large: 89px, medium: 74px)",
     },
     radius: {
       control: "select",
@@ -91,10 +91,10 @@ export const WithDefaultValue: Story = {
   },
 };
 
-export const Small: Story = {
+export const Medium: Story = {
   args: {
     options: SAMPLE_OPTIONS,
-    size: "small",
+    size: "medium",
     placeholder: "선택",
   },
 };
@@ -184,9 +184,9 @@ export const AllVariants: Story = {
         <Dropdown options={SAMPLE_OPTIONS} size="large" defaultValue="latest" />
       </div>
       <div className="flex items-start gap-4">
-        <span className="w-24 shrink-0 text-sm text-gray-400">Small</span>
-        <Dropdown options={SAMPLE_OPTIONS} size="small" placeholder="선택" />
-        <Dropdown options={SAMPLE_OPTIONS} size="small" defaultValue="latest" />
+        <span className="w-24 shrink-0 text-sm text-gray-400">Medium</span>
+        <Dropdown options={SAMPLE_OPTIONS} size="medium" placeholder="선택" />
+        <Dropdown options={SAMPLE_OPTIONS} size="medium" defaultValue="latest" />
       </div>
       <div className="flex items-start gap-4">
         <span className="w-24 shrink-0 text-sm text-gray-400">Radius SM</span>

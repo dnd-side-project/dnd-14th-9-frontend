@@ -37,6 +37,11 @@ describe("login-policy", () => {
       expect(normalizeInternalPath("/login?reason=auth_required")).toBe("/");
     });
 
+    it("/api 경로는 루트(/)로 폴백해야 함", () => {
+      expect(normalizeInternalPath("/api")).toBe("/");
+      expect(normalizeInternalPath("/api/members/me/profile")).toBe("/");
+    });
+
     it("정상 내부 경로는 유지해야 함", () => {
       expect(normalizeInternalPath("/dashboard")).toBe("/dashboard");
       expect(normalizeInternalPath("/dashboard?tab=all")).toBe("/dashboard?tab=all");

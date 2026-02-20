@@ -23,7 +23,7 @@ const meta = {
   argTypes: {
     size: {
       control: "select",
-      options: ["large", "small"],
+      options: ["large", "medium"],
       description: "필터 버튼 크기",
     },
     radius: {
@@ -69,10 +69,10 @@ export const Large: Story = {
   },
 };
 
-export const Small: Story = {
+export const Medium: Story = {
   args: {
     children: "필터",
-    size: "small",
+    size: "medium",
   },
 };
 
@@ -97,10 +97,10 @@ export const Bordered: Story = {
   },
 };
 
-export const BorderedSmall: Story = {
+export const BorderedMedium: Story = {
   args: {
     children: "필터",
-    size: "small",
+    size: "medium",
     bordered: true,
   },
 };
@@ -169,15 +169,15 @@ export const AllVariants: Story = {
         </Filter>
       </div>
       <div className="flex items-center gap-4">
-        <span className="w-24 text-sm text-gray-400">Small</span>
-        <Filter size="small">필터</Filter>
-        <Filter size="small" bordered>
+        <span className="w-24 text-sm text-gray-400">Medium</span>
+        <Filter size="medium">필터</Filter>
+        <Filter size="medium" bordered>
           필터
         </Filter>
-        <Filter size="small" radius="sm">
+        <Filter size="medium" radius="sm">
           필터
         </Filter>
-        <Filter size="small" radius="sm" bordered>
+        <Filter size="medium" radius="sm" bordered>
           필터
         </Filter>
       </div>

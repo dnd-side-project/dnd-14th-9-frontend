@@ -12,7 +12,7 @@ import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/toke
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 
 // 공개 페이지 라우트 (인증 불필요)
-const PUBLIC_PAGE_ROUTES = ["/", "/login"];
+const PUBLIC_PAGE_ROUTES = [/^\/$/, /^\/login$/, /^\/session\/\d+$/];
 
 // 공개 API 라우트 (인증 불필요)
 const PUBLIC_API_ROUTE_PATTERNS = [
@@ -34,7 +34,7 @@ interface TryRefreshTokenOptions {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublicPageRoute = PUBLIC_PAGE_ROUTES.includes(pathname);
+  const isPublicPageRoute = PUBLIC_PAGE_ROUTES.some((pattern) => pattern.test(pathname));
 
   // well-known 경로는 인증 처리 없이 통과한다.
   if (pathname.startsWith("/.well-known")) {
@@ -98,7 +98,9 @@ function redirectToLoginRoute(
     ? buildLoginRedirectUrl(request, options.reason)
     : new URL("/login", request.url);
   const response = NextResponse.redirect(loginUrl);
-  setRedirectAfterLoginCookie(response, `${request.nextUrl.pathname}${request.nextUrl.search}`);
+  if (shouldPersistRedirectAfterLogin(request.nextUrl.pathname)) {
+    setRedirectAfterLoginCookie(response, `${request.nextUrl.pathname}${request.nextUrl.search}`);
+  }
 
   if (options?.clearAuth) {
     clearAuthCookies(response.cookies);
@@ -109,6 +111,10 @@ function redirectToLoginRoute(
 
 function isPublicApiRoute(pathname: string): boolean {
   return PUBLIC_API_ROUTE_PATTERNS.some((pattern) => pattern.test(pathname));
+}
+
+function shouldPersistRedirectAfterLogin(pathname: string): boolean {
+  return !pathname.startsWith("/api/");
 }
 
 /**

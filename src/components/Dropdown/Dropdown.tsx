@@ -12,7 +12,7 @@ import type { DropdownProps } from "./Dropdown.types";
 const DROPDOWN_WIDTH_MAP = {
   full: "w-full",
   large: "w-[89px]",
-  small: "w-[74px]",
+  medium: "w-[74px]",
 } as const;
 
 export function Dropdown({

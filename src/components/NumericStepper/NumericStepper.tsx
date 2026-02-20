@@ -28,10 +28,12 @@ export function NumericStepper({
 }: NumericStepperProps) {
   const isAtMin = value <= min;
   const isAtMax = value >= max;
+  const nextDecrementValue = Math.max(min, value - step);
+  const nextIncrementValue = Math.min(max, value + step);
 
   return (
-    <div className={cn("shrink-0 rounded-sm border border-gray-700 p-4", className)}>
-      <div className="flex h-full flex-col justify-between">
+    <div className={cn("p-md shrink-0 rounded-sm border border-gray-700", className)}>
+      <div className="flex h-full flex-col gap-[20px]">
         <div className="flex items-center justify-between">
           <span className="text-text-secondary text-base">{label}</span>
           <span className="text-text-muted text-[10px]">{hint}</span>
@@ -44,7 +46,7 @@ export function NumericStepper({
             size="xsmall"
             iconOnly
             leftIcon={<MinusIcon size="xsmall" />}
-            onClick={() => onChange(Math.max(min, value - step))}
+            onClick={() => onChange(nextDecrementValue)}
             disabled={isAtMin}
             className="h-7 w-7 rounded-xs"
           />
@@ -56,7 +58,7 @@ export function NumericStepper({
             size="xsmall"
             iconOnly
             leftIcon={<PlusIcon size="xsmall" />}
-            onClick={() => onChange(Math.min(max, value + step))}
+            onClick={() => onChange(nextIncrementValue)}
             disabled={isAtMax}
             className="h-7 w-7 rounded-xs"
           />

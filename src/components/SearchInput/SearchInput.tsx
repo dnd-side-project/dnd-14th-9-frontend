@@ -5,47 +5,54 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { SearchIcon } from "@/components/Icon/SearchIcon";
 import { cn } from "@/lib/utils/utils";
 
-const searchInputVariants = cva(
+const searchInputContainerVariants = cva(
   [
+    "flex",
+    "items-center",
     "w-full",
     "max-w-[580px]",
     "h-14",
-    "px-sm",
-    "pr-10",
+    "pl-lg",
+    "pr-sm",
+    "py-xs",
+    "gap-xs",
     "border",
-    "border-border-gray-default",
+    "border-border-gray-subtler",
     "rounded-sm",
+    "bg-gray-950",
+    "transition-colors",
+    "focus-within:border-border-strong",
+  ].join(" ")
+);
+
+const searchInputVariants = cva(
+  [
+    "flex-1",
+    "h-full",
     "bg-transparent",
     "text-gray-50",
     "text-base",
     "font-weight-semibold",
     "font-pretendard",
     "placeholder:text-gray-300",
-    "transition-colors",
     "focus:outline-none",
-    "focus:border-border-strong",
+    "min-w-0",
   ].join(" ")
 );
 
 export interface SearchInputProps
   extends
     Omit<InputHTMLAttributes<HTMLInputElement>, "type">,
-    VariantProps<typeof searchInputVariants> {}
+    VariantProps<typeof searchInputContainerVariants> {}
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   ({ className, ...props }, ref) => {
     return (
-      <div className="relative w-full max-w-145">
-        <input
-          ref={ref}
-          type="search"
-          className={cn(searchInputVariants(), className)}
-          {...props}
-        />
-        <SearchIcon
-          size="small"
-          className="right-xs pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-300"
-        />
+      <div className={cn(searchInputContainerVariants(), className)}>
+        <input ref={ref} type="search" className={searchInputVariants()} {...props} />
+        <div className="p-xs flex shrink-0 items-center justify-center rounded-md">
+          <SearchIcon size="small" className="mr-sm pointer-events-none text-gray-300" />
+        </div>
       </div>
     );
   }
@@ -53,4 +60,4 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
 
 SearchInput.displayName = "SearchInput";
 
-export { searchInputVariants };
+export { searchInputContainerVariants, searchInputVariants };

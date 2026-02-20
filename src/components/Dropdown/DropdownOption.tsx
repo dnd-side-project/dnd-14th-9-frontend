@@ -8,7 +8,7 @@ import type { DropdownOptionProps } from "./Dropdown.types";
 const SIZE_STYLES = {
   full: { text: "text-[16px]", container: "px-xs h-14", showIcon: true },
   large: { text: "text-sm", container: "px-sm h-10", showIcon: false },
-  small: { text: "text-xs", container: "px-sm h-7", showIcon: false },
+  medium: { text: "text-xs", container: "px-sm h-7", showIcon: false },
 } as const;
 
 export function DropdownOption({

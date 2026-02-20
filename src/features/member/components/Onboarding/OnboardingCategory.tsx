@@ -2,11 +2,8 @@ import { useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
+import { CATEGORY_LABELS, ONBOARDING_CATEGORIES, type Category } from "@/lib/constants/category";
 import { cn } from "@/lib/utils/utils";
-import {
-  MEMBER_INTEREST_CATEGORY_LABELS,
-  type MemberInterestCategory,
-} from "@/types/shared/member-interest-category";
 
 interface OnboardingCategoryProps {
   className?: string;
@@ -14,24 +11,21 @@ interface OnboardingCategoryProps {
   onNext?: (categories: string[]) => void;
 }
 
-const CATEGORIES = [
-  { key: "DEVELOPMENT", spanClassName: "col-span-2" },
-  { key: "DESIGN", spanClassName: "col-span-2" },
-  { key: "PLANNING_PM", spanClassName: "col-span-2" },
-  { key: "CAREER_SELF_DEVELOPMENT", spanClassName: "col-span-3" },
-  { key: "STUDY_READING", spanClassName: "col-span-3" },
-  { key: "CREATIVE", spanClassName: "col-span-2" },
-  { key: "TEAM_PROJECT", spanClassName: "col-span-2" },
-  { key: "FREE", spanClassName: "col-span-2" },
-] as const satisfies ReadonlyArray<{
-  key: MemberInterestCategory;
-  spanClassName: string;
-}>;
+const ONBOARDING_CATEGORY_SPAN_CLASS: Record<Category, string> = {
+  DEVELOPMENT: "col-span-2",
+  DESIGN: "col-span-2",
+  PLANNING_PM: "col-span-2",
+  CAREER_SELF_DEVELOPMENT: "col-span-3",
+  STUDY_READING: "col-span-3",
+  CREATIVE: "col-span-2",
+  TEAM_PROJECT: "col-span-2",
+  FREE: "col-span-2",
+};
 
 export function OnboardingCategory({ className, nickname, onNext }: OnboardingCategoryProps) {
-  const [selectedCategories, setSelectedCategories] = useState<MemberInterestCategory[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 
-  const toggleCategory = (category: MemberInterestCategory) => {
+  const toggleCategory = (category: Category) => {
     setSelectedCategories((prev) => {
       if (prev.includes(category)) {
         return prev.filter((c) => c !== category);
@@ -44,7 +38,7 @@ export function OnboardingCategory({ className, nickname, onNext }: OnboardingCa
   };
 
   const handleNext = () => {
-    onNext?.(selectedCategories.map((category) => MEMBER_INTEREST_CATEGORY_LABELS[category]));
+    onNext?.(selectedCategories.map((category) => CATEGORY_LABELS[category]));
   };
 
   return (
@@ -64,19 +58,19 @@ export function OnboardingCategory({ className, nickname, onNext }: OnboardingCa
 
       {/* Category Grid */}
       <div className="grid w-full grid-cols-6 gap-3">
-        {CATEGORIES.map((category) => {
-          const label = MEMBER_INTEREST_CATEGORY_LABELS[category.key];
-          const isSelected = selectedCategories.includes(category.key);
+        {ONBOARDING_CATEGORIES.map((category) => {
+          const label = CATEGORY_LABELS[category];
+          const isSelected = selectedCategories.includes(category);
 
           return (
             <CategoryFilterButton
-              key={category.key}
+              key={category}
               type="button"
               isSelected={isSelected}
-              onClick={() => toggleCategory(category.key)}
+              onClick={() => toggleCategory(category)}
               className={cn(
                 "h-14 w-full rounded-lg px-4 py-3 text-center text-base",
-                category.spanClassName,
+                ONBOARDING_CATEGORY_SPAN_CLASS[category],
                 isSelected
                   ? "text-text-brand-default bg-[#27EA671F]"
                   : "bg-surface-strong text-text-secondary hover:bg-surface-subtle"
