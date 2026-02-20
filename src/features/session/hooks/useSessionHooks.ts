@@ -21,11 +21,8 @@ import type {
   SessionReportResponse,
   CreateSessionRequest,
   CreateSessionResponse,
+  JoinSessionRequest,
   JoinSessionResponse,
-  SetGoalRequest,
-  SetGoalResponse,
-  AddTodosRequest,
-  AddTodosResponse,
   ToggleTodoResponse,
 } from "../types";
 
@@ -100,18 +97,8 @@ const createSessionMutationHook = <TData, TVariables extends { sessionRoomId: st
 
 export const useJoinSession = createSessionMutationHook<
   ApiSuccessResponse<JoinSessionResponse>,
-  { sessionRoomId: string }
->(({ sessionRoomId }) => sessionApi.join(sessionRoomId));
-
-export const useSetGoal = createSessionMutationHook<
-  ApiSuccessResponse<SetGoalResponse>,
-  { sessionRoomId: string; body: SetGoalRequest }
->(({ sessionRoomId, body }) => sessionApi.setGoal(sessionRoomId, body));
-
-export const useAddTodos = createSessionMutationHook<
-  ApiSuccessResponse<AddTodosResponse>,
-  { sessionRoomId: string; body: AddTodosRequest }
->(({ sessionRoomId, body }) => sessionApi.addTodos(sessionRoomId, body));
+  { sessionRoomId: string; body: JoinSessionRequest }
+>(({ sessionRoomId, body }) => sessionApi.join(sessionRoomId, body));
 
 export const useToggleTodo = createSessionMutationHook<
   ApiSuccessResponse<ToggleTodoResponse>,
