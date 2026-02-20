@@ -5,31 +5,52 @@ import type { ComponentProps, ReactNode } from "react";
 import Link from "next/link";
 
 import { buttonVariants, type ButtonVariantProps } from "@/components/Button/Button";
+import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 import { cn } from "@/lib/utils/utils";
 
 import type { VariantProps } from "class-variance-authority";
 
-export type ButtonLinkProps = ComponentProps<typeof Link> &
-  Omit<VariantProps<typeof buttonVariants>, "variant" | "colorScheme"> &
+type LinkProps = ComponentProps<typeof Link>;
+
+type ButtonLinkStyleProps = Omit<VariantProps<typeof buttonVariants>, "variant" | "colorScheme"> &
   ButtonVariantProps & {
     leftIcon?: ReactNode;
     rightIcon?: ReactNode;
-    /** true일 경우 soft navigation 대신 full page reload를 수행합니다 */
-    hardNavigate?: boolean;
   };
 
-export function ButtonLink({
-  className,
-  variant,
-  colorScheme,
-  size,
-  iconOnly,
-  leftIcon,
-  rightIcon,
-  children,
-  hardNavigate,
-  ...props
-}: ButtonLinkProps) {
+type BaseButtonLinkProps = Omit<LinkProps, "href" | "onClick"> & ButtonLinkStyleProps;
+
+type SoftNavigateButtonLinkProps = BaseButtonLinkProps & {
+  href: LinkProps["href"];
+  onClick?: LinkProps["onClick"];
+  hardNavigate?: false;
+};
+
+type HardNavigateButtonLinkProps = BaseButtonLinkProps & {
+  href: string;
+  onClick?: LinkProps["onClick"];
+  /** true일 경우 soft navigation 대신 full page reload를 수행합니다 */
+  hardNavigate: true;
+};
+
+export type ButtonLinkProps = SoftNavigateButtonLinkProps | HardNavigateButtonLinkProps;
+
+export function ButtonLink(props: ButtonLinkProps) {
+  const {
+    className,
+    variant,
+    colorScheme,
+    size,
+    iconOnly,
+    leftIcon,
+    rightIcon,
+    children,
+    hardNavigate,
+    href,
+    onClick,
+    ...linkProps
+  } = props;
+
   const content = iconOnly ? (
     (leftIcon ?? rightIcon)
   ) : (
@@ -43,14 +64,18 @@ export function ButtonLink({
   const classNames = cn(buttonVariants({ variant, colorScheme, size, iconOnly, className }));
 
   if (hardNavigate) {
-    const href = typeof props.href === "string" ? props.href : props.href.toString();
     return (
       <Link
         className={classNames}
-        {...props}
+        {...linkProps}
+        href={href}
         onClick={(e) => {
+          onClick?.(e);
+          if (e.defaultPrevented) {
+            return;
+          }
           e.preventDefault();
-          window.location.href = href;
+          navigateWithHardReload(e.currentTarget.href);
         }}
       >
         {content}
@@ -59,7 +84,7 @@ export function ButtonLink({
   }
 
   return (
-    <Link className={classNames} {...props}>
+    <Link className={classNames} {...linkProps} href={href} onClick={onClick}>
       {content}
     </Link>
   );
