@@ -59,8 +59,8 @@ export interface UpdateNicknameRequest {
 }
 
 export interface UpdateInterestCategoriesRequest {
-  firstInterestCategory: MemberInterestCategory;
-  secondInterestCategory: MemberInterestCategory;
+  firstInterestCategory: MemberInterestCategory | null;
+  secondInterestCategory: MemberInterestCategory | null;
   thirdInterestCategory: MemberInterestCategory | null;
 }
 
