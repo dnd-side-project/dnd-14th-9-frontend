@@ -20,6 +20,16 @@ const nextConfig: NextConfig = {
         hostname: "example.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "**.kakaocdn.net",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "**.kakaocdn.net",
+        pathname: "/**",
+      },
     ],
   },
 };

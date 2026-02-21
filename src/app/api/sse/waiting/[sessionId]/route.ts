@@ -15,19 +15,16 @@ export async function GET(
     return new Response("Unauthorized", { status: 401 });
   }
 
-  // 쿠키 값이 URL 인코딩 되어있을 수 있음
-  const accessToken = decodeURIComponent(rawToken);
-
   const backendUrl = `${SERVER_API_URL}/sessions/sse/waiting/${sessionId}`;
 
   console.warn("[SSE Proxy] Request URL:", backendUrl);
   console.warn("[SSE Proxy] Raw token:", rawToken.substring(0, 30) + "...");
-  console.warn("[SSE Proxy] Decoded token:", accessToken.substring(0, 30) + "...");
+  console.warn("[SSE Proxy] Decoded token:", rawToken.substring(0, 30) + "...");
 
   try {
     const response = await fetch(backendUrl, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${rawToken}`,
         Accept: "text/event-stream",
       },
       cache: "no-store",
