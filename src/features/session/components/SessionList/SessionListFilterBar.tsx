@@ -77,46 +77,51 @@ export function SessionListFilterBar({
   };
 
   return (
-    <div className="gap-md flex flex-col">
-      <div className="flex items-center gap-[15px]">
-        <DateRangeFilter
-          isOpen={isDatePickerOpen}
-          label={dateFilterLabel}
-          value={selectedDateRange}
-          hasSelection={hasDateSelection}
-          onOpenChange={handleDateOpenChange}
-          onChange={handleDateRangeChange}
-        />
+    <>
+      {openFilter && openFilter !== "sort" && (
+        <div className="bg-overlay-default fixed inset-0 z-10 w-full" />
+      )}
+      <div className="gap-md relative z-20 flex flex-col">
+        <div className="flex items-center gap-[15px]">
+          <DateRangeFilter
+            isOpen={isDatePickerOpen}
+            label={dateFilterLabel}
+            value={selectedDateRange}
+            hasSelection={hasDateSelection}
+            onOpenChange={handleDateOpenChange}
+            onChange={handleDateRangeChange}
+          />
 
-        <StartTimeFilter
-          isOpen={isTimeSlotOpen}
-          selectedTimeSlots={values.timeSlots}
-          onOpenChange={handleTimeSlotOpenChange}
-          onToggleTimeSlot={onToggleTimeSlot}
-        />
+          <StartTimeFilter
+            isOpen={isTimeSlotOpen}
+            selectedTimeSlots={values.timeSlots}
+            onOpenChange={handleTimeSlotOpenChange}
+            onToggleTimeSlot={onToggleTimeSlot}
+          />
 
-        <DurationFilter
-          isOpen={isDurationOpen}
-          value={values.durationRange}
-          onOpenChange={handleDurationOpenChange}
-          onSelect={onSetDurationRange}
-        />
+          <DurationFilter
+            isOpen={isDurationOpen}
+            value={values.durationRange}
+            onOpenChange={handleDurationOpenChange}
+            onSelect={onSetDurationRange}
+          />
 
-        <ParticipantsFilter
-          isOpen={isParticipantsOpen}
-          participants={values.participants}
-          onOpenChange={handleParticipantsOpenChange}
-          onChange={onSetParticipants}
+          <ParticipantsFilter
+            isOpen={isParticipantsOpen}
+            participants={values.participants}
+            onOpenChange={handleParticipantsOpenChange}
+            onChange={onSetParticipants}
+          />
+        </div>
+
+        <SortFilter
+          isOpen={isSortOpen}
+          value={values.sort}
+          onOpenChange={handleSortOpenChange}
+          onSelect={onSetSort}
+          className="self-end"
         />
       </div>
-
-      <SortFilter
-        isOpen={isSortOpen}
-        value={values.sort}
-        onOpenChange={handleSortOpenChange}
-        onSelect={onSetSort}
-        className="self-end"
-      />
-    </div>
+    </>
   );
 }
