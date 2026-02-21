@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/Button/Button";
 import { ButtonLink } from "@/components/Button/ButtonLink";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
-import { useIsAuthenticated } from "@/features/member/hooks/useMemberHooks";
+import { useIsAuthenticated, useMe } from "@/features/member/hooks/useMemberHooks";
 import { useDialog } from "@/hooks/useDialog";
 
-import { useSessionDetail } from "../../hooks/useSessionHooks";
+import { useSessionDetail, useWaitingRoom } from "../../hooks/useSessionHooks";
 import { Card } from "../Card/Card";
 
 import { getSessionStatusDisplay } from "./utils";
@@ -19,12 +21,40 @@ interface SessionDetailModalProps {
 }
 
 export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
+  const router = useRouter();
   const { dialogRef, handleClose, handleBackdropClick } = useDialog("/");
   const { data } = useSessionDetail(sessionId);
   const isAuthenticated = useIsAuthenticated();
   const [showJoinModal, setShowJoinModal] = useState(false);
 
+  // 현재 사용자 정보 (인증된 경우만)
+  const { data: meData } = useMe({ enabled: isAuthenticated });
+
+  // 대기방 참여자 정보 (인증된 경우만)
+  const { data: waitingRoomData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
+    enabled: isAuthenticated,
+  });
+
   const session = data?.result;
+  const myMemberId = meData?.result?.id;
+
+  // 참여 여부 확인
+  const isParticipant =
+    waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false;
+
+  // 세션이 대기 상태인지 확인
+  const isWaitingStatus = session?.status === "대기";
+
+  // 자동 리다이렉트: 이미 참여 중이고 세션이 대기 상태이면 대기방으로 이동
+  useEffect(() => {
+    if (isParticipant && isWaitingStatus) {
+      dialogRef.current?.close();
+      router.replace(`/session/${sessionId}/waiting`);
+    }
+  }, [isParticipant, isWaitingStatus, sessionId, router, dialogRef]);
+
+  // 참여 여부 확인 중인지 여부
+  const isCheckingParticipation = isAuthenticated && isWaitingRoomLoading;
 
   const statusDisplay = session ? getSessionStatusDisplay(session.status) : null;
 
@@ -81,8 +111,9 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
             size="medium"
             className="w-full"
             onClick={() => setShowJoinModal(true)}
+            disabled={isCheckingParticipation}
           >
-            참여하기
+            {isCheckingParticipation ? "확인 중..." : "참여하기"}
           </Button>
         ) : (
           <ButtonLink
