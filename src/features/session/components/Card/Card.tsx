@@ -1,8 +1,8 @@
 "use client";
 
 import { Badge } from "@/components/Badge/Badge";
+import { RelativeTimeBadge } from "@/components/RelativeTime/RelativeTimeBadge";
 import { Thumbnail } from "@/components/Thumbnail/Thumbnail";
-import { formatRelativeTime } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
 
 import { CardMeta } from "./CardMeta";
@@ -41,12 +41,21 @@ export function Card({
   durationMinutes,
   sessionDate,
 }: CardProps) {
-  const relativeTime = createdAt ? formatRelativeTime(createdAt) : null;
-  const isClosing = relativeTime === "마감임박" || relativeTime === "마감 임박";
-  const displayRelativeTime = isClosing ? "마감임박" : relativeTime;
-
-  const badgeText = statusText ?? displayRelativeTime;
-  const badgeStatus = statusBadgeStatus ?? (isClosing ? "closing" : "recruiting");
+  // statusText가 명시적으로 제공되면 직접 Badge 사용
+  // 그 외에 createdAt이 있으면 RelativeTimeBadge 사용 (hydration 안전)
+  const renderStatusBadge = () => {
+    if (statusText) {
+      return (
+        <Badge radius="max" status={statusBadgeStatus ?? "recruiting"}>
+          {statusText}
+        </Badge>
+      );
+    }
+    if (createdAt) {
+      return <RelativeTimeBadge date={createdAt} />;
+    }
+    return null;
+  };
 
   return (
     <div className={cn("flex w-full max-w-69 flex-col gap-4", className)}>
@@ -57,11 +66,7 @@ export function Card({
           <Badge radius="xs" className="border-0">
             {category}
           </Badge>
-          {badgeText && (
-            <Badge radius="max" status={badgeStatus}>
-              {badgeText}
-            </Badge>
-          )}
+          {renderStatusBadge()}
         </div>
 
         <h3 className="text-text-primary truncate text-lg font-bold">{title}</h3>

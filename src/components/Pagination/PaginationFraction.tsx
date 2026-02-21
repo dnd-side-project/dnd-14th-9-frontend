@@ -34,31 +34,33 @@ export function PaginationFraction({
   }
 
   return (
-    <div className={cn("flex items-center gap-[15px]", className)}>
+    <div className={cn("gap-sm flex items-center justify-center", className)}>
       <button
         type="button"
         onClick={goToPreviousPage}
         disabled={isFirstPage}
         className={cn(
-          "bg-alpha-white-16 flex size-10 items-center justify-center rounded-full p-1 transition-colors",
-          isFirstPage ? "cursor-not-allowed opacity-50" : "hover:bg-surface-subtle cursor-pointer"
+          "flex size-10 shrink-0 items-center justify-center rounded-full p-1 transition-colors",
+          isFirstPage ? "cursor-not-allowed opacity-50" : "hover:bg-surface-strong cursor-pointer"
         )}
         aria-label="Previous page"
       >
         <ChevronLeftIcon className="text-text-disabled size-6" />
       </button>
 
-      <span className="font-regular text-text-disabled text-[18px]">
-        {normalizedCurrentPage}/{normalizedTotalPage}
-      </span>
+      <div className="gap-2xs text-text-muted flex items-center justify-center text-[16px] font-semibold">
+        <span>{normalizedCurrentPage}</span>
+        <span>/</span>
+        <span>{normalizedTotalPage}</span>
+      </div>
 
       <button
         type="button"
         onClick={goToNextPage}
         disabled={isLastPage}
         className={cn(
-          "bg-alpha-white-16 flex size-10 items-center justify-center rounded-full p-1 transition-colors",
-          isLastPage ? "cursor-not-allowed opacity-50" : "hover:bg-surface-subtle cursor-pointer"
+          "flex size-10 shrink-0 items-center justify-center rounded-full p-1 transition-colors",
+          isLastPage ? "cursor-not-allowed opacity-50" : "hover:bg-surface-strong cursor-pointer"
         )}
         aria-label="Next page"
       >

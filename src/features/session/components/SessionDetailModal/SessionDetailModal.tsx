@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
+
+import { Button } from "@/components/Button/Button";
 import { ButtonLink } from "@/components/Button/ButtonLink";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
+import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
 import { useIsAuthenticated } from "@/features/member/hooks/useMemberHooks";
 import { useDialog } from "@/hooks/useDialog";
 
@@ -18,6 +22,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
   const { dialogRef, handleClose, handleBackdropClick } = useDialog("/");
   const { data } = useSessionDetail(sessionId);
   const isAuthenticated = useIsAuthenticated();
+  const [showJoinModal, setShowJoinModal] = useState(false);
 
   const session = data?.result;
 
@@ -70,15 +75,15 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
 
         {/* 버튼 영역 */}
         {isAuthenticated ? (
-          <ButtonLink
-            href="#"
+          <Button
             variant="solid"
             colorScheme="primary"
             size="medium"
             className="w-full"
+            onClick={() => setShowJoinModal(true)}
           >
             참여하기
-          </ButtonLink>
+          </Button>
         ) : (
           <ButtonLink
             href="/login"
@@ -91,6 +96,17 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
           </ButtonLink>
         )}
       </div>
+
+      {showJoinModal && (
+        <SessionJoinModal
+          sessionId={sessionId}
+          onClose={() => setShowJoinModal(false)}
+          onJoinSuccess={() => {
+            // router.back() 없이 dialog만 직접 닫기
+            dialogRef.current?.close();
+          }}
+        />
+      )}
     </dialog>
   );
 }
