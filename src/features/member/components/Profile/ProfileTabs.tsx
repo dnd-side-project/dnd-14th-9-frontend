@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils/utils";
 
-const tabs = [
+const TABS = [
   { name: "내 정보", href: "/profile/settings" },
   { name: "기록 리포트", href: "/profile/report" },
 ];
@@ -15,7 +15,7 @@ export function ProfileTabs() {
 
   return (
     <div className="border-border-subtle flex w-full items-center border-b-[2px]">
-      {tabs.map((tab) => {
+      {TABS.map((tab) => {
         const isActive = pathname === tab.href;
         return (
           <Link

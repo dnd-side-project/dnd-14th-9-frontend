@@ -12,7 +12,7 @@ export interface HelperTextProps {
   className?: string;
 }
 
-const typeStyles: Record<HelperTextType, string> = {
+const TYPE_STYLES: Record<HelperTextType, string> = {
   default: "text-text-tertiary",
   positive: "text-text-status-positive-default",
   negative: "text-text-status-negative-default",
@@ -23,7 +23,7 @@ export function HelperText({ id, text, type = "default", className }: HelperText
   const isPositiveOrDefault = type === "default" || type === "positive";
 
   return (
-    <div id={id} className={cn("mt-1 flex items-center gap-1", typeStyles[type], className)}>
+    <div id={id} className={cn("mt-1 flex items-center gap-1", TYPE_STYLES[type], className)}>
       {isPositiveOrDefault ? (
         <CheckIcon className="h-4 w-4 shrink-0" />
       ) : (
