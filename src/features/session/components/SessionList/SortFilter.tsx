@@ -3,7 +3,6 @@
 import { useCallback, useRef } from "react";
 
 import { Filter } from "@/components/Filter/Filter";
-import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { cn } from "@/lib/utils/utils";
 
