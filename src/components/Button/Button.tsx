@@ -75,11 +75,11 @@ const buttonVariants = cva(
         class: "text-text-muted hover:text-text-secondary active:text-text-primary",
       },
       // iconOnly
-      { iconOnly: true, size: "xlarge", class: "min-w-0 w-16 px-0" },
-      { iconOnly: true, size: "large", class: "min-w-0 w-14 px-0" },
-      { iconOnly: true, size: "medium", class: "min-w-0 w-12 px-0" },
-      { iconOnly: true, size: "small", class: "min-w-0 w-10 px-0" },
-      { iconOnly: true, size: "xsmall", class: "min-w-0 w-8 px-0" },
+      { iconOnly: true, size: "xlarge", class: "min-w-0 w-16 p-xs" },
+      { iconOnly: true, size: "large", class: "min-w-0 w-14 p-xs" },
+      { iconOnly: true, size: "medium", class: "min-w-0 w-12 p-xs" },
+      { iconOnly: true, size: "small", class: "min-w-0 w-10 p-xs" },
+      { iconOnly: true, size: "xsmall", class: "min-w-0 w-8 p-xs" },
     ],
     defaultVariants: {
       variant: "solid",

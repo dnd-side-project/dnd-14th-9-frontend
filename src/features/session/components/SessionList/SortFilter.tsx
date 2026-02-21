@@ -45,43 +45,35 @@ export function SortFilter({ isOpen, value, onOpenChange, onSelect, className }:
         <div
           role="dialog"
           aria-label="정렬 선택"
-          className="p-xl absolute top-full right-0 z-20 mt-3 w-50 rounded-sm border border-gray-900 bg-gray-950"
+          className="p-sm border-border-subtle bg-surface-default absolute top-full right-0 z-20 mt-3 w-[89px] rounded-md border shadow-[0px_0px_2px_0px_#00000014,0px_16px_24px_0px_#0000001F]"
         >
-          <div className="flex flex-col gap-5">
-            <p className="text-[16px] leading-[1.4] font-semibold text-gray-300">정렬</p>
-            <ul role="radiogroup" className="gap-md flex flex-col">
-              {SORT_OPTIONS.map((option) => {
-                const isSelected = option.value === value;
+          <ul role="radiogroup" className="gap-2xs flex flex-col">
+            {SORT_OPTIONS.map((option) => {
+              const isSelected = option.value === value;
 
-                return (
-                  <li key={option.value} className="w-full">
-                    <button
-                      type="button"
-                      role="radio"
-                      aria-checked={isSelected}
-                      onClick={() => {
-                        onSelect(option.value);
-                        onOpenChange(false);
-                      }}
-                      className="focus-visible:ring-primary text-text-secondary hover:text-text-primary gap-2xs flex w-full items-center rounded-lg text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
-                    >
-                      <span
-                        className={cn(
-                          "flex h-4.5 w-4.5 items-center justify-center rounded-full border",
-                          isSelected
-                            ? "border-[#007E4E] bg-[#003A23] text-[#27EA67]"
-                            : "border-gray-600 bg-transparent text-transparent"
-                        )}
-                      >
-                        <CheckIcon size="xsmall" />
-                      </span>
-                      <span className="text-[15px] leading-[1.4]">{option.label}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+              return (
+                <li key={option.value} className="w-full">
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() => {
+                      onSelect(option.value);
+                      onOpenChange(false);
+                    }}
+                    className={cn(
+                      "px-md py-2xs flex w-full items-center justify-center rounded-xs text-[13px] leading-[1.4] transition-colors focus-visible:outline-none",
+                      isSelected
+                        ? "bg-surface-strong text-text-primary font-semibold"
+                        : "text-text-secondary font-pretendard font-regular hover:bg-surface-strong hover:text-text-primary"
+                    )}
+                  >
+                    <span>{option.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
     </div>
