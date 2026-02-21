@@ -37,7 +37,7 @@ export function OnboardingModal({
     updateNickname.isPending || updateProfileImage.isPending || updateInterestCategories.isPending;
 
   const handleProfileSkip = () => {
-    setStep("category");
+    onComplete();
   };
 
   const handleProfileNext = async (newNickname: string, profileImage?: File) => {
