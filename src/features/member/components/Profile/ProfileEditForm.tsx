@@ -8,8 +8,8 @@ import { z } from "zod";
 
 import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
-import { Input } from "@/components/Input/Input";
-import { Textarea } from "@/components/Textarea/Textarea";
+import { Textarea } from "@/components/Input/Textarea";
+import { TextInput } from "@/components/Input/TextInput";
 import { useMeForEdit, useUpdateMe } from "@/features/member/hooks/useMemberHooks";
 import { CATEGORY_LABELS, ONBOARDING_CATEGORIES } from "@/lib/constants/category";
 import { isValidNickname } from "@/lib/utils/validation";
@@ -91,7 +91,7 @@ export function ProfileEditForm() {
           name="nickname"
           control={control}
           render={({ field: { value, onChange, ref, onBlur } }) => (
-            <Input
+            <TextInput
               ref={ref}
               value={value}
               onChange={onChange}

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
 import { Button } from "@/components/Button/Button";
-import { Input } from "@/components/Input/Input";
+import { TextInput } from "@/components/Input/TextInput";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils/utils";
 
@@ -140,19 +140,14 @@ export function OnboardingProfile({
         </div>
 
         {/* TextInput */}
-        <div className="flex w-full flex-col gap-2">
-          <Input
+        <div className="gap-sm flex w-full flex-col">
+          <TextInput
             label="닉네임"
+            placeholder="10글자 이내"
             value={nickname}
             onChange={handleNicknameChange}
-            placeholder="닉네임을 입력해주세요"
-            onClear={() => {
-              setNickname("");
-              setNicknameError(null);
-            }}
-            error={!!nicknameError}
-            errorMessage={nicknameError ?? undefined}
           />
+          <p className="font-pretendard text-text-tertiary text-sm">or</p>
         </div>
       </div>
 

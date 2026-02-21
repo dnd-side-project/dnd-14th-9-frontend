@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/Button/Button";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
-import { Input } from "@/components/Input/Input";
+import { TextInput } from "@/components/Input/TextInput";
 import type { ReportTodoItem } from "@/features/session/types";
 
 const MOCK_GOAL = "React 심화 학습 완료하기";
@@ -74,7 +74,7 @@ export function GoalAndTodoCard() {
       <div className="flex w-full flex-col gap-2">
         <span className="text-text-secondary text-[14px] font-semibold">목표</span>
         {isEditing ? (
-          <Input
+          <TextInput
             value={draftGoal}
             onChange={(e) => setDraftGoal(e.target.value)}
             onClear={() => setDraftGoal("")}
@@ -123,7 +123,7 @@ export function GoalAndTodoCard() {
                   const canAdd = draftTodos.length < 5;
                   return (
                     <li key={todo.todoId} className="flex items-start gap-2">
-                      <Input
+                      <TextInput
                         value={todo.content}
                         onChange={(e) => handleTodoChange(index, e.target.value)}
                         onClear={() => handleTodoChange(index, "")}

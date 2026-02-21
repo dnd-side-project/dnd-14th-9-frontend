@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
-import { Input } from "@/components/Input/Input";
+import { TextInput } from "@/components/Input/TextInput";
 
 interface ChatMessage {
   id: string;
@@ -121,7 +121,7 @@ export function ChatPopup({ isOpen, onClose }: ChatPopupProps) {
 
       {/* 입력 영역 */}
       <div className="border-border-subtle flex gap-2 border-t p-3">
-        <Input
+        <TextInput
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
