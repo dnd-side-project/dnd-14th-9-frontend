@@ -1,4 +1,5 @@
 import { ButtonLink } from "@/components/Button/ButtonLink";
+import { ChevronRightIcon } from "@/components/Icon/ChevronRightIcon";
 
 /**
  * Banner - 피드백 참여 유도 CTA 배너
@@ -9,7 +10,7 @@ import { ButtonLink } from "@/components/Button/ButtonLink";
  */
 export function Banner() {
   return (
-    <section className="p-4xl relative flex h-[264px] w-full flex-col justify-center overflow-hidden rounded-sm bg-gradient-to-b from-gray-950 to-gray-900">
+    <section className="p-4xl relative flex h-[264px] w-full flex-col justify-center overflow-hidden rounded-sm bg-[linear-gradient(180deg,_var(--color-gray-800,_#33363D)_-30.1%,_var(--color-gray-900,_#1E2124)_100%)]">
       {/* 배경 이미지 오버레이 (Optional) */}
       <div className="absolute inset-0 bg-[url('/images/banner-bg.png')] bg-cover bg-center opacity-5 mix-blend-overlay" />
 
@@ -27,7 +28,10 @@ export function Banner() {
           href="https://forms.gle/placeholder"
           target="_blank"
           rel="noopener noreferrer"
-          className="border-none bg-green-500 font-semibold text-gray-950 hover:bg-green-600"
+          variant="outlined"
+          colorScheme="secondary"
+          className="gap-xs py-sm pr-sm pl-lg rounded-sm"
+          rightIcon={<ChevronRightIcon />}
           size="medium"
         >
           피드백 남기기
