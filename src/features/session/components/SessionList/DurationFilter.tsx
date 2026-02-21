@@ -36,11 +36,7 @@ export function DurationFilter({ isOpen, value, onOpenChange, onSelect }: Durati
         isOpen={isOpen}
         aria-haspopup="dialog"
         onClick={() => onOpenChange(!isOpen)}
-        className={cn(
-          "w-auto shrink-0",
-          hasSelection && "text-text-primary",
-          isOpen && ["border-text-brand-default", "shadow-[0_0_8px_0_#27EA674D]"]
-        )}
+        className={cn("w-auto shrink-0", hasSelection && "text-text-primary")}
       >
         {triggerLabel}
       </Filter>
@@ -49,43 +45,38 @@ export function DurationFilter({ isOpen, value, onOpenChange, onSelect }: Durati
         <div
           role="dialog"
           aria-label="진행 시간 선택"
-          className="p-xl absolute top-full left-0 z-20 mt-3 w-[256px] rounded-sm border border-gray-900 bg-gray-950"
+          className="px-xl py-lg border-border-subtle bg-surface-default absolute top-full left-0 z-20 mt-3 w-[256px] rounded-sm border shadow-[0px_0px_2px_0px_#00000014,0px_16px_24px_0px_#0000001F]"
         >
-          <div className="flex flex-col gap-[20px]">
-            <p className="text-[16px] leading-[1.4] font-semibold text-gray-300">진행 시간</p>
-            <ul role="radiogroup" className="gap-md flex flex-col">
-              {DURATION_OPTIONS.map((option) => {
-                const isSelected = option.value === value;
+          <ul role="radiogroup" className="gap-xs flex flex-col">
+            {DURATION_OPTIONS.map((option) => {
+              const isSelected = option.value === value;
 
-                return (
-                  <li key={option.value} className="w-full">
-                    <button
-                      type="button"
-                      role="radio"
-                      aria-checked={isSelected}
-                      onClick={() => {
-                        onSelect(option.value);
-                        onOpenChange(false);
-                      }}
-                      className="focus-visible:ring-primary text-text-secondary hover:text-text-primary gap-2xs flex w-full items-center rounded-[4px] text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
-                    >
-                      <span
-                        className={cn(
-                          "flex h-[18px] w-[18px] items-center justify-center rounded-full border",
-                          isSelected
-                            ? "border-[#007E4E] bg-[#003A23] text-[#27EA67]"
-                            : "border-gray-600 bg-transparent text-transparent"
-                        )}
-                      >
-                        <CheckIcon size="xsmall" />
-                      </span>
-                      <span className="text-[15px] leading-[1.4]">{option.label}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+              return (
+                <li key={option.value} className="w-full">
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() => {
+                      onSelect(option.value);
+                      onOpenChange(false);
+                    }}
+                    className="focus-visible:ring-primary text-text-secondary hover:text-text-primary gap-xs flex w-full items-center rounded-[4px] text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                  >
+                    <span
+                      className={cn(
+                        "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-solid bg-transparent",
+                        isSelected
+                          ? "border-border-primary-default border-[4px]"
+                          : "border-border-strong border-[1px]"
+                      )}
+                    />
+                    <span className="text-[15px] leading-[1.4]">{option.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
     </div>
