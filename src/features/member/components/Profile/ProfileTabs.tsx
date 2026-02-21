@@ -14,7 +14,7 @@ export function ProfileTabs() {
   const pathname = usePathname();
 
   return (
-    <div className="border-border-default flex w-full items-center border-b">
+    <div className="border-border-subtle flex w-full items-center border-b-[2px]">
       {tabs.map((tab) => {
         const isActive = pathname === tab.href;
         return (
@@ -22,13 +22,13 @@ export function ProfileTabs() {
             key={tab.href}
             href={tab.href}
             className={cn(
-              "flex flex-1 items-center justify-center border-b-2 py-3 text-base font-semibold transition-colors",
+              "flex flex-col items-start border-b-[2px] px-6 py-3 transition-colors",
               isActive
-                ? "border-text-normal text-text-normal"
-                : "text-text-subtle hover:text-text-normal border-transparent"
+                ? "border-border-stronger text-text-primary mb-[-2px]" // mb-[-2px] ensures the active border overlaps the container's bottom border visually
+                : "text-text-muted hover:text-text-primary mb-[-2px] border-transparent"
             )}
           >
-            {tab.name}
+            <span className="font-pretendard text-base font-semibold">{tab.name}</span>
           </Link>
         );
       })}
