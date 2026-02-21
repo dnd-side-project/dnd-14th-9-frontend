@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { useQueryClient } from "@tanstack/react-query";
+
 import { Button } from "@/components/Button/Button";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
@@ -11,6 +13,7 @@ import { useDeleteTodo, useUpdateGoal, useUpdateTodo } from "@/features/task/hoo
 import type { WaitingMemberTask, WaitingTodoItem } from "../types";
 
 interface GoalAndTodoCardProps {
+  sessionId: string;
   task: WaitingMemberTask | null;
 }
 
@@ -20,7 +23,8 @@ interface DraftTodo {
   isNew?: boolean;
 }
 
-export function GoalAndTodoCard({ task }: GoalAndTodoCardProps) {
+export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
+  const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -94,8 +98,10 @@ export function GoalAndTodoCard({ task }: GoalAndTodoCardProps) {
 
       setIsEditing(false);
       setDeletedTodoIds([]);
-      // 저장 후 페이지 새로고침으로 최신 데이터 반영
-      window.location.reload();
+      // 저장 후 waitingRoom 쿼리 무효화로 최신 데이터 반영
+      await queryClient.invalidateQueries({
+        queryKey: ["session", "waitingRoom", sessionId],
+      });
     } catch (error) {
       console.error("저장 실패:", error);
     } finally {

@@ -59,7 +59,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
         <LobbyHeader />
         <SessionInfoCard session={session} />
         <div className="gap-lg flex">
-          <GoalAndTodoCard task={myTask ?? null} />
+          <GoalAndTodoCard sessionId={sessionId} task={myTask ?? null} />
           <ParticipantListCard members={members} maxParticipants={maxParticipants} />
         </div>
       </div>
