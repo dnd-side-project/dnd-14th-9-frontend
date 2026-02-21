@@ -109,7 +109,7 @@ describe("SSEClient", () => {
       const client = new SSEClient();
       client.connect("/api/sse/test");
 
-      expect(global.EventSource).toHaveBeenCalledWith("/api/sse/test");
+      expect(global.EventSource).toHaveBeenCalledWith("/api/sse/test", { withCredentials: true });
     });
 
     it("연결 성공 시 status가 connected로 변경되어야 합니다", () => {
