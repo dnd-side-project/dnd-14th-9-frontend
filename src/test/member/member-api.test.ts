@@ -2,10 +2,10 @@ import { memberApi } from "@/features/member/api";
 import type {
   GetMeForEditResponse,
   GetMeResponse,
-  MemberInterestCategory,
   MemberProfileMutationResponse,
   MemberProfileView,
   MemberReport,
+  UpdateInterestCategoriesRequest,
 } from "@/features/member/types";
 import { api } from "@/lib/api/api";
 import type { ApiSuccessResponse } from "@/types/shared/types";
@@ -101,11 +101,7 @@ describe("memberApi", () => {
   it("관심 카테고리 수정 시 분리된 interest-categories 엔드포인트를 호출해야 한다", async () => {
     mockedApi.patch.mockResolvedValueOnce(mockMemberMutationResponse);
 
-    const body: {
-      firstInterestCategory: MemberInterestCategory;
-      secondInterestCategory: MemberInterestCategory;
-      thirdInterestCategory: MemberInterestCategory | null;
-    } = {
+    const body: UpdateInterestCategoriesRequest = {
       firstInterestCategory: "DEVELOPMENT",
       secondInterestCategory: "DESIGN",
       thirdInterestCategory: null,

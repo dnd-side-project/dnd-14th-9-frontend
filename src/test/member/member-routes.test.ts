@@ -10,6 +10,7 @@ import { PATCH as patchInterestCategories } from "@/app/api/members/me/interest-
 import { PATCH as patchNickname } from "@/app/api/members/me/nickname/route";
 import { GET as getMeProfile } from "@/app/api/members/me/profile/route";
 import { PATCH as patchProfileImage } from "@/app/api/members/me/profile-image/route";
+import type { UpdateInterestCategoriesRequest } from "@/features/member/types";
 import { forwardToBackend } from "@/lib/api/api-route-forwarder";
 
 jest.mock("@/lib/api/api-route-forwarder", () => ({
@@ -76,13 +77,16 @@ describe("member route handlers", () => {
 
   it("interest-categories 라우트는 forwardToBackend로 /members/me/interest-categories를 위임해야 한다", async () => {
     mockedForwardToBackend.mockResolvedValueOnce(NextResponse.json({}, { status: 200 }));
+
+    const body: UpdateInterestCategoriesRequest = {
+      firstInterestCategory: "DEVELOPMENT",
+      secondInterestCategory: "DESIGN",
+      thirdInterestCategory: null,
+    };
+
     const request = new NextRequest("http://localhost:3000/api/members/me/interest-categories", {
       method: "PATCH",
-      body: JSON.stringify({
-        firstInterestCategory: "DEVELOPMENT",
-        secondInterestCategory: "DESIGN",
-        thirdInterestCategory: null,
-      }),
+      body: JSON.stringify(body),
       headers: { "Content-Type": "application/json" },
     });
 

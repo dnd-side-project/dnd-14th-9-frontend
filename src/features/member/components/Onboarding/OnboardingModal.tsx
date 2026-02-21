@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import type { UpdateInterestCategoriesRequest } from "@/features/member/types";
 import { type Category } from "@/lib/constants/category";
 
 import {
@@ -66,11 +67,12 @@ export function OnboardingModal({
 
   const handleCategoryNext = async (categories: Category[]) => {
     try {
-      await updateInterestCategories.mutateAsync({
-        firstInterestCategory: categories[0],
-        secondInterestCategory: categories[1],
+      const payload: UpdateInterestCategoriesRequest = {
+        firstInterestCategory: categories[0] ?? null,
+        secondInterestCategory: categories[1] ?? null,
         thirdInterestCategory: categories[2] ?? null,
-      });
+      };
+      await updateInterestCategories.mutateAsync(payload);
       onComplete();
     } catch (error) {
       console.error("관심 카테고리 업데이트 실패:", error);
