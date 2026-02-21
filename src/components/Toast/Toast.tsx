@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { InfoIcon } from "@/components/Icon/InfoIcon";
@@ -26,19 +26,31 @@ const TOAST_STYLES: Record<ToastType, string> = {
 };
 
 export function Toast({ id, type, message, duration = 3000, onClose }: ToastProps) {
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose(id);
+    }, 200); // 200ms duration for exit animation to complete
+  }, [id, onClose]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      onClose(id);
+      handleClose();
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [id, duration, onClose]);
+  }, [duration, handleClose]);
 
   return (
     <div
       className={cn(
-        "animate-in slide-in-from-top-2 fade-in pointer-events-auto flex max-w-md min-w-[320px] items-center gap-3 rounded-lg border p-4 shadow-lg transition-all",
+        "pointer-events-auto flex max-w-md min-w-[320px] items-center gap-3 rounded-lg border p-4 shadow-lg transition-all",
         "bg-surface-default border-border-subtle",
+        isClosing
+          ? "animate-out fade-out slide-out-to-top-2 duration-200"
+          : "animate-in slide-in-from-top-2 fade-in duration-300",
         TOAST_STYLES[type]
       )}
       role="alert"
@@ -47,7 +59,7 @@ export function Toast({ id, type, message, duration = 3000, onClose }: ToastProp
       <p className="text-text-primary flex-1 text-sm font-medium">{message}</p>
       <button
         type="button"
-        onClick={() => onClose(id)}
+        onClick={handleClose}
         className="text-text-muted hover:text-text-secondary flex-shrink-0 transition-colors"
         aria-label="닫기"
       >

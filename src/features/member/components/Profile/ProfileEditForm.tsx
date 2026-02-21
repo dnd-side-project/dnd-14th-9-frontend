@@ -12,6 +12,7 @@ import { Textarea } from "@/components/Input/Textarea";
 import { TextInput } from "@/components/Input/TextInput";
 import { useMeForEdit, useUpdateMe } from "@/features/member/hooks/useMemberHooks";
 import { CATEGORY_LABELS, ONBOARDING_CATEGORIES } from "@/lib/constants/category";
+import { toast } from "@/lib/toast";
 import { isValidNickname } from "@/lib/utils/validation";
 
 const profileEditSchema = z.object({
@@ -72,7 +73,12 @@ export function ProfileEditForm() {
       },
       {
         onSuccess: () => {
+          toast.success("프로필 정보가 저장되었습니다.");
           reset(values);
+        },
+        onError: (error) => {
+          const err = error as Error;
+          toast.error(err.message || "프로필 정보 저장 중 오류가 발생했습니다.");
         },
       }
     );
