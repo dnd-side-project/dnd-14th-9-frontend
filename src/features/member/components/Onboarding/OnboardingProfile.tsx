@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
 import { Button } from "@/components/Button/Button";
@@ -44,6 +44,15 @@ export function OnboardingProfile({
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(defaultProfileImageUrl ?? null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
+    };
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -62,7 +71,12 @@ export function OnboardingProfile({
 
     // 검증 통과
     setProfileImage(file);
-    setPreviewUrl(URL.createObjectURL(file));
+    const nextObjectUrl = URL.createObjectURL(file);
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+    }
+    objectUrlRef.current = nextObjectUrl;
+    setPreviewUrl(nextObjectUrl);
     toast.showToast("success", "이미지가 선택되었어요");
   };
 
