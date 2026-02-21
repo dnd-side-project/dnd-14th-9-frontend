@@ -83,10 +83,15 @@ export function useSessionReport(sessionId: string) {
   });
 }
 
-export function useWaitingRoom(sessionId: string) {
+interface UseWaitingRoomOptions {
+  enabled?: boolean;
+}
+
+export function useWaitingRoom(sessionId: string, options?: UseWaitingRoomOptions) {
   return useQuery<ApiSuccessResponse<WaitingRoomResponse>>({
     queryKey: sessionKeys.waitingRoom(sessionId),
     queryFn: () => sessionApi.getWaitingRoom(sessionId),
+    enabled: options?.enabled ?? true,
   });
 }
 

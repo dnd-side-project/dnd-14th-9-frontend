@@ -33,6 +33,7 @@ export function Header({ isAuthenticated }: HeaderProps) {
                 variant="solid"
                 colorScheme="primary"
                 className="px-xs py-2xs md:px-sm md:py-xs"
+                hardNavigate
               >
                 세션 만들기
               </ButtonLink>
