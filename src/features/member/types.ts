@@ -58,6 +58,15 @@ export interface UpdateNicknameRequest {
   nickname: string;
 }
 
+export interface UpdateMeRequest {
+  nickname: string;
+  email?: string | null;
+  bio?: string | null;
+  firstInterestCategory?: string | null;
+  secondInterestCategory?: string | null;
+  thirdInterestCategory?: string | null;
+}
+
 export interface UpdateInterestCategoriesRequest {
   firstInterestCategory: MemberInterestCategory;
   secondInterestCategory: MemberInterestCategory;
@@ -70,6 +79,7 @@ export type GetMeForEditResponse = ApiSuccessResponse<MemberEditInfo>;
 export type MemberProfileMutationResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateProfileImageResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateNicknameResponse = ApiSuccessResponse<MemberEditInfo>;
+export type UpdateMeResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateInterestCategoriesResponse = ApiSuccessResponse<MemberEditInfo>;
 export type GetMyReportResponse = ApiSuccessResponse<MemberReport>;
 export type DeleteMeResponse = ApiSuccessResponse<null>;
