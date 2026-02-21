@@ -18,7 +18,7 @@ interface OnboardingProfileProps {
 // Validation 함수
 const validateNickname = (value: string): string | null => {
   if (value.length < 2) return "2자 이상 입력해주세요";
-  if (value.length > 12) return "12자 이하로 입력해주세요";
+  if (value.length > 10) return "10자 이하로 입력해주세요";
   if (!/^[a-zA-Z0-9가-힣]+$/.test(value)) return "영문, 한글, 숫자만 사용 가능해요";
   return null;
 };

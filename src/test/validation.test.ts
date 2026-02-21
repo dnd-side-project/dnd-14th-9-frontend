@@ -34,21 +34,21 @@ describe("isEmpty", () => {
 describe("isValidNickname", () => {
   it("유효한 한글 닉네임을 허용해야 합니다", () => {
     expect(isValidNickname("홍길동")).toBe(true);
-    expect(isValidNickname("김")).toBe(true);
+    expect(isValidNickname("김김")).toBe(true);
     expect(isValidNickname("테스트유저")).toBe(true);
   });
 
   it("유효한 영문 닉네임을 허용해야 합니다", () => {
     expect(isValidNickname("John")).toBe(true);
-    expect(isValidNickname("a")).toBe(true);
+    expect(isValidNickname("ab")).toBe(true);
     expect(isValidNickname("Test")).toBe(true);
-    expect(isValidNickname("ABCDE")).toBe(true);
+    expect(isValidNickname("ABCDEFGHIJ")).toBe(true);
   });
 
   it("유효한 숫자 닉네임을 허용해야 합니다", () => {
     expect(isValidNickname("123")).toBe(true);
     expect(isValidNickname("12345")).toBe(true);
-    expect(isValidNickname("1")).toBe(true);
+    expect(isValidNickname("12")).toBe(true);
   });
 
   it("한글, 영문, 숫자 조합 닉네임을 허용해야 합니다", () => {
@@ -57,22 +57,28 @@ describe("isValidNickname", () => {
     expect(isValidNickname("김ab")).toBe(true);
   });
 
-  it("1글자 닉네임을 허용해야 합니다", () => {
-    expect(isValidNickname("a")).toBe(true);
-    expect(isValidNickname("김")).toBe(true);
-    expect(isValidNickname("1")).toBe(true);
+  it("2글자 닉네임을 허용해야 합니다", () => {
+    expect(isValidNickname("ab")).toBe(true);
+    expect(isValidNickname("김김")).toBe(true);
+    expect(isValidNickname("12")).toBe(true);
   });
 
-  it("5글자 닉네임을 허용해야 합니다", () => {
-    expect(isValidNickname("abcde")).toBe(true);
-    expect(isValidNickname("가나다라마")).toBe(true);
-    expect(isValidNickname("12345")).toBe(true);
+  it("10글자 닉네임을 허용해야 합니다", () => {
+    expect(isValidNickname("abcdefghij")).toBe(true);
+    expect(isValidNickname("가나다라마바사아자차")).toBe(true);
+    expect(isValidNickname("1234567890")).toBe(true);
   });
 
-  it("6글자 이상 닉네임을 거부해야 합니다", () => {
-    expect(isValidNickname("abcdef")).toBe(false);
-    expect(isValidNickname("가나다라마바")).toBe(false);
-    expect(isValidNickname("123456")).toBe(false);
+  it("11글자 이상 닉네임을 거부해야 합니다", () => {
+    expect(isValidNickname("abcdefghijk")).toBe(false);
+    expect(isValidNickname("가나다라마바사아자차카")).toBe(false);
+    expect(isValidNickname("12345678901")).toBe(false);
+  });
+
+  it("1글자 닉네임을 거부해야 합니다", () => {
+    expect(isValidNickname("a")).toBe(false);
+    expect(isValidNickname("김")).toBe(false);
+    expect(isValidNickname("1")).toBe(false);
   });
 
   it("빈 문자열을 거부해야 합니다", () => {
