@@ -2,9 +2,8 @@ import { useEffect } from "react";
 
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { InfoIcon } from "@/components/Icon/InfoIcon";
+import type { ToastType } from "@/lib/toast";
 import { cn } from "@/lib/utils/utils";
-
-export type ToastType = "success" | "error" | "info";
 
 export interface ToastProps {
   id: string;

@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import { Avatar } from "@/components/Avatar/Avatar";
 import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils/utils";
 
 interface OnboardingProfileProps {
@@ -39,7 +39,6 @@ export function OnboardingProfile({
   onSkip,
   onNext,
 }: OnboardingProfileProps) {
-  const { showToast } = useToast();
   const [nickname, setNickname] = useState(defaultNickname);
   const [nicknameError, setNicknameError] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<File | null>(null);
@@ -53,7 +52,7 @@ export function OnboardingProfile({
     // 파일 타입 및 용량 검증
     const fileError = validateImageFile(file);
     if (fileError) {
-      showToast("error", fileError);
+      toast.showToast("error", fileError);
       // Input 초기화
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -64,7 +63,7 @@ export function OnboardingProfile({
     // 검증 통과
     setProfileImage(file);
     setPreviewUrl(URL.createObjectURL(file));
-    showToast("success", "이미지가 선택되었어요");
+    toast.showToast("success", "이미지가 선택되었어요");
   };
 
   const handleAvatarClick = () => {

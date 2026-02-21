@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ToastProvider } from "@/components/Toast/ToastProvider";
+import { ToastViewport } from "@/components/Toast/ToastViewport";
 import { QueryProvider } from "@/providers/QueryProvider";
 
 import { geistMono, geistSans, pretendard } from "./fonts";
@@ -24,10 +24,9 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${pretendard.variable} font-sans antialiased`}
       >
         <QueryProvider>
-          <ToastProvider>
-            {children}
-            {modal}
-          </ToastProvider>
+          {children}
+          {modal}
+          <ToastViewport />
         </QueryProvider>
       </body>
     </html>
