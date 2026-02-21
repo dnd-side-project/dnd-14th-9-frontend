@@ -64,7 +64,7 @@ export function ProfileSummary() {
             <span className="text-text-tertiary font-pretendard text-[15px] font-normal">
               투두 달성률
             </span>
-            <span className="text-brand-default font-pretendard text-lg font-semibold">
+            <span className="text-text-brand-default font-pretendard text-lg font-semibold">
               {profile.todoCompletionRate ?? 0}%
             </span>
           </div>

@@ -84,7 +84,7 @@ export function ProfileEditForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col gap-20">
-      <div className="flex flex-col gap-8">
+      <div className="gap-2xl flex flex-col">
         <h3 className="text-text-primary text-lg font-bold">프로필 정보</h3>
 
         <Controller
@@ -100,30 +100,31 @@ export function ProfileEditForm() {
               placeholder="닉네임을 입력해 주세요"
               error={!!errors.nickname}
               errorMessage={errors.nickname?.message}
+              fullWidth
             />
           )}
         />
 
-        <div className="flex flex-col gap-2">
-          <Controller
-            name="bio"
-            control={control}
-            render={({ field: { value, onChange, ref, onBlur } }) => (
-              <Textarea
-                ref={ref}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-                label="한 줄 소개"
-                placeholder="텍스트를 입력해 주세요"
-                error={!!errors.bio}
-                errorMessage={errors.bio?.message}
-                showCharacterCount={true}
-                maxLength={100}
-              />
-            )}
-          />
-        </div>
+        <Controller
+          name="bio"
+          control={control}
+          render={({ field: { value, onChange, ref, onBlur } }) => (
+            <Textarea
+              ref={ref}
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              label="한 줄 소개"
+              placeholder="텍스트를 입력해 주세요"
+              error={!!errors.bio}
+              errorMessage={errors.bio?.message}
+              showCharacterCount={true}
+              maxLength={100}
+              containerClassName="max-w-full"
+              className="max-w-full"
+            />
+          )}
+        />
       </div>
 
       <div className="flex flex-col gap-8">
@@ -175,8 +176,8 @@ export function ProfileEditForm() {
         <Button
           type="button"
           variant="solid"
-          colorScheme="secondary"
-          className="max-w-[160px] flex-1"
+          colorScheme="tertiary"
+          size="large"
           onClick={() => reset()}
         >
           취소
@@ -185,7 +186,7 @@ export function ProfileEditForm() {
           type="submit"
           variant="solid"
           colorScheme="primary"
-          className="max-w-[160px] flex-1"
+          size="large"
           disabled={!isDirty || !isValid || isPending}
         >
           저장하기
