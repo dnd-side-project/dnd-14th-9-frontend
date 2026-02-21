@@ -25,6 +25,7 @@ import type {
   MemberProfileMutationResponse,
   MemberProfileView,
   UpdateInterestCategoriesRequest,
+  UpdateMeRequest,
   UpdateNicknameRequest,
   UpdateProfileImageRequest,
 } from "../types";
@@ -150,3 +151,7 @@ export const useUpdateInterestCategories =
   createMemberProfileMutation<UpdateInterestCategoriesRequest>((body) =>
     memberApi.updateInterestCategories(body)
   );
+
+export const useUpdateMe = createMemberProfileMutation<UpdateMeRequest>((body) =>
+  memberApi.updateMe(body)
+);
