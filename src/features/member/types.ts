@@ -70,8 +70,8 @@ export interface UpdateMeRequest {
 }
 
 export interface UpdateInterestCategoriesRequest {
-  firstInterestCategory: MemberInterestCategory;
-  secondInterestCategory: MemberInterestCategory;
+  firstInterestCategory: MemberInterestCategory | null;
+  secondInterestCategory: MemberInterestCategory | null;
   thirdInterestCategory: MemberInterestCategory | null;
 }
 
@@ -85,3 +85,4 @@ export type UpdateMeResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateInterestCategoriesResponse = ApiSuccessResponse<MemberEditInfo>;
 export type GetMyReportResponse = ApiSuccessResponse<MemberReport>;
 export type DeleteMeResponse = ApiSuccessResponse<null>;
+export type DeleteProfileImageResponse = ApiSuccessResponse<null>;

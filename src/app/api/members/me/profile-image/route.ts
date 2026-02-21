@@ -11,3 +11,12 @@ export async function PATCH(request: NextRequest) {
     forwardRequestCookies: true,
   });
 }
+
+export async function DELETE(request: NextRequest) {
+  return forwardToBackend({
+    request,
+    method: "DELETE",
+    pathWithQuery: "/members/me/profile-image",
+    forwardRequestCookies: true,
+  });
+}

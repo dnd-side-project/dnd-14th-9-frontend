@@ -11,7 +11,10 @@ import {
   useUpdateNickname,
   useUpdateProfileImage,
 } from "@/features/member/hooks/useMemberHooks";
-import type { MemberProfileMutationResponse } from "@/features/member/types";
+import type {
+  MemberProfileMutationResponse,
+  UpdateInterestCategoriesRequest,
+} from "@/features/member/types";
 
 jest.mock("@/features/member/api", () => ({
   memberApi: {
@@ -102,12 +105,14 @@ describe("memberHooks mutation", () => {
       wrapper: createWrapper(queryClient),
     });
 
+    const request: UpdateInterestCategoriesRequest = {
+      firstInterestCategory: "DEVELOPMENT",
+      secondInterestCategory: "DESIGN",
+      thirdInterestCategory: null,
+    };
+
     await act(async () => {
-      await result.current.mutateAsync({
-        firstInterestCategory: "DEVELOPMENT",
-        secondInterestCategory: "DESIGN",
-        thirdInterestCategory: null,
-      });
+      await result.current.mutateAsync(request);
     });
 
     await waitFor(() => {
