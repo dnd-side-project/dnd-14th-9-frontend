@@ -90,6 +90,11 @@ export function OnboardingProfile({
     setNicknameError(validateNickname(value));
   };
 
+  const handleNicknameClear = () => {
+    setNickname("");
+    setNicknameError(validateNickname(""));
+  };
+
   const handleNext = () => {
     const nicknameValidation = validateNickname(nickname);
     if (nicknameValidation) {
@@ -146,6 +151,9 @@ export function OnboardingProfile({
             placeholder="10글자 이내"
             value={nickname}
             onChange={handleNicknameChange}
+            onClear={handleNicknameClear}
+            error={!!nicknameError}
+            errorMessage={nicknameError ?? undefined}
           />
           <p className="font-pretendard text-text-tertiary text-sm">or</p>
         </div>
