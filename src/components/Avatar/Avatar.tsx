@@ -65,16 +65,26 @@ export const Avatar = ({
   const iconSize = getIconSize(size);
   const isSmall = size === "small";
 
+  // Avatar 크기에 따른 sizes 값 설정
+  const getSizes = () => {
+    switch (size) {
+      case "xlarge":
+        return "48px";
+      case "large":
+        return "40px";
+      case "medium":
+        return "32px";
+      case "small":
+        return "24px";
+      default:
+        return "48px";
+    }
+  };
+
   return (
     <div className={cn(AVATAR_VARIANTS({ size, type, className }))} {...props}>
       {type === "image" && src ? (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
+        <Image src={src} alt={alt} fill className="aspect-square object-cover" sizes={getSizes()} />
       ) : (
         <DefaultProfileIcon
           size={iconSize}
@@ -82,7 +92,7 @@ export const Avatar = ({
         />
       )}
       {edit && (
-        <div className="bg-overlay-subtle absolute inset-0 flex items-center justify-center">
+        <div className="bg-overlay-subtle absolute inset-0 flex items-center justify-center opacity-0 transition-opacity hover:opacity-100">
           <EditProfileIcon
             size={iconSize}
             className={cn("text-common-white", isSmall && "size-3")}

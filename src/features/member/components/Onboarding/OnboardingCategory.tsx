@@ -2,13 +2,15 @@ import { useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
+import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { CATEGORY_LABELS, ONBOARDING_CATEGORIES, type Category } from "@/lib/constants/category";
 import { cn } from "@/lib/utils/utils";
 
 interface OnboardingCategoryProps {
   className?: string;
   nickname: string;
-  onNext?: (categories: string[]) => void;
+  isLoading?: boolean;
+  onNext?: (categories: Category[]) => void;
 }
 
 const ONBOARDING_CATEGORY_SPAN_CLASS: Record<Category, string> = {
@@ -22,7 +24,12 @@ const ONBOARDING_CATEGORY_SPAN_CLASS: Record<Category, string> = {
   FREE: "col-span-2",
 };
 
-export function OnboardingCategory({ className, nickname, onNext }: OnboardingCategoryProps) {
+export function OnboardingCategory({
+  className,
+  nickname,
+  isLoading = false,
+  onNext,
+}: OnboardingCategoryProps) {
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 
   const toggleCategory = (category: Category) => {
@@ -37,8 +44,12 @@ export function OnboardingCategory({ className, nickname, onNext }: OnboardingCa
     });
   };
 
+  const removeCategory = (category: Category) => {
+    setSelectedCategories((prev) => prev.filter((c) => c !== category));
+  };
+
   const handleNext = () => {
-    onNext?.(selectedCategories.map((category) => CATEGORY_LABELS[category]));
+    onNext?.(selectedCategories);
   };
 
   return (
@@ -57,29 +68,52 @@ export function OnboardingCategory({ className, nickname, onNext }: OnboardingCa
       </div>
 
       {/* Category Grid */}
-      <div className="grid w-full grid-cols-6 gap-3">
-        {ONBOARDING_CATEGORIES.map((category) => {
-          const label = CATEGORY_LABELS[category];
-          const isSelected = selectedCategories.includes(category);
+      <div className="flex w-full flex-col gap-4">
+        <div className="grid w-full grid-cols-6 gap-3">
+          {ONBOARDING_CATEGORIES.map((category) => {
+            const label = CATEGORY_LABELS[category];
+            const isSelected = selectedCategories.includes(category);
 
-          return (
-            <CategoryFilterButton
+            return (
+              <CategoryFilterButton
+                key={category}
+                type="button"
+                isSelected={isSelected}
+                onClick={() => toggleCategory(category)}
+                className={cn(
+                  "h-14 w-full rounded-lg px-4 py-3 text-center text-base",
+                  ONBOARDING_CATEGORY_SPAN_CLASS[category],
+                  isSelected
+                    ? "text-text-brand-default bg-[#27EA671F]"
+                    : "bg-surface-strong text-text-secondary hover:bg-surface-subtle"
+                )}
+              >
+                {label}
+              </CategoryFilterButton>
+            );
+          })}
+        </div>
+
+        {/* Selected Categories Tags */}
+        <div className="flex min-h-[40px] w-full flex-wrap gap-2">
+          {selectedCategories.map((category, index) => (
+            <span
               key={category}
-              type="button"
-              isSelected={isSelected}
-              onClick={() => toggleCategory(category)}
-              className={cn(
-                "h-14 w-full rounded-lg px-4 py-3 text-center text-base",
-                ONBOARDING_CATEGORY_SPAN_CLASS[category],
-                isSelected
-                  ? "text-text-brand-default bg-[#27EA671F]"
-                  : "bg-surface-strong text-text-secondary hover:bg-surface-subtle"
-              )}
+              className="bg-surface-brand-subtle text-text-brand-default inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm"
             >
-              {label}
-            </CategoryFilterButton>
-          );
-        })}
+              <span className="text-text-muted text-xs">{index + 1}</span>
+              <span>{CATEGORY_LABELS[category]}</span>
+              <button
+                type="button"
+                onClick={() => removeCategory(category)}
+                className="text-text-muted hover:text-text-secondary flex items-center"
+                aria-label={`${CATEGORY_LABELS[category]} 선택 해제`}
+              >
+                <CloseIcon size="xsmall" />
+              </button>
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="flex w-full">
@@ -87,10 +121,10 @@ export function OnboardingCategory({ className, nickname, onNext }: OnboardingCa
           variant="solid"
           colorScheme="primary"
           className="h-12 w-full text-base font-semibold"
-          disabled={selectedCategories.length === 0}
+          disabled={selectedCategories.length === 0 || isLoading}
           onClick={handleNext}
         >
-          완료
+          {isLoading ? "저장 중..." : "완료"}
         </Button>
       </div>
     </div>

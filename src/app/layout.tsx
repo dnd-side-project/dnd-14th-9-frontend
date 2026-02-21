@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ToastViewport } from "@/components/Toast/ToastViewport";
 import { QueryProvider } from "@/providers/QueryProvider";
 
 import { geistMono, geistSans, pretendard } from "./fonts";
@@ -25,6 +26,7 @@ export default async function RootLayout({
         <QueryProvider>
           {children}
           {modal}
+          <ToastViewport />
         </QueryProvider>
       </body>
     </html>
