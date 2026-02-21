@@ -44,7 +44,7 @@ export function SortFilter({ isOpen, value, onOpenChange, onSelect, className }:
         <div
           role="dialog"
           aria-label="정렬 선택"
-          className="p-sm border-border-subtle bg-surface-default absolute top-full right-0 z-20 mt-3 w-[89px] rounded-md border shadow-[0px_0px_2px_0px_#00000014,0px_16px_24px_0px_#0000001F]"
+          className="p-sm border-border-subtle bg-surface-default absolute top-full right-0 z-20 mt-3 rounded-md border shadow-[0px_0px_2px_0px_#00000014,0px_16px_24px_0px_#0000001F]"
         >
           <ul role="radiogroup" className="gap-2xs flex flex-col">
             {SORT_OPTIONS.map((option) => {
@@ -61,13 +61,13 @@ export function SortFilter({ isOpen, value, onOpenChange, onSelect, className }:
                       onOpenChange(false);
                     }}
                     className={cn(
-                      "px-md py-2xs flex w-full items-center justify-center rounded-xs text-[13px] leading-[1.4] transition-colors focus-visible:outline-none",
+                      "px-md py-2xs hover:bg-surface-strong hover:text-text-primary flex w-full items-center justify-center rounded-xs text-[13px] leading-[1.4] transition-colors focus-visible:outline-none",
                       isSelected
-                        ? "bg-surface-strong text-text-primary font-semibold"
-                        : "text-text-secondary font-pretendard font-regular hover:bg-surface-strong hover:text-text-primary"
+                        ? "text-text-primary font-semibold"
+                        : "text-text-secondary font-pretendard font-regular"
                     )}
                   >
-                    <span>{option.label}</span>
+                    <span className="whitespace-nowrap">{option.label}</span>
                   </button>
                 </li>
               );
