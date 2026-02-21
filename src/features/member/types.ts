@@ -11,6 +11,7 @@ export interface MemberProfileView {
   nickname: string;
   profileImageUrl: string | null;
   email: string | null;
+  bio: string | null;
   socialProvider: MemberSocialProvider;
   totalParticipationTime: number;
   focusedTime: number;
@@ -18,6 +19,7 @@ export interface MemberProfileView {
   totalTodoCount: number;
   completedTodoCount: number;
   todoCompletionRate: number;
+  participationSessionCount: number;
   firstLogin: boolean;
 }
 

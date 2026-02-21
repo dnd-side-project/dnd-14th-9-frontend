@@ -19,8 +19,9 @@ export function ProfileSummary() {
       />
       <div className="flex flex-col items-center justify-center gap-1">
         <h2 className="text-text-normal font-pretendard text-2xl font-bold">{profile.nickname}</h2>
-        {/* bio가 MemberProfileView에 추가된다면 아래 주석을 해제하거나 활용 */}
-        {/* <p className="text-text-subtle text-base font-normal">{profile.bio}</p> */}
+        {profile.bio && (
+          <p className="text-text-subtle font-pretendard text-sm font-medium">{profile.bio}</p>
+        )}
       </div>
     </div>
   );
