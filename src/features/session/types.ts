@@ -212,6 +212,40 @@ export interface SessionDetailResponse {
 }
 
 // ============================================
+// 대기방 조회 API 관련 타입
+// ============================================
+
+// 대기방 Todo 아이템
+export interface WaitingRoomTodoItem {
+  subtaskId: number;
+  content: string;
+}
+
+// 대기방 참여자의 Task 정보
+export interface WaitingRoomTask {
+  taskId: number;
+  goal: string;
+  todos: WaitingRoomTodoItem[];
+}
+
+// 대기방 참여자 정보
+export interface WaitingRoomMember {
+  memberId: number;
+  nickname: string;
+  profileImageUrl?: string;
+  focusRate: number;
+  achievementRate: number;
+  role: SessionRole;
+  task: WaitingRoomTask | null;
+}
+
+// 대기방 응답
+export interface WaitingRoomResponse {
+  participantCount: number;
+  members: WaitingRoomMember[];
+}
+
+// ============================================
 // 세션 리포트 조회 API 관련 타입
 // ============================================
 

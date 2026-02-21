@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -24,7 +24,7 @@ interface SessionJoinModalProps {
 
 export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJoinModalProps) {
   const router = useRouter();
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [goal, setGoal] = useState("");
   const [todos, setTodos] = useState<ReportTodoItem[]>([
     { todoId: "0", content: "", isCompleted: false },
@@ -35,12 +35,12 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
 
   const joinSessionMutation = useJoinSession();
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    dialog.showModal();
-    return () => dialog.close();
+  // callback ref: dialog 요소가 DOM에 마운트되면 showModal 호출
+  const setDialogRef = useCallback((node: HTMLDialogElement | null) => {
+    if (node && !node.open) {
+      node.showModal();
+    }
+    dialogRef.current = node;
   }, []);
 
   const handleBackdropClick = (event: React.MouseEvent<HTMLDialogElement>) => {
@@ -96,7 +96,7 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
   return (
     <Portal>
       <dialog
-        ref={dialogRef}
+        ref={setDialogRef}
         onCancel={onClose}
         onClick={handleBackdropClick}
         className="bg-surface-default gap-lg p-3xl fixed inset-0 m-auto flex w-full max-w-110 flex-col rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default)"

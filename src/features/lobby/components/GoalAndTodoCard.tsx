@@ -8,18 +8,35 @@ import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { Input } from "@/components/Input/Input";
 import type { ReportTodoItem } from "@/features/session/types";
 
-const MOCK_GOAL = "React 심화 학습 완료하기";
-const MOCK_TODOS: ReportTodoItem[] = [
-  { todoId: "1", content: "useEffect 정리", isCompleted: false },
-  { todoId: "2", content: "Server Component 학습", isCompleted: true },
-];
+import type { WaitingMemberTask } from "../types";
 
-export function GoalAndTodoCard() {
+interface GoalAndTodoCardProps {
+  task: WaitingMemberTask | null;
+}
+
+export function GoalAndTodoCard({ task }: GoalAndTodoCardProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [goal, setGoal] = useState(MOCK_GOAL);
-  const [todos, setTodos] = useState(MOCK_TODOS);
+
+  // props에서 파생된 기본값 (메모이제이션으로 참조 안정화)
+  const taskGoal = task?.goal ?? "";
+  const taskTodos: ReportTodoItem[] =
+    task?.todos.map((t) => ({
+      todoId: String(t.subtaskId),
+      content: t.content,
+      isCompleted: false,
+    })) ?? [];
+
+  // 로컬 수정 상태 (저장 후에도 유지)
+  const [localGoal, setLocalGoal] = useState<string | null>(null);
+  const [localTodos, setLocalTodos] = useState<ReportTodoItem[] | null>(null);
+
+  // 편집 중 임시 상태
   const [draftGoal, setDraftGoal] = useState("");
   const [draftTodos, setDraftTodos] = useState<ReportTodoItem[]>([]);
+
+  // 표시할 값: 로컬 수정 > props 기본값
+  const goal = localGoal ?? taskGoal;
+  const todos = localTodos ?? taskTodos;
 
   const handleEdit = () => {
     setDraftGoal(goal);
@@ -32,9 +49,10 @@ export function GoalAndTodoCard() {
   };
 
   const handleSave = () => {
-    setGoal(draftGoal);
-    setTodos(draftTodos);
+    setLocalGoal(draftGoal);
+    setLocalTodos(draftTodos);
     setIsEditing(false);
+    // TODO: API 호출로 서버에 저장
   };
 
   const handleTodoChange = (index: number, content: string) => {

@@ -12,6 +12,7 @@ import type {
   SessionListResponse,
   SessionReportResponse,
   ToggleTodoResponse,
+  WaitingRoomResponse,
 } from "./types";
 
 export const sessionApi = {
@@ -56,6 +57,12 @@ export const sessionApi = {
   ): Promise<ApiSuccessResponse<ToggleTodoResponse>> => {
     return api.post<ApiSuccessResponse<ToggleTodoResponse>>(
       `/api/sessions/${sessionRoomId}/todos/${todoId}/toggle`
+    );
+  },
+
+  getWaitingRoom: async (sessionId: string): Promise<ApiSuccessResponse<WaitingRoomResponse>> => {
+    return api.get<ApiSuccessResponse<WaitingRoomResponse>>(
+      `/api/sessions/${sessionId}/waiting-room`
     );
   },
 };

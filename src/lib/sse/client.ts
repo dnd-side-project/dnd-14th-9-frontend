@@ -75,7 +75,7 @@ export class SSEClient<TEventType extends string = string> {
       return;
     }
 
-    this.eventSource = new EventSource(this.url);
+    this.eventSource = new EventSource(this.url, { withCredentials: true });
     this.registeredEvents.clear(); // 새 EventSource 생성 시 등록 이벤트 초기화
 
     this.eventSource.onopen = () => {

@@ -14,7 +14,7 @@ export interface WaitingMemberTask {
 export interface WaitingMember {
   memberId: number;
   nickname: string;
-  profileImageUrl: string;
+  profileImageUrl?: string;
   focusRate: number;
   achievementRate: number;
   role: "HOST" | "PARTICIPANT";

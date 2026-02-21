@@ -24,6 +24,7 @@ import type {
   JoinSessionRequest,
   JoinSessionResponse,
   ToggleTodoResponse,
+  WaitingRoomResponse,
 } from "../types";
 
 const sessionCrud = createCrudHooks<
@@ -43,6 +44,7 @@ const sessionCrud = createCrudHooks<
 export const sessionKeys = {
   ...sessionCrud.keys,
   report: (id: string) => ["session", "report", id] as const,
+  waitingRoom: (id: string) => ["session", "waitingRoom", id] as const,
 };
 
 export const useSessionList = sessionCrud.useList;
@@ -78,6 +80,13 @@ export function useSessionReport(sessionId: string) {
   return useQuery<ApiSuccessResponse<SessionReportResponse>>({
     queryKey: sessionKeys.report(sessionId),
     queryFn: () => sessionApi.getReport(sessionId),
+  });
+}
+
+export function useWaitingRoom(sessionId: string) {
+  return useQuery<ApiSuccessResponse<WaitingRoomResponse>>({
+    queryKey: sessionKeys.waitingRoom(sessionId),
+    queryFn: () => sessionApi.getWaitingRoom(sessionId),
   });
 }
 
