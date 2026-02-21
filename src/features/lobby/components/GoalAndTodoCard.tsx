@@ -6,53 +6,101 @@ import { Button } from "@/components/Button/Button";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { Input } from "@/components/Input/Input";
-import type { ReportTodoItem } from "@/features/session/types";
+import { useDeleteTodo, useUpdateGoal, useUpdateTodo } from "@/features/task/hooks/useTaskHooks";
 
-import type { WaitingMemberTask } from "../types";
+import type { WaitingMemberTask, WaitingTodoItem } from "../types";
 
 interface GoalAndTodoCardProps {
   task: WaitingMemberTask | null;
 }
 
+interface DraftTodo {
+  subtaskId: number;
+  content: string;
+  isNew?: boolean;
+}
+
 export function GoalAndTodoCard({ task }: GoalAndTodoCardProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // props에서 파생된 기본값 (메모이제이션으로 참조 안정화)
+  // API mutation hooks
+  const updateGoalMutation = useUpdateGoal();
+  const updateTodoMutation = useUpdateTodo();
+  const deleteTodoMutation = useDeleteTodo();
+
+  // props에서 파생된 기본값
+  const taskId = task?.taskId ?? null;
   const taskGoal = task?.goal ?? "";
-  const taskTodos: ReportTodoItem[] =
-    task?.todos.map((t) => ({
-      todoId: String(t.subtaskId),
-      content: t.content,
-      isCompleted: false,
-    })) ?? [];
-
-  // 로컬 수정 상태 (저장 후에도 유지)
-  const [localGoal, setLocalGoal] = useState<string | null>(null);
-  const [localTodos, setLocalTodos] = useState<ReportTodoItem[] | null>(null);
+  const taskTodos: WaitingTodoItem[] = task?.todos ?? [];
 
   // 편집 중 임시 상태
   const [draftGoal, setDraftGoal] = useState("");
-  const [draftTodos, setDraftTodos] = useState<ReportTodoItem[]>([]);
+  const [draftTodos, setDraftTodos] = useState<DraftTodo[]>([]);
+  const [deletedTodoIds, setDeletedTodoIds] = useState<number[]>([]);
 
-  // 표시할 값: 로컬 수정 > props 기본값
-  const goal = localGoal ?? taskGoal;
-  const todos = localTodos ?? taskTodos;
+  // 표시할 값
+  const goal = taskGoal;
+  const todos = taskTodos;
 
   const handleEdit = () => {
     setDraftGoal(goal);
-    setDraftTodos(todos);
+    setDraftTodos(
+      todos.map((t) => ({
+        subtaskId: t.subtaskId,
+        content: t.content,
+      }))
+    );
+    setDeletedTodoIds([]);
     setIsEditing(true);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
+    setDeletedTodoIds([]);
   };
 
-  const handleSave = () => {
-    setLocalGoal(draftGoal);
-    setLocalTodos(draftTodos);
-    setIsEditing(false);
-    // TODO: API 호출로 서버에 저장
+  const handleSave = async () => {
+    if (!taskId) return;
+
+    setIsSaving(true);
+
+    try {
+      // 1. 목표가 변경되었으면 업데이트
+      if (draftGoal.trim() !== goal) {
+        await updateGoalMutation.mutateAsync({
+          taskId,
+          body: { goalContent: draftGoal.trim() },
+        });
+      }
+
+      // 2. 변경된 todo 업데이트
+      for (const draft of draftTodos) {
+        if (draft.isNew) continue; // 새로 추가된 항목은 별도 API 필요 (현재 미지원)
+
+        const original = todos.find((t) => t.subtaskId === draft.subtaskId);
+        if (original && original.content !== draft.content.trim()) {
+          await updateTodoMutation.mutateAsync({
+            subtaskId: draft.subtaskId,
+            body: { todoContent: draft.content.trim() },
+          });
+        }
+      }
+
+      // 3. 삭제된 todo 처리
+      for (const subtaskId of deletedTodoIds) {
+        await deleteTodoMutation.mutateAsync({ subtaskId });
+      }
+
+      setIsEditing(false);
+      setDeletedTodoIds([]);
+      // 저장 후 페이지 새로고침으로 최신 데이터 반영
+      window.location.reload();
+    } catch (error) {
+      console.error("저장 실패:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleTodoChange = (index: number, content: string) => {
@@ -60,15 +108,17 @@ export function GoalAndTodoCard({ task }: GoalAndTodoCardProps) {
   };
 
   const handleRemoveTodo = (index: number) => {
+    const todoToRemove = draftTodos[index];
+    // 기존 todo만 삭제 목록에 추가 (새로 추가된 것은 제외)
+    if (todoToRemove && !todoToRemove.isNew) {
+      setDeletedTodoIds((prev) => [...prev, todoToRemove.subtaskId]);
+    }
     setDraftTodos((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleAddTodo = () => {
     if (draftTodos.length >= 5) return;
-    setDraftTodos((prev) => [
-      ...prev,
-      { todoId: String(Date.now()), content: "", isCompleted: false },
-    ]);
+    setDraftTodos((prev) => [...prev, { subtaskId: -Date.now(), content: "", isNew: true }]);
   };
 
   const displayTodos = isEditing ? draftTodos : todos;
@@ -140,7 +190,7 @@ export function GoalAndTodoCard({ task }: GoalAndTodoCardProps) {
                   const isFirst = index === 0;
                   const canAdd = draftTodos.length < 5;
                   return (
-                    <li key={todo.todoId} className="flex items-start gap-2">
+                    <li key={todo.subtaskId} className="flex items-start gap-2">
                       <Input
                         value={todo.content}
                         onChange={(e) => handleTodoChange(index, e.target.value)}
@@ -183,7 +233,7 @@ export function GoalAndTodoCard({ task }: GoalAndTodoCardProps) {
           <ul className="flex flex-col gap-2">
             {todos.map((todo) => (
               <li
-                key={todo.todoId}
+                key={todo.subtaskId}
                 className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-[16px]"
               >
                 {todo.content}
@@ -211,8 +261,9 @@ export function GoalAndTodoCard({ task }: GoalAndTodoCardProps) {
             size="medium"
             className="flex-1"
             onClick={handleSave}
+            disabled={isSaving}
           >
-            저장하기
+            {isSaving ? "저장 중..." : "저장하기"}
           </Button>
         </div>
       )}
