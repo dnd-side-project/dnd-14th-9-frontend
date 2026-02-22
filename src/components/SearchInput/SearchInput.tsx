@@ -43,16 +43,22 @@ const searchInputVariants = cva(
 export interface SearchInputProps
   extends
     Omit<InputHTMLAttributes<HTMLInputElement>, "type">,
-    VariantProps<typeof searchInputContainerVariants> {}
+    VariantProps<typeof searchInputContainerVariants> {
+  onSearchClick?: () => void;
+}
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, onSearchClick, ...props }, ref) => {
     return (
       <div className={cn(searchInputContainerVariants(), className)}>
-        <input ref={ref} type="search" className={searchInputVariants()} {...props} />
-        <div className="p-xs flex shrink-0 items-center justify-center rounded-md">
-          <SearchIcon size="small" className="mr-sm pointer-events-none text-gray-300" />
-        </div>
+        <input ref={ref} type="text" className={searchInputVariants()} {...props} />
+        <button
+          type="button"
+          onClick={onSearchClick}
+          className="p-xs flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors hover:bg-gray-800"
+        >
+          <SearchIcon size="small" className="text-gray-300" />
+        </button>
       </div>
     );
   }
