@@ -45,9 +45,9 @@ export function RecommendedSectionContent() {
     [searchTotalPage]
   );
 
-  const handleMetaChange = useCallback((meta: { totalPage: number }) => {
+  const handleMetaChange = (meta: { totalPage: number }) => {
     setSearchTotalPage(meta.totalPage);
-  }, []);
+  };
 
   // 검색 필터가 바뀌면 페이지를 1로 리셋
   const prevFiltersRef = useRef({ keyword, category });
