@@ -67,10 +67,6 @@ function formatTime(totalSeconds: number): string {
 }
 
 function restoreTimerState(sessionId: string, maxSeconds: number, autoStart: boolean): TimerState {
-  if (typeof window === "undefined") {
-    return { elapsedSeconds: 0, focusedSeconds: 0, isFocusing: true, isRunning: false };
-  }
-
   const saved = loadTimerState(sessionId);
 
   if (!saved) {
@@ -98,14 +94,24 @@ function restoreTimerState(sessionId: string, maxSeconds: number, autoStart: boo
   };
 }
 
+const SSR_DEFAULT: TimerState = {
+  elapsedSeconds: 0,
+  focusedSeconds: 0,
+  isFocusing: true,
+  isRunning: false,
+};
+
 export function useSessionTimer({
   sessionId,
   maxSeconds,
   autoStart = true,
 }: UseSessionTimerOptions): UseSessionTimerReturn {
-  const [state, setState] = useState<TimerState>(() =>
-    restoreTimerState(sessionId, maxSeconds, autoStart)
-  );
+  const [state, setState] = useState<TimerState>(SSR_DEFAULT);
+
+  // 클라이언트 mount 후 localStorage에서 복원 (hydration mismatch 방지)
+  useEffect(() => {
+    setState(restoreTimerState(sessionId, maxSeconds, autoStart));
+  }, [sessionId, maxSeconds, autoStart]);
 
   // 매 초 타이머 틱 + localStorage 저장 (단일 setState 콜백 내에서 처리)
   useEffect(() => {
