@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
 import { Avatar } from "@/components/Avatar/Avatar";
-import { useMe, useLogout } from "@/features/member/hooks/useMemberHooks";
+import { useLogout } from "@/features/auth/hooks/useAuthHooks";
+import { useMe } from "@/features/member/hooks/useMemberHooks";
 
 import { useProfileDropdownDialog } from "../../hooks/useProfileDropdownDialog";
 

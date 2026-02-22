@@ -16,7 +16,6 @@ import {
   queryOptions,
 } from "@tanstack/react-query";
 
-import { authApi } from "@/features/auth/api";
 import { createSingletonHooks } from "@/hooks/createSingletonHooks";
 
 import { memberApi } from "../api";
@@ -170,13 +169,3 @@ export function useDeleteProfileImage() {
 export const useUpdateMe = createMemberProfileMutation<UpdateMeRequest>((body) =>
   memberApi.updateMe(body)
 );
-
-export function useLogout() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: () => authApi.logout(),
-    onSuccess: () => {
-      queryClient.clear();
-    },
-  });
-}
