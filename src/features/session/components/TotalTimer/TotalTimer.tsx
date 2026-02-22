@@ -53,7 +53,7 @@ export function TotalTimer({
           size={200}
           strokeWidth={12}
           trackClassName="stroke-border-inverse"
-          progressClassName="stroke-border-disabled"
+          progressClassName="stroke-border-error-default"
         >
           <span className="text-text-disabled text-[24px] font-bold">
             {isExpired ? "종료" : formatted}
