@@ -68,7 +68,11 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
           todos={myMember?.task?.todos}
           achievementRate={myMember?.achievementRate}
         />
-        <SessionParticipantListCard />
+        <SessionParticipantListCard
+          members={inProgressData?.members}
+          participantCount={inProgressData?.participantCount}
+          averageAchievementRate={inProgressData?.averageAchievementRate}
+        />
       </div>
     </div>
   );
