@@ -8,6 +8,7 @@ const baseProfile: MemberProfileView = {
   nickname: "빵가루 요정 쥐이",
   profileImageUrl: "https://github.com/shadcn.png",
   email: "sewonlim9060@naver.com",
+  bio: null,
   socialProvider: "kakao",
   totalParticipationTime: 60,
   focusedTime: 30,
@@ -15,6 +16,7 @@ const baseProfile: MemberProfileView = {
   totalTodoCount: 10,
   completedTodoCount: 8,
   todoCompletionRate: 80,
+  participationSessionCount: 5,
   firstLogin: false,
 };
 

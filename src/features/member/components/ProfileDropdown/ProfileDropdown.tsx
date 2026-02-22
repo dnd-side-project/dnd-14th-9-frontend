@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
-import { ProfileIcon } from "@/components/Icon/ProfileIcon";
+import { Avatar } from "@/components/Avatar/Avatar";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 
 import { useProfileDropdownDialog } from "../../hooks/useProfileDropdownDialog";
@@ -76,9 +76,15 @@ export function ProfileDropdown() {
         onMouseEnter={handlePrefetchPopup}
         onFocus={handlePrefetchPopup}
         onClick={toggleDropdown}
-        className="border-border-subtle bg-surface-subtle focus-visible:ring-primary focus-visible flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border p-2 transition-colors focus-visible:outline-none"
+        className="focus-visible:ring-primary flex cursor-pointer rounded-full transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:outline-none"
       >
-        <ProfileIcon className="h-4 w-4" />
+        <Avatar
+          type={profile?.profileImageUrl ? "image" : "empty"}
+          src={profile?.profileImageUrl ?? undefined}
+          alt={profile?.nickname ?? "프로필"}
+          size="medium"
+          className="h-8 w-8"
+        />
       </button>
 
       {isOpen && (

@@ -14,7 +14,12 @@ export function ProfileHeader({ nickname, email, profileImageUrl, onClose }: Pro
   return (
     <div className="gap-md relative flex w-full items-start bg-gray-900 px-6 pt-6">
       <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center">
-        <Avatar src={profileImageUrl ?? undefined} alt={nickname} size="xlarge" />
+        <Avatar
+          type={profileImageUrl ? "image" : "empty"}
+          src={profileImageUrl ?? undefined}
+          alt={nickname}
+          size="xlarge"
+        />
       </div>
       <div className="flex flex-1 flex-col items-start">
         <p className="text-common-white font-pretendard w-full text-lg font-semibold">{nickname}</p>

@@ -2,11 +2,14 @@ import { api } from "@/lib/api/api";
 
 import type {
   DeleteMeResponse,
+  DeleteProfileImageResponse,
   GetMeForEditResponse,
   GetMeResponse,
   GetMyReportResponse,
   UpdateInterestCategoriesRequest,
   UpdateInterestCategoriesResponse,
+  UpdateMeRequest,
+  UpdateMeResponse,
   UpdateNicknameRequest,
   UpdateNicknameResponse,
   UpdateProfileImageRequest,
@@ -60,8 +63,16 @@ export const memberApi = {
     return patchProfileImage<UpdateProfileImageResponse>("/api/members/me/profile-image", formData);
   },
 
+  deleteProfileImage: async (): Promise<DeleteProfileImageResponse> => {
+    return api.delete<DeleteProfileImageResponse>("/api/members/me/profile-image");
+  },
+
   updateNickname: async (body: UpdateNicknameRequest): Promise<UpdateNicknameResponse> => {
     return api.patch<UpdateNicknameResponse>("/api/members/me/nickname", body);
+  },
+
+  updateMe: async (body: UpdateMeRequest): Promise<UpdateMeResponse> => {
+    return api.patch<UpdateMeResponse>("/api/members/me", body);
   },
 
   updateInterestCategories: async (

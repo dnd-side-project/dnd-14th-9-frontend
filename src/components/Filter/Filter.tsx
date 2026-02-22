@@ -56,7 +56,12 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>(
       <button
         ref={ref}
         type="button"
-        className={cn(FILTER_VARIANTS({ size, radius, bordered, className }))}
+        className={cn(
+          FILTER_VARIANTS({ size, radius, bordered, className }),
+          isOpen
+            ? "bg-surface-strong border-border-default text-text-primary"
+            : "bg-surface-default"
+        )}
         aria-expanded={isOpen}
         {...props}
       >

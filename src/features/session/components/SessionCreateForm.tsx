@@ -12,10 +12,10 @@ import { Filter } from "@/components/Filter/Filter";
 import { CalendarIcon } from "@/components/Icon/CalendarIcon";
 import { InfoIcon } from "@/components/Icon/InfoIcon";
 import { ImageUploader } from "@/components/ImageUploader/ImageUploader";
-import { Input } from "@/components/Input/Input";
+import { Textarea } from "@/components/Input/Textarea";
+import { TextInput } from "@/components/Input/TextInput";
 import { NumericStepper } from "@/components/NumericStepper/NumericStepper";
 import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
-import { Textarea } from "@/components/Textarea/Textarea";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { ApiError } from "@/lib/api/api-client";
 import { ONBOARDING_CATEGORIES, CATEGORY_LABELS, type Category } from "@/lib/constants/category";
@@ -141,7 +141,7 @@ export function SessionCreateForm() {
   return (
     <form className="gap-xl flex w-full flex-col" onSubmit={handleSubmit}>
       {/* 방 이름 */}
-      <Input
+      <TextInput
         label="방 이름*"
         placeholder="예) 아침코딩모각작"
         maxLength={20}
@@ -159,7 +159,7 @@ export function SessionCreateForm() {
       />
 
       {/* 방 한줄 소개 */}
-      <Input
+      <TextInput
         label="방 한줄 소개*"
         placeholder="예) 1일 1목표를 달성하는 방이에요"
         maxLength={50}

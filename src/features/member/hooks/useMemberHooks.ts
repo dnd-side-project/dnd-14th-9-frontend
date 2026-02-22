@@ -21,10 +21,12 @@ import { createSingletonHooks } from "@/hooks/createSingletonHooks";
 import { memberApi } from "../api";
 
 import type {
+  DeleteProfileImageResponse,
   GetMeForEditResponse,
   MemberProfileMutationResponse,
   MemberProfileView,
   UpdateInterestCategoriesRequest,
+  UpdateMeRequest,
   UpdateNicknameRequest,
   UpdateProfileImageRequest,
 } from "../types";
@@ -150,3 +152,18 @@ export const useUpdateInterestCategories =
   createMemberProfileMutation<UpdateInterestCategoriesRequest>((body) =>
     memberApi.updateInterestCategories(body)
   );
+
+export function useDeleteProfileImage() {
+  const queryClient = useQueryClient();
+  return useMutation<DeleteProfileImageResponse, unknown, void>({
+    mutationFn: () => memberApi.deleteProfileImage(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: memberKeys.me() });
+      queryClient.invalidateQueries({ queryKey: memberKeys.edit() });
+    },
+  });
+}
+
+export const useUpdateMe = createMemberProfileMutation<UpdateMeRequest>((body) =>
+  memberApi.updateMe(body)
+);

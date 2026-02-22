@@ -7,7 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/Button/Button";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
-import { Input } from "@/components/Input/Input";
+import { TextInput } from "@/components/Input/TextInput";
 import { useDeleteTodo, useUpdateGoal, useUpdateTodo } from "@/features/task/hooks/useTaskHooks";
 
 import type { WaitingMemberTask, WaitingTodoItem } from "../types";
@@ -148,7 +148,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
       <div className="flex w-full flex-col gap-2">
         <span className="text-text-secondary text-[14px] font-semibold">목표</span>
         {isEditing ? (
-          <Input
+          <TextInput
             value={draftGoal}
             onChange={(e) => setDraftGoal(e.target.value)}
             onClear={() => setDraftGoal("")}
@@ -197,7 +197,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
                   const canAdd = draftTodos.length < 5;
                   return (
                     <li key={todo.subtaskId} className="flex items-start gap-2">
-                      <Input
+                      <TextInput
                         value={todo.content}
                         onChange={(e) => handleTodoChange(index, e.target.value)}
                         onClear={() => handleTodoChange(index, "")}
