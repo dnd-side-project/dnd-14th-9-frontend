@@ -6,7 +6,7 @@ import SessionPerformanceCard from "@/features/member/components/Profile/Report/
 
 export default function ProfileReportPage() {
   return (
-    <div className="gap-lg flex flex-col">
+    <div className="flex flex-col gap-[80px]">
       <div className="gap-lg grid grid-cols-2">
         <ActivitySummaryCard />
         <CategoryParticipationCard />

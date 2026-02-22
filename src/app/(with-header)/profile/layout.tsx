@@ -9,7 +9,7 @@ interface ProfileLayoutProps {
 
 export default function ProfileLayout({ children }: ProfileLayoutProps) {
   return (
-    <div className="mx-auto flex w-full flex-col gap-[64px] px-6 pt-16 pb-36 md:px-[54px]">
+    <div className="mx-auto flex w-full flex-col gap-[64px] px-6 py-[64px] md:px-[54px]">
       <ProfileSummary />
       <div className="flex flex-col gap-[64px]">
         <ProfileTabs />
