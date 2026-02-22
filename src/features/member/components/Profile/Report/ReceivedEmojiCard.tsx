@@ -1,4 +1,4 @@
-import ReportCard from "@/components/ReportCard/Card";
+import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
 
 export default function ReceivedEmojiCard() {
