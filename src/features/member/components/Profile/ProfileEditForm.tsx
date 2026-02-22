@@ -4,26 +4,15 @@ import { useEffect } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
 
 import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
 import { Textarea } from "@/components/Input/Textarea";
 import { TextInput } from "@/components/Input/TextInput";
 import { useMeForEdit, useUpdateMe } from "@/features/member/hooks/useMemberHooks";
+import { profileEditSchema, type ProfileEditFormValues } from "@/features/member/schemas";
 import { CATEGORY_LABELS, ONBOARDING_CATEGORIES } from "@/lib/constants/category";
 import { toast } from "@/lib/toast";
-import { isValidNickname } from "@/lib/utils/validation";
-
-const profileEditSchema = z.object({
-  nickname: z.string().min(1, "닉네임을 입력해주세요").refine(isValidNickname, {
-    message: "특수문자와 공백을 제외한 2~10자리여야 합니다.",
-  }),
-  bio: z.string().max(100, "한 줄 소개는 최대 100자까지 입력 가능합니다"),
-  interestCategories: z.array(z.string()).max(3, "관심 카테고리는 최대 3개까지 선택 가능합니다."),
-});
-
-type ProfileEditFormValues = z.infer<typeof profileEditSchema>;
 
 export function ProfileEditForm() {
   const { data: meData } = useMeForEdit();
