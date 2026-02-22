@@ -65,4 +65,8 @@ export const sessionApi = {
       `/api/sessions/${sessionId}/waiting-room`
     );
   },
+
+  leave: async (sessionId: string): Promise<ApiSuccessResponse<null>> => {
+    return api.delete<ApiSuccessResponse<null>>(`/api/sessions/${sessionId}/leave`);
+  },
 };

@@ -4,6 +4,8 @@ import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 
 const SERVER_API_URL = process.env.BACKEND_API_BASE ?? process.env.NEXT_PUBLIC_BACKEND_API_BASE;
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ sessionId: string }> }
@@ -15,11 +17,12 @@ export async function GET(
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const backendUrl = `${SERVER_API_URL}/sessions/sse/waiting/${sessionId}`;
+  const backendUrl = `${SERVER_API_URL}/sessions/${sessionId}/waiting-room/events`;
+  const abortController = new AbortController();
 
-  console.warn("[SSE Proxy] Request URL:", backendUrl);
-  console.warn("[SSE Proxy] Raw token:", rawToken.substring(0, 30) + "...");
-  console.warn("[SSE Proxy] Decoded token:", rawToken.substring(0, 30) + "...");
+  request.signal.addEventListener("abort", () => {
+    abortController.abort();
+  });
 
   try {
     const response = await fetch(backendUrl, {
@@ -28,18 +31,49 @@ export async function GET(
         Accept: "text/event-stream",
       },
       cache: "no-store",
+      signal: abortController.signal,
     });
-
-    console.warn("[SSE Proxy] Response status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("[SSE Proxy] Error response:", errorText);
+      console.error("[SSE Proxy] Error response:", response.status, errorText);
       return new Response(response.statusText, { status: response.status });
     }
 
-    // SSE 스트림을 클라이언트로 전달
-    return new Response(response.body, {
+    const stream = new ReadableStream({
+      async start(controller) {
+        const reader = response.body?.getReader();
+        if (!reader) {
+          controller.close();
+          return;
+        }
+
+        try {
+          while (true) {
+            const decoder = new TextDecoder();
+            const { done, value } = await reader.read();
+            console.log(value);
+            if (done) break;
+            controller.enqueue(value);
+            const chunk = decoder.decode(value, { stream: true });
+            console.log("받은 데이터:", chunk);
+          }
+        } catch {
+          // 클라이언트/백엔드 연결 해제 시 정상 종료
+        } finally {
+          try {
+            controller.close();
+          } catch {
+            // 이미 닫힌 스트림 무시
+          }
+        }
+      },
+      cancel() {
+        abortController.abort();
+      },
+    });
+
+    return new Response(stream, {
       headers: {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache, no-transform",
@@ -47,6 +81,13 @@ export async function GET(
       },
     });
   } catch (error) {
+    const isAbort = error instanceof DOMException && error.name === "AbortError";
+    const isSocketClosed = error instanceof Error && error.message.includes("other side closed");
+
+    if (isAbort || isSocketClosed) {
+      return new Response(null, { status: 499 });
+    }
+
     console.error("[SSE Proxy] Connection error:", error);
     return new Response("Internal Server Error", { status: 500 });
   }

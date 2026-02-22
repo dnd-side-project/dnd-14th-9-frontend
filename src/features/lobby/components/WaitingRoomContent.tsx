@@ -25,6 +25,8 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   // 실시간 업데이트: SSE로 수신
   const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
 
+  console.log(sseWaitingData);
+
   if (isLoading) {
     return (
       <div className="flex min-h-100 items-center justify-center">
@@ -56,7 +58,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
         <CountdownBanner targetTime={new Date(session.startTime)} />
       </div>
       <div className="gap-3xl p-3xl flex flex-col">
-        <LobbyHeader />
+        <LobbyHeader sessionId={sessionId} />
         <SessionInfoCard session={session} />
         <div className="gap-lg flex">
           <GoalAndTodoCard sessionId={sessionId} task={myTask ?? null} />
