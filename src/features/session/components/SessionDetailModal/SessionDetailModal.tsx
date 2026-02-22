@@ -45,13 +45,19 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
   // 세션이 대기 상태인지 확인
   const isWaitingStatus = session?.status === "대기";
 
-  // 자동 리다이렉트: 이미 참여 중이고 세션이 대기 상태이면 대기방으로 이동
+  // 세션이 진행 중 상태인지 확인
+  const isOngoingStatus = session?.status === "진행중" || session?.status === "진행 중";
+
+  // 자동 리다이렉트: 이미 참여 중이면 해당 세션 페이지로 이동
   useEffect(() => {
     if (isParticipant && isWaitingStatus) {
       dialogRef.current?.close();
       router.replace(`/session/${sessionId}/waiting`);
+    } else if (isParticipant && isOngoingStatus) {
+      dialogRef.current?.close();
+      router.replace(`/session/${sessionId}`);
     }
-  }, [isParticipant, isWaitingStatus, sessionId, router, dialogRef]);
+  }, [isParticipant, isWaitingStatus, isOngoingStatus, sessionId, router, dialogRef]);
 
   // 참여 여부 확인 중인지 여부
   const isCheckingParticipation = isAuthenticated && isWaitingRoomLoading;

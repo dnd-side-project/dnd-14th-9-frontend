@@ -204,12 +204,8 @@ export function useInProgressData({
   };
 }
 
-export function useToggleSubtaskCompletion(sessionId: string) {
-  const queryClient = useQueryClient();
+export function useToggleSubtaskCompletion() {
   return useMutation<ApiSuccessResponse<null>, ApiError, { subtaskId: number }>({
     mutationFn: ({ subtaskId }) => sessionApi.toggleSubtaskCompletion(subtaskId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: sessionKeys.inProgress(sessionId) });
-    },
   });
 }
