@@ -54,7 +54,14 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
         sessionDate={session.startTime}
         notice={session.notice}
       />
-      <SessionTimerSection sessionId={sessionId} className="mt-xl" />
+      <SessionTimerSection
+        sessionId={sessionId}
+        sessionDurationMinutes={session.sessionDurationMinutes}
+        startTime={session.startTime}
+        focusingCount={inProgressData?.members.filter((m) => m.status === "FOCUS").length ?? 0}
+        totalCount={inProgressData?.participantCount ?? session.currentParticipants}
+        className="mt-xl"
+      />
       <div className="gap-lg mt-xl flex">
         <SessionGoalAndTodoCard />
         <SessionParticipantListCard />
