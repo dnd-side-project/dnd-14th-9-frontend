@@ -12,7 +12,6 @@ import type {
   SessionListParams,
   SessionListResponse,
   SessionReportResponse,
-  ToggleTodoResponse,
   WaitingRoomResponse,
 } from "./types";
 
@@ -55,15 +54,6 @@ export const sessionApi = {
   getInProgress: async (sessionId: string): Promise<ApiSuccessResponse<InProgressEventData>> => {
     return api.get<ApiSuccessResponse<InProgressEventData>>(
       `/api/sessions/${sessionId}/in-progress`
-    );
-  },
-
-  toggleTodo: async (
-    sessionRoomId: string,
-    todoId: string
-  ): Promise<ApiSuccessResponse<ToggleTodoResponse>> => {
-    return api.post<ApiSuccessResponse<ToggleTodoResponse>>(
-      `/api/sessions/${sessionRoomId}/todos/${todoId}/toggle`
     );
   },
 

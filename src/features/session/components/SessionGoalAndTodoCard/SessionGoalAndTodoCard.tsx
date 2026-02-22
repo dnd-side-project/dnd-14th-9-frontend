@@ -7,6 +7,7 @@ import { useToggleSubtaskCompletion } from "../../hooks/useSessionHooks";
 import type { InProgressTodoItem } from "../../types";
 
 interface SessionGoalAndTodoCardProps {
+  sessionId: string;
   goal?: string;
   todos?: InProgressTodoItem[];
   achievementRate?: number;
@@ -14,12 +15,13 @@ interface SessionGoalAndTodoCardProps {
 }
 
 export function SessionGoalAndTodoCard({
+  sessionId,
   goal,
   todos = [],
   achievementRate = 0,
   className,
 }: SessionGoalAndTodoCardProps) {
-  const { mutate: toggleSubtask } = useToggleSubtaskCompletion();
+  const { mutate: toggleSubtask } = useToggleSubtaskCompletion(sessionId);
 
   const handleToggleTodo = (subtaskId: number) => {
     toggleSubtask({ subtaskId });

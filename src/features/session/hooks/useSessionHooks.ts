@@ -119,17 +119,13 @@ export const useJoinSession = createSessionMutationHook<
   { sessionRoomId: string; body: JoinSessionRequest }
 >(({ sessionRoomId, body }) => sessionApi.join(sessionRoomId, body));
 
-export const useToggleTodo = createSessionMutationHook<
-  ApiSuccessResponse<ToggleTodoResponse>,
-  { sessionRoomId: string; todoId: string }
->(({ sessionRoomId, todoId }) => sessionApi.toggleTodo(sessionRoomId, todoId));
-
 export function useLeaveSession() {
   const queryClient = useQueryClient();
   return useMutation<ApiSuccessResponse<null>, ApiError, { sessionRoomId: string }>({
     mutationFn: ({ sessionRoomId }) => sessionApi.leave(sessionRoomId),
-    onSuccess: () => {
+    onSuccess: (_, { sessionRoomId }) => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.inProgress(sessionRoomId) });
     },
   });
 }
@@ -209,8 +205,12 @@ export function useInProgressData({
   };
 }
 
-export function useToggleSubtaskCompletion() {
+export function useToggleSubtaskCompletion(sessionId: string) {
+  const queryClient = useQueryClient();
   return useMutation<ApiSuccessResponse<null>, ApiError, { subtaskId: number }>({
     mutationFn: ({ subtaskId }) => sessionApi.toggleSubtaskCompletion(subtaskId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.inProgress(sessionId) });
+    },
   });
 }

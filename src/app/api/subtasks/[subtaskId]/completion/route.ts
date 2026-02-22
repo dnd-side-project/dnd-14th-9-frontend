@@ -10,7 +10,7 @@ export async function POST(
 
   return forwardToBackend({
     request,
-    method: "POST",
+    method: "PATCH",
     pathWithQuery: `/subtasks/${subtaskId}/completion`,
     forwardRequestCookies: true,
   });
