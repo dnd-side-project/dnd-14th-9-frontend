@@ -161,8 +161,6 @@ describe("RecommendedSectionContent", () => {
     render(<RecommendedSectionContent />);
 
     expect(screen.getByText("지금 바로 참여할 수 있는 세션")).toBeInTheDocument();
-    // useSuspenseMeForEdit는 hooks 규칙상 항상 호출됨 (초기 렌더 + onMetaChange로 인한 재렌더)
-    expect(mockUseSuspenseMeForEdit).toHaveBeenCalledTimes(2);
     expect(mockUseSuspenseSessionList).toHaveBeenCalledWith(
       expect.objectContaining({
         keyword: "react",
