@@ -32,6 +32,12 @@ interface TryRefreshTokenOptions {
   allowPassThroughOnFailure?: boolean;
 }
 
+interface AuthFailureResponseOptions {
+  clearAuth?: boolean;
+  reason?: string;
+  status?: number;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublicPageRoute = PUBLIC_PAGE_ROUTES.some((pattern) => pattern.test(pathname));
@@ -65,9 +71,10 @@ export async function proxy(request: NextRequest) {
   // 토큰 없으면 로그인 라우트로 리다이렉트
   if (!accessToken) {
     if (!refreshToken) {
-      return redirectToLoginRoute(request, {
+      return buildAuthFailureResponse(request, {
         clearAuth: true,
         reason: LOGIN_INTERNAL_ERROR_CODES.AUTH_REQUIRED,
+        status: 401,
       });
     }
     return await tryRefreshToken(request, refreshToken);
@@ -78,13 +85,41 @@ export async function proxy(request: NextRequest) {
     if (refreshToken) {
       return await tryRefreshToken(request, refreshToken);
     }
-    return redirectToLoginRoute(request, {
+    return buildAuthFailureResponse(request, {
       clearAuth: true,
       reason: LOGIN_INTERNAL_ERROR_CODES.AUTH_REQUIRED,
+      status: 401,
     });
   }
 
   return NextResponse.next();
+}
+
+function buildAuthFailureResponse(
+  request: NextRequest,
+  options?: AuthFailureResponseOptions
+): NextResponse {
+  const reason = options?.reason ?? LOGIN_INTERNAL_ERROR_CODES.AUTH_REQUIRED;
+
+  if (isApiRoute(request.nextUrl.pathname)) {
+    const response = NextResponse.json(
+      {
+        isSuccess: false,
+        code: reason,
+        result: null,
+        message: "인증이 필요합니다.",
+      },
+      { status: options?.status ?? 401 }
+    );
+
+    if (options?.clearAuth) {
+      clearAuthCookies(response.cookies);
+    }
+
+    return response;
+  }
+
+  return redirectToLoginRoute(request, options);
 }
 
 function redirectToLoginRoute(
@@ -113,8 +148,12 @@ function isPublicApiRoute(pathname: string): boolean {
   return PUBLIC_API_ROUTE_PATTERNS.some((pattern) => pattern.test(pathname));
 }
 
+function isApiRoute(pathname: string): boolean {
+  return pathname.startsWith("/api/");
+}
+
 function shouldPersistRedirectAfterLogin(pathname: string): boolean {
-  return !pathname.startsWith("/api/");
+  return !isApiRoute(pathname);
 }
 
 /**
@@ -171,9 +210,10 @@ async function tryRefreshToken(
       if (allowPassThroughOnFailure) {
         return NextResponse.next();
       }
-      return redirectToLoginRoute(request, {
+      return buildAuthFailureResponse(request, {
         clearAuth: true,
         reason: LOGIN_INTERNAL_ERROR_CODES.CONFIG_ERROR,
+        status: 500,
       });
     }
 
@@ -207,9 +247,16 @@ async function tryRefreshToken(
       }
 
       const errorCode = await getErrorCodeFromResponse(reissueResponse);
-      return redirectToLoginRoute(request, {
+      const status =
+        reissueResponse.status === 401 || reissueResponse.status === 403
+          ? 401
+          : reissueResponse.status >= 500
+            ? 500
+            : 400;
+      return buildAuthFailureResponse(request, {
         clearAuth: true,
         reason: errorCode ?? BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
+        status,
       });
     }
 
@@ -222,9 +269,10 @@ async function tryRefreshToken(
       if (allowPassThroughOnFailure) {
         return NextResponse.next();
       }
-      return redirectToLoginRoute(request, {
+      return buildAuthFailureResponse(request, {
         clearAuth: true,
         reason: BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
+        status: 500,
       });
     }
 
@@ -261,9 +309,10 @@ async function tryRefreshToken(
     if (allowPassThroughOnFailure) {
       return NextResponse.next();
     }
-    return redirectToLoginRoute(request, {
+    return buildAuthFailureResponse(request, {
       clearAuth: true,
       reason: LOGIN_INTERNAL_ERROR_CODES.NETWORK_ERROR,
+      status: isTimeout ? 504 : 500,
     });
   }
 }
