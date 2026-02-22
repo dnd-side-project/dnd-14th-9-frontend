@@ -106,6 +106,21 @@ describe("Proxy Middleware", () => {
     ).toBe(true);
   }
 
+  async function expectApiAuthError(
+    response: Response,
+    { status = 401, code = "auth_required" }: { status?: number; code?: string } = {}
+  ) {
+    expect(response.status).toBe(status);
+    expect(response.headers.get("location")).toBeNull();
+
+    const payload = await response.json();
+    expect(payload).toMatchObject({
+      isSuccess: false,
+      code,
+      result: null,
+    });
+  }
+
   describe("공개 라우트", () => {
     it("홈(/) 경로는 인증 없이 통과해야 함", async () => {
       // Given
@@ -265,7 +280,7 @@ describe("Proxy Middleware", () => {
       }
     });
 
-    it("공개 API 예외가 아닌 경로는 토큰 없이 접근 시 로그인 리다이렉트하되 복귀 쿠키는 남기지 않아야 함", async () => {
+    it("공개 API 예외가 아닌 경로는 토큰 없이 접근 시 401 JSON 에러를 반환해야 함", async () => {
       const protectedApiPaths = [
         "/api/auth/logout",
         "/api/sessions/create",
@@ -278,7 +293,7 @@ describe("Proxy Middleware", () => {
         const request = new NextRequest(`http://localhost:3000${path}`);
         const response = await proxy(request);
 
-        expectLoginRedirect(response, "auth_required");
+        await expectApiAuthError(response, { code: "auth_required" });
         expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
           false
         );
@@ -789,15 +804,15 @@ describe("Proxy Middleware", () => {
   describe("/api/* 보호된 경로 (인증 필요)", () => {
     // 공개 API 예외를 제외한 모든 /api/* 경로는 보호된 라우트로 동작함
 
-    it("/api/* 에 토큰이 없으면 로그인 리다이렉트해야 함", async () => {
+    it("/api/* 에 토큰이 없으면 401 JSON 에러를 반환해야 함", async () => {
       // Given: 토큰 없음
       const request = new NextRequest("http://localhost:3000/api/members/me/profile");
 
       // When
       const response = await proxy(request);
 
-      // Then: 로그인 리다이렉트
-      expectLoginRedirect(response, "auth_required");
+      // Then: 인증 에러 JSON
+      await expectApiAuthError(response, { code: "auth_required" });
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
         false
       );
@@ -868,7 +883,7 @@ describe("Proxy Middleware", () => {
       expect(setCookies.some((c) => c.includes(newRefreshToken))).toBe(true);
     });
 
-    it("/api/* 에서 재발급 실패하면 로그인 리다이렉트해야 함", async () => {
+    it("/api/* 에서 재발급 실패하면 401 JSON 에러를 반환해야 함", async () => {
       // Given: 만료된 토큰
       const accessToken = createMockToken(-60);
       const refreshToken = createMockToken(-60);
@@ -891,11 +906,11 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: 로그인 리다이렉트
-      expectLoginRedirect(response, "AUTH401_4");
+      // Then: 인증 에러 JSON
+      await expectApiAuthError(response, { code: "AUTH401_4" });
     });
 
-    it("/api/* 에서 재발급 네트워크 에러가 나면 로그인 리다이렉트해야 함", async () => {
+    it("/api/* 에서 재발급 네트워크 에러가 나면 500 JSON 에러를 반환해야 함", async () => {
       // Given
       const accessToken = createMockToken(-60);
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
@@ -909,8 +924,11 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: 로그인 리다이렉트
-      expectLoginRedirect(response, "network_error");
+      // Then: 서버 에러 JSON
+      await expectApiAuthError(response, {
+        status: 500,
+        code: "network_error",
+      });
     });
   });
 });

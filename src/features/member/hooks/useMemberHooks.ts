@@ -56,12 +56,14 @@ export const memberQueries = {
       queryKey: memberKeys.me(),
       queryFn: memberApi.getMe,
       staleTime: MEMBER_STALE_TIME,
+      retry: false,
     }),
   edit: () =>
     queryOptions({
       queryKey: memberKeys.edit(),
       queryFn: memberApi.getMeForEdit,
       staleTime: MEMBER_STALE_TIME,
+      retry: false,
     }),
   report: () =>
     queryOptions({
