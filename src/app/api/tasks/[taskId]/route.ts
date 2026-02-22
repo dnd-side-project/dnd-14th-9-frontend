@@ -2,16 +2,16 @@ import { NextRequest } from "next/server";
 
 import { forwardToBackend } from "@/lib/api/api-route-forwarder";
 
-export async function POST(
+export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ sessionId: string }> }
+  { params }: { params: Promise<{ taskId: string }> }
 ) {
-  const { sessionId } = await params;
+  const { taskId } = await params;
 
   return forwardToBackend({
     request,
-    method: "POST",
-    pathWithQuery: `/sessions/${sessionId}/join`,
+    method: "PATCH",
+    pathWithQuery: `/tasks/${taskId}`,
     includeRequestBody: "json",
     forwardRequestCookies: true,
   });

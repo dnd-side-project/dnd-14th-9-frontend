@@ -134,6 +134,12 @@ export interface CreateSessionResponse {
 // 세션 참여 Role
 export type SessionRole = "HOST" | "PARTICIPANT";
 
+// 세션 참여 요청
+export interface JoinSessionRequest {
+  goal: string; // 목표 (최대 50자, Required)
+  todos: string[]; // 할일 목록 (각 아이템 최대 50자, Required)
+}
+
 // 세션 참여 응답
 export interface JoinSessionResponse {
   sessionId: number; // 참여한 세션 ID
@@ -201,6 +207,42 @@ export interface SessionDetailResponse {
   imageUrl: string;
   summary: string;
   notice: string;
+  requiredAchievementRate?: number; // 최소 달성률 기준 (백엔드 확정 후 수정 예정)
+  requiredFocusRate?: number; // 최소 집중도 기준 (백엔드 확정 후 수정 예정)
+}
+
+// ============================================
+// 대기방 조회 API 관련 타입
+// ============================================
+
+// 대기방 Todo 아이템
+export interface WaitingRoomTodoItem {
+  subtaskId: number;
+  content: string;
+}
+
+// 대기방 참여자의 Task 정보
+export interface WaitingRoomTask {
+  taskId: number;
+  goal: string;
+  todos: WaitingRoomTodoItem[];
+}
+
+// 대기방 참여자 정보
+export interface WaitingRoomMember {
+  memberId: number;
+  nickname: string;
+  profileImageUrl?: string;
+  focusRate: number;
+  achievementRate: number;
+  role: SessionRole;
+  task: WaitingRoomTask | null;
+}
+
+// 대기방 응답
+export interface WaitingRoomResponse {
+  participantCount: number;
+  members: WaitingRoomMember[];
 }
 
 // ============================================

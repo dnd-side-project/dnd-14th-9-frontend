@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 
 import { forwardToBackend } from "@/lib/api/api-route-forwarder";
 
-export async function POST(
+export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
@@ -10,9 +10,8 @@ export async function POST(
 
   return forwardToBackend({
     request,
-    method: "POST",
-    pathWithQuery: `/sessions/${sessionId}/join`,
-    includeRequestBody: "json",
+    method: "DELETE",
+    pathWithQuery: `/sessions/${sessionId}/leave`,
     forwardRequestCookies: true,
   });
 }
