@@ -3,18 +3,16 @@ import { buildQueryString, type QueryParams } from "@/lib/utils/url";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
 import type {
-  AddTodosRequest,
-  AddTodosResponse,
   CreateSessionRequest,
   CreateSessionResponse,
+  JoinSessionRequest,
   JoinSessionResponse,
   SessionDetailResponse,
   SessionListParams,
   SessionListResponse,
   SessionReportResponse,
-  SetGoalRequest,
-  SetGoalResponse,
   ToggleTodoResponse,
+  WaitingRoomResponse,
 } from "./types";
 
 export const sessionApi = {
@@ -43,26 +41,12 @@ export const sessionApi = {
     return api.post<ApiSuccessResponse<CreateSessionResponse>>("/api/sessions/create", formData);
   },
 
-  join: async (sessionId: string): Promise<ApiSuccessResponse<JoinSessionResponse>> => {
-    return api.post<ApiSuccessResponse<JoinSessionResponse>>(`/api/sessions/${sessionId}/join`);
-  },
-
-  setGoal: async (
-    sessionRoomId: string,
-    body: SetGoalRequest
-  ): Promise<ApiSuccessResponse<SetGoalResponse>> => {
-    return api.post<ApiSuccessResponse<SetGoalResponse>>(
-      `/api/sessions/${sessionRoomId}/goal`,
-      body
-    );
-  },
-
-  addTodos: async (
-    sessionRoomId: string,
-    body: AddTodosRequest
-  ): Promise<ApiSuccessResponse<AddTodosResponse>> => {
-    return api.post<ApiSuccessResponse<AddTodosResponse>>(
-      `/api/sessions/${sessionRoomId}/todos`,
+  join: async (
+    sessionId: string,
+    body: JoinSessionRequest
+  ): Promise<ApiSuccessResponse<JoinSessionResponse>> => {
+    return api.post<ApiSuccessResponse<JoinSessionResponse>>(
+      `/api/sessions/${sessionId}/join`,
       body
     );
   },
@@ -74,5 +58,15 @@ export const sessionApi = {
     return api.post<ApiSuccessResponse<ToggleTodoResponse>>(
       `/api/sessions/${sessionRoomId}/todos/${todoId}/toggle`
     );
+  },
+
+  getWaitingRoom: async (sessionId: string): Promise<ApiSuccessResponse<WaitingRoomResponse>> => {
+    return api.get<ApiSuccessResponse<WaitingRoomResponse>>(
+      `/api/sessions/${sessionId}/waiting-room`
+    );
+  },
+
+  leave: async (sessionId: string): Promise<ApiSuccessResponse<null>> => {
+    return api.delete<ApiSuccessResponse<null>>(`/api/sessions/${sessionId}/leave`);
   },
 };

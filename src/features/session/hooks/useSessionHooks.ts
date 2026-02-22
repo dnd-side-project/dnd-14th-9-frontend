@@ -21,12 +21,10 @@ import type {
   SessionReportResponse,
   CreateSessionRequest,
   CreateSessionResponse,
+  JoinSessionRequest,
   JoinSessionResponse,
-  SetGoalRequest,
-  SetGoalResponse,
-  AddTodosRequest,
-  AddTodosResponse,
   ToggleTodoResponse,
+  WaitingRoomResponse,
 } from "../types";
 
 const sessionCrud = createCrudHooks<
@@ -46,6 +44,7 @@ const sessionCrud = createCrudHooks<
 export const sessionKeys = {
   ...sessionCrud.keys,
   report: (id: string) => ["session", "report", id] as const,
+  waitingRoom: (id: string) => ["session", "waitingRoom", id] as const,
 };
 
 export const useSessionList = sessionCrud.useList;
@@ -84,6 +83,18 @@ export function useSessionReport(sessionId: string) {
   });
 }
 
+interface UseWaitingRoomOptions {
+  enabled?: boolean;
+}
+
+export function useWaitingRoom(sessionId: string, options?: UseWaitingRoomOptions) {
+  return useQuery<ApiSuccessResponse<WaitingRoomResponse>>({
+    queryKey: sessionKeys.waitingRoom(sessionId),
+    queryFn: () => sessionApi.getWaitingRoom(sessionId),
+    enabled: options?.enabled ?? true,
+  });
+}
+
 const createSessionMutationHook = <TData, TVariables extends { sessionRoomId: string }>(
   mutationFn: (vars: TVariables) => Promise<TData>
 ) => {
@@ -100,20 +111,20 @@ const createSessionMutationHook = <TData, TVariables extends { sessionRoomId: st
 
 export const useJoinSession = createSessionMutationHook<
   ApiSuccessResponse<JoinSessionResponse>,
-  { sessionRoomId: string }
->(({ sessionRoomId }) => sessionApi.join(sessionRoomId));
-
-export const useSetGoal = createSessionMutationHook<
-  ApiSuccessResponse<SetGoalResponse>,
-  { sessionRoomId: string; body: SetGoalRequest }
->(({ sessionRoomId, body }) => sessionApi.setGoal(sessionRoomId, body));
-
-export const useAddTodos = createSessionMutationHook<
-  ApiSuccessResponse<AddTodosResponse>,
-  { sessionRoomId: string; body: AddTodosRequest }
->(({ sessionRoomId, body }) => sessionApi.addTodos(sessionRoomId, body));
+  { sessionRoomId: string; body: JoinSessionRequest }
+>(({ sessionRoomId, body }) => sessionApi.join(sessionRoomId, body));
 
 export const useToggleTodo = createSessionMutationHook<
   ApiSuccessResponse<ToggleTodoResponse>,
   { sessionRoomId: string; todoId: string }
 >(({ sessionRoomId, todoId }) => sessionApi.toggleTodo(sessionRoomId, todoId));
+
+export function useLeaveSession() {
+  const queryClient = useQueryClient();
+  return useMutation<ApiSuccessResponse<null>, ApiError, { sessionRoomId: string }>({
+    mutationFn: ({ sessionRoomId }) => sessionApi.leave(sessionRoomId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+    },
+  });
+}
