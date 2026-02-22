@@ -11,8 +11,8 @@ import { ChevronRightIcon } from "@/components/Icon/ChevronRightIcon";
 export function Banner() {
   return (
     <section className="p-4xl relative flex h-[264px] w-full flex-col justify-center overflow-hidden rounded-sm bg-[linear-gradient(180deg,_var(--color-gray-800,_#33363D)_-30.1%,_var(--color-gray-900,_#1E2124)_100%)]">
-      {/* 배경 이미지 오버레이 (Optional) */}
-      <div className="absolute inset-0 bg-[url('/images/banner-bg.png')] bg-cover bg-center opacity-5 mix-blend-overlay" />
+      {/* 배경 오버레이: 정적 이미지 의존을 제거해 404 요청을 방지한다. */}
+      <div className="absolute inset-0 bg-[radial-gradient(80%_120%_at_0%_0%,rgba(255,255,255,0.18),transparent_65%),radial-gradient(70%_90%_at_100%_10%,rgba(255,255,255,0.12),transparent_70%)] mix-blend-overlay" />
 
       <div className="relative z-10 flex flex-col items-start gap-6">
         <div className="flex flex-col items-start gap-1">

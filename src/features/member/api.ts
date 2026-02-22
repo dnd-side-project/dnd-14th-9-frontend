@@ -16,6 +16,12 @@ import type {
   UpdateProfileImageResponse,
 } from "./types";
 
+const AUTH_MEMBER_QUERY_OPTIONS = {
+  // 인증 실패를 빠르게 surface하고, 지수 백오프로 인한 초기 로딩 지연을 방지한다.
+  retry: { maxRetries: 0 },
+  timeout: 5000,
+} as const;
+
 async function patchProfileImage<T>(endpoint: string, body: FormData): Promise<T> {
   const response = await fetch(endpoint, {
     method: "PATCH",
@@ -47,11 +53,11 @@ async function patchProfileImage<T>(endpoint: string, body: FormData): Promise<T
  */
 export const memberApi = {
   getMe: async (): Promise<GetMeResponse> => {
-    return api.get<GetMeResponse>("/api/members/me/profile");
+    return api.get<GetMeResponse>("/api/members/me/profile", AUTH_MEMBER_QUERY_OPTIONS);
   },
 
   getMeForEdit: async (): Promise<GetMeForEditResponse> => {
-    return api.get<GetMeForEditResponse>("/api/members/me/edit");
+    return api.get<GetMeForEditResponse>("/api/members/me/edit", AUTH_MEMBER_QUERY_OPTIONS);
   },
 
   updateProfileImage: async (

@@ -1,10 +1,12 @@
 import dynamic from "next/dynamic";
+import { cookies } from "next/headers";
 
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
 import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
+import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 
 const OnboardingModalWrapper = dynamic(() =>
   import("@/features/member/components/Onboarding/OnboardingModalWrapper").then(
@@ -25,13 +27,20 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const queryClient = new QueryClient();
   let isAuthenticated = false;
   let memberProfile = null;
+  const cookieStore = await cookies();
+  const hasAuthCookie = Boolean(
+    cookieStore.get(ACCESS_TOKEN_COOKIE)?.value || cookieStore.get(REFRESH_TOKEN_COOKIE)?.value
+  );
 
-  try {
-    const response = await queryClient.fetchQuery(memberQueries.me());
-    memberProfile = response.result;
-    isAuthenticated = true;
-  } catch {
-    queryClient.removeQueries({ queryKey: memberKeys.me(), exact: true });
+  // 인증 쿠키가 없으면 서버에서 me 조회를 건너뛰어 초기 문서 TTFB를 줄인다.
+  if (hasAuthCookie) {
+    try {
+      const response = await queryClient.fetchQuery(memberQueries.me());
+      memberProfile = response.result;
+      isAuthenticated = true;
+    } catch {
+      queryClient.removeQueries({ queryKey: memberKeys.me(), exact: true });
+    }
   }
 
   return (

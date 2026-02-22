@@ -27,9 +27,12 @@ const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
 
 // 토큰 갱신 API 타임아웃 (10초)
 const REFRESH_TIMEOUT_MS = 10000;
+// 공개 페이지에서 사용하는 소프트 갱신 타임아웃 (짧게 제한)
+const SOFT_REFRESH_TIMEOUT_MS = 1500;
 
 interface TryRefreshTokenOptions {
   allowPassThroughOnFailure?: boolean;
+  timeoutMs?: number;
 }
 
 interface AuthFailureResponseOptions {
@@ -62,7 +65,10 @@ export async function proxy(request: NextRequest) {
     }
 
     if (!accessToken || isTokenExpiringSoon(accessToken)) {
-      return await tryRefreshToken(request, refreshToken, { allowPassThroughOnFailure: true });
+      return await tryRefreshToken(request, refreshToken, {
+        allowPassThroughOnFailure: true,
+        timeoutMs: SOFT_REFRESH_TIMEOUT_MS,
+      });
     }
 
     return NextResponse.next();
@@ -201,6 +207,7 @@ async function tryRefreshToken(
   options?: TryRefreshTokenOptions
 ): Promise<NextResponse> {
   const allowPassThroughOnFailure = options?.allowPassThroughOnFailure ?? false;
+  const refreshTimeoutMs = options?.timeoutMs ?? REFRESH_TIMEOUT_MS;
 
   try {
     const backendUrl = process.env.BACKEND_API_BASE;
@@ -219,7 +226,7 @@ async function tryRefreshToken(
 
     // fetch 타임아웃 설정 (필수 버그 픽스)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), REFRESH_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => controller.abort(), refreshTimeoutMs);
 
     let reissueResponse: Response;
     try {

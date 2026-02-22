@@ -150,8 +150,14 @@ describe("memberApi", () => {
     await memberApi.getMyReport();
     await memberApi.deleteMe();
 
-    expect(mockedApi.get).toHaveBeenNthCalledWith(1, "/api/members/me/profile");
-    expect(mockedApi.get).toHaveBeenNthCalledWith(2, "/api/members/me/edit");
+    expect(mockedApi.get).toHaveBeenNthCalledWith(1, "/api/members/me/profile", {
+      retry: { maxRetries: 0 },
+      timeout: 5000,
+    });
+    expect(mockedApi.get).toHaveBeenNthCalledWith(2, "/api/members/me/edit", {
+      retry: { maxRetries: 0 },
+      timeout: 5000,
+    });
     expect(mockedApi.get).toHaveBeenNthCalledWith(3, "/api/members/me/report");
     expect(mockedApi.delete).toHaveBeenCalledWith("/api/members/me");
   });
