@@ -45,7 +45,7 @@ export function NumericStepper({
   }, [value]);
 
   return (
-    <div className={cn("p-md shrink-0 rounded-sm border border-gray-700", className)}>
+    <div className={cn("p-md border-border-default shrink-0 rounded-sm border", className)}>
       <div className="flex h-full flex-col gap-[20px]">
         {!hideHeader && (
           <div className="flex items-center justify-between">
@@ -60,7 +60,7 @@ export function NumericStepper({
             colorScheme="secondary"
             size="xsmall"
             iconOnly
-            leftIcon={<MinusIcon style={{ width: "13px", height: "13px" }} />}
+            leftIcon={<MinusIcon className="h-[13px] w-[13px]" />}
             onClick={() => onChange(nextDecrementValue)}
             disabled={isAtMin}
             className="flex h-7 w-7 min-w-0 items-center justify-center rounded-xs p-0"
@@ -106,7 +106,7 @@ export function NumericStepper({
             colorScheme="secondary"
             size="xsmall"
             iconOnly
-            leftIcon={<PlusIcon style={{ width: "13px", height: "13px" }} />}
+            leftIcon={<PlusIcon className="h-[13px] w-[13px]" />}
             onClick={() => onChange(nextIncrementValue)}
             disabled={isAtMax}
             className="flex h-7 w-7 min-w-0 items-center justify-center rounded-xs p-0"
