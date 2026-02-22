@@ -13,36 +13,48 @@ interface SessionPageProps {
   params: Promise<{ sessionId: string }>;
 }
 
-// TODO: 실제 API 연동 시 제거
-const MOCK_SESSION_DETAIL = {
-  thumbnailUrl: "/images/thumbnail-placeholder.svg",
-  category: "개발",
-  title: "함께 집중하는 코딩 세션",
-  description: "함께 집중하며 각자의 프로젝트를 진행하는 세션입니다.",
-  currentParticipants: 4,
-  maxParticipants: 6,
-  durationMinutes: 120,
-  sessionDate: new Date(),
-  notice: "카메라는 필수이며, 마이크는 선택입니다. 중간에 10분 휴식이 있습니다.",
-};
-
 export default async function SessionPage({ params }: SessionPageProps) {
   const { sessionId } = await params;
   let participantCardData: SessionParticipantCardViewModel | undefined;
   let participantCardError: string | undefined;
+  let sessionDetailData;
 
   try {
-    const response = await sessionApi.getInProgress(sessionId);
-    participantCardData = mapInProgressToParticipantCard(response.result);
+    const [inProgressResponse, detailResponse] = await Promise.all([
+      sessionApi.getInProgress(sessionId),
+      sessionApi.getDetail(sessionId),
+    ]);
+    participantCardData = mapInProgressToParticipantCard(inProgressResponse.result);
+    sessionDetailData = detailResponse.result;
   } catch {
-    participantCardError = "참여자 정보를 불러오지 못했습니다.";
+    participantCardError = "세션 정보를 불러오지 못했습니다.";
+  }
+
+  if (!sessionDetailData) {
+    // 세부 정보를 불러오지 못한 경우 간단한 Fallback 또는 에러 UI 처리를 진행할 수 있습니다.
+    return (
+      <div className="p-3xl flex h-full flex-col items-center justify-center">
+        <p className="text-gray-400">세션 정보를 불러오지 못했습니다.</p>
+      </div>
+    );
   }
 
   return (
     <div className="p-3xl flex flex-col">
-      <SessionHeader />
+      <SessionHeader sessionId={sessionId} />
       <SessionTimerSection sessionId={sessionId} className="mt-xl" />
-      <SessionDetailSection className="mt-xl" {...MOCK_SESSION_DETAIL} />
+      <SessionDetailSection
+        className="mt-xl"
+        thumbnailUrl={sessionDetailData.imageUrl ?? "/images/thumbnail-placeholder.svg"}
+        category={sessionDetailData.category}
+        title={sessionDetailData.title}
+        description={sessionDetailData.summary}
+        currentParticipants={sessionDetailData.currentParticipants}
+        maxParticipants={sessionDetailData.maxParticipants}
+        durationMinutes={sessionDetailData.sessionDurationMinutes}
+        sessionDate={new Date(sessionDetailData.startTime)}
+        notice={sessionDetailData.notice}
+      />
       <div className="gap-lg mt-xl flex">
         <SessionGoalAndTodoCard />
         <SessionParticipantListCard data={participantCardData} error={participantCardError} />

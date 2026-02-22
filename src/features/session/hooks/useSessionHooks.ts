@@ -103,6 +103,17 @@ export const useJoinSession = createSessionMutationHook<
   { sessionRoomId: string }
 >(({ sessionRoomId }) => sessionApi.join(sessionRoomId));
 
+export const useExitSession = () => {
+  const queryClient = useQueryClient();
+  return useMutation<ApiSuccessResponse<null>, unknown, { sessionRoomId: string }>({
+    mutationFn: ({ sessionRoomId }) => sessionApi.exit(sessionRoomId),
+    onSuccess: (_, { sessionRoomId }) => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionRoomId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+    },
+  });
+};
+
 export const useSetGoal = createSessionMutationHook<
   ApiSuccessResponse<SetGoalResponse>,
   { sessionRoomId: string; body: SetGoalRequest }

@@ -3,12 +3,25 @@
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/Button/Button";
+import { useExitSession } from "@/features/session/hooks/useSessionHooks";
 
-export function SessionHeader() {
+interface SessionHeaderProps {
+  sessionId?: string;
+}
+
+export function SessionHeader({ sessionId }: SessionHeaderProps) {
   const router = useRouter();
+  const { mutateAsync: exitSession } = useExitSession();
 
-  const handleExit = () => {
-    // TODO: 세션 나가기 API 호출 후 이동
+  const handleExit = async () => {
+    if (sessionId) {
+      try {
+        await exitSession({ sessionRoomId: sessionId });
+      } catch (error) {
+        // TODO: Handle error properly
+        console.error("Failed to exit session:", error);
+      }
+    }
     router.push("/");
   };
 

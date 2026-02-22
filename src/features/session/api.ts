@@ -56,6 +56,10 @@ export const sessionApi = {
     return api.post<ApiSuccessResponse<JoinSessionResponse>>(`/api/sessions/${sessionId}/join`);
   },
 
+  exit: async (sessionId: string): Promise<ApiSuccessResponse<null>> => {
+    return api.delete<ApiSuccessResponse<null>>(`/api/sessions/${sessionId}`);
+  },
+
   setGoal: async (
     sessionRoomId: string,
     body: SetGoalRequest
