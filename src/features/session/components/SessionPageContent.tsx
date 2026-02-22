@@ -63,7 +63,11 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
         className="mt-xl"
       />
       <div className="gap-lg mt-xl flex">
-        <SessionGoalAndTodoCard />
+        <SessionGoalAndTodoCard
+          goal={myMember?.task?.goal}
+          todos={myMember?.task?.todos}
+          achievementRate={myMember?.achievementRate}
+        />
         <SessionParticipantListCard />
       </div>
     </div>
