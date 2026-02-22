@@ -86,7 +86,7 @@ export function SessionList() {
       ) : (
         <div className="grid grid-cols-4 gap-x-[24px] gap-y-[48px]">
           {sessions.map((session) => (
-            <Link key={session.sessionId} href={`/session/${session.sessionId}`}>
+            <Link key={session.sessionId} href={`/session/${session.sessionId}/preview`}>
               <Card
                 thumbnailSrc={session.imageUrl}
                 category={session.category}
