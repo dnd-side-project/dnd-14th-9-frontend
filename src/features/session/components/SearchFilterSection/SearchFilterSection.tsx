@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
@@ -30,6 +32,7 @@ export function SearchFilterSection() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const parsedParams = parseSessionListSearchParams(searchParams);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const currentCategory = parsedParams.category ?? "ALL";
   const currentQuery = parsedParams.keyword ?? "";
@@ -46,6 +49,11 @@ export function SearchFilterSection() {
     updateSearchParams({ q: query || null });
   };
 
+  const handleSearchClick = () => {
+    const query = inputRef.current?.value || "";
+    updateSearchParams({ q: query || null });
+  };
+
   const handleCategoryChange = (category: SessionCategoryFilter) => {
     updateSearchParams({
       category: category === "ALL" ? null : category,
@@ -56,9 +64,11 @@ export function SearchFilterSection() {
     <section className="gap-xl flex flex-col items-center">
       <form onSubmit={handleSearch} className="flex w-full justify-center">
         <SearchInput
+          ref={inputRef}
           name="q"
           defaultValue={currentQuery}
           placeholder="관심 있는 세션을 검색해 보세요"
+          onSearchClick={handleSearchClick}
         />
       </form>
 
