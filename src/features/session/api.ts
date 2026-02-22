@@ -9,6 +9,7 @@ import type {
   CreateSessionResponse,
   JoinSessionResponse,
   SessionDetailResponse,
+  SessionInProgressResponse,
   SessionListParams,
   SessionListResponse,
   SessionReportResponse,
@@ -25,6 +26,14 @@ export const sessionApi = {
 
   getDetail: async (sessionId: string): Promise<ApiSuccessResponse<SessionDetailResponse>> => {
     return api.get<ApiSuccessResponse<SessionDetailResponse>>(`/api/sessions/${sessionId}`);
+  },
+
+  getInProgress: async (
+    sessionId: string
+  ): Promise<ApiSuccessResponse<SessionInProgressResponse>> => {
+    return api.get<ApiSuccessResponse<SessionInProgressResponse>>(
+      `/api/sessions/${sessionId}/in-progress`
+    );
   },
 
   getReport: async (sessionId: string): Promise<ApiSuccessResponse<SessionReportResponse>> => {

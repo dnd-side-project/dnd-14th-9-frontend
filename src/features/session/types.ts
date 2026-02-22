@@ -204,6 +204,41 @@ export interface SessionDetailResponse {
 }
 
 // ============================================
+// 세션 진행 중 참여자 목록 조회 API 관련 타입
+// ============================================
+
+export interface SessionInProgressTodo {
+  subtaskId?: number;
+  content?: string;
+  isCompleted?: boolean;
+}
+
+export interface SessionInProgressTask {
+  taskId?: number;
+  goal?: string;
+  todos?: SessionInProgressTodo[];
+}
+
+export type SessionInProgressRole = "HOST" | "PARTICIPANT" | (string & {});
+export type SessionInProgressStatus = "FOCUSED" | "REST" | (string & {});
+
+export interface SessionInProgressMember {
+  nickname?: string;
+  memberId?: number;
+  profileImageUrl?: string | null;
+  role?: SessionInProgressRole;
+  achievementRate?: number;
+  status?: SessionInProgressStatus;
+  task?: SessionInProgressTask | null;
+}
+
+export interface SessionInProgressResponse {
+  participantCount?: number;
+  averageAchievementRate?: number;
+  members?: SessionInProgressMember[];
+}
+
+// ============================================
 // 세션 리포트 조회 API 관련 타입
 // ============================================
 

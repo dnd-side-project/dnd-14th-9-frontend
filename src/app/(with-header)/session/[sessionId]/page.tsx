@@ -1,8 +1,13 @@
+import { sessionApi } from "@/features/session/api";
 import { SessionDetailSection } from "@/features/session/components/SessionDetailSection";
 import { SessionGoalAndTodoCard } from "@/features/session/components/SessionGoalAndTodoCard";
 import { SessionHeader } from "@/features/session/components/SessionHeader";
 import { SessionParticipantListCard } from "@/features/session/components/SessionParticipantListCard";
 import { SessionTimerSection } from "@/features/session/components/SessionTimerSection";
+import {
+  mapInProgressToParticipantCard,
+  type SessionParticipantCardViewModel,
+} from "@/features/session/utils/mapInProgressToParticipantCard";
 
 interface SessionPageProps {
   params: Promise<{ sessionId: string }>;
@@ -23,6 +28,15 @@ const MOCK_SESSION_DETAIL = {
 
 export default async function SessionPage({ params }: SessionPageProps) {
   const { sessionId } = await params;
+  let participantCardData: SessionParticipantCardViewModel | undefined;
+  let participantCardError: string | undefined;
+
+  try {
+    const response = await sessionApi.getInProgress(sessionId);
+    participantCardData = mapInProgressToParticipantCard(response.result);
+  } catch {
+    participantCardError = "참여자 정보를 불러오지 못했습니다.";
+  }
 
   return (
     <div className="p-3xl flex flex-col">
@@ -31,7 +45,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
       <SessionDetailSection className="mt-xl" {...MOCK_SESSION_DETAIL} />
       <div className="gap-lg mt-xl flex">
         <SessionGoalAndTodoCard />
-        <SessionParticipantListCard />
+        <SessionParticipantListCard data={participantCardData} error={participantCardError} />
       </div>
     </div>
   );
