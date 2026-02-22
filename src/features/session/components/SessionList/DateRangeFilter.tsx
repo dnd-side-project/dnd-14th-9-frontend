@@ -37,11 +37,7 @@ export function DateRangeFilter({
         radius="sm"
         isOpen={isOpen}
         onClick={() => onOpenChange(!isOpen)}
-        className={cn(
-          "w-auto max-w-[280px] shrink-0",
-          hasSelection && "text-text-primary",
-          isOpen && ["border-text-brand-default", "shadow-[0_0_8px_0_#27EA674D]"]
-        )}
+        className={cn("w-auto max-w-[280px] shrink-0", hasSelection && "text-text-primary")}
       >
         {label}
       </Filter>
@@ -52,7 +48,7 @@ export function DateRangeFilter({
             mode="range"
             value={value}
             onChange={onChange}
-            className="bg-surface-strong"
+            className="bg-surface-default"
           />
         </div>
       )}
