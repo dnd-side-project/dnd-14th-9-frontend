@@ -1,30 +1,28 @@
 "use client";
 
-import { useState } from "react";
-
 import { CheckIcon } from "@/components/Icon/CheckIcon";
-import type { ReportTodoItem } from "@/features/session/types";
 
-const MOCK_GOAL = "React 심화 학습 완료하기";
-const MOCK_TODOS: ReportTodoItem[] = [
-  { todoId: "1", content: "useEffect 정리", isCompleted: false },
-  { todoId: "2", content: "Server Component 학습", isCompleted: true },
-];
+import { useToggleSubtaskCompletion } from "../../hooks/useSessionHooks";
+
+import type { InProgressTodoItem } from "../../types";
 
 interface SessionGoalAndTodoCardProps {
+  goal: string;
+  todos: InProgressTodoItem[];
+  achievementRate?: number;
   className?: string;
 }
 
-export function SessionGoalAndTodoCard({ className }: SessionGoalAndTodoCardProps) {
-  const [todos, setTodos] = useState(MOCK_TODOS);
+export function SessionGoalAndTodoCard({
+  goal,
+  todos = [],
+  achievementRate = 0,
+  className,
+}: SessionGoalAndTodoCardProps) {
+  const { mutate: toggleSubtask } = useToggleSubtaskCompletion();
 
-  const handleToggleTodo = (todoId: string) => {
-    setTodos((prev) =>
-      prev.map((todo) =>
-        todo.todoId === todoId ? { ...todo, isCompleted: !todo.isCompleted } : todo
-      )
-    );
-    // TODO: API 호출로 완료 상태 업데이트
+  const handleToggleTodo = (subtaskId: number) => {
+    toggleSubtask({ subtaskId });
   };
 
   const completedCount = todos.filter((todo) => todo.isCompleted).length;
@@ -45,7 +43,7 @@ export function SessionGoalAndTodoCard({ className }: SessionGoalAndTodoCardProp
       <div className="flex w-full flex-col gap-2">
         <span className="text-text-secondary text-[14px] font-semibold">목표</span>
         <div className="bg-surface-strong border-border-subtle p-xs text-text-muted flex h-13.5 items-center rounded-sm border text-[16px]">
-          {MOCK_GOAL}
+          {goal ?? "목표가 설정되지 않았습니다"}
         </div>
       </div>
 
@@ -58,7 +56,8 @@ export function SessionGoalAndTodoCard({ className }: SessionGoalAndTodoCardProp
           To do{" "}
           <span className="text-green-600">
             {completedCount}/{todos.length}
-          </span>
+          </span>{" "}
+          <span className="text-text-disabled">({achievementRate}%)</span>
         </span>
 
         {todos.length === 0 ? (
@@ -67,7 +66,7 @@ export function SessionGoalAndTodoCard({ className }: SessionGoalAndTodoCardProp
           <ul className="flex flex-col gap-2">
             {todos.map((todo) => (
               <li
-                key={todo.todoId}
+                key={todo.subtaskId}
                 className="bg-surface-strong border-border-subtle p-xs flex h-13.5 items-center gap-3 rounded-sm border"
               >
                 {/* 체크박스 */}
@@ -78,7 +77,7 @@ export function SessionGoalAndTodoCard({ className }: SessionGoalAndTodoCardProp
                       ? "border-green-600 bg-[#27EA671A]"
                       : "border-border-subtle bg-surface-strong"
                   }`}
-                  onClick={() => handleToggleTodo(todo.todoId)}
+                  onClick={() => handleToggleTodo(todo.subtaskId)}
                   aria-label={`${todo.content} ${todo.isCompleted ? "완료 취소" : "완료"}`}
                 >
                   {todo.isCompleted && <CheckIcon size="small" className="text-green-600" />}
