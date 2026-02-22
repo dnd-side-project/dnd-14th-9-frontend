@@ -27,7 +27,6 @@ import type {
   CreateSessionResponse,
   JoinSessionRequest,
   JoinSessionResponse,
-  ToggleTodoResponse,
   WaitingRoomResponse,
 } from "../types";
 
