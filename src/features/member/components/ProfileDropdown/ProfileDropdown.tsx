@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
 import { Avatar } from "@/components/Avatar/Avatar";
-import { useMe } from "@/features/member/hooks/useMemberHooks";
+import { useMe, useLogout } from "@/features/member/hooks/useMemberHooks";
 
 import { useProfileDropdownDialog } from "../../hooks/useProfileDropdownDialog";
 
@@ -28,20 +28,18 @@ export function ProfileDropdown() {
   } = useProfileDropdownDialog();
   const { data, isPending, isError } = useMe();
   const profile = data?.result;
+  const { mutate: logout } = useLogout();
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("/api/auth/logout", { method: "POST" });
-
-      if (!response.ok) {
-        throw new Error("Logout failed");
-      }
-
-      closeDropdown();
-      router.refresh();
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+  const handleLogout = () => {
+    logout(undefined, {
+      onSuccess: () => {
+        closeDropdown();
+        router.refresh();
+      },
+      onError: (error) => {
+        console.error("Logout error:", error);
+      },
+    });
   };
 
   const handlePrefetchPopup = () => {
