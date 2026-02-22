@@ -50,13 +50,9 @@ export async function GET(
 
         try {
           while (true) {
-            const decoder = new TextDecoder();
             const { done, value } = await reader.read();
-            console.log(value);
             if (done) break;
             controller.enqueue(value);
-            const chunk = decoder.decode(value, { stream: true });
-            console.log("받은 데이터:", chunk);
           }
         } catch {
           // 클라이언트/백엔드 연결 해제 시 정상 종료
