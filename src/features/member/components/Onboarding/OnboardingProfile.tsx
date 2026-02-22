@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
 import { Button } from "@/components/Button/Button";
-import { Input } from "@/components/Input/Input";
+import { TextInput } from "@/components/Input/TextInput";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils/utils";
 
@@ -18,7 +18,7 @@ interface OnboardingProfileProps {
 // Validation 함수
 const validateNickname = (value: string): string | null => {
   if (value.length < 2) return "2자 이상 입력해주세요";
-  if (value.length > 12) return "12자 이하로 입력해주세요";
+  if (value.length > 10) return "10자 이하로 입력해주세요";
   if (!/^[a-zA-Z0-9가-힣]+$/.test(value)) return "영문, 한글, 숫자만 사용 가능해요";
   return null;
 };
@@ -90,6 +90,11 @@ export function OnboardingProfile({
     setNicknameError(validateNickname(value));
   };
 
+  const handleNicknameClear = () => {
+    setNickname("");
+    setNicknameError(validateNickname(""));
+  };
+
   const handleNext = () => {
     const nicknameValidation = validateNickname(nickname);
     if (nicknameValidation) {
@@ -140,19 +145,17 @@ export function OnboardingProfile({
         </div>
 
         {/* TextInput */}
-        <div className="flex w-full flex-col gap-2">
-          <Input
+        <div className="gap-sm flex w-full flex-col">
+          <TextInput
             label="닉네임"
+            placeholder="10글자 이내"
             value={nickname}
             onChange={handleNicknameChange}
-            placeholder="닉네임을 입력해주세요"
-            onClear={() => {
-              setNickname("");
-              setNicknameError(null);
-            }}
+            onClear={handleNicknameClear}
             error={!!nicknameError}
             errorMessage={nicknameError ?? undefined}
           />
+          <p className="font-pretendard text-text-tertiary text-sm">or</p>
         </div>
       </div>
 

@@ -51,11 +51,7 @@ export function ParticipantsFilter({
         isOpen={isOpen}
         aria-haspopup="dialog"
         onClick={() => onOpenChange(!isOpen)}
-        className={cn(
-          "w-auto shrink-0",
-          hasSelection && "text-text-primary",
-          isOpen && ["border-text-brand-default", "shadow-[0_0_8px_0_#27EA674D]"]
-        )}
+        className={cn("w-auto shrink-0", hasSelection && "text-text-primary")}
       >
         {triggerLabel}
       </Filter>
@@ -64,7 +60,7 @@ export function ParticipantsFilter({
         <div
           role="dialog"
           aria-label="참여 인원 선택"
-          className="absolute top-full right-0 z-20 mt-3"
+          className="border-border-subtle bg-surface-default absolute top-full right-0 z-20 mt-3 rounded-sm border shadow-[0px_0px_2px_0px_#00000014,0px_16px_24px_0px_#0000001F]"
         >
           <NumericStepper
             label="참여인원"
@@ -75,7 +71,9 @@ export function ParticipantsFilter({
             max={SESSION_PARTICIPANTS_MAX}
             step={1}
             onChange={onChange}
-            className="w-45 bg-gray-950"
+            className="bg-surface-default gap-xs border-none"
+            hideHeader
+            allowKeyboardInput
           />
         </div>
       )}

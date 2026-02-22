@@ -11,3 +11,13 @@ export async function DELETE(request: NextRequest) {
     forwardRequestCookies: true,
   });
 }
+
+export async function PATCH(request: NextRequest) {
+  return forwardToBackend({
+    request,
+    method: "PATCH",
+    pathWithQuery: "/members/me",
+    includeRequestBody: "json",
+    forwardRequestCookies: true,
+  });
+}

@@ -4,7 +4,7 @@ export function isEmpty(value: string | null | undefined): boolean {
 
 // TODO(장근호): nickname 길이 제한 확인 필요.
 export function isValidNickname(nickname: string): boolean {
-  const regex = /^[가-힣a-zA-Z0-9]{1,5}$/;
+  const regex = /^[가-힣a-zA-Z0-9]{2,10}$/;
   return regex.test(nickname);
 }
 

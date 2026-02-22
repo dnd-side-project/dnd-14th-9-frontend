@@ -41,11 +41,7 @@ export function StartTimeFilter({
         isOpen={isOpen}
         aria-haspopup="dialog"
         onClick={() => onOpenChange(!isOpen)}
-        className={cn(
-          "w-auto shrink-0",
-          hasTimeSlotSelection && "text-text-primary",
-          isOpen && ["border-text-brand-default", "shadow-[0_0_8px_0_#27EA674D]"]
-        )}
+        className={cn("w-auto shrink-0", hasTimeSlotSelection && "text-text-primary")}
       >
         {timeSlotLabel}
       </Filter>
@@ -54,40 +50,37 @@ export function StartTimeFilter({
         <div
           role="dialog"
           aria-label="시작 시간대 선택"
-          className="p-xl absolute top-full left-0 z-20 mt-3 w-[256px] rounded-sm border border-gray-900 bg-gray-950"
+          className="px-xl py-lg border-border-subtle bg-surface-default absolute top-full left-0 z-20 mt-3 w-[256px] rounded-sm border shadow-[0px_0px_2px_0px_#00000014,0px_16px_24px_0px_#0000001F]"
         >
-          <div className="flex flex-col gap-[20px]">
-            <p className="text-[16px] leading-[1.4] font-semibold text-gray-300">시작 시간대</p>
-            <ul className="gap-md flex flex-col">
-              {TIME_SLOT_OPTIONS.map((option) => {
-                const isSelected = selectedTimeSlots.includes(option.value);
+          <ul className="gap-md flex flex-col">
+            {TIME_SLOT_OPTIONS.map((option) => {
+              const isSelected = selectedTimeSlots.includes(option.value);
 
-                return (
-                  <li key={option.value} className="w-full">
-                    <button
-                      type="button"
-                      role="checkbox"
-                      aria-checked={isSelected}
-                      onClick={() => onToggleTimeSlot(option.value)}
-                      className="focus-visible:ring-primary text-text-secondary hover:text-text-primary gap-2xs flex w-full items-center rounded-[4px] text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              return (
+                <li key={option.value} className="w-full">
+                  <button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={isSelected}
+                    onClick={() => onToggleTimeSlot(option.value)}
+                    className="focus-visible:ring-primary text-text-secondary hover:text-text-primary gap-xs flex w-full items-center rounded-[4px] text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                  >
+                    <span
+                      className={cn(
+                        "flex h-5 w-5 items-center justify-center rounded-[4px] border border-solid",
+                        isSelected
+                          ? "border-primary-default bg-surface-primary-alpha-subtle text-text-brand-default"
+                          : "border-border-strong bg-transparent text-transparent"
+                      )}
                     >
-                      <span
-                        className={cn(
-                          "flex h-5 w-5 items-center justify-center rounded-[4px] border",
-                          isSelected
-                            ? "border-[#007E4E] bg-[#003A23] text-[#27EA67]"
-                            : "border-gray-600 bg-transparent text-transparent"
-                        )}
-                      >
-                        <CheckIcon size="xsmall" />
-                      </span>
-                      <span className="text-[15px] leading-[1.4]">{option.panelLabel}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+                      <CheckIcon size="xsmall" />
+                    </span>
+                    <span className="text-[15px] leading-[1.4]">{option.panelLabel}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
     </div>

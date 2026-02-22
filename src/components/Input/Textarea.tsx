@@ -12,6 +12,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils/utils";
 
+import { HelperText, type HelperTextType } from "./HelperText";
+
 const SIZE_STYLES = {
   medium: { minHeight: "98px" },
   small: { minHeight: "87px" },
@@ -42,12 +44,16 @@ const textareaVariants = cva(
           "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
         ],
         filled: [
-          "border-border-strong",
+          "border-border-subtle",
           "text-text-primary",
           "focus:border-text-brand-default",
           "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
         ],
-        error: ["border-border-error-default", "text-text-status-negative-default"],
+        error: [
+          "border-border-error-default",
+          "text-text-primary",
+          "focus:shadow-[0_0_8px_rgba(239,68,68,0.5)]",
+        ],
         disabled: [
           "bg-surface-disabled",
           "border-border-disabled",
@@ -71,6 +77,8 @@ export interface TextareaProps
   label?: string;
   error?: boolean;
   errorMessage?: string;
+  helperText?: string;
+  helperTextType?: HelperTextType;
   showCharacterCount?: boolean;
   containerClassName?: string;
   size?: keyof typeof SIZE_STYLES;
@@ -84,6 +92,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       label,
       error = false,
       errorMessage,
+      helperText,
+      helperTextType = "default",
       disabled = false,
       value,
       defaultValue,
@@ -167,22 +177,25 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         />
 
         {showCount && (
-          <span
-            className={cn(
-              "text-sm",
-              error ? "text-text-status-negative-default" : "text-text-muted"
-            )}
-            aria-live="polite"
-          >
-            {characterCount}/{maxLength}
-          </span>
+          <div className="flex w-full justify-end">
+            <span
+              className={cn(
+                "text-sm",
+                error ? "text-text-status-negative-default" : "text-text-muted"
+              )}
+              aria-live="polite"
+            >
+              {characterCount}/{maxLength}
+            </span>
+          </div>
         )}
 
-        {error && errorMessage && (
-          <span id={errorMessageId} className="text-text-status-negative-default text-sm">
-            {errorMessage}
-          </span>
-        )}
+        {/* Priority: errorMessage > helperText */}
+        {error && errorMessage ? (
+          <HelperText id={errorMessageId} text={errorMessage} type="negative" />
+        ) : helperText ? (
+          <HelperText text={helperText} type={helperTextType} />
+        ) : null}
       </div>
     );
   }

@@ -14,11 +14,11 @@ import { cn } from "@/lib/utils/utils";
 
 import { ClearIcon } from "../Icon/ClearIcon";
 
-const inputVariants = cva(
+import { HelperText, type HelperTextType } from "./HelperText";
+
+const textInputVariants = cva(
   [
     "w-full",
-    "h-14",
-    "px-md",
     "rounded-sm",
     "border",
     "text-base",
@@ -26,56 +26,64 @@ const inputVariants = cva(
     "transition-all",
     "outline-none",
     "placeholder:text-text-muted",
+    "bg-surface-strong",
   ],
   {
     variants: {
       state: {
         default: [
           "border-border-subtle",
-          "bg-transparent",
-          "text-text-tertiary",
+          "text-text-primary",
           "focus:border-text-brand-default",
           "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
         ],
         filled: [
-          "border-border-strong",
-          "bg-transparent",
-          "text-text-tertiary",
+          "border-border-subtle",
+          "text-text-primary",
           "focus:border-text-brand-default",
           "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
         ],
         error: [
           "border-border-error-default",
-          "bg-transparent",
-          "text-text-status-negative-default",
+          "text-text-primary",
+          "focus:shadow-[0_0_8px_rgba(239,68,68,0.5)]",
         ],
         disabled: [
-          "border-border-subtle",
+          "border-border-disabled",
           "bg-surface-disabled",
           "text-text-disabled",
           "placeholder:text-text-disabled",
           "cursor-not-allowed",
         ],
       },
+      size: {
+        md: "h-[56px] px-md",
+        sm: "h-[44px] px-md",
+      },
     },
     defaultVariants: {
       state: "default",
+      size: "md",
     },
   }
 );
 
-export interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size">, VariantProps<typeof inputVariants> {
+export interface TextInputProps
+  extends
+    Omit<InputHTMLAttributes<HTMLInputElement>, "size">,
+    VariantProps<typeof textInputVariants> {
   label?: string;
   error?: boolean;
   errorMessage?: string;
+  helperText?: string;
+  helperTextType?: HelperTextType;
   onClear?: () => void;
   containerClassName?: string;
   fullWidth?: boolean;
   showCharacterCount?: boolean;
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
+export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   (
     {
       className,
@@ -84,9 +92,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       label,
       error = false,
       errorMessage,
+      helperText,
+      helperTextType = "default",
       disabled = false,
       value,
       defaultValue,
+      size = "md",
       onClear,
       onFocus,
       onBlur,
@@ -103,6 +114,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const errorMessageId = `${inputId}-error`;
 
     const [internalValue, setInternalValue] = useState(defaultValue ?? "");
+    const [isFocused, setIsFocused] = useState(false);
 
     const isControlled = value !== undefined;
     const currentValue = isControlled ? value : internalValue;
@@ -119,6 +131,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const handleFocus = useCallback(
       (e: FocusEvent<HTMLInputElement>) => {
+        setIsFocused(true);
         onFocus?.(e);
       },
       [onFocus]
@@ -126,6 +139,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const handleBlur = useCallback(
       (e: FocusEvent<HTMLInputElement>) => {
+        setIsFocused(false);
         onBlur?.(e);
       },
       [onBlur]
@@ -148,7 +162,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       onClear?.();
     }, [isControlled, onClear]);
 
-    const showClearButton = hasValue && !disabled && !error;
+    const showClearButton = hasValue && isFocused && !disabled && !error;
 
     return (
       <div
@@ -165,7 +179,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={cn(
-              inputVariants({ state: getState() }),
+              textInputVariants({ state: getState(), size }),
               showClearButton && "pr-12",
               className
             )}
@@ -177,7 +191,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             onChange={handleChange}
             aria-invalid={error}
             aria-describedby={error && errorMessage ? errorMessageId : undefined}
-            {...props}
+            {...(props as Omit<InputHTMLAttributes<HTMLInputElement>, "size">)}
           />
 
           {showClearButton && (
@@ -195,27 +209,30 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         </div>
 
         {showCount && (
-          <span
-            className={cn(
-              "text-sm",
-              error ? "text-text-status-negative-default" : "text-text-muted"
-            )}
-            aria-live="polite"
-          >
-            {characterCount}/{maxLength}
-          </span>
+          <div className="flex w-full justify-end">
+            <span
+              className={cn(
+                "text-sm",
+                error ? "text-text-status-negative-default" : "text-text-muted"
+              )}
+              aria-live="polite"
+            >
+              {characterCount}/{maxLength}
+            </span>
+          </div>
         )}
 
-        {error && errorMessage && (
-          <span id={errorMessageId} className="text-text-status-negative-default text-sm">
-            {errorMessage}
-          </span>
-        )}
+        {/* Priority: errorMessage > helperText */}
+        {error && errorMessage ? (
+          <HelperText id={errorMessageId} text={errorMessage} type="negative" />
+        ) : helperText ? (
+          <HelperText text={helperText} type={helperTextType} />
+        ) : null}
       </div>
     );
   }
 );
 
-Input.displayName = "Input";
+TextInput.displayName = "TextInput";
 
-export { inputVariants };
+export { textInputVariants };
