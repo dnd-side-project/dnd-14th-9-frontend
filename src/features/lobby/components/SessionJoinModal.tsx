@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button/Button";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
-import { Input } from "@/components/Input/Input";
+import { TextInput } from "@/components/Input/TextInput";
 import { Portal } from "@/components/Portal/Portal";
 import type { ReportTodoItem } from "@/features/session/types";
 
@@ -99,7 +99,7 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
           <span className="text-text-secondary text-[14px] font-semibold">
             목표 <span className="text-status-danger">*</span>
           </span>
-          <Input
+          <TextInput
             value={goal}
             onChange={(e) => {
               setGoal(e.target.value);
@@ -147,7 +147,7 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
                 const canAdd = todos.length < MAX_TODOS;
                 return (
                   <li key={todo.todoId} className="flex items-start gap-2">
-                    <Input
+                    <TextInput
                       value={todo.content}
                       onChange={(e) => {
                         handleTodoChange(index, e.target.value);

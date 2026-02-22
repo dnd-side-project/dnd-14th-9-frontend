@@ -25,6 +25,7 @@ const mockMemberProfile: MemberProfileView = {
   nickname: "new용",
   profileImageUrl: "https://example.com/profile.png",
   email: "tem@tem.com",
+  bio: null,
   socialProvider: "kakao",
   totalParticipationTime: 60,
   focusedTime: 30,
@@ -32,6 +33,7 @@ const mockMemberProfile: MemberProfileView = {
   totalTodoCount: 10,
   completedTodoCount: 8,
   todoCompletionRate: 80,
+  participationSessionCount: 5,
   firstLogin: false,
 };
 

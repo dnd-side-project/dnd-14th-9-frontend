@@ -26,6 +26,7 @@ import type {
   MemberProfileMutationResponse,
   MemberProfileView,
   UpdateInterestCategoriesRequest,
+  UpdateMeRequest,
   UpdateNicknameRequest,
   UpdateProfileImageRequest,
 } from "../types";
@@ -162,3 +163,7 @@ export function useDeleteProfileImage() {
     },
   });
 }
+
+export const useUpdateMe = createMemberProfileMutation<UpdateMeRequest>((body) =>
+  memberApi.updateMe(body)
+);

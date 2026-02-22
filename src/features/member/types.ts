@@ -11,6 +11,7 @@ export interface MemberProfileView {
   nickname: string;
   profileImageUrl: string | null;
   email: string | null;
+  bio: string | null;
   socialProvider: MemberSocialProvider;
   totalParticipationTime: number;
   focusedTime: number;
@@ -18,6 +19,7 @@ export interface MemberProfileView {
   totalTodoCount: number;
   completedTodoCount: number;
   todoCompletionRate: number;
+  participationSessionCount: number;
   firstLogin: boolean;
 }
 
@@ -58,6 +60,15 @@ export interface UpdateNicknameRequest {
   nickname: string;
 }
 
+export interface UpdateMeRequest {
+  nickname: string;
+  email?: string | null;
+  bio?: string | null;
+  firstInterestCategory?: string | null;
+  secondInterestCategory?: string | null;
+  thirdInterestCategory?: string | null;
+}
+
 export interface UpdateInterestCategoriesRequest {
   firstInterestCategory: MemberInterestCategory | null;
   secondInterestCategory: MemberInterestCategory | null;
@@ -70,6 +81,7 @@ export type GetMeForEditResponse = ApiSuccessResponse<MemberEditInfo>;
 export type MemberProfileMutationResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateProfileImageResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateNicknameResponse = ApiSuccessResponse<MemberEditInfo>;
+export type UpdateMeResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateInterestCategoriesResponse = ApiSuccessResponse<MemberEditInfo>;
 export type GetMyReportResponse = ApiSuccessResponse<MemberReport>;
 export type DeleteMeResponse = ApiSuccessResponse<null>;
