@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { useSearchParams } from "next/navigation";
 
@@ -48,6 +48,21 @@ export function RecommendedSectionContent() {
   const handleMetaChange = useCallback((meta: { totalPage: number }) => {
     setSearchTotalPage(meta.totalPage);
   }, []);
+
+  // 검색 필터가 바뀌면 페이지를 1로 리셋
+  const prevFiltersRef = useRef({ keyword, category });
+
+  useEffect(() => {
+    const prev = prevFiltersRef.current;
+    const hasChanged = prev.keyword !== keyword || prev.category !== category;
+
+    if (hasChanged && keyword) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- URL 파라미터 변경 시 로컬 페이지 상태 동기화
+      setSearchPage(1);
+    }
+
+    prevFiltersRef.current = { keyword, category };
+  }, [keyword, category]);
 
   // 검색 모드: keyword가 있으면 검색 전용 섹션 표시
   if (keyword) {

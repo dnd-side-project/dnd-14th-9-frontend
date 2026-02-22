@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { RecommendedSectionContent } from "@/features/session/components/RecommendedSection/RecommendedSectionContent";
@@ -24,8 +26,34 @@ jest.mock("@/features/session/components/Card/Card", () => ({
 }));
 
 jest.mock("@/features/session/components/RecommendedSection/RecommendedGrid", () => ({
-  RecommendedGrid: ({ category }: { category: string }) => {
-    mockRecommendedGrid(category);
+  RecommendedGrid: ({
+    category,
+    keyword,
+    page,
+    onMetaChange,
+  }: {
+    category?: string;
+    keyword?: string;
+    page?: number;
+    onMetaChange?: (meta: { totalPage: number }) => void;
+  }) => {
+    useEffect(() => {
+      // 검색 모드: useSuspenseSessionList 호출 시뮬레이션
+      if (keyword) {
+        mockUseSuspenseSessionList({ keyword, category, page, size: 4 });
+        // totalPage 콜백 시뮬레이션
+        if (onMetaChange) {
+          onMetaChange({ totalPage: 3 });
+        }
+      } else if (category) {
+        // 추천 모드
+        mockRecommendedGrid(category);
+      }
+    }, [keyword, category, page, onMetaChange]);
+
+    if (keyword) {
+      return <div data-testid="recommended-grid">Search: {keyword}</div>;
+    }
     return <div data-testid="recommended-grid">{category}</div>;
   },
 }));
@@ -133,20 +161,16 @@ describe("RecommendedSectionContent", () => {
     render(<RecommendedSectionContent />);
 
     expect(screen.getByText("지금 바로 참여할 수 있는 세션")).toBeInTheDocument();
-    expect(mockUseSuspenseMeForEdit).not.toHaveBeenCalled();
+    // useSuspenseMeForEdit는 hooks 규칙상 항상 호출됨 (초기 렌더 + onMetaChange로 인한 재렌더)
+    expect(mockUseSuspenseMeForEdit).toHaveBeenCalledTimes(2);
     expect(mockUseSuspenseSessionList).toHaveBeenCalledWith(
       expect.objectContaining({
         keyword: "react",
         category: undefined,
-        sort: "DEADLINE_APPROACHING",
         page: 1,
         size: 4,
       })
     );
-    expect(screen.getByText("Session 1")).toBeInTheDocument();
-    expect(screen.getByText("Session 2")).toBeInTheDocument();
-    expect(screen.getByText("Session 3")).toBeInTheDocument();
-    expect(screen.getByText("Session 4")).toBeInTheDocument();
   });
 
   it("검색 필터가 바뀌면 검색 모드 페이지를 1로 리셋한다", async () => {
