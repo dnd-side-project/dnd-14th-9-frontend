@@ -27,8 +27,8 @@ export default async function SessionPage({ params }: SessionPageProps) {
   return (
     <div className="p-3xl flex flex-col">
       <SessionHeader />
-      <SessionTimerSection sessionId={sessionId} className="mt-xl" />
       <SessionDetailSection className="mt-xl" {...MOCK_SESSION_DETAIL} />
+      <SessionTimerSection sessionId={sessionId} className="mt-xl" />
       <div className="gap-lg mt-xl flex">
         <SessionGoalAndTodoCard />
         <SessionParticipantListCard />
