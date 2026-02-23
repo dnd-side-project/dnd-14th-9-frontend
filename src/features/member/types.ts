@@ -86,12 +86,14 @@ export interface SessionHistoryPagination {
   totalElements: number;
 }
 
-// Report Stats (통계 정보)
+// Report Stats (통계 정보) — 실제 API 응답의 flat 구조
 export interface MemberReportStats {
-  activitySummary: ActivitySummaryData;
-  categoryParticipation: CategoryParticipationItem[];
+  focusedTime: number;
+  totalParticipationTime: number;
+  todoCompletionRate: number;
+  focusRate: number;
+  sessionParticipationStats: CategoryParticipationItem[];
   receivedEmojis: ReceivedEmojiItem[];
-  sessionPerformance: SessionPerformanceData;
 }
 
 // Report Sessions (세션 히스토리)

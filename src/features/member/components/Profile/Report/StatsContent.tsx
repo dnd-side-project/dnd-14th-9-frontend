@@ -16,10 +16,21 @@ export default async function StatsContent() {
 
   return (
     <div className="gap-lg grid grid-cols-2">
-      <ActivitySummaryCard data={stats.activitySummary} />
-      <CategoryParticipationCard data={stats.categoryParticipation} />
+      <ActivitySummaryCard
+        data={{
+          focusedTime: stats.focusedTime,
+          totalParticipationTime: stats.totalParticipationTime,
+          focusRate: stats.focusRate,
+        }}
+      />
+      <CategoryParticipationCard data={stats.sessionParticipationStats} />
       <ReceivedEmojiCard data={stats.receivedEmojis} />
-      <SessionPerformanceCard data={stats.sessionPerformance} />
+      <SessionPerformanceCard
+        data={{
+          todoCompletionRate: stats.todoCompletionRate,
+          focusRate: stats.focusRate,
+        }}
+      />
     </div>
   );
 }
