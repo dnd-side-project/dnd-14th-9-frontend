@@ -264,7 +264,7 @@ export interface InProgressTask {
 }
 
 // in-progress 참여자 상태
-export type InProgressMemberStatus = "FOCUS" | "REST";
+export type InProgressMemberStatus = "FOCUSED" | "REST";
 
 // in-progress 참여자 정보
 export interface InProgressMember {

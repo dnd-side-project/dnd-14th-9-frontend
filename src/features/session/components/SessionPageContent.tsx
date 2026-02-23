@@ -45,9 +45,12 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
             overallSeconds: timerState.elapsedSeconds,
           },
         });
-      } catch {
-        // 결과 전송 실패해도 페이지 이동은 진행
-        console.error("[SessionPageContent] 결과 전송 실패");
+      } catch (error) {
+        // [임시] 결과 전송 실패 시 상세 로그 출력 및 페이지 이동 중단
+        console.error("[SessionPageContent] 결과 전송 실패:", error);
+        console.error("[SessionPageContent] timerState:", timerState);
+        console.error("[SessionPageContent] sessionId:", sessionId);
+        return; // 페이지 이동 중단
       }
     }
 
@@ -135,7 +138,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
         sessionId={sessionId}
         sessionDurationMinutes={session.sessionDurationMinutes}
         startTime={session.startTime}
-        focusingCount={inProgressData?.members.filter((m) => m.status === "FOCUS").length ?? 0}
+        focusingCount={inProgressData?.members.filter((m) => m.status === "FOCUSED").length ?? 0}
         totalCount={inProgressData?.participantCount ?? session.currentParticipants}
         className="mt-xl"
       />
