@@ -33,6 +33,7 @@ export function ProfileHeader({ nickname, email, profileImageUrl, onClose }: Pro
             leftIcon={<EditIcon className="h-[18px] w-[18px]" />}
             href="/profile/settings"
             onClick={onClose}
+            className="rounded-[4px] pl-[4px]"
           >
             프로필 수정
           </ButtonLink>

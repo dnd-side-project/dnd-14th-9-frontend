@@ -23,7 +23,7 @@ const buttonVariants = cva(
         large: "min-w-[94px] px-xl py-md",
         medium: "h-12 min-w-[82px] px-md py-2xs",
         small: "h-8 min-w-[70px] px-sm py-xs text-xs font-semibold",
-        xsmall: "h-8 min-w-[58px] px-2 py-1 text-xs font-semibold",
+        xsmall: "min-w-[58px] px-2 py-1 text-xs font-semibold",
       },
       iconOnly: {
         true: "",
@@ -79,7 +79,7 @@ const buttonVariants = cva(
       { iconOnly: true, size: "large", class: "min-w-0 w-14 p-xs" },
       { iconOnly: true, size: "medium", class: "min-w-0 w-12 p-xs" },
       { iconOnly: true, size: "small", class: "min-w-0 w-10 p-xs" },
-      { iconOnly: true, size: "xsmall", class: "min-w-0 w-8 p-xs" },
+      { iconOnly: true, size: "xsmall", class: "min-w-0 w-[26px] p-xs" },
     ],
     defaultVariants: {
       variant: "solid",
