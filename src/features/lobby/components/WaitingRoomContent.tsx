@@ -25,8 +25,6 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   // 실시간 업데이트: SSE로 수신
   const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
 
-  console.log(sseWaitingData);
-
   if (isLoading) {
     return (
       <div className="flex min-h-100 items-center justify-center">

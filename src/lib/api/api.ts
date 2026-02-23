@@ -227,8 +227,8 @@ export const api = {
   patch: <T>(endpoint: string, data?: unknown, options?: RequestOptions) =>
     request<T>("PATCH", endpoint, data, options),
 
-  delete: <T>(endpoint: string, options?: RequestOptions) =>
-    request<T>("DELETE", endpoint, undefined, options),
+  delete: <T>(endpoint: string, data?: unknown, options?: RequestOptions) =>
+    request<T>("DELETE", endpoint, data, options),
 
   // Route Handler/BFF 레이어에서 사용하는 raw Response 기반 호출
   server: serverRequestApi,
