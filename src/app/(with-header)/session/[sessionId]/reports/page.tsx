@@ -6,7 +6,6 @@ import { Button } from "@/components/Button/Button";
 import ActivitySummaryCard from "@/features/member/components/Profile/Report/ActivitySummaryCard";
 import ReceivedEmojiCard from "@/features/member/components/Profile/Report/ReceivedEmojiCard";
 import { SessionDetailSection } from "@/features/session/components/SessionDetailSection";
-import { GoalAchievementSection } from "@/features/session/components/SessionResult/GoalAchievementSection";
 import { ParticipantGoalSection } from "@/features/session/components/SessionResult/ParticipantGoalSection";
 import { SessionResultHeader } from "@/features/session/components/SessionResult/SessionResultHeader";
 
@@ -21,19 +20,6 @@ const MOCK_SESSION_DETAIL = {
   durationMinutes: 120,
   sessionDate: new Date(),
   notice: "카메라는 선택사항입니다. 편하게 참여해주세요!",
-};
-
-// TODO: API 연동 후 실제 목표 달성 데이터로 교체
-const MOCK_GOAL_ACHIEVEMENT = {
-  goal: "React 심화 학습하기",
-  todoAchievementRate: 80,
-  todoList: [
-    { todoId: "1", content: "useEffect 정리하기", isCompleted: true },
-    { todoId: "2", content: "Server Component 학습", isCompleted: true },
-    { todoId: "3", content: "상태 관리 비교", isCompleted: true },
-    { todoId: "4", content: "React Query 연습", isCompleted: true },
-    { todoId: "5", content: "성능 최적화 적용", isCompleted: false },
-  ],
 };
 
 // TODO: API 연동 후 실제 참여자 데이터로 교체
@@ -64,7 +50,7 @@ const MOCK_PARTICIPANTS = [
   },
 ];
 
-export default function SessionResultPage() {
+export default function ParticipantsReportPage() {
   const router = useRouter();
   const params = useParams();
   const sessionId = params.sessionId as string;
@@ -73,8 +59,8 @@ export default function SessionResultPage() {
     router.push("/");
   };
 
-  const handleViewParticipantsReport = () => {
-    router.push(`/session/${sessionId}/reports`);
+  const handleViewMyReport = () => {
+    router.push(`/session/${sessionId}/result`);
   };
 
   // TODO: API 연동 - 이모지 전송
@@ -94,10 +80,7 @@ export default function SessionResultPage() {
         <ReceivedEmojiCard />
       </div>
 
-      {/* 섹션 4: 나의 목표 달성 */}
-      <GoalAchievementSection {...MOCK_GOAL_ACHIEVEMENT} />
-
-      {/* 섹션 5: 참여자들의 목표 달성 요약 */}
+      {/* 섹션 4: 참여자들의 목표 달성 요약 */}
       <section className="gap-lg border-border-subtle p-lg flex flex-col rounded-lg border">
         {/* 헤더 */}
         <div className="flex items-center justify-between">
@@ -140,18 +123,13 @@ export default function SessionResultPage() {
         </ul>
       </section>
 
-      {/* 섹션 6: 버튼 영역 */}
+      {/* 섹션 5: 버튼 영역 */}
       <section className="mt-2xl mb-3xl gap-md flex justify-center">
         <Button variant="outlined" colorScheme="secondary" size="large" onClick={handleGoHome}>
-          홈으로
+          그만두기
         </Button>
-        <Button
-          variant="solid"
-          colorScheme="primary"
-          size="large"
-          onClick={handleViewParticipantsReport}
-        >
-          참여자 리포트 보기
+        <Button variant="solid" colorScheme="primary" size="large" onClick={handleViewMyReport}>
+          내 리포트 보기
         </Button>
       </section>
     </div>

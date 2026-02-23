@@ -23,7 +23,7 @@ export function GoalAchievementSection({
       </div>
 
       {/* 컨텐츠 영역 (border 있음) */}
-      <div className="border-border-subtle p-lg flex flex-col rounded-lg border bg-gray-900">
+      <div className="border-border-subtle p-lg bg-surface-default flex flex-col rounded-lg border">
         {/* 목표 달성률 & 투두 완료 (세로 정렬) */}
         <div className="gap-lg flex">
           {/* 나의 목표 달성률 */}
