@@ -22,10 +22,8 @@ export function FocusTimeCard({
   focusRate,
 }: FocusTimeCardProps) {
   return (
-    <article className="p-lg flex flex-1 flex-col rounded-lg bg-gray-900">
-      <h3 className="text-lg font-semibold text-gray-50">나의 집중 시간</h3>
-
-      <div className="mt-lg gap-2xl flex">
+    <article className="border-border-subtle p-lg flex flex-1 flex-col rounded-lg border bg-gray-900">
+      <div className="gap-2xl flex">
         <div className="gap-xs flex flex-col">
           <span className="text-sm text-gray-400">총 집중 시간</span>
           <span className="text-2xl font-bold text-gray-50">

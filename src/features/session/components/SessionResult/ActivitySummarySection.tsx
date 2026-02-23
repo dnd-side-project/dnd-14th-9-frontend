@@ -23,12 +23,21 @@ export function ActivitySummarySection({
 }: ActivitySummarySectionProps) {
   return (
     <section className="gap-lg flex">
-      <FocusTimeCard
-        focusTimeMinutes={focusTimeMinutes}
-        totalDurationMinutes={totalDurationMinutes}
-        focusRate={focusRate}
-      />
-      <ReceivedEmojiCard emojis={emojis} />
+      {/* 나의 활동 요약 */}
+      <div className="flex flex-1 flex-col">
+        <h3 className="mb-md text-lg font-semibold text-gray-50">나의 활동 요약</h3>
+        <FocusTimeCard
+          focusTimeMinutes={focusTimeMinutes}
+          totalDurationMinutes={totalDurationMinutes}
+          focusRate={focusRate}
+        />
+      </div>
+
+      {/* 내가 받은 이모지 */}
+      <div className="flex flex-1 flex-col">
+        <h3 className="mb-md text-lg font-semibold text-gray-50">내가 받은 이모지</h3>
+        <ReceivedEmojiCard emojis={emojis} />
+      </div>
     </section>
   );
 }

@@ -15,64 +15,83 @@ export function GoalAchievementSection({
   const completedCount = todoList.filter((todo) => todo.isCompleted).length;
 
   return (
-    <section className="p-lg flex flex-col rounded-lg bg-gray-900">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-50">목표 달성</h3>
-        <span className="text-sm font-semibold text-green-500">달성률 {todoAchievementRate}%</span>
+    <section className="flex flex-col">
+      {/* 헤더 (별도) */}
+      <div className="mb-md flex flex-col">
+        <h3 className="text-lg font-semibold text-gray-50">나의 목표 달성 요약</h3>
+        <p className="mt-2xs text-sm text-gray-500">세션을 진행하면서 달성한 투두리스트에요</p>
       </div>
 
-      {/* 목표 */}
-      <div className="mt-md flex items-center justify-between">
-        <p className="text-base text-gray-300">
-          나의 목표: <span className="text-gray-50">{goal}</span>
-        </p>
-        <span className="text-sm text-gray-400">
-          ⭕ {completedCount}/{todoList.length}
-        </span>
-      </div>
+      {/* 컨텐츠 영역 (border 있음) */}
+      <div className="border-border-subtle p-lg flex flex-col rounded-lg border bg-gray-900">
+        {/* 목표 달성률 & 투두 완료 (세로 정렬) */}
+        <div className="gap-lg flex">
+          {/* 나의 목표 달성률 */}
+          <div className="flex flex-col">
+            <span className="text-text-secondary text-[16px] font-semibold">나의 목표 달성률</span>
+            <span className="text-text-brand-default text-[32px] font-bold">
+              {todoAchievementRate}%
+            </span>
+          </div>
 
-      {/* 구분선 */}
-      <div className="my-lg h-px w-full bg-gray-800" />
+          {/* 나의 목표 */}
+          <div className="flex flex-col">
+            <span className="text-text-secondary text-[16px] font-semibold">나의 목표</span>
+            <span className="text-[32px] font-bold">
+              <span className="text-text-brand-default">{completedCount}</span>
+              <span className="text-text-secondary">/{todoList.length}</span>
+            </span>
+          </div>
+        </div>
 
-      {/* Todo 목록 */}
-      <div className="gap-sm flex flex-col">
-        <span className="text-sm font-semibold text-gray-400">
-          To do{" "}
-          <span className="text-green-500">
-            {completedCount}/{todoList.length}
-          </span>
-        </span>
+        {/* 목표 섹션 */}
+        <div className="mt-lg flex flex-col gap-2">
+          <span className="text-text-secondary text-[16px] font-semibold">목표</span>
+          <div className="bg-surface-strong rounded-sm p-3">
+            <span className="text-text-primary text-base">{goal}</span>
+          </div>
+        </div>
 
-        {todoList.length === 0 ? (
-          <p className="py-md text-center text-sm text-gray-500">등록된 할 일이 없습니다</p>
-        ) : (
-          <ul className="gap-sm flex flex-col">
-            {todoList.map((todo) => (
-              <li key={todo.todoId} className="p-sm flex items-center gap-3 rounded-sm bg-gray-800">
-                {/* 체크 표시 */}
-                <span
-                  className={`flex size-5 shrink-0 items-center justify-center rounded-xs border ${
-                    todo.isCompleted
-                      ? "border-green-600 bg-green-600/10"
-                      : "border-gray-600 bg-gray-700"
-                  }`}
+        {/* 구분선 */}
+        <div className="my-lg h-px w-full bg-gray-800" />
+
+        {/* Todo 목록 */}
+        <div className="gap-sm flex flex-col">
+          <span className="text-text-primary text-[16px] font-semibold">투두리스트</span>
+
+          {todoList.length === 0 ? (
+            <p className="py-md text-center text-sm text-gray-500">등록된 할 일이 없습니다</p>
+          ) : (
+            <ul className="gap-sm flex flex-col">
+              {todoList.map((todo) => (
+                <li
+                  key={todo.todoId}
+                  className="p-sm flex items-center gap-3 rounded-sm bg-gray-800"
                 >
-                  {todo.isCompleted && <CheckIcon size="small" className="text-green-500" />}
-                </span>
+                  {/* 체크 표시 */}
+                  <span
+                    className={`flex size-5 shrink-0 items-center justify-center rounded-xs border ${
+                      todo.isCompleted
+                        ? "border-green-600 bg-green-600/10"
+                        : "border-gray-600 bg-gray-700"
+                    }`}
+                  >
+                    {todo.isCompleted && <CheckIcon size="small" className="text-green-500" />}
+                  </span>
 
-                {/* 내용 */}
-                <span
-                  className={`text-base ${
-                    todo.isCompleted ? "text-gray-500 line-through" : "text-gray-50"
-                  }`}
-                >
-                  {todo.content}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+                  {/* 내용 */}
+                  <span
+                    className={`text-base ${
+                      todo.isCompleted ? "text-gray-500 line-through" : "text-gray-50"
+                    }`}
+                  >
+                    {todo.content}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </section>
   );
