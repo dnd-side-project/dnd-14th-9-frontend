@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
+import { Badge } from "@/components/Badge/Badge";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 
 export function ProfileSummary() {
@@ -16,7 +17,7 @@ export function ProfileSummary() {
     <div className="gap-3xl flex w-full flex-col items-start">
       <h1 className="text-text-primary font-pretendard text-2xl font-bold">마이페이지</h1>
 
-      <div className="flex w-full items-start gap-5">
+      <div className="gap-lg flex">
         <label
           className="relative h-16 w-16 shrink-0 cursor-pointer"
           onMouseEnter={() => setIsHovered(true)}
@@ -34,10 +35,19 @@ export function ProfileSummary() {
           />
         </label>
 
-        <div className="flex min-w-0 flex-1 flex-col items-start gap-1 pt-1">
-          <h2 className="text-text-primary font-pretendard text-lg font-bold">
-            {profile.nickname}
-          </h2>
+        <div className="gap-2xs flex min-w-0 flex-1 flex-col items-start">
+          <div className="gap-xs flex items-center">
+            <h2 className="text-text-primary font-pretendard text-lg font-bold">
+              {profile.nickname}
+            </h2>
+            <Badge
+              status="closed"
+              radius="xs"
+              className="bg-alpha-white-8 text-text-secondary px-xs py-2xs border-none text-[12px] font-semibold"
+            >
+              {profile.email}
+            </Badge>
+          </div>
           <p className="text-text-tertiary font-pretendard text-base font-normal">
             {profile.bio || "아직 한 줄 소개가 없습니다."}
           </p>

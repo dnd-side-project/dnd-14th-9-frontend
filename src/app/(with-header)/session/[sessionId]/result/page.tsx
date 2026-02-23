@@ -1,6 +1,7 @@
+import ActivitySummaryCard from "@/features/member/components/Profile/Report/ActivitySummaryCard";
+import ReceivedEmojiCard from "@/features/member/components/Profile/Report/ReceivedEmojiCard";
 import { SessionDetailSection } from "@/features/session/components/SessionDetailSection";
 import {
-  ActivitySummarySection,
   GoalAchievementSection,
   SessionResultHeader,
 } from "@/features/session/components/SessionResult";
@@ -16,18 +17,6 @@ const MOCK_SESSION_DETAIL = {
   durationMinutes: 120,
   sessionDate: new Date(),
   notice: "카메라는 선택사항입니다. 편하게 참여해주세요!",
-};
-
-const MOCK_ACTIVITY_SUMMARY = {
-  focusTimeMinutes: 105,
-  totalDurationMinutes: 120,
-  focusRate: 87,
-  emojis: {
-    heart: 12,
-    thumbsUp: 8,
-    star: 5,
-    thumbsDown: 3,
-  },
 };
 
 const MOCK_GOAL_ACHIEVEMENT = {
@@ -52,7 +41,14 @@ export default function SessionResultPage() {
       <SessionDetailSection {...MOCK_SESSION_DETAIL} />
 
       {/* 섹션 3: 나의 활동 요약 */}
-      <ActivitySummarySection {...MOCK_ACTIVITY_SUMMARY} />
+      <section className="gap-lg flex">
+        <div className="flex-1">
+          <ActivitySummaryCard />
+        </div>
+        <div className="flex-1">
+          <ReceivedEmojiCard />
+        </div>
+      </section>
 
       {/* 섹션 4: 목표 달성 */}
       <GoalAchievementSection {...MOCK_GOAL_ACHIEVEMENT} />

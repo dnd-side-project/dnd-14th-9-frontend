@@ -45,3 +45,22 @@ export function formatSessionDuration(minutes: number): string {
   if (hours > 0) return `${hours}시간`;
   return `${mins}분`;
 }
+
+export function formatHHMMSS(seconds: number): string {
+  const h = Math.floor(seconds / SECONDS_IN_HOUR);
+  const m = Math.floor((seconds % SECONDS_IN_HOUR) / 60);
+  const s = seconds % 60;
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
+
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
+export function formatSessionStartDateTime(dateString: string): string {
+  const date = new Date(dateString);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${month}/${day} · ${hours}:${minutes}`;
+}
