@@ -289,7 +289,7 @@ export interface InProgressEventData {
 // ============================================
 
 // 세션 상태 (SSE에서 사용)
-export type SessionStatusType = "WAITING" | "IN-PROGRESS" | "COMPLETED";
+export type SessionStatusType = "WAITING" | "IN_PROGRESS" | "COMPLETED";
 
 // 세션 상태 SSE 이벤트 데이터
 export interface SessionStatusEventData {

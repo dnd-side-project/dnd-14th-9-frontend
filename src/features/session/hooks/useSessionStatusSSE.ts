@@ -84,6 +84,7 @@ export function useSessionStatusSSE({
 
     // 이벤트 리스너 등록
     const unsubscribeEvent = client.on<SessionStatusEventData>(SSE_EVENT_NAME, (eventData) => {
+      console.warn("[SSE] session-status-updated 이벤트 수신:", eventData);
       setData(eventData);
       setError(null);
       onStatusChangeRef.current?.(eventData);

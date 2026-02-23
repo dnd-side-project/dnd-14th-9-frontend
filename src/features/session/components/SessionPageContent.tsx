@@ -23,13 +23,15 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const { data: inProgressData } = useInProgressData({ sessionId });
   const { data: meData } = useMe();
 
-  // 세션 상태 SSE - 세션 종료 시 리포트 페이지로 이동
+  // 세션 상태 SSE - 진행 중 상태가 아니면 적절한 페이지로 이동
   useSessionStatusSSE({
     sessionId,
     enabled: true,
     onStatusChange: (eventData) => {
       if (eventData.status === "COMPLETED") {
-        router.push(`/sessions/${sessionId}/report`);
+        router.replace(`/session/${sessionId}/result`);
+      } else if (eventData.status === "WAITING") {
+        router.replace(`/session/${sessionId}/waiting`);
       }
     },
   });
@@ -51,6 +53,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   }
 
   const session = sessionData.result;
+
   const myMemberId = meData?.result?.id;
   const myMember = inProgressData?.members.find((m) => m.memberId === myMemberId);
 

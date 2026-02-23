@@ -29,13 +29,15 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   // 실시간 업데이트: SSE로 수신
   const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
 
-  // 세션 상태 SSE - 세션 시작 시 세션 페이지로 이동
+  // 세션 상태 SSE - 대기 상태가 아니면 적절한 페이지로 이동
   useSessionStatusSSE({
     sessionId,
     enabled: true,
     onStatusChange: (eventData) => {
-      if (eventData.status === "IN-PROGRESS") {
-        router.push(`/sessions/${sessionId}`);
+      if (eventData.status === "IN_PROGRESS") {
+        router.replace(`/session/${sessionId}`);
+      } else if (eventData.status === "COMPLETED") {
+        router.replace(`/session/${sessionId}/result`);
       }
     },
   });
@@ -57,6 +59,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   }
 
   const session = data.result;
+
   const myMemberId = meData?.result?.id;
   // SSE 데이터가 있으면 우선, 없으면 초기 REST API 데이터 사용
   const members: WaitingMember[] = (sseWaitingData?.members ??
