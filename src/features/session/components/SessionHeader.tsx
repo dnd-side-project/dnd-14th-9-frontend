@@ -9,6 +9,7 @@ import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
 import { useLeaveSession } from "../hooks/useSessionHooks";
+import { clearTimerState } from "../hooks/useSessionTimer";
 
 interface SessionHeaderProps {
   sessionId: string;
@@ -33,6 +34,8 @@ export function SessionHeader({
     isLeavingRef.current = true;
     try {
       await leaveSessionMutation.mutateAsync({ sessionRoomId: sessionId });
+      // 타이머 상태 초기화
+      clearTimerState(sessionId);
       onCloseDialog();
       // 하드 네비게이션으로 캐시 클리어 및 SSE 연결 정리
       navigateWithHardReload("/");

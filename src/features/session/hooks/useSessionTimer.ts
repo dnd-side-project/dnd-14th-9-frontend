@@ -56,6 +56,14 @@ function saveTimerState(sessionId: string, state: TimerState) {
   }
 }
 
+export function clearTimerState(sessionId: string) {
+  try {
+    localStorage.removeItem(getStorageKey(sessionId));
+  } catch {
+    // localStorage unavailable
+  }
+}
+
 function formatTime(totalSeconds: number): string {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);

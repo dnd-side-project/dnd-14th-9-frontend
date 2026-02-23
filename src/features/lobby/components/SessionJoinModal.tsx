@@ -2,8 +2,6 @@
 
 import { useCallback, useRef, useState } from "react";
 
-import { useRouter } from "next/navigation";
-
 import { Button } from "@/components/Button/Button";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
@@ -18,12 +16,17 @@ const MAX_TODOS = 5;
 
 interface SessionJoinModalProps {
   sessionId: string;
+  sessionStatus?: string;
   onClose: () => void;
   onJoinSuccess?: () => void;
 }
 
-export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJoinModalProps) {
-  const router = useRouter();
+export function SessionJoinModal({
+  sessionId,
+  sessionStatus,
+  onClose,
+  onJoinSuccess,
+}: SessionJoinModalProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [goal, setGoal] = useState("");
   const [todos, setTodos] = useState<ReportTodoItem[]>([
@@ -83,10 +86,18 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
         body: { goal: goal.trim(), todos: validTodos },
       });
 
-      // 성공 시: 모달 닫고 대기방으로 이동
+      // 성공 시: 모달 닫고 세션 상태에 따라 이동
       onJoinSuccess?.();
       onClose();
-      router.push(`/session/${sessionId}/waiting`);
+
+      const isInProgress = sessionStatus?.includes("진행") || sessionStatus === "IN_PROGRESS";
+      if (isInProgress) {
+        // 진행 중인 세션이면 바로 세션 페이지로 이동
+        window.location.replace(`/session/${sessionId}`);
+      } else {
+        // 대기 중인 세션이면 대기방으로 이동
+        window.location.replace(`/session/${sessionId}/waiting`);
+      }
     } catch (error) {
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
       setServerError(message);
