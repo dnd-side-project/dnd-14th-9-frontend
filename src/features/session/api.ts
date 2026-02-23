@@ -70,4 +70,13 @@ export const sessionApi = {
   leave: async (sessionId: string): Promise<ApiSuccessResponse<null>> => {
     return api.delete<ApiSuccessResponse<null>>(`/api/sessions/${sessionId}/leave`);
   },
+
+  kickMembers: async (
+    sessionId: string,
+    memberIds: number[]
+  ): Promise<ApiSuccessResponse<null>> => {
+    return api.delete<ApiSuccessResponse<null>>(`/api/sessions/${sessionId}/members`, {
+      memberIds,
+    });
+  },
 };

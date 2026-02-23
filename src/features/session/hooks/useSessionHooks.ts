@@ -130,6 +130,20 @@ export function useLeaveSession() {
   });
 }
 
+export function useKickMembers() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ApiSuccessResponse<null>,
+    ApiError,
+    { sessionId: string; memberIds: number[] }
+  >({
+    mutationFn: ({ sessionId, memberIds }) => sessionApi.kickMembers(sessionId, memberIds),
+    onSuccess: (_, { sessionId }) => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.waitingRoom(sessionId) });
+    },
+  });
+}
+
 // ============================================
 // In-Progress (REST + SSE)
 // ============================================
