@@ -1,8 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 
 import { useInProgressData, useSessionDetail } from "../hooks/useSessionHooks";
+import { useSessionStatusSSE } from "../hooks/useSessionStatusSSE";
 
 import { SessionDetailSection } from "./SessionDetailSection";
 import { SessionGoalAndTodoCard } from "./SessionGoalAndTodoCard";
@@ -15,9 +18,21 @@ interface SessionPageContentProps {
 }
 
 export function SessionPageContent({ sessionId }: SessionPageContentProps) {
+  const router = useRouter();
   const { data: sessionData, isLoading, error } = useSessionDetail(sessionId);
   const { data: inProgressData } = useInProgressData({ sessionId });
   const { data: meData } = useMe();
+
+  // 세션 상태 SSE - 세션 종료 시 리포트 페이지로 이동
+  useSessionStatusSSE({
+    sessionId,
+    enabled: true,
+    onStatusChange: (eventData) => {
+      if (eventData.status === "COMPLETED") {
+        router.push(`/sessions/${sessionId}/report`);
+      }
+    },
+  });
 
   if (isLoading) {
     return (

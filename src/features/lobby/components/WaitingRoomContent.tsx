@@ -1,7 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useSessionDetail, useWaitingRoom } from "@/features/session/hooks/useSessionHooks";
+import { useSessionStatusSSE } from "@/features/session/hooks/useSessionStatusSSE";
 
 import { useWaitingMembersSSE } from "../hooks/useWaitingMembersSSE";
 
@@ -18,12 +21,24 @@ interface WaitingRoomContentProps {
 }
 
 export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
+  const router = useRouter();
   const { data, isLoading, error } = useSessionDetail(sessionId);
   const { data: meData } = useMe();
   // 초기 데이터: REST API로 조회
   const { data: initialWaitingData } = useWaitingRoom(sessionId);
   // 실시간 업데이트: SSE로 수신
   const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
+
+  // 세션 상태 SSE - 세션 시작 시 세션 페이지로 이동
+  useSessionStatusSSE({
+    sessionId,
+    enabled: true,
+    onStatusChange: (eventData) => {
+      if (eventData.status === "IN-PROGRESS") {
+        router.push(`/sessions/${sessionId}`);
+      }
+    },
+  });
 
   if (isLoading) {
     return (

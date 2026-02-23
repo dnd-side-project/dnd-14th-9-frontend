@@ -285,6 +285,18 @@ export interface InProgressEventData {
 }
 
 // ============================================
+// 세션 상태 SSE 관련 타입
+// ============================================
+
+// 세션 상태 (SSE에서 사용)
+export type SessionStatusType = "WAITING" | "IN-PROGRESS" | "COMPLETED";
+
+// 세션 상태 SSE 이벤트 데이터
+export interface SessionStatusEventData {
+  status: SessionStatusType;
+}
+
+// ============================================
 // 세션 리포트 조회 API 관련 타입
 // ============================================
 
