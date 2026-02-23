@@ -246,6 +246,45 @@ export interface WaitingRoomResponse {
 }
 
 // ============================================
+// 세션 진행 중(in-progress) API 관련 타입
+// ============================================
+
+// in-progress Todo 아이템
+export interface InProgressTodoItem {
+  subtaskId: number;
+  content: string;
+  isCompleted: boolean;
+}
+
+// in-progress 참여자의 Task 정보
+export interface InProgressTask {
+  taskId: number;
+  goal: string;
+  todos: InProgressTodoItem[];
+}
+
+// in-progress 참여자 상태
+export type InProgressMemberStatus = "FOCUS" | "REST";
+
+// in-progress 참여자 정보
+export interface InProgressMember {
+  memberId: number;
+  nickname: string;
+  profileImageUrl?: string;
+  role: SessionRole;
+  achievementRate: number;
+  status: InProgressMemberStatus;
+  task: InProgressTask | null;
+}
+
+// in-progress 응답 (REST + SSE 동일 구조)
+export interface InProgressEventData {
+  participantCount: number;
+  averageAchievementRate: number;
+  members: InProgressMember[];
+}
+
+// ============================================
 // 세션 리포트 조회 API 관련 타입
 // ============================================
 

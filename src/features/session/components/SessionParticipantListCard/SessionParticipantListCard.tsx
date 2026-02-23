@@ -7,111 +7,28 @@ import { ChatIcon } from "@/components/Icon/ChatIcon";
 import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
 import { HostBadgeIcon } from "@/components/Icon/HostBadgeIcon";
-import type { ReportTodoItem } from "@/features/session/types";
 
 import { ChatPopup } from "./ChatPopup";
 
-interface MockParticipant {
-  memberId: string;
-  nickname: string;
-  profileImageUrl?: string;
-  isHost: boolean;
-  goal: string;
-  isFocusing: boolean;
-  focusedSeconds: number;
-  todos: ReportTodoItem[];
-}
-
-const MOCK_PARTICIPANTS: MockParticipant[] = [
-  {
-    memberId: "1",
-    nickname: "장근호",
-    isHost: true,
-    goal: "React 심화 학습",
-    isFocusing: true,
-    focusedSeconds: 3720, // 1:02:00
-    todos: [
-      { todoId: "1", content: "useEffect 정리", isCompleted: true },
-      { todoId: "2", content: "Server Component 학습", isCompleted: false },
-    ],
-  },
-  {
-    memberId: "2",
-    nickname: "김민수",
-    isHost: false,
-    goal: "TypeScript 마스터",
-    isFocusing: true,
-    focusedSeconds: 2700, // 45:00
-    todos: [
-      { todoId: "3", content: "제네릭 타입 학습", isCompleted: true },
-      { todoId: "4", content: "유틸리티 타입 정리", isCompleted: false },
-    ],
-  },
-  {
-    memberId: "3",
-    nickname: "이서연",
-    isHost: false,
-    goal: "Next.js 앱 라우터 학습",
-    isFocusing: false,
-    focusedSeconds: 5400, // 1:30:00
-    todos: [
-      { todoId: "5", content: "라우팅 구조 파악", isCompleted: true },
-      { todoId: "6", content: "서버 액션 구현", isCompleted: true },
-    ],
-  },
-  {
-    memberId: "4",
-    nickname: "박지훈",
-    isHost: false,
-    goal: "CSS 애니메이션 연습",
-    isFocusing: true,
-    focusedSeconds: 1800, // 30:00
-    todos: [{ todoId: "7", content: "keyframe 애니메이션", isCompleted: false }],
-  },
-  {
-    memberId: "5",
-    nickname: "최유진",
-    isHost: false,
-    goal: "테스트 코드 작성",
-    isFocusing: false,
-    focusedSeconds: 4200, // 1:10:00
-    todos: [
-      { todoId: "8", content: "Jest 기본 학습", isCompleted: true },
-      { todoId: "9", content: "React Testing Library", isCompleted: false },
-    ],
-  },
-  {
-    memberId: "6",
-    nickname: "정하늘",
-    isHost: false,
-    goal: "상태관리 라이브러리 비교",
-    isFocusing: true,
-    focusedSeconds: 3000, // 50:00
-    todos: [{ todoId: "10", content: "Zustand vs Jotai 비교", isCompleted: false }],
-  },
-];
-
-// 초를 MM:SS 또는 H:MM:SS 포맷으로 변환
-function formatTime(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-
-  if (h > 0) {
-    return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-  }
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
+import type { InProgressMember } from "../../types";
 
 interface SessionParticipantListCardProps {
+  members?: InProgressMember[];
+  participantCount?: number;
+  averageAchievementRate?: number;
   className?: string;
 }
 
-export function SessionParticipantListCard({ className }: SessionParticipantListCardProps) {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+export function SessionParticipantListCard({
+  members = [],
+  participantCount = 0,
+  averageAchievementRate = 0,
+  className,
+}: SessionParticipantListCardProps) {
+  const [expandedId, setExpandedId] = useState<number | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const handleToggle = (memberId: string) => {
+  const handleToggle = (memberId: number) => {
     setExpandedId((prev) => (prev === memberId ? null : memberId));
   };
 
@@ -146,37 +63,28 @@ export function SessionParticipantListCard({ className }: SessionParticipantList
         </div>
 
         {/* 참여자 수 + 평균 목표 달성률 */}
-        {(() => {
-          // 평균 목표 달성률 계산 (todo check 기반)
-          const totalTodos = MOCK_PARTICIPANTS.reduce((acc, p) => acc + p.todos.length, 0);
-          const completedTodos = MOCK_PARTICIPANTS.reduce(
-            (acc, p) => acc + p.todos.filter((t) => t.isCompleted).length,
-            0
-          );
-          const avgAchievementRate =
-            totalTodos > 0 ? Math.round((completedTodos / totalTodos) * 100) : 0;
-
-          return (
-            <div className="flex items-center justify-between">
-              <span className="text-text-disabled text-[14px] font-semibold">
-                총 {MOCK_PARTICIPANTS.length}명
-              </span>
-              <span className="text-text-secondary text-[14px]">
-                평균 목표 달성률{" "}
-                <span className="font-semibold text-green-600">{avgAchievementRate}%</span>
-              </span>
-            </div>
-          );
-        })()}
+        <div className="flex items-center justify-between">
+          <span className="text-text-disabled text-[14px] font-semibold">
+            총 {participantCount}명
+          </span>
+          <span className="text-text-secondary text-[14px]">
+            평균 목표 달성률{" "}
+            <span className="font-semibold text-green-600">{averageAchievementRate}%</span>
+          </span>
+        </div>
 
         {/* 참여자 목록 */}
         <ul className="scrollbar-hide flex flex-1 flex-col gap-2 overflow-y-auto">
-          {MOCK_PARTICIPANTS.map((participant) => {
-            const isExpanded = expandedId === participant.memberId;
-            const completedCount = participant.todos.filter((t) => t.isCompleted).length;
+          {members.map((member) => {
+            const isExpanded = expandedId === member.memberId;
+            const todos = member.task?.todos ?? [];
+            const completedCount = todos.filter((t) => t.isCompleted).length;
+            const isFocusing = member.status === "FOCUS";
+            const isHost = member.role === "HOST";
+
             return (
               <li
-                key={participant.memberId}
+                key={member.memberId}
                 className="bg-surface-strong border-border-subtle rounded-sm border"
               >
                 <div className="p-sm flex items-start gap-3">
@@ -184,11 +92,11 @@ export function SessionParticipantListCard({ className }: SessionParticipantList
                   <div className="relative shrink-0">
                     <Avatar
                       size="xlarge"
-                      type={participant.profileImageUrl ? "image" : "empty"}
-                      src={participant.profileImageUrl}
-                      alt={participant.nickname}
+                      type={member.profileImageUrl ? "image" : "empty"}
+                      src={member.profileImageUrl}
+                      alt={member.nickname}
                     />
-                    {participant.isHost && (
+                    {isHost && (
                       <span className="absolute -right-0.5 -bottom-0.5">
                         <HostBadgeIcon />
                       </span>
@@ -198,47 +106,29 @@ export function SessionParticipantListCard({ className }: SessionParticipantList
                   {/* 정보 */}
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <span className="text-[16px] font-semibold text-gray-50">
-                      {participant.nickname}
+                      {member.nickname}
                     </span>
                     <span className="truncate text-[12px] font-bold text-gray-500">
-                      {participant.goal}
+                      {member.task?.goal}
                     </span>
                     <div className="mt-md flex items-center gap-2">
                       {/* 현재 상태 (집중 중 / 자리 비움) */}
                       <span
                         className={`flex items-center gap-1 text-[12px] ${
-                          participant.isFocusing
-                            ? "text-text-status-positive-default"
-                            : "text-text-tertiary"
+                          isFocusing ? "text-text-status-positive-default" : "text-text-tertiary"
                         }`}
                       >
                         <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
                           <circle cx="3" cy="3" r="3" />
                         </svg>
-                        {participant.isFocusing ? "집중 중" : "자리 비움"}
+                        {isFocusing ? "집중 중" : "자리 비움"}
                       </span>
-
-                      {/* 시간 (집중 중이면 배경색 있는 div로 감싸기) */}
-                      {participant.isFocusing ? (
-                        <span className="text-text-status-positive-default rounded-xs bg-cyan-500/10 px-1.5 py-0.5 text-[12px]">
-                          {formatTime(participant.focusedSeconds)}
-                        </span>
-                      ) : (
-                        <span className="text-text-tertiary text-[12px]">
-                          {formatTime(participant.focusedSeconds)}
-                        </span>
-                      )}
 
                       {/* 목표 달성률 */}
                       <span className="text-text-disabled text-[12px]">|</span>
                       <span className="text-text-secondary text-[12px]">달성률</span>
                       <span className="px-xs py-2xs text-text-secondary rounded-xs bg-white/8 text-[12px]">
-                        {Math.round(
-                          (participant.todos.filter((t) => t.isCompleted).length /
-                            participant.todos.length) *
-                            100
-                        ) || 0}
-                        %
+                        {member.achievementRate}%
                       </span>
                     </div>
                   </div>
@@ -247,7 +137,7 @@ export function SessionParticipantListCard({ className }: SessionParticipantList
                   <button
                     type="button"
                     className="shrink-0 cursor-pointer p-1"
-                    onClick={() => handleToggle(participant.memberId)}
+                    onClick={() => handleToggle(member.memberId)}
                     aria-label={isExpanded ? "할 일 접기" : "할 일 펼치기"}
                   >
                     <ChevronDownIcon
@@ -258,17 +148,17 @@ export function SessionParticipantListCard({ className }: SessionParticipantList
                 </div>
 
                 {/* 펼침 영역: Todo 목록 (체크 표시 포함) */}
-                {isExpanded && participant.todos.length > 0 && (
+                {isExpanded && todos.length > 0 && (
                   <div className="border-border-subtle mx-sm mb-sm gap-sm flex flex-col border-t pt-2">
                     <span className="text-text-secondary text-[13px] font-semibold">
                       To do list{" "}
                       <span className="text-green-600">
-                        {completedCount}/{participant.todos.length}
+                        {completedCount}/{todos.length}
                       </span>
                     </span>
                     <ul className="gap-xs flex flex-col">
-                      {participant.todos.map((todo) => (
-                        <li key={todo.todoId} className="flex items-center gap-2">
+                      {todos.map((todo) => (
+                        <li key={todo.subtaskId} className="flex items-center gap-2">
                           {/* 완료 상태 체크 표시 */}
                           <span
                             className={`flex size-5 shrink-0 items-center justify-center rounded-xs border ${

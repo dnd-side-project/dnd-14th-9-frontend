@@ -5,13 +5,13 @@ import type { ApiSuccessResponse } from "@/types/shared/types";
 import type {
   CreateSessionRequest,
   CreateSessionResponse,
+  InProgressEventData,
   JoinSessionRequest,
   JoinSessionResponse,
   SessionDetailResponse,
   SessionListParams,
   SessionListResponse,
   SessionReportResponse,
-  ToggleTodoResponse,
   WaitingRoomResponse,
 } from "./types";
 
@@ -51,13 +51,14 @@ export const sessionApi = {
     );
   },
 
-  toggleTodo: async (
-    sessionRoomId: string,
-    todoId: string
-  ): Promise<ApiSuccessResponse<ToggleTodoResponse>> => {
-    return api.post<ApiSuccessResponse<ToggleTodoResponse>>(
-      `/api/sessions/${sessionRoomId}/todos/${todoId}/toggle`
+  getInProgress: async (sessionId: string): Promise<ApiSuccessResponse<InProgressEventData>> => {
+    return api.get<ApiSuccessResponse<InProgressEventData>>(
+      `/api/sessions/${sessionId}/in-progress`
     );
+  },
+
+  toggleSubtaskCompletion: async (subtaskId: number): Promise<ApiSuccessResponse<null>> => {
+    return api.post<ApiSuccessResponse<null>>(`/api/subtasks/${subtaskId}/completion`);
   },
 
   getWaitingRoom: async (sessionId: string): Promise<ApiSuccessResponse<WaitingRoomResponse>> => {
