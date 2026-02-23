@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +19,12 @@ const ProfilePopup = dynamic(() => loadProfilePopup().then((mod) => mod.ProfileP
 
 export function ProfileDropdown() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const {
     isOpen,
     dialogId,
@@ -78,9 +86,9 @@ export function ProfileDropdown() {
         className="focus-visible:ring-primary flex cursor-pointer rounded-full transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:outline-none"
       >
         <Avatar
-          type={profile?.profileImageUrl ? "image" : "empty"}
-          src={profile?.profileImageUrl ?? undefined}
-          alt={profile?.nickname ?? "프로필"}
+          type={mounted && profile?.profileImageUrl ? "image" : "empty"}
+          src={mounted ? (profile?.profileImageUrl ?? undefined) : undefined}
+          alt={mounted ? (profile?.nickname ?? "프로필") : "프로필"}
           size="medium"
           className="h-8 w-8"
         />

@@ -2,21 +2,19 @@
 
 import { useCallback, useRef, useState } from "react";
 
-import { useRouter } from "next/navigation";
-
 import { Button } from "@/components/Button/Button";
 import { ChevronLeftIcon } from "@/components/Icon/ChevronLeftIcon";
 import { Portal } from "@/components/Portal/Portal";
 import { useLeaveSession } from "@/features/session/hooks/useSessionHooks";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
 interface LobbyHeaderProps {
   sessionId: string;
 }
 
 export function LobbyHeader({ sessionId }: LobbyHeaderProps) {
-  const router = useRouter();
   const [showDialog, setShowDialog] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const leaveSessionMutation = useLeaveSession();
@@ -26,7 +24,8 @@ export function LobbyHeader({ sessionId }: LobbyHeaderProps) {
     try {
       await leaveSessionMutation.mutateAsync({ sessionRoomId: sessionId });
       setShowDialog(false);
-      router.push("/");
+      // 하드 네비게이션으로 캐시 클리어 및 SSE 연결 정리
+      navigateWithHardReload("/");
     } catch (error) {
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
       setServerError(message);

@@ -10,11 +10,15 @@ import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tansta
 
 import { createCrudHooks } from "@/hooks/createCrudHooks";
 import { ApiError } from "@/lib/api/api-client";
+import type { SSEConnectionStatus, SSEError } from "@/lib/sse/types";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
 import { sessionApi } from "../api";
 
+import { useInProgressMembersSSE } from "./useInProgressMembersSSE";
+
 import type {
+  InProgressEventData,
   SessionListParams,
   SessionListResponse,
   SessionDetailResponse,
@@ -23,7 +27,6 @@ import type {
   CreateSessionResponse,
   JoinSessionRequest,
   JoinSessionResponse,
-  ToggleTodoResponse,
   WaitingRoomResponse,
 } from "../types";
 
@@ -45,6 +48,7 @@ export const sessionKeys = {
   ...sessionCrud.keys,
   report: (id: string) => ["session", "report", id] as const,
   waitingRoom: (id: string) => ["session", "waitingRoom", id] as const,
+  inProgress: (id: string) => ["session", "inProgress", id] as const,
 };
 
 export const useSessionList = sessionCrud.useList;
@@ -114,17 +118,95 @@ export const useJoinSession = createSessionMutationHook<
   { sessionRoomId: string; body: JoinSessionRequest }
 >(({ sessionRoomId, body }) => sessionApi.join(sessionRoomId, body));
 
-export const useToggleTodo = createSessionMutationHook<
-  ApiSuccessResponse<ToggleTodoResponse>,
-  { sessionRoomId: string; todoId: string }
->(({ sessionRoomId, todoId }) => sessionApi.toggleTodo(sessionRoomId, todoId));
-
 export function useLeaveSession() {
   const queryClient = useQueryClient();
   return useMutation<ApiSuccessResponse<null>, ApiError, { sessionRoomId: string }>({
     mutationFn: ({ sessionRoomId }) => sessionApi.leave(sessionRoomId),
-    onSuccess: () => {
+    onSuccess: (_, { sessionRoomId }) => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.inProgress(sessionRoomId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.waitingRoom(sessionRoomId) });
     },
+  });
+}
+
+// ============================================
+// In-Progress (REST + SSE)
+// ============================================
+
+interface UseInProgressOptions {
+  sessionId: string;
+  enabled?: boolean;
+}
+
+export function useInProgress({ sessionId, enabled = true }: UseInProgressOptions) {
+  return useQuery<ApiSuccessResponse<InProgressEventData>>({
+    queryKey: sessionKeys.inProgress(sessionId),
+    queryFn: () => sessionApi.getInProgress(sessionId),
+    enabled: enabled && !!sessionId,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+  });
+}
+
+interface UseInProgressDataOptions {
+  sessionId: string;
+  enabled?: boolean;
+  onSSEError?: (error: SSEError) => void;
+}
+
+interface UseInProgressDataReturn {
+  data: InProgressEventData | null;
+  isLoading: boolean;
+  sseStatus: SSEConnectionStatus;
+  sseError: SSEError | null;
+  reconnect: () => void;
+  disconnect: () => void;
+}
+
+/**
+ * 세션 진행 중 참여자 데이터 통합 훅
+ *
+ * 초기 진입 시 HTTP API로 데이터를 가져오고,
+ * 이후에는 SSE로 실시간 업데이트를 받습니다.
+ */
+export function useInProgressData({
+  sessionId,
+  enabled = true,
+  onSSEError,
+}: UseInProgressDataOptions): UseInProgressDataReturn {
+  const { data: initialData, isLoading } = useInProgress({ sessionId, enabled });
+
+  const {
+    data: sseData,
+    status: sseStatus,
+    error: sseError,
+    reconnect,
+    disconnect,
+  } = useInProgressMembersSSE({
+    sessionId,
+    enabled,
+    onError: onSSEError,
+  });
+
+  // SSE 데이터 우선, 없으면 초기 HTTP 응답 사용
+  const data = sseData ?? initialData?.result ?? null;
+
+  // HTTP 로딩 중이면서 SSE 데이터도 아직 없는 경우에만 로딩 표시
+  const isInitialLoading = isLoading && !sseData;
+
+  return {
+    data,
+    isLoading: isInitialLoading,
+    sseStatus,
+    sseError,
+    reconnect,
+    disconnect,
+  };
+}
+
+export function useToggleSubtaskCompletion() {
+  return useMutation<ApiSuccessResponse<null>, ApiError, { subtaskId: number }>({
+    mutationFn: ({ subtaskId }) => sessionApi.toggleSubtaskCompletion(subtaskId),
   });
 }
