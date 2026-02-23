@@ -41,7 +41,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
 
   return (
     <div className="p-3xl flex flex-col">
-      <SessionHeader />
+      <SessionHeader sessionId={sessionId} />
       <SessionDetailSection
         className="mt-xl"
         thumbnailUrl={session.imageUrl}
