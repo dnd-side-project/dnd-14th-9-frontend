@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -17,13 +17,14 @@ const ProfilePopup = dynamic(() => loadProfilePopup().then((mod) => mod.ProfileP
   ssr: false,
 });
 
+// 클라이언트 마운트 상태를 외부 시스템으로 취급
+const subscribe = () => () => {};
+const getSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export function ProfileDropdown() {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const {
     isOpen,

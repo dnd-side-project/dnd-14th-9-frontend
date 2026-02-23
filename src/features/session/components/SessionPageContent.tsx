@@ -110,8 +110,6 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const myMemberId = meData?.result?.id;
   const myMember = inProgressData?.members.find((m) => m.memberId === myMemberId);
 
-  console.warn("[SessionPageContent] 정상 렌더링");
-
   return (
     <div className="p-3xl flex flex-col">
       <SessionHeader
