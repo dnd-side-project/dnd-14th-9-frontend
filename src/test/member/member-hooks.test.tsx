@@ -20,7 +20,7 @@ jest.mock("@/features/member/api", () => ({
   memberApi: {
     getMe: jest.fn(),
     getMeForEdit: jest.fn(),
-    getMyReport: jest.fn(),
+    getMyReportStats: jest.fn(),
     deleteMe: jest.fn(),
     updateProfileImage: jest.fn(),
     updateNickname: jest.fn(),
