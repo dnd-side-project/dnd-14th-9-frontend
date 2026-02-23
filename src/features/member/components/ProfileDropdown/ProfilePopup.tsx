@@ -88,7 +88,7 @@ export function ProfilePopup({
   return (
     <div
       className={cn(
-        "bg-background-subtle flex h-[603px] w-[386px] flex-col items-center overflow-hidden rounded-xl shadow-md",
+        "px-lg py-md gap-sm border-border-default bg-surface-default flex flex-col rounded-lg border",
         className
       )}
     >
