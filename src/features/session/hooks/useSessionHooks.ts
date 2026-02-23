@@ -28,6 +28,8 @@ import type {
   JoinSessionRequest,
   JoinSessionResponse,
   WaitingRoomResponse,
+  SubmitSessionResultRequest,
+  SubmitSessionResultResponse,
 } from "../types";
 
 const sessionCrud = createCrudHooks<
@@ -222,5 +224,20 @@ export function useInProgressData({
 export function useToggleSubtaskCompletion() {
   return useMutation<ApiSuccessResponse<null>, ApiError, { subtaskId: number }>({
     mutationFn: ({ subtaskId }) => sessionApi.toggleSubtaskCompletion(subtaskId),
+  });
+}
+
+/**
+ * 세션 결과 제출 mutation 훅
+ *
+ * 세션 완료 시 집중 시간과 참여 시간을 서버로 전송합니다.
+ */
+export function useSubmitSessionResult() {
+  return useMutation<
+    ApiSuccessResponse<SubmitSessionResultResponse>,
+    ApiError,
+    { sessionId: string; body: SubmitSessionResultRequest }
+  >({
+    mutationFn: ({ sessionId, body }) => sessionApi.submitResult(sessionId, body),
   });
 }

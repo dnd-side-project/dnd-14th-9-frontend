@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 
-import { useInProgressData, useSessionDetail } from "../hooks/useSessionHooks";
+import {
+  useInProgressData,
+  useSessionDetail,
+  useSubmitSessionResult,
+} from "../hooks/useSessionHooks";
 import { useSessionStatusSSE } from "../hooks/useSessionStatusSSE";
+import { clearTimerState, getTimerState } from "../hooks/useSessionTimer";
 
 import { SessionDetailSection } from "./SessionDetailSection";
 import { SessionGoalAndTodoCard } from "./SessionGoalAndTodoCard";
@@ -24,6 +29,32 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const { data: sessionData, isLoading, error } = useSessionDetail(sessionId);
   const { data: inProgressData } = useInProgressData({ sessionId });
   const { data: meData } = useMe();
+  const submitResultMutation = useSubmitSessionResult();
+
+  // 세션 완료 시 결과 제출 및 페이지 이동
+  const handleSessionComplete = useCallback(async () => {
+    const timerState = getTimerState(sessionId);
+
+    // 타이머 상태가 있으면 결과 전송
+    if (timerState) {
+      try {
+        await submitResultMutation.mutateAsync({
+          sessionId,
+          body: {
+            totalFocusSeconds: timerState.focusedSeconds,
+            overallSeconds: timerState.elapsedSeconds,
+          },
+        });
+      } catch {
+        // 결과 전송 실패해도 페이지 이동은 진행
+        console.error("[SessionPageContent] 결과 전송 실패");
+      }
+    }
+
+    // 타이머 상태 정리 후 이동
+    clearTimerState(sessionId);
+    window.location.replace(`/session/${sessionId}/result`);
+  }, [sessionId, submitResultMutation]);
 
   // 브라우저 뒤로 가기 감지
   useEffect(() => {
@@ -59,7 +90,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     enabled: true,
     onStatusChange: (eventData) => {
       if (eventData.status === "COMPLETED") {
-        window.location.replace(`/session/${sessionId}/result`);
+        handleSessionComplete();
       } else if (eventData.status === "WAITING") {
         window.location.replace(`/session/${sessionId}/waiting`);
       }

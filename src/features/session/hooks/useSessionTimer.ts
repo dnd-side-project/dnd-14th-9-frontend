@@ -64,6 +64,32 @@ export function clearTimerState(sessionId: string) {
   }
 }
 
+/**
+ * 세션 타이머 상태를 localStorage에서 읽어옵니다.
+ * 세션 완료 시 결과 전송을 위해 사용됩니다.
+ */
+export function getTimerState(
+  sessionId: string
+): { focusedSeconds: number; elapsedSeconds: number } | null {
+  const state = loadTimerState(sessionId);
+  if (!state) return null;
+
+  let savedElapsed = state.elapsedSeconds;
+  let savedFocused = state.focusedSeconds;
+
+  // 이전에 running 상태였으면 경과 시간 추가
+  if (state.isRunning && state.lastSavedAt > 0) {
+    const gap = Math.floor((Date.now() - state.lastSavedAt) / 1000);
+    const addedTime = Math.max(0, gap);
+    savedElapsed = savedElapsed + addedTime;
+    if (state.isFocusing) {
+      savedFocused = savedFocused + addedTime;
+    }
+  }
+
+  return { focusedSeconds: savedFocused, elapsedSeconds: savedElapsed };
+}
+
 function formatTime(totalSeconds: number): string {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);

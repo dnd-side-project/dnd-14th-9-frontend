@@ -328,3 +328,18 @@ export interface SessionReportResponse {
   todoAchievementRate: number; // todo 달성률 (0-100)
   participants: ReportParticipant[]; // 참여자 정보
 }
+
+// ============================================
+// 세션 결과 제출 API 관련 타입
+// ============================================
+
+// 세션 결과 제출 요청
+export interface SubmitSessionResultRequest {
+  totalFocusSeconds: number; // 총 집중 시간 (초)
+  overallSeconds: number; // 전체 참여 시간 (초)
+}
+
+// 세션 결과 제출 응답
+export interface SubmitSessionResultResponse {
+  sessionId: number;
+}

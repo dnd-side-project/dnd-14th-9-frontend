@@ -68,7 +68,7 @@ export function RecommendedGrid({
   return (
     <div className={gridClassName}>
       {sessions.map((session) => (
-        <Link key={session.sessionId} href={`/session/${session.sessionId}/preview`}>
+        <Link key={session.sessionId} href={`/session/${session.sessionId}`}>
           <Card
             thumbnailSrc={session.imageUrl}
             category={session.category}
