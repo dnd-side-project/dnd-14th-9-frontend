@@ -125,6 +125,7 @@ export function useLeaveSession() {
     onSuccess: (_, { sessionRoomId }) => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
       queryClient.invalidateQueries({ queryKey: sessionKeys.inProgress(sessionRoomId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.waitingRoom(sessionRoomId) });
     },
   });
 }
