@@ -65,22 +65,13 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
       window.history.go(1);
     };
 
-    // 페이지 이탈 시 브라우저 기본 확인 다이얼로그 표시 (다른 도메인으로 이동 시)
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (isLeavingRef.current) return;
-      event.preventDefault();
-      return "";
-    };
-
     window.addEventListener("popstate", handlePopState);
-    window.addEventListener("beforeunload", handleBeforeUnload);
 
     // 히스토리 엔트리 추가 (뒤로 가기 시 go(1)로 돌아올 수 있도록)
     window.history.pushState({ preventBack: true }, "", window.location.href);
 
     return () => {
       window.removeEventListener("popstate", handlePopState);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
 
