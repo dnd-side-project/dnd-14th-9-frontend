@@ -86,16 +86,21 @@ export interface SessionHistoryPagination {
   totalElements: number;
 }
 
-// Member Report (전체 응답)
-export interface MemberReport {
+// Report Stats (통계 정보)
+export interface MemberReportStats {
   activitySummary: ActivitySummaryData;
   categoryParticipation: CategoryParticipationItem[];
   receivedEmojis: ReceivedEmojiItem[];
   sessionPerformance: SessionPerformanceData;
-  sessionHistory: {
-    items: SessionHistoryItem[];
-    pagination: SessionHistoryPagination;
-  };
+}
+
+// Report Sessions (세션 히스토리)
+export interface MemberReportSessions {
+  sessions: SessionHistoryItem[];
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalElements: number;
 }
 
 // Request 타입
@@ -130,6 +135,7 @@ export type UpdateProfileImageResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateNicknameResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateMeResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateInterestCategoriesResponse = ApiSuccessResponse<MemberEditInfo>;
-export type GetMyReportResponse = ApiSuccessResponse<MemberReport>;
+export type GetMyReportStatsResponse = ApiSuccessResponse<MemberReportStats>;
+export type GetMyReportSessionsResponse = ApiSuccessResponse<MemberReportSessions>;
 export type DeleteMeResponse = ApiSuccessResponse<null>;
 export type DeleteProfileImageResponse = ApiSuccessResponse<null>;
