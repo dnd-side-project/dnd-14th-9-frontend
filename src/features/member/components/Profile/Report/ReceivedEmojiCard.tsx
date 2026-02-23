@@ -6,25 +6,7 @@ import { ThumbDownIcon } from "@/components/Icon/ThumbDownIcon";
 import { ThumbUpIcon } from "@/components/Icon/ThumbUpIcon";
 import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
-
-const MOCK_RECEIVED_EMOJI_STATS = [
-  {
-    emojiName: "HEART",
-    count: "12",
-  },
-  {
-    emojiName: "THUMBS_UP",
-    count: "8",
-  },
-  {
-    emojiName: "THUMBS_DOWN",
-    count: "5",
-  },
-  {
-    emojiName: "STAR",
-    count: "2",
-  },
-];
+import type { ReceivedEmojiItem } from "@/features/member/types";
 
 const EMOJI_META: Record<string, { label: string; topText: string; icon: ElementType | null }> = {
   HEART: { label: "하트", topText: "하트를 제일 많이 받았어요!", icon: HeartFillIcon },
@@ -33,9 +15,15 @@ const EMOJI_META: Record<string, { label: string; topText: string; icon: Element
   STAR: { label: "별", topText: "별을 제일 많이 받았어요!", icon: StarIcon },
 };
 
-export default function ReceivedEmojiCard() {
-  const topEmoji = MOCK_RECEIVED_EMOJI_STATS[0];
-  const restEmojis = MOCK_RECEIVED_EMOJI_STATS.slice(1);
+interface ReceivedEmojiCardProps {
+  data: ReceivedEmojiItem[];
+}
+
+export default function ReceivedEmojiCard({ data }: ReceivedEmojiCardProps) {
+  // Sort by count descending to get top emoji
+  const sortedEmojis = [...data].sort((a, b) => b.count - a.count);
+  const topEmoji = sortedEmojis[0];
+  const restEmojis = sortedEmojis.slice(1);
 
   const TopIcon = EMOJI_META[topEmoji.emojiName]?.icon;
 
@@ -43,7 +31,7 @@ export default function ReceivedEmojiCard() {
     <ReportCard>
       <SectionTitle>받은 이모지</SectionTitle>
       {/** 큰 이모지 카드 */}
-      {MOCK_RECEIVED_EMOJI_STATS.length > 0 && (
+      {data.length > 0 && (
         <div className="p-xl border-sm border-border-subtle flex gap-[16px] rounded-md border">
           <div className="px-xl py-2xl bg-surface-strong gap-lg flex flex-col items-center justify-center rounded-md">
             <p className="text-text-secondary px-lg py-xs flex items-center justify-center text-[16px] font-semibold">

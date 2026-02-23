@@ -5,50 +5,17 @@ import { useState } from "react";
 import { PaginationList } from "@/components/Pagination/PaginationList";
 import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
+import type { SessionHistoryItem, SessionHistoryPagination } from "@/features/member/types";
 
 import SessionHistoryCard from "./SessionHistoryCard";
 
-interface SessionHistory {
-  title: string;
-  category: string;
-  currentCount: number;
-  maxCapacity: number;
-  durationTime?: number;
-  durationMinutes?: number;
-  startTime: string;
-  focusedTime: number;
-  focusRate: number;
-  todoCompletionRate: number;
+interface SessionHistorySectionProps {
+  items: SessionHistoryItem[];
+  pagination: SessionHistoryPagination;
 }
 
-const MOCK_SESSIONS: SessionHistory[] = [
-  {
-    title: "React 스터디 세션",
-    category: "DEVELOPMENT",
-    currentCount: 6,
-    maxCapacity: 10,
-    durationTime: 3600,
-    startTime: "2026-02-20T14:00:00",
-    focusedTime: 2912,
-    focusRate: 20,
-    todoCompletionRate: 100,
-  },
-  {
-    title: "Java 스터디 세션",
-    category: "DEVELOPMENT",
-    currentCount: 6,
-    maxCapacity: 10,
-    durationMinutes: 60,
-    startTime: "2026-02-16T14:00:00",
-    focusedTime: 2912,
-    focusRate: 20,
-    todoCompletionRate: 100,
-  },
-];
-
-export default function SessionHistorySection() {
+export default function SessionHistorySection({ items, pagination }: SessionHistorySectionProps) {
   const [expandedIndexes, setExpandedIndexes] = useState<number[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const toggleExpand = (index: number) => {
     setExpandedIndexes((prev) =>
@@ -61,9 +28,9 @@ export default function SessionHistorySection() {
       <SectionTitle>지금까지 참여한 세션</SectionTitle>
 
       <div className="gap-lg flex flex-col">
-        {MOCK_SESSIONS.map((session, index) => (
+        {items.map((session, index) => (
           <SessionHistoryCard
-            key={index}
+            key={session.sessionId}
             session={session}
             isExpanded={expandedIndexes.includes(index)}
             onToggle={() => toggleExpand(index)}
@@ -72,7 +39,11 @@ export default function SessionHistorySection() {
       </div>
 
       <div className="py-3xl flex w-full justify-center">
-        <PaginationList totalPage={5} currentPage={currentPage} onPageChange={setCurrentPage} />
+        <PaginationList
+          totalPage={pagination.totalPages}
+          currentPage={pagination.currentPage}
+          onPageChange={() => {}}
+        />
       </div>
     </ReportCard>
   );

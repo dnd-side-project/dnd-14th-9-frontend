@@ -1,37 +1,19 @@
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
 import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
+import type { CategoryParticipationItem } from "@/features/member/types";
 import { CategoryFilter, getCategoryLabel } from "@/lib/constants/category";
 
-const MOCK_SESSION_PARTICIPATION_STATS = [
-  {
-    categoryName: "DESIGN",
-    count: 10,
-    rate: 50,
-  },
-  {
-    categoryName: "DEVELOPMENT",
-    count: 10,
-    rate: 50,
-  },
-  {
-    categoryName: "TEAM_PROJECT",
-    count: 0,
-    rate: 0,
-  },
-  {
-    categoryName: "FREE",
-    count: 0,
-    rate: 0,
-  },
-];
+interface CategoryParticipationCardProps {
+  data: CategoryParticipationItem[];
+}
 
-export default function CategoryParticipationCard() {
+export default function CategoryParticipationCard({ data }: CategoryParticipationCardProps) {
   return (
     <ReportCard>
       <SectionTitle>카테고리별 세션 참여율</SectionTitle>
       <div className="p-xl gap-md border-sm border-border-subtle flex flex-col rounded-md border">
-        {MOCK_SESSION_PARTICIPATION_STATS.map((stat, index) => (
+        {data.map((stat, index) => (
           <div key={stat.categoryName} className="flex flex-col gap-[8px]">
             <div className="flex justify-between">
               <p

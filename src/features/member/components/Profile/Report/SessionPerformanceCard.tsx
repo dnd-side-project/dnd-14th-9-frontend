@@ -1,11 +1,7 @@
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
 import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
-
-const MOCK_SUMMARY = {
-  todoCompletionRate: 50, // 투두 달성률
-  focusRate: 50, // 집중률
-};
+import type { SessionPerformanceData } from "@/features/member/types";
 
 const VARIANT_STYLES = {
   primary: {
@@ -42,7 +38,11 @@ function PerformanceMetricItem({ label, value, variant }: PerformanceMetricItemP
   );
 }
 
-export default function SessionPerformanceCard() {
+interface SessionPerformanceCardProps {
+  data: SessionPerformanceData;
+}
+
+export default function SessionPerformanceCard({ data }: SessionPerformanceCardProps) {
   return (
     <ReportCard>
       <SectionTitle>세션 성과</SectionTitle>
@@ -50,14 +50,10 @@ export default function SessionPerformanceCard() {
         <div className="gap-sm grid grid-cols-2">
           <PerformanceMetricItem
             label="투두 달성률"
-            value={MOCK_SUMMARY.todoCompletionRate}
+            value={data.todoCompletionRate}
             variant="primary"
           />
-          <PerformanceMetricItem
-            label="집중률"
-            value={MOCK_SUMMARY.focusRate}
-            variant="secondary"
-          />
+          <PerformanceMetricItem label="집중률" value={data.focusRate} variant="secondary" />
         </div>
       </div>
     </ReportCard>
