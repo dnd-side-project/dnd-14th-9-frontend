@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { useRouter } from "next/navigation";
-
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useSessionDetail, useWaitingRoom } from "@/features/session/hooks/useSessionHooks";
 import { useSessionStatusSSE } from "@/features/session/hooks/useSessionStatusSSE";
@@ -23,7 +21,6 @@ interface WaitingRoomContentProps {
 }
 
 export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
-  const router = useRouter();
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const isLeavingRef = useRef(false);
 
@@ -63,14 +60,15 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   }, []);
 
   // 세션 상태 SSE - 대기 상태가 아니면 적절한 페이지로 이동
+  // hard navigation을 사용하여 modal interceptor routing 우회
   useSessionStatusSSE({
     sessionId,
     enabled: true,
     onStatusChange: (eventData) => {
       if (eventData.status === "IN_PROGRESS") {
-        router.replace(`/session/${sessionId}`);
+        window.location.replace(`/session/${sessionId}`);
       } else if (eventData.status === "COMPLETED") {
-        router.replace(`/session/${sessionId}/result`);
+        window.location.replace(`/session/${sessionId}/result`);
       }
     },
   });

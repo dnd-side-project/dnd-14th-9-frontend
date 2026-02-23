@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { useRouter } from "next/navigation";
-
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 
 import { useInProgressData, useSessionDetail } from "../hooks/useSessionHooks";
@@ -20,9 +18,6 @@ interface SessionPageContentProps {
 }
 
 export function SessionPageContent({ sessionId }: SessionPageContentProps) {
-  console.warn("[SessionPageContent] 컴포넌트 렌더링, sessionId:", sessionId);
-
-  const router = useRouter();
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const isLeavingRef = useRef(false);
 
@@ -64,9 +59,9 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     enabled: true,
     onStatusChange: (eventData) => {
       if (eventData.status === "COMPLETED") {
-        router.replace(`/session/${sessionId}/result`);
+        window.location.replace(`/session/${sessionId}/result`);
       } else if (eventData.status === "WAITING") {
-        router.replace(`/session/${sessionId}/waiting`);
+        window.location.replace(`/session/${sessionId}/waiting`);
       }
     },
   });
