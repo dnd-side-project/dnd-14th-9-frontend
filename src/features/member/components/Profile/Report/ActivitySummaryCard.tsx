@@ -32,7 +32,7 @@ export default function ActivitySummaryCard() {
 
         <div className="bg-surface-strong px-lg py-md flex flex-col gap-[8px] rounded-sm">
           <div className="flex justify-between">
-            <p className="text-text-secondary text-[16px] font-semibold">집중도</p>
+            <p className="text-text-secondary text-[16px] font-semibold">평균 집중도</p>
             <p className="text-text-primary text-[16px] font-semibold">{MOCK_SUMMARY.focusRate}%</p>
           </div>
           <ProgressBar

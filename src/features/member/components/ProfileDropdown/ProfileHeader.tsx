@@ -5,6 +5,8 @@ import { Button } from "@/components/Button/Button";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { EditIcon } from "@/components/Icon/EditIcon";
 
+import { ButtonLink } from "../../../../components/Button/ButtonLink";
+
 interface ProfileHeaderProps {
   nickname: string;
   email: string | null;
@@ -25,13 +27,15 @@ export function ProfileHeader({ nickname, email, profileImageUrl, onClose }: Pro
       <div className="gap-3xs flex flex-col">
         <div className="gap-xs flex items-center">
           <p className="text-common-white text-lg font-semibold">{nickname}</p>
-          <Button
+          <ButtonLink
             colorScheme="tertiary"
             size="xsmall"
             leftIcon={<EditIcon className="h-[18px] w-[18px]" />}
+            href="/profile/settings"
+            onClick={onClose}
           >
             프로필 수정
-          </Button>
+          </ButtonLink>
         </div>
         <p className="text-alpha-white-48 font-regular text-[13px]">{email ?? ""}</p>
       </div>

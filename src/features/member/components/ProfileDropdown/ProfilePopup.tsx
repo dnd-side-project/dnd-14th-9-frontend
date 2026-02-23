@@ -1,10 +1,14 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+
+import { Badge } from "@/components/Badge/Badge";
 import { ButtonLink } from "@/components/Button/ButtonLink";
-import { FrameIcon } from "@/components/Icon/FrameIcon";
+import { BarGraphIcon } from "@/components/Icon/BarGraphIcon";
+import { EditContainedIcon } from "@/components/Icon/EditContainedIcon";
 import { LogoutIcon } from "@/components/Icon/LogoutIcon";
-import { NoteIcon } from "@/components/Icon/NoteIcon";
-import { ProfileCircleIcon } from "@/components/Icon/ProfileCircleIcon";
+import { getCategoryLabel } from "@/lib/constants/category";
+import type { Category } from "@/lib/constants/category";
 import { cn } from "@/lib/utils/utils";
 
 import { FocusStatusItem } from "./FocusStatusItem";
@@ -44,6 +48,9 @@ export function ProfilePopup({
     totalParticipationTime,
     completedTodoCount,
     totalTodoCount,
+    firstInterestCategory,
+    secondInterestCategory,
+    thirdInterestCategory,
   } = profile;
 
   const handleMenuItemClick = (callback?: () => void) => () => {
@@ -51,44 +58,19 @@ export function ProfilePopup({
     callback?.();
   };
 
-  const menuItems = [
-    {
-      key: "profile-settings",
-      kind: "link" as const,
-      icon: <ProfileCircleIcon className="h-[22px] w-[22px]" />,
-      label: "프로필 설정",
-      href: PROFILE_SETTINGS_PATH,
-      onClick: handleMenuItemClick(onProfileSettingsClick),
-    },
-    {
-      key: "report",
-      kind: "link" as const,
-      icon: <FrameIcon size="xsmall" className="h-[16px] w-[16px]" />,
-      label: "기록 리포트",
-      href: PROFILE_REPORT_PATH,
-      onClick: handleMenuItemClick(onReportClick),
-    },
-    {
-      key: "feedback",
-      kind: "link" as const,
-      icon: <NoteIcon className="h-[18px] w-[18px]" />,
-      label: "피드백",
-      href: FEEDBACK_PATH,
-      onClick: handleMenuItemClick(onFeedbackClick),
-    },
-    {
-      key: "logout",
-      kind: "action" as const,
-      icon: <LogoutIcon size="xsmall" className="h-[16px] w-[16px]" />,
-      label: "로그아웃",
-      onClick: handleMenuItemClick(onLogoutClick),
-    },
-  ];
+  const pathname = usePathname();
+
+  const getLinkClassName = (href: string) =>
+    cn(
+      menuItemBaseClassName,
+      "border-color-default hover:border-border-default pr-md pl-lg py-md",
+      pathname === href && "bg-surface-strong!"
+    );
 
   return (
     <div
       className={cn(
-        "px-lg py-md gap-sm border-border-default bg-surface-default flex flex-col rounded-lg border",
+        "px-lg py-md gap-sm border-border-default bg-surface-default flex w-[428px] flex-col rounded-lg border",
         className
       )}
     >
@@ -99,34 +81,70 @@ export function ProfilePopup({
         onClose={onClose}
       />
 
-      <div className="flex h-[512px] w-full flex-col items-start justify-center gap-0 p-6">
-        <div className="gap-sm flex w-full flex-col items-start">
-          <FocusStatusItem
-            focusedTime={focusedTime}
-            totalParticipationTime={totalParticipationTime}
-            completedTodoCount={completedTodoCount}
-            totalTodoCount={totalTodoCount}
-          />
-
-          {menuItems.map((item) =>
-            item.kind === "link" ? (
-              <ButtonLink
-                key={item.key}
-                href={item.href}
-                onClick={item.onClick}
-                variant="ghost"
-                colorScheme="secondary"
-                className={cn(
-                  menuItemBaseClassName,
-                  "border-color-default hover:border-border-default hover:bg-surface-subtle"
-                )}
-              >
-                <MenuItemContent icon={item.icon} label={item.label} />
-              </ButtonLink>
-            ) : (
-              <MenuItem key={item.key} icon={item.icon} label={item.label} onClick={item.onClick} />
-            )
+      <div className="gap-md flex flex-col">
+        <div className="gap-xs flex">
+          {firstInterestCategory && (
+            <div className="gap-xs flex items-center">
+              <p className="text-text-primary text-xs font-semibold">1순위</p>
+              <Badge>{getCategoryLabel(firstInterestCategory as Category)}</Badge>
+            </div>
           )}
+          {secondInterestCategory && (
+            <div className="gap-xs flex items-center">
+              <p className="text-text-primary text-xs font-semibold">2순위</p>
+              <Badge>{getCategoryLabel(secondInterestCategory as Category)}</Badge>
+            </div>
+          )}
+          {thirdInterestCategory && (
+            <div className="gap-xs flex items-center">
+              <p className="text-text-primary text-xs font-semibold">3순위</p>
+              <Badge>{getCategoryLabel(thirdInterestCategory as Category)}</Badge>
+            </div>
+          )}
+        </div>
+
+        <FocusStatusItem
+          focusedTime={focusedTime}
+          totalParticipationTime={totalParticipationTime}
+          completedTodoCount={completedTodoCount}
+          totalTodoCount={totalTodoCount}
+        />
+
+        <ButtonLink
+          href={PROFILE_REPORT_PATH}
+          onClick={handleMenuItemClick(onReportClick)}
+          variant="ghost"
+          colorScheme="secondary"
+          className={getLinkClassName(PROFILE_REPORT_PATH)}
+        >
+          <MenuItemContent
+            icon={<BarGraphIcon size="xsmall" className="h-[20px] w-[20px]" />}
+            label="기록 리포트"
+            isActive={pathname === PROFILE_REPORT_PATH}
+          />
+        </ButtonLink>
+
+        <ButtonLink
+          href={FEEDBACK_PATH}
+          onClick={handleMenuItemClick(onFeedbackClick)}
+          variant="ghost"
+          colorScheme="secondary"
+          className={getLinkClassName(FEEDBACK_PATH)}
+        >
+          <MenuItemContent
+            icon={<EditContainedIcon size="xsmall" className="h-[20px] w-[20px]" />}
+            label="피드백 남기기"
+            isActive={pathname === FEEDBACK_PATH}
+          />
+        </ButtonLink>
+
+        <div className="flex justify-end">
+          <MenuItem
+            icon={<LogoutIcon size="xsmall" className="h-[20px] w-[20px]" />}
+            label="로그아웃"
+            onClick={handleMenuItemClick(onLogoutClick)}
+            className="bg-surface-strong pl-md gap-sm text-text-muted! justify-center border-none py-[12px] pr-[20px]"
+          />
         </div>
       </div>
     </div>

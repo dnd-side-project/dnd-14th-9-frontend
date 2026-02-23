@@ -5,7 +5,7 @@ export type MemberInterestCategory = Category;
 
 export type MemberSocialProvider = "kakao" | "google";
 
-// GET /members/me/profile 응답 result
+// GET /members/me 응답 result
 export interface MemberProfileView {
   id: number;
   nickname: string;
@@ -21,6 +21,10 @@ export interface MemberProfileView {
   todoCompletionRate: number;
   participationSessionCount: number;
   firstLogin: boolean;
+  // 관심 카테고리
+  firstInterestCategory?: string;
+  secondInterestCategory?: string;
+  thirdInterestCategory?: string;
 }
 
 // GET /members/me/edit 응답 result
