@@ -14,6 +14,7 @@ import type {
   SessionReportResponse,
   SubmitSessionResultRequest,
   SubmitSessionResultResponse,
+  ToggleMyStatusResponse,
   WaitingRoomResponse,
 } from "./types";
 
@@ -89,6 +90,14 @@ export const sessionApi = {
     return api.post<ApiSuccessResponse<SubmitSessionResultResponse>>(
       `/api/sessions/${sessionId}/results`,
       body
+    );
+  },
+
+  toggleMyStatus: async (
+    sessionId: string
+  ): Promise<ApiSuccessResponse<ToggleMyStatusResponse>> => {
+    return api.post<ApiSuccessResponse<ToggleMyStatusResponse>>(
+      `/api/sessions/${sessionId}/me/status`
     );
   },
 };

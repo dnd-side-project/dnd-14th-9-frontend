@@ -3,6 +3,7 @@
 import { Button } from "@/components/Button/Button";
 import { ProgressRing } from "@/components/ProgressRing/ProgressRing";
 
+import { useToggleMyStatus } from "../../hooks/useSessionHooks";
 import { useSessionTimer } from "../../hooks/useSessionTimer";
 
 interface MyTimerProps {
@@ -19,12 +20,25 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
     autoStart: true,
   });
 
+  const { mutate: toggleStatus, isPending } = useToggleMyStatus();
+
   const handleToggle = () => {
-    if (isRunning) {
-      pause();
-    } else {
-      start();
-    }
+    toggleStatus(
+      { sessionId },
+      {
+        onSuccess: (response) => {
+          const newStatus = response.result.currentStatus;
+          if (newStatus === "FOCUSED") {
+            start();
+          } else {
+            pause();
+          }
+        },
+        onError: (error) => {
+          console.error("[MyTimer] 상태 전환 실패:", error);
+        },
+      }
+    );
   };
 
   return (
@@ -60,6 +74,7 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
           colorScheme={isRunning ? "secondary" : "primary"}
           size="medium"
           onClick={handleToggle}
+          disabled={isPending}
         >
           {isRunning ? (
             <>

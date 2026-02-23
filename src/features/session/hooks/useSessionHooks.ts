@@ -30,6 +30,7 @@ import type {
   WaitingRoomResponse,
   SubmitSessionResultRequest,
   SubmitSessionResultResponse,
+  ToggleMyStatusResponse,
 } from "../types";
 
 const sessionCrud = createCrudHooks<
@@ -239,5 +240,16 @@ export function useSubmitSessionResult() {
     { sessionId: string; body: SubmitSessionResultRequest }
   >({
     mutationFn: ({ sessionId, body }) => sessionApi.submitResult(sessionId, body),
+  });
+}
+
+/**
+ * 세션 내 상태(집중/휴식) 토글 mutation 훅
+ *
+ * 집중 중이면 휴식으로, 휴식 중이면 집중으로 상태를 전환합니다.
+ */
+export function useToggleMyStatus() {
+  return useMutation<ApiSuccessResponse<ToggleMyStatusResponse>, ApiError, { sessionId: string }>({
+    mutationFn: ({ sessionId }) => sessionApi.toggleMyStatus(sessionId),
   });
 }

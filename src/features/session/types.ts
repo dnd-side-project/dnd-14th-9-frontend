@@ -343,3 +343,12 @@ export interface SubmitSessionResultRequest {
 export interface SubmitSessionResultResponse {
   sessionId: number;
 }
+
+// ============================================
+// 세션 내 상태 토글 API 관련 타입
+// ============================================
+
+// 세션 내 상태 토글 응답
+export interface ToggleMyStatusResponse {
+  currentStatus: InProgressMemberStatus;
+}
