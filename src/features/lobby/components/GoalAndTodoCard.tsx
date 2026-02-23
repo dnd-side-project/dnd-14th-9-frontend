@@ -169,7 +169,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
       <div className="bg-divider-default h-px w-full" />
 
       {/* Todo */}
-      <div className="gap-sm flex flex-col">
+      <div className="gap-sm flex min-h-0 flex-1 flex-col">
         <span className="text-text-secondary text-[14px] font-semibold">
           To do <span className="text-green-600">{displayTodos.length}</span>
         </span>
@@ -191,12 +191,12 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
                 />
               </div>
             ) : (
-              <ul className="flex flex-col gap-2">
+              <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
                 {draftTodos.map((todo, index) => {
                   const isFirst = index === 0;
                   const canAdd = draftTodos.length < 5;
                   return (
-                    <li key={todo.subtaskId} className="flex items-start gap-2">
+                    <li key={todo.subtaskId} className="flex shrink-0 items-start gap-2">
                       <TextInput
                         value={todo.content}
                         onChange={(e) => handleTodoChange(index, e.target.value)}
@@ -236,11 +236,11 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
         ) : displayTodos.length === 0 ? (
           <p className="text-text-muted py-md text-center text-[14px]">등록된 할 일이 없습니다</p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
             {todos.map((todo) => (
               <li
                 key={todo.subtaskId}
-                className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-[16px]"
+                className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 shrink-0 items-center rounded-sm border text-[16px]"
               >
                 {todo.content}
               </li>

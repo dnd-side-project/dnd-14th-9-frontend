@@ -51,7 +51,7 @@ export function SessionGoalAndTodoCard({
       <div className="bg-divider-default h-px w-full" />
 
       {/* Todo */}
-      <div className="gap-sm flex flex-col">
+      <div className="gap-sm flex min-h-0 flex-1 flex-col">
         <span className="text-text-secondary text-[14px] font-semibold">
           To do{" "}
           <span className="text-green-600">
@@ -63,11 +63,11 @@ export function SessionGoalAndTodoCard({
         {todos.length === 0 ? (
           <p className="text-text-muted py-md text-center text-[14px]">등록된 할 일이 없습니다</p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
             {todos.map((todo) => (
               <li
                 key={todo.subtaskId}
-                className="bg-surface-strong border-border-subtle p-xs flex h-13.5 items-center gap-3 rounded-sm border"
+                className="bg-surface-strong border-border-subtle p-xs flex h-13.5 shrink-0 items-center gap-3 rounded-sm border"
               >
                 {/* 체크박스 */}
                 <button
