@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 import { useRouter } from "next/navigation";
 
 import { useMe } from "@/features/member/hooks/useMemberHooks";
@@ -22,12 +24,43 @@ interface WaitingRoomContentProps {
 
 export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   const router = useRouter();
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const isLeavingRef = useRef(false);
+
   const { data, isLoading, error } = useSessionDetail(sessionId);
   const { data: meData } = useMe();
   // 초기 데이터: REST API로 조회
   const { data: initialWaitingData } = useWaitingRoom(sessionId);
   // 실시간 업데이트: SSE로 수신
   const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
+
+  // 브라우저 뒤로 가기 감지
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isLeavingRef.current) return;
+      setShowLeaveDialog(true);
+      // 뒤로 가기를 취소하기 위해 앞으로 가기
+      window.history.go(1);
+    };
+
+    // 페이지 이탈 시 브라우저 기본 확인 다이얼로그 표시 (다른 도메인으로 이동 시)
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isLeavingRef.current) return;
+      event.preventDefault();
+      return "";
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // 히스토리 엔트리 추가 (뒤로 가기 시 go(1)로 돌아올 수 있도록)
+    window.history.pushState({ preventBack: true }, "", window.location.href);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   // 세션 상태 SSE - 대기 상태가 아니면 적절한 페이지로 이동
   useSessionStatusSSE({
@@ -74,7 +107,13 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
         <CountdownBanner targetTime={new Date(session.startTime)} />
       </div>
       <div className="gap-3xl p-3xl flex flex-col">
-        <LobbyHeader sessionId={sessionId} />
+        <LobbyHeader
+          sessionId={sessionId}
+          showDialog={showLeaveDialog}
+          onShowDialog={() => setShowLeaveDialog(true)}
+          onCloseDialog={() => setShowLeaveDialog(false)}
+          isLeavingRef={isLeavingRef}
+        />
         <SessionInfoCard session={session} />
         <div className="gap-lg flex">
           <GoalAndTodoCard sessionId={sessionId} task={myTask ?? null} />

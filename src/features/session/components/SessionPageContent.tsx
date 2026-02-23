@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 import { useRouter } from "next/navigation";
 
 import { useMe } from "@/features/member/hooks/useMemberHooks";
@@ -18,10 +20,43 @@ interface SessionPageContentProps {
 }
 
 export function SessionPageContent({ sessionId }: SessionPageContentProps) {
+  console.warn("[SessionPageContent] 컴포넌트 렌더링, sessionId:", sessionId);
+
   const router = useRouter();
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const isLeavingRef = useRef(false);
+
   const { data: sessionData, isLoading, error } = useSessionDetail(sessionId);
   const { data: inProgressData } = useInProgressData({ sessionId });
   const { data: meData } = useMe();
+
+  // 브라우저 뒤로 가기 감지
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isLeavingRef.current) return;
+      setShowLeaveDialog(true);
+      // 뒤로 가기를 취소하기 위해 앞으로 가기
+      window.history.go(1);
+    };
+
+    // 페이지 이탈 시 브라우저 기본 확인 다이얼로그 표시 (다른 도메인으로 이동 시)
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isLeavingRef.current) return;
+      event.preventDefault();
+      return "";
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // 히스토리 엔트리 추가 (뒤로 가기 시 go(1)로 돌아올 수 있도록)
+    window.history.pushState({ preventBack: true }, "", window.location.href);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   // 세션 상태 SSE - 진행 중 상태가 아니면 적절한 페이지로 이동
   useSessionStatusSSE({
@@ -37,6 +72,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   });
 
   if (isLoading) {
+    console.warn("[SessionPageContent] 로딩 중...");
     return (
       <div className="flex min-h-100 items-center justify-center">
         <p className="text-text-secondary">세션 정보를 불러오는 중...</p>
@@ -57,9 +93,17 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const myMemberId = meData?.result?.id;
   const myMember = inProgressData?.members.find((m) => m.memberId === myMemberId);
 
+  console.warn("[SessionPageContent] 정상 렌더링");
+
   return (
     <div className="p-3xl flex flex-col">
-      <SessionHeader sessionId={sessionId} />
+      <SessionHeader
+        sessionId={sessionId}
+        showDialog={showLeaveDialog}
+        onShowDialog={() => setShowLeaveDialog(true)}
+        onCloseDialog={() => setShowLeaveDialog(false)}
+        isLeavingRef={isLeavingRef}
+      />
       <SessionDetailSection
         className="mt-xl"
         thumbnailUrl={session.imageUrl}

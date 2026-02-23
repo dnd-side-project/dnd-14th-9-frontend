@@ -12,21 +12,32 @@ import { useLeaveSession } from "../hooks/useSessionHooks";
 
 interface SessionHeaderProps {
   sessionId: string;
+  showDialog: boolean;
+  onShowDialog: () => void;
+  onCloseDialog: () => void;
+  isLeavingRef: React.MutableRefObject<boolean>;
 }
 
-export function SessionHeader({ sessionId }: SessionHeaderProps) {
-  const [showDialog, setShowDialog] = useState(false);
+export function SessionHeader({
+  sessionId,
+  showDialog,
+  onShowDialog,
+  onCloseDialog,
+  isLeavingRef,
+}: SessionHeaderProps) {
   const [serverError, setServerError] = useState<string | null>(null);
   const leaveSessionMutation = useLeaveSession();
 
   const handleLeave = async () => {
     setServerError(null);
+    isLeavingRef.current = true;
     try {
       await leaveSessionMutation.mutateAsync({ sessionRoomId: sessionId });
-      setShowDialog(false);
+      onCloseDialog();
       // 하드 네비게이션으로 캐시 클리어 및 SSE 연결 정리
       navigateWithHardReload("/");
     } catch (error) {
+      isLeavingRef.current = false;
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
       setServerError(message);
     }
@@ -39,19 +50,14 @@ export function SessionHeader({ sessionId }: SessionHeaderProps) {
           <h1 className="text-[24px] leading-[140%] font-bold text-gray-50">진행 중인 세션</h1>
         </div>
 
-        <Button
-          variant="outlined"
-          colorScheme="secondary"
-          size="small"
-          onClick={() => setShowDialog(true)}
-        >
+        <Button variant="outlined" colorScheme="secondary" size="small" onClick={onShowDialog}>
           나가기
         </Button>
       </header>
 
       {showDialog && (
         <LeaveConfirmDialog
-          onClose={() => setShowDialog(false)}
+          onClose={onCloseDialog}
           onConfirm={handleLeave}
           isPending={leaveSessionMutation.isPending}
           serverError={serverError}
