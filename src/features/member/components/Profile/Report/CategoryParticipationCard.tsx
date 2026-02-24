@@ -12,9 +12,9 @@ export default function CategoryParticipationCard({ data }: CategoryParticipatio
   return (
     <ReportCard>
       <SectionTitle>카테고리별 세션 참여율</SectionTitle>
-      <div className="p-xl gap-md border-sm border-border-subtle flex flex-col rounded-md border">
+      <div className="p-xl gap-md border-sm border-border-subtle flex flex-1 flex-col rounded-md">
         {data.map((stat, index) => (
-          <div key={stat.categoryName} className="flex flex-col gap-[8px]">
+          <div key={stat.categoryName} className="flex h-10 flex-col gap-2">
             <div className="flex justify-between">
               <p
                 className={`text-[15px] font-semibold ${
@@ -29,7 +29,7 @@ export default function CategoryParticipationCard({ data }: CategoryParticipatio
             </div>
             <ProgressBar
               progress={stat.rate}
-              className="bg-border-default h-[4px]"
+              className="bg-border-default h-1"
               indicatorClassName={index === 0 ? "bg-border-primary-default" : "bg-border-strong"}
             />
           </div>
