@@ -1,5 +1,7 @@
 "use client";
 
+import { useCallback } from "react";
+
 import { Button } from "@/components/Button/Button";
 import { ProgressRing } from "@/components/ProgressRing/ProgressRing";
 
@@ -22,11 +24,23 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
 
   const { mutate: toggleStatus, isPending } = useToggleMyStatus();
 
-  const handleToggle = () => {
+  const handleToggle = useCallback(() => {
+    // 이중 호출 방지
+    if (isPending) return;
+
+    // Optimistic update: 즉시 UI 반영
+    const wasRunning = isRunning;
+    if (wasRunning) {
+      pause();
+    } else {
+      start();
+    }
+
     toggleStatus(
       { sessionId },
       {
         onSuccess: (response) => {
+          // 서버 상태로 동기화 (idempotent)
           const newStatus = response.result.currentStatus;
           if (newStatus === "FOCUSED") {
             start();
@@ -36,10 +50,16 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
         },
         onError: (error) => {
           console.error("[MyTimer] 상태 전환 실패:", error);
+          // 롤백: 이전 상태로 복원
+          if (wasRunning) {
+            start();
+          } else {
+            pause();
+          }
         },
       }
     );
-  };
+  }, [isPending, isRunning, sessionId, toggleStatus, start, pause]);
 
   return (
     <div className="gap-xl p-xl bg-surface-strong flex h-full rounded-2xl">
