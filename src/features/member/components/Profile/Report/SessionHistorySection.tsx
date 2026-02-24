@@ -15,11 +15,11 @@ interface SessionHistorySectionProps {
 }
 
 export default function SessionHistorySection({ items, pagination }: SessionHistorySectionProps) {
-  const [expandedIndexes, setExpandedIndexes] = useState<number[]>([]);
+  const [expandedSessionIds, setExpandedSessionIds] = useState<string[]>([]);
 
-  const toggleExpand = (index: number) => {
-    setExpandedIndexes((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+  const toggleExpand = (sessionId: string) => {
+    setExpandedSessionIds((prev) =>
+      prev.includes(sessionId) ? prev.filter((id) => id !== sessionId) : [...prev, sessionId]
     );
   };
 
@@ -28,12 +28,12 @@ export default function SessionHistorySection({ items, pagination }: SessionHist
       <SectionTitle>지금까지 참여한 세션</SectionTitle>
 
       <div className="gap-lg flex flex-col">
-        {items.map((session, index) => (
+        {items.map((session) => (
           <SessionHistoryCard
             key={session.sessionId}
             session={session}
-            isExpanded={expandedIndexes.includes(index)}
-            onToggle={() => toggleExpand(index)}
+            isExpanded={expandedSessionIds.includes(session.sessionId)}
+            onToggle={() => toggleExpand(session.sessionId)}
           />
         ))}
       </div>
