@@ -62,7 +62,7 @@ export function OnboardingCategory({
   return (
     <div
       className={cn(
-        "p-3xl border-sm border-border-default bg-surface-default flex w-140 flex-col gap-12 rounded-lg shadow-[0_0_2px_0_rgba(0,0,0,0.08),0_16px_24px_0_rgba(0,0,0,0.12)]",
+        "p-3xl border-sm border-border-default bg-surface-default flex min-w-140 flex-col gap-12 rounded-lg shadow-[0_0_2px_0_rgba(0,0,0,0.08),0_16px_24px_0_rgba(0,0,0,0.12)]",
         className
       )}
     >

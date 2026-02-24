@@ -12,9 +12,10 @@ import {
 } from "../../hooks/useMemberHooks";
 
 import { OnboardingCategory } from "./OnboardingCategory";
+import { OnboardingConfirm } from "./OnboardingConfirm";
 import { OnboardingProfile } from "./OnboardingProfile";
 
-type OnboardingStep = "profile" | "category";
+type OnboardingStep = "profile" | "category" | "confirm";
 
 interface OnboardingModalProps {
   defaultNickname: string;
@@ -29,6 +30,7 @@ export function OnboardingModal({
 }: OnboardingModalProps) {
   const [step, setStep] = useState<OnboardingStep>("profile");
   const [nickname, setNickname] = useState(defaultNickname);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 
   const updateNickname = useUpdateNickname();
   const updateProfileImage = useUpdateProfileImage();
@@ -73,7 +75,8 @@ export function OnboardingModal({
         thirdInterestCategory: categories[2] ?? null,
       };
       await updateInterestCategories.mutateAsync(payload);
-      onComplete();
+      setSelectedCategories(categories);
+      setStep("confirm");
     } catch (error) {
       console.error("관심 카테고리 업데이트 실패:", error);
     }
@@ -96,6 +99,14 @@ export function OnboardingModal({
           isLoading={isLoading}
           onBack={() => setStep("profile")}
           onNext={handleCategoryNext}
+        />
+      ) : null}
+      {step === "confirm" ? (
+        <OnboardingConfirm
+          nickname={nickname}
+          categories={selectedCategories}
+          onBack={() => setStep("category")}
+          onConfirm={onComplete}
         />
       ) : null}
     </div>
