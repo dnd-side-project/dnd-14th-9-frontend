@@ -128,7 +128,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
             size="medium"
             className="w-full"
           >
-            로그인하기
+            로그인하고 참여하기
           </ButtonLink>
         )}
       </div>
