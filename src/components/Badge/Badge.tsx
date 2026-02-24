@@ -52,14 +52,20 @@ export interface BadgeProps
 
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className, status, radius, showIcon = false, onIconClick, children, ...props }, ref) => {
+    const canRenderIconButton = showIcon && typeof onIconClick === "function";
+
     return (
       <span
         ref={ref}
-        className={cn(BADGE_VARIANTS({ status, radius }), showIcon && "gap-1", className)}
+        className={cn(
+          BADGE_VARIANTS({ status, radius }),
+          canRenderIconButton && "gap-1",
+          className
+        )}
         {...props}
       >
         {children}
-        {showIcon && (
+        {canRenderIconButton && (
           <button type="button" onClick={onIconClick} className="inline-flex items-center">
             <XIcon size="xsmall" />
           </button>
