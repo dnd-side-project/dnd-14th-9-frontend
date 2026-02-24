@@ -91,7 +91,12 @@ export function OnboardingModal({
         />
       ) : null}
       {step === "category" ? (
-        <OnboardingCategory nickname={nickname} isLoading={isLoading} onNext={handleCategoryNext} />
+        <OnboardingCategory
+          nickname={nickname}
+          isLoading={isLoading}
+          onBack={() => setStep("profile")}
+          onNext={handleCategoryNext}
+        />
       ) : null}
     </div>
   );
