@@ -88,7 +88,7 @@ export default async function ParticipantsReportPage({
       {/* 섹션 5: 버튼 영역 */}
       <ResultNavigationButtons
         actions={[
-          { label: "그만두기", href: "/", variant: "outlined", colorScheme: "secondary" },
+          { label: "종료", href: "/", variant: "outlined", colorScheme: "secondary" },
           {
             label: "내 리포트 보기",
             href: `/session/${sessionId}/result`,
