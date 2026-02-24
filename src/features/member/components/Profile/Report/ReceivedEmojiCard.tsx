@@ -44,8 +44,8 @@ export default function ReceivedEmojiCard() {
       <SectionTitle>받은 이모지</SectionTitle>
       {/** 큰 이모지 카드 */}
       {MOCK_RECEIVED_EMOJI_STATS.length > 0 && (
-        <div className="p-xl border-sm border-border-subtle flex gap-[16px] rounded-md border">
-          <div className="px-xl py-2xl bg-surface-strong gap-lg flex flex-col items-center justify-center rounded-md">
+        <div className="p-xl border-border-subtle flex flex-1 gap-4 rounded-md border">
+          <div className="px-xl py-2xl bg-surface-strong gap-lg flex flex-1 flex-col items-center justify-center rounded-md">
             <p className="text-text-secondary px-lg py-xs flex items-center justify-center text-[16px] font-semibold">
               {TopIcon ? (
                 <TopIcon size="xlarge" />
@@ -68,7 +68,7 @@ export default function ReceivedEmojiCard() {
             return (
               <div
                 key={emoji.emojiName}
-                className="gap-xs py-lg px-md bg-surface-strong flex flex-col items-center justify-center self-end rounded-sm"
+                className="gap-xs py-lg px-md bg-surface-strong flex flex-1 flex-col items-center justify-center self-end rounded-sm"
               >
                 <p className="px-lg py-sm flex items-center justify-center">
                   {Icon ? (
