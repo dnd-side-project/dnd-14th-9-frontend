@@ -22,7 +22,10 @@ export function useProfileDropdownDialog() {
   useEffect(() => {
     if (!isOpen) return;
 
-    dialogRef.current?.focus();
+    // 이벤트 리스너 등록 후 focus를 지연 호출하여 cascading render 방지
+    requestAnimationFrame(() => {
+      dialogRef.current?.focus();
+    });
 
     const handleClickOutside = (event: PointerEvent) => {
       const target = event.target;

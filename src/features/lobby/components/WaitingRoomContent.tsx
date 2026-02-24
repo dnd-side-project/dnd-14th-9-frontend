@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useSessionDetail, useWaitingRoom } from "@/features/session/hooks/useSessionHooks";
+import { useSessionStatusSSE } from "@/features/session/hooks/useSessionStatusSSE";
 
 import { useWaitingMembersSSE } from "../hooks/useWaitingMembersSSE";
 
@@ -18,6 +21,9 @@ interface WaitingRoomContentProps {
 }
 
 export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const isLeavingRef = useRef(false);
+
   const { data, isLoading, error } = useSessionDetail(sessionId);
   const { data: meData } = useMe();
   // 초기 데이터: REST API로 조회
@@ -25,7 +31,38 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   // 실시간 업데이트: SSE로 수신
   const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
 
-  console.log(sseWaitingData);
+  // 브라우저 뒤로 가기 감지
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isLeavingRef.current) return;
+      setShowLeaveDialog(true);
+      // 뒤로 가기를 취소하기 위해 앞으로 가기
+      window.history.go(1);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    // 히스토리 엔트리 추가 (뒤로 가기 시 go(1)로 돌아올 수 있도록)
+    window.history.pushState({ preventBack: true }, "", window.location.href);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  // 세션 상태 SSE - 대기 상태가 아니면 적절한 페이지로 이동
+  // hard navigation을 사용하여 modal interceptor routing 우회
+  useSessionStatusSSE({
+    sessionId,
+    enabled: true,
+    onStatusChange: (eventData) => {
+      if (eventData.status === "IN_PROGRESS") {
+        window.location.replace(`/session/${sessionId}`);
+      } else if (eventData.status === "COMPLETED") {
+        window.location.replace(`/session/${sessionId}/result`);
+      }
+    },
+  });
 
   if (isLoading) {
     return (
@@ -44,12 +81,15 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   }
 
   const session = data.result;
+
   const myMemberId = meData?.result?.id;
-  // SSE 데이터가 있으면 우선, 없으면 초기 REST API 데이터 사용
+  // 참여자 목록: SSE 데이터가 있으면 우선, 없으면 초기 REST API 데이터 사용
   const members: WaitingMember[] = (sseWaitingData?.members ??
     initialWaitingData?.result?.members ??
     []) as WaitingMember[];
-  const myTask = members.find((m) => m.memberId === myMemberId)?.task;
+  // 내 할 일: REST API 데이터에서 가져옴 (SSE는 참여자 상태만 업데이트)
+  const myTask =
+    initialWaitingData?.result?.members?.find((m) => m.memberId === myMemberId)?.task ?? null;
   const maxParticipants = session.maxParticipants;
 
   return (
@@ -58,11 +98,21 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
         <CountdownBanner targetTime={new Date(session.startTime)} />
       </div>
       <div className="gap-3xl p-3xl flex flex-col">
-        <LobbyHeader sessionId={sessionId} />
+        <LobbyHeader
+          sessionId={sessionId}
+          showDialog={showLeaveDialog}
+          onShowDialog={() => setShowLeaveDialog(true)}
+          onCloseDialog={() => setShowLeaveDialog(false)}
+          isLeavingRef={isLeavingRef}
+        />
         <SessionInfoCard session={session} />
         <div className="gap-lg flex">
-          <GoalAndTodoCard sessionId={sessionId} task={myTask ?? null} />
-          <ParticipantListCard members={members} maxParticipants={maxParticipants} />
+          <GoalAndTodoCard sessionId={sessionId} task={myTask} />
+          <ParticipantListCard
+            sessionId={sessionId}
+            members={members}
+            maxParticipants={maxParticipants}
+          />
         </div>
       </div>
     </>

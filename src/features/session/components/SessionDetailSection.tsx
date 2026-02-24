@@ -31,9 +31,7 @@ export function SessionDetailSection({
   notice,
 }: SessionDetailSectionProps) {
   return (
-    <section
-      className={`gap-lg p-lg border-border-gray-default flex rounded-lg border ${className ?? ""}`}
-    >
+    <section className={`gap-lg flex rounded-lg ${className ?? ""}`}>
       {/* 왼쪽: 썸네일 (30%) */}
       <div className="flex-3">
         <Thumbnail src={thumbnailUrl} alt={title} radius="lg" className="h-full" />
