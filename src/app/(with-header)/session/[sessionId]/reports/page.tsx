@@ -7,9 +7,9 @@ import { ResultNavigationButtons } from "@/features/session/components/SessionRe
 import { SessionResultHeader } from "@/features/session/components/SessionResult/SessionResultHeader";
 import {
   mapEmojiResultToItems,
-  mapMemberResultToActivitySummary,
   mapSessionDetailToProps,
   mapSessionReportMemberToParticipantProps,
+  mapSessionReportToActivitySummary,
 } from "@/features/session/utils/reportMappers";
 
 export default async function ParticipantsReportPage({
@@ -37,7 +37,9 @@ export default async function ParticipantsReportPage({
     );
   }
 
-  const activitySummary = mapMemberResultToActivitySummary(memberResult);
+  const activitySummary = sessionReport
+    ? mapSessionReportToActivitySummary(sessionReport)
+    : { focusedTime: 0, totalParticipationTime: 0, focusRate: 0 };
   const initialEmojis = mapEmojiResultToItems(memberResult.emojiResult);
   const detailProps = mapSessionDetailToProps(sessionDetail);
 
@@ -57,7 +59,14 @@ export default async function ParticipantsReportPage({
 
       {/* 섹션 3: 나의 활동 요약 */}
       <div className="gap-lg flex">
-        <ActivitySummaryCard data={activitySummary} />
+        <ActivitySummaryCard
+          data={activitySummary}
+          title="전체 활동 요약"
+          focusedTimeLabel="평균 집중 시간"
+          participationTimeLabel="평균 참여 시간"
+          achievementRate={sessionReport?.averageAchievementRate ?? 0}
+          achievementRateLabel="평균 목표 달성율"
+        />
         <RealtimeReceivedEmojiCard
           sessionId={sessionId}
           memberId={memberResult.memberId}

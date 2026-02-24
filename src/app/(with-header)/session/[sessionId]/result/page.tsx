@@ -56,7 +56,13 @@ export default async function SessionResultPage({
 
       {/* 섹션 3: 나의 활동 요약 */}
       <div className="gap-lg flex">
-        <ActivitySummaryCard data={activitySummary} />
+        <ActivitySummaryCard
+          data={activitySummary}
+          title="나의 활동 요약"
+          participationTimeLabel="전체 참여 시간"
+          achievementRate={memberResult.achievementRate}
+          achievementRateLabel="목표 달성율"
+        />
         <RealtimeReceivedEmojiCard
           sessionId={sessionId}
           memberId={memberResult.memberId}

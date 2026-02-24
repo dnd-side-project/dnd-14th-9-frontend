@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "@/lib/toast";
+
 import { useSendReaction } from "../../hooks/useSessionHooks";
 import { mapEmojiKeyToType } from "../../utils/reportMappers";
 
@@ -26,10 +28,17 @@ export function ParticipantReactionList({ sessionId, participants }: Participant
     emoji: "heart" | "thumbsUp" | "thumbsDown" | "star",
     targetMemberId: number
   ) => {
-    sendReaction.mutate({
-      sessionId,
-      body: { targetMemberId, emojiType: mapEmojiKeyToType(emoji) },
-    });
+    sendReaction.mutate(
+      {
+        sessionId,
+        body: { targetMemberId, emojiType: mapEmojiKeyToType(emoji) },
+      },
+      {
+        onError: (error) => {
+          toast.error(error.message || "리액션을 보내는 중 오류가 발생했습니다.");
+        },
+      }
+    );
   };
 
   return (
