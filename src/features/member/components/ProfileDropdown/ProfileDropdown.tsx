@@ -72,7 +72,7 @@ export function ProfileDropdown() {
         aria-label="프로필 메뉴"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        aria-controls={dialogId}
+        aria-controls={isOpen ? dialogId : undefined}
         onMouseEnter={handlePrefetchPopup}
         onFocus={handlePrefetchPopup}
         onClick={toggleDropdown}
