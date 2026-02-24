@@ -5,69 +5,81 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/Button/Button";
 import ActivitySummaryCard from "@/features/member/components/Profile/Report/ActivitySummaryCard";
 import ReceivedEmojiCard from "@/features/member/components/Profile/Report/ReceivedEmojiCard";
-import type { ActivitySummaryData, ReceivedEmojiItem } from "@/features/member/types";
 import { SessionDetailSection } from "@/features/session/components/SessionDetailSection";
 import { ParticipantGoalSection } from "@/features/session/components/SessionResult/ParticipantGoalSection";
 import { SessionResultHeader } from "@/features/session/components/SessionResult/SessionResultHeader";
-
-// TODO: API 연동 후 실제 데이터로 교체
-const MOCK_SESSION_DETAIL = {
-  thumbnailUrl: "/images/placeholder.png",
-  category: "개발",
-  title: "React 심화 학습 세션",
-  description: "React의 고급 패턴과 최적화 기법을 함께 학습합니다.",
-  currentParticipants: 5,
-  maxParticipants: 10,
-  durationMinutes: 120,
-  sessionDate: new Date(),
-  notice: "카메라는 선택사항입니다. 편하게 참여해주세요!",
-};
-
-// TODO: API 연동 후 실제 참여자 데이터로 교체
-const MOCK_PARTICIPANTS = [
-  {
-    participantId: "1",
-    participantName: "김개발",
-    profileImageUrl: undefined,
-    goal: "React 심화 학습하기",
-    todoAchievementRate: 80,
-    focusRate: 85,
-  },
-  {
-    participantId: "2",
-    participantName: "이코딩",
-    profileImageUrl: undefined,
-    goal: "TypeScript 마스터하기",
-    todoAchievementRate: 100,
-    focusRate: 92,
-  },
-  {
-    participantId: "3",
-    participantName: "박프론트",
-    profileImageUrl: undefined,
-    goal: "Next.js 앱 라우터 익히기",
-    todoAchievementRate: 60,
-    focusRate: 78,
-  },
-];
-
-const MOCK_ACTIVITY_SUMMARY: ActivitySummaryData = {
-  focusedTime: 6120,
-  totalParticipationTime: 7200,
-  focusRate: 85,
-};
-
-const MOCK_RECEIVED_EMOJIS: ReceivedEmojiItem[] = [
-  { emojiName: "HEART", count: 12 },
-  { emojiName: "THUMBS_UP", count: 8 },
-  { emojiName: "STAR", count: 6 },
-  { emojiName: "THUMBS_DOWN", count: 1 },
-];
+import { useMemberReactionSSE } from "@/features/session/hooks/useMemberReactionSSE";
+import {
+  useMyReport,
+  useSendReaction,
+  useSessionDetail,
+  useSessionReport,
+} from "@/features/session/hooks/useSessionHooks";
+import {
+  mapEmojiKeyToType,
+  mapEmojiResultToItems,
+  mapMemberResultToActivitySummary,
+  mapSessionDetailToProps,
+  mapSessionReportMemberToParticipantProps,
+} from "@/features/session/utils/reportMappers";
 
 export default function ParticipantsReportPage() {
   const router = useRouter();
   const params = useParams();
   const sessionId = params.sessionId as string;
+
+  const { data: myReportData, isLoading: isMyReportLoading } = useMyReport(sessionId);
+  const { data: sessionDetailData, isLoading: isDetailLoading } = useSessionDetail(sessionId);
+  const { data: sessionReportData, isLoading: isReportLoading } = useSessionReport(sessionId);
+  const sendReaction = useSendReaction();
+
+  const memberResult = myReportData?.result?.sessionMemberResult;
+
+  const { data: sseReactionData } = useMemberReactionSSE({
+    sessionId,
+    memberId: String(memberResult?.memberId ?? ""),
+    enabled: !!memberResult?.memberId,
+  });
+
+  const isLoading = isMyReportLoading || isDetailLoading || isReportLoading;
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-100 items-center justify-center">
+        <p className="text-text-secondary text-[16px]">리포트를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  const sessionDetail = sessionDetailData?.result;
+  const sessionReport = sessionReportData?.result;
+
+  if (!memberResult || !sessionDetail) {
+    return (
+      <div className="flex min-h-100 items-center justify-center">
+        <p className="text-text-secondary text-[16px]">리포트 데이터를 불러올 수 없습니다.</p>
+      </div>
+    );
+  }
+
+  const activitySummary = mapMemberResultToActivitySummary(memberResult);
+  const receivedEmojis = sseReactionData
+    ? mapEmojiResultToItems(sseReactionData)
+    : mapEmojiResultToItems(memberResult.emojiResult);
+  const detailProps = mapSessionDetailToProps(sessionDetail);
+
+  const participants = sessionReport?.members ?? [];
+  const averageAchievementRate = sessionReport?.averageAchievementRate ?? 0;
+
+  const handleEmojiClick = (
+    emoji: "heart" | "thumbsUp" | "thumbsDown" | "star",
+    targetMemberId: number
+  ) => {
+    sendReaction.mutate({
+      sessionId,
+      body: { targetMemberId, emojiType: mapEmojiKeyToType(emoji) },
+    });
+  };
 
   const handleGoHome = () => {
     router.push("/");
@@ -77,21 +89,18 @@ export default function ParticipantsReportPage() {
     router.push(`/session/${sessionId}/result`);
   };
 
-  // TODO: API 연동 - 이모지 전송
-  const handleEmojiClick = () => {};
-
   return (
     <div className="gap-lg p-3xl flex flex-col">
       {/* 섹션 1: 제목 */}
       <SessionResultHeader />
 
       {/* 섹션 2: 세션 디테일 */}
-      <SessionDetailSection {...MOCK_SESSION_DETAIL} />
+      <SessionDetailSection {...detailProps} />
 
       {/* 섹션 3: 나의 활동 요약 */}
       <div className="gap-lg flex">
-        <ActivitySummaryCard data={MOCK_ACTIVITY_SUMMARY} />
-        <ReceivedEmojiCard data={MOCK_RECEIVED_EMOJIS} />
+        <ActivitySummaryCard data={activitySummary} />
+        <ReceivedEmojiCard data={receivedEmojis} />
       </div>
 
       {/* 섹션 4: 참여자들의 목표 달성 요약 */}
@@ -107,33 +116,26 @@ export default function ParticipantsReportPage() {
         {/* 참여자 수 + 평균 목표 달성률 */}
         <div className="flex items-center justify-between">
           <span className="text-text-disabled text-[14px] font-semibold">
-            총 {MOCK_PARTICIPANTS.length}명
+            총 {participants.length}명
           </span>
           <span className="text-text-secondary text-[14px]">
             평균 목표 달성률{" "}
-            <span className="font-semibold text-green-600">
-              {Math.round(
-                MOCK_PARTICIPANTS.reduce((acc, p) => acc + p.todoAchievementRate, 0) /
-                  MOCK_PARTICIPANTS.length
-              )}
-              %
-            </span>
+            <span className="font-semibold text-green-600">{averageAchievementRate}%</span>
           </span>
         </div>
 
         {/* 참여자 목록 */}
         <ul className="gap-sm flex flex-col">
-          {MOCK_PARTICIPANTS.map((participant) => (
-            <ParticipantGoalSection
-              key={participant.participantId}
-              participantName={participant.participantName}
-              profileImageUrl={participant.profileImageUrl}
-              goal={participant.goal}
-              todoAchievementRate={participant.todoAchievementRate}
-              focusRate={participant.focusRate}
-              onEmojiClick={handleEmojiClick}
-            />
-          ))}
+          {participants.map((member) => {
+            const participantProps = mapSessionReportMemberToParticipantProps(member);
+            return (
+              <ParticipantGoalSection
+                key={member.memberId}
+                {...participantProps}
+                onEmojiClick={(emoji) => handleEmojiClick(emoji, member.memberId)}
+              />
+            );
+          })}
         </ul>
       </section>
 
