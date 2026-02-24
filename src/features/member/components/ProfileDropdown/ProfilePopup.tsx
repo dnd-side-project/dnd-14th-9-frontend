@@ -115,7 +115,7 @@ export function ProfilePopup({
           onClick={handleMenuItemClick(onReportClick)}
           variant="ghost"
           colorScheme="secondary"
-          className={getLinkClassName(PROFILE_REPORT_PATH)}
+          className={cn(getLinkClassName(PROFILE_REPORT_PATH), "justify-start")}
         >
           <MenuItemContent
             icon={<BarGraphIcon size="xsmall" className="h-[20px] w-[20px]" />}
@@ -129,7 +129,7 @@ export function ProfilePopup({
           onClick={handleMenuItemClick(onFeedbackClick)}
           variant="ghost"
           colorScheme="secondary"
-          className={getLinkClassName(FEEDBACK_PATH)}
+          className={cn(getLinkClassName(FEEDBACK_PATH), "justify-start")}
         >
           <MenuItemContent
             icon={<EditContainedIcon size="xsmall" className="h-[20px] w-[20px]" />}
