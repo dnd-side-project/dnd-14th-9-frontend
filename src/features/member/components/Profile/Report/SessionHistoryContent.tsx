@@ -13,15 +13,15 @@ export default async function SessionHistoryContent({ page }: SessionHistoryCont
     throw new Error("Failed to load session history");
   }
 
-  const { sessions, currentPage, totalPages, pageSize, totalElements } = data.result;
+  const { sessions, totalPage, listSize, totalElements } = data.result;
 
   return (
     <SessionHistorySection
       items={sessions}
       pagination={{
-        currentPage,
-        totalPages,
-        pageSize,
+        currentPage: page,
+        totalPage,
+        listSize,
         totalElements,
       }}
     />
