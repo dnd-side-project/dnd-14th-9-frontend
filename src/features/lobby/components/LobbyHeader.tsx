@@ -12,21 +12,32 @@ import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
 interface LobbyHeaderProps {
   sessionId: string;
+  showDialog: boolean;
+  onShowDialog: () => void;
+  onCloseDialog: () => void;
+  isLeavingRef: React.MutableRefObject<boolean>;
 }
 
-export function LobbyHeader({ sessionId }: LobbyHeaderProps) {
-  const [showDialog, setShowDialog] = useState(false);
+export function LobbyHeader({
+  sessionId,
+  showDialog,
+  onShowDialog,
+  onCloseDialog,
+  isLeavingRef,
+}: LobbyHeaderProps) {
   const [serverError, setServerError] = useState<string | null>(null);
   const leaveSessionMutation = useLeaveSession();
 
   const handleLeave = async () => {
     setServerError(null);
+    isLeavingRef.current = true;
     try {
       await leaveSessionMutation.mutateAsync({ sessionRoomId: sessionId });
-      setShowDialog(false);
+      onCloseDialog();
       // 하드 네비게이션으로 캐시 클리어 및 SSE 연결 정리
       navigateWithHardReload("/");
     } catch (error) {
+      isLeavingRef.current = false;
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
       setServerError(message);
     }
@@ -38,7 +49,7 @@ export function LobbyHeader({ sessionId }: LobbyHeaderProps) {
         <div className="gap-lg flex items-start">
           <button
             type="button"
-            onClick={() => setShowDialog(true)}
+            onClick={onShowDialog}
             aria-label="뒤로 가기"
             className="text-text-muted hover:text-text-secondary mt-1 shrink-0 cursor-pointer transition-colors"
           >
@@ -53,19 +64,14 @@ export function LobbyHeader({ sessionId }: LobbyHeaderProps) {
           </div>
         </div>
 
-        <Button
-          variant="outlined"
-          colorScheme="secondary"
-          size="small"
-          onClick={() => setShowDialog(true)}
-        >
+        <Button variant="outlined" colorScheme="secondary" size="small" onClick={onShowDialog}>
           나가기
         </Button>
       </header>
 
       {showDialog && (
         <LeaveConfirmDialog
-          onClose={() => setShowDialog(false)}
+          onClose={onCloseDialog}
           onConfirm={handleLeave}
           isPending={leaveSessionMutation.isPending}
           serverError={serverError}
