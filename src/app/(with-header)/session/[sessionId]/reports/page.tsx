@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/Button/Button";
 import ActivitySummaryCard from "@/features/member/components/Profile/Report/ActivitySummaryCard";
 import ReceivedEmojiCard from "@/features/member/components/Profile/Report/ReceivedEmojiCard";
+import type { ActivitySummaryData, ReceivedEmojiItem } from "@/features/member/types";
 import { SessionDetailSection } from "@/features/session/components/SessionDetailSection";
 import { ParticipantGoalSection } from "@/features/session/components/SessionResult/ParticipantGoalSection";
 import { SessionResultHeader } from "@/features/session/components/SessionResult/SessionResultHeader";
@@ -50,6 +51,19 @@ const MOCK_PARTICIPANTS = [
   },
 ];
 
+const MOCK_ACTIVITY_SUMMARY: ActivitySummaryData = {
+  focusedTime: 6120,
+  totalParticipationTime: 7200,
+  focusRate: 85,
+};
+
+const MOCK_RECEIVED_EMOJIS: ReceivedEmojiItem[] = [
+  { emojiName: "HEART", count: 12 },
+  { emojiName: "THUMBS_UP", count: 8 },
+  { emojiName: "STAR", count: 6 },
+  { emojiName: "THUMBS_DOWN", count: 1 },
+];
+
 export default function ParticipantsReportPage() {
   const router = useRouter();
   const params = useParams();
@@ -76,8 +90,8 @@ export default function ParticipantsReportPage() {
 
       {/* 섹션 3: 나의 활동 요약 */}
       <div className="gap-lg flex">
-        <ActivitySummaryCard />
-        <ReceivedEmojiCard />
+        <ActivitySummaryCard data={MOCK_ACTIVITY_SUMMARY} />
+        <ReceivedEmojiCard data={MOCK_RECEIVED_EMOJIS} />
       </div>
 
       {/* 섹션 4: 참여자들의 목표 달성 요약 */}
