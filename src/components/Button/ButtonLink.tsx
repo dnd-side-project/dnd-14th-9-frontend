@@ -84,7 +84,7 @@ export function ButtonLink(props: ButtonLinkProps) {
   }
 
   return (
-    <Link className={classNames} {...linkProps} href={href} onClick={onClick}>
+    <Link className={cn(classNames)} {...linkProps} href={href} onClick={onClick}>
       {content}
     </Link>
   );

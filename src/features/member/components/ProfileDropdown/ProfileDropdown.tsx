@@ -100,7 +100,7 @@ export function ProfileDropdown() {
           aria-modal="false"
           aria-labelledby={dialogTitleId}
           tabIndex={-1}
-          className="absolute top-[calc(100%+12px)] right-0 z-50 shadow-xl"
+          className="absolute top-[calc(100%+20px)] right-0 z-50 shadow-xl"
         >
           <h2 id={dialogTitleId} className="sr-only">
             프로필 메뉴
