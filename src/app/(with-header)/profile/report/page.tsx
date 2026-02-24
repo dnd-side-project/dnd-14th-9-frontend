@@ -1,23 +1,27 @@
-import ActivitySummaryCard from "@/features/member/components/Profile/Report/ActivitySummaryCard";
-import CategoryParticipationCard from "@/features/member/components/Profile/Report/CategoryParticipationCard";
-import ReceivedEmojiCard from "@/features/member/components/Profile/Report/ReceivedEmojiCard";
-import SessionHistorySection from "@/features/member/components/Profile/Report/SessionHistorySection";
-import SessionPerformanceCard from "@/features/member/components/Profile/Report/SessionPerformanceCard";
+import { Suspense } from "react";
 
-export default function ProfileReportPage() {
+import SessionHistoryContent from "@/features/member/components/Profile/Report/SessionHistoryContent";
+import SessionHistorySkeleton from "@/features/member/components/Profile/Report/SessionHistorySkeleton";
+import StatsContent from "@/features/member/components/Profile/Report/StatsContent";
+import StatsSkeleton from "@/features/member/components/Profile/Report/StatsSkeleton";
+
+export default async function ProfileReportPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Number(pageParam) || 1;
+
   return (
     <div className="flex flex-col gap-[80px]">
-      <div className="gap-lg grid grid-cols-2">
-        <ActivitySummaryCard />
-        <CategoryParticipationCard />
-      </div>
+      <Suspense fallback={<StatsSkeleton />}>
+        <StatsContent />
+      </Suspense>
 
-      <div className="gap-lg grid grid-cols-2">
-        <ReceivedEmojiCard />
-        <SessionPerformanceCard />
-      </div>
-
-      <SessionHistorySection />
+      {/* <Suspense fallback={<SessionHistorySkeleton />}>
+        <SessionHistoryContent page={page} />
+      </Suspense> */}
     </div>
   );
 }
