@@ -6,5 +6,5 @@ interface ReportCardProps {
 }
 
 export default function ReportCard({ children, className = "" }: ReportCardProps) {
-  return <div className={`gap-lg flex flex-col ${className}`}>{children}</div>;
+  return <div className={`gap-lg flex flex-1 flex-col ${className}`}>{children}</div>;
 }
