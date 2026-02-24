@@ -9,6 +9,16 @@ export interface UpdateTodoRequest {
   todoContent: string;
 }
 
+export interface CreateSubtaskItem {
+  todoContent: string;
+}
+
+export type CreateSubtaskRequest = CreateSubtaskItem[];
+
+export interface CreateSubtaskResponse {
+  subtaskIds: number[];
+}
+
 export const taskApi = {
   updateGoal: async (
     taskId: number,
@@ -26,5 +36,15 @@ export const taskApi = {
 
   deleteTodo: async (subtaskId: number): Promise<ApiSuccessResponse<null>> => {
     return api.delete<ApiSuccessResponse<null>>(`/api/subtasks/${subtaskId}`);
+  },
+
+  createSubtask: async (
+    taskId: number,
+    body: CreateSubtaskRequest
+  ): Promise<ApiSuccessResponse<CreateSubtaskResponse>> => {
+    return api.post<ApiSuccessResponse<CreateSubtaskResponse>>(
+      `/api/tasks/${taskId}/subtasks`,
+      body
+    );
   },
 };

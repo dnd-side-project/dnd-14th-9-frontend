@@ -264,7 +264,7 @@ export interface InProgressTask {
 }
 
 // in-progress 참여자 상태
-export type InProgressMemberStatus = "FOCUS" | "REST";
+export type InProgressMemberStatus = "FOCUSED" | "REST";
 
 // in-progress 참여자 정보
 export interface InProgressMember {
@@ -282,6 +282,18 @@ export interface InProgressEventData {
   participantCount: number;
   averageAchievementRate: number;
   members: InProgressMember[];
+}
+
+// ============================================
+// 세션 상태 SSE 관련 타입
+// ============================================
+
+// 세션 상태 (SSE에서 사용)
+export type SessionStatusType = "WAITING" | "IN_PROGRESS" | "COMPLETED";
+
+// 세션 상태 SSE 이벤트 데이터
+export interface SessionStatusEventData {
+  status: SessionStatusType;
 }
 
 // ============================================
@@ -400,4 +412,28 @@ export interface SessionReactionEventData {
   star: number;
   thumbsUp: number;
   thumbsDown: number;
+}
+
+// ============================================
+// 세션 결과 제출 API 관련 타입
+// ============================================
+
+// 세션 결과 제출 요청
+export interface SubmitSessionResultRequest {
+  totalFocusSeconds: number; // 총 집중 시간 (초)
+  overallSeconds: number; // 전체 참여 시간 (초)
+}
+
+// 세션 결과 제출 응답
+export interface SubmitSessionResultResponse {
+  sessionId: number;
+}
+
+// ============================================
+// 세션 내 상태 토글 API 관련 타입
+// ============================================
+
+// 세션 내 상태 토글 응답
+export interface ToggleMyStatusResponse {
+  currentStatus: InProgressMemberStatus;
 }

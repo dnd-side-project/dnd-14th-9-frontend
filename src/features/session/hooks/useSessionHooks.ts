@@ -31,6 +31,9 @@ import type {
   SessionListResponse,
   SessionReportResponse,
   WaitingRoomResponse,
+  SubmitSessionResultRequest,
+  SubmitSessionResultResponse,
+  ToggleMyStatusResponse,
 } from "../types";
 
 const sessionCrud = createCrudHooks<
@@ -130,6 +133,20 @@ export function useLeaveSession() {
       queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
       queryClient.invalidateQueries({ queryKey: sessionKeys.inProgress(sessionRoomId) });
       queryClient.invalidateQueries({ queryKey: sessionKeys.waitingRoom(sessionRoomId) });
+    },
+  });
+}
+
+export function useKickMembers() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ApiSuccessResponse<null>,
+    ApiError,
+    { sessionId: string; memberIds: number[] }
+  >({
+    mutationFn: ({ sessionId, memberIds }) => sessionApi.kickMembers(sessionId, memberIds),
+    onSuccess: (_, { sessionId }) => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.waitingRoom(sessionId) });
     },
   });
 }
@@ -244,5 +261,30 @@ export function useSendReaction() {
     { sessionId: string; body: SendReactionRequest }
   >({
     mutationFn: ({ sessionId, body }) => sessionApi.sendReaction(sessionId, body),
+  });
+}
+/**
+ * 세션 결과 제출 mutation 훅
+ *
+ * 세션 완료 시 집중 시간과 참여 시간을 서버로 전송합니다.
+ */
+export function useSubmitSessionResult() {
+  return useMutation<
+    ApiSuccessResponse<SubmitSessionResultResponse>,
+    ApiError,
+    { sessionId: string; body: SubmitSessionResultRequest }
+  >({
+    mutationFn: ({ sessionId, body }) => sessionApi.submitResult(sessionId, body),
+  });
+}
+
+/**
+ * 세션 내 상태(집중/휴식) 토글 mutation 훅
+ *
+ * 집중 중이면 휴식으로, 휴식 중이면 집중으로 상태를 전환합니다.
+ */
+export function useToggleMyStatus() {
+  return useMutation<ApiSuccessResponse<ToggleMyStatusResponse>, ApiError, { sessionId: string }>({
+    mutationFn: ({ sessionId }) => sessionApi.toggleMyStatus(sessionId),
   });
 }

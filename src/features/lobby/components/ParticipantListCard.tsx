@@ -8,18 +8,26 @@ import { Button } from "@/components/Button/Button";
 import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
 import { HostBadgeIcon } from "@/components/Icon/HostBadgeIcon";
+import { useKickMembers } from "@/features/session/hooks/useSessionHooks";
 
 import type { WaitingMember } from "../types";
 
 interface ParticipantListCardProps {
+  sessionId: string;
   members: WaitingMember[];
   maxParticipants: number;
 }
 
-export function ParticipantListCard({ members, maxParticipants }: ParticipantListCardProps) {
+export function ParticipantListCard({
+  sessionId,
+  members,
+  maxParticipants,
+}: ParticipantListCardProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isKicking, setIsKicking] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+
+  const kickMembersMutation = useKickMembers();
 
   const handleToggle = (memberId: string) => {
     setExpandedId((prev) => (prev === memberId ? null : memberId));
@@ -36,9 +44,18 @@ export function ParticipantListCard({ members, maxParticipants }: ParticipantLis
   };
 
   const handleConfirmKick = () => {
-    // TODO: 강퇴 API 호출
-    setIsKicking(false);
-    setSelectedIds(new Set());
+    if (selectedIds.size === 0) return;
+
+    const memberIds = Array.from(selectedIds).map(Number);
+    kickMembersMutation.mutate(
+      { sessionId, memberIds },
+      {
+        onSuccess: () => {
+          setIsKicking(false);
+          setSelectedIds(new Set());
+        },
+      }
+    );
   };
 
   const handleSelectToggle = (memberId: string) => {
@@ -197,8 +214,9 @@ export function ParticipantListCard({ members, maxParticipants }: ParticipantLis
             size="medium"
             className="flex-1"
             onClick={handleConfirmKick}
+            disabled={kickMembersMutation.isPending || selectedIds.size === 0}
           >
-            강퇴하기
+            {kickMembersMutation.isPending ? "강퇴 중..." : "강퇴하기"}
           </Button>
         </div>
       )}

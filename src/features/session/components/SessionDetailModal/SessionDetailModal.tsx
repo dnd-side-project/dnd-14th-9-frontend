@@ -136,6 +136,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
       {showJoinModal && (
         <SessionJoinModal
           sessionId={sessionId}
+          sessionStatus={session?.status}
           onClose={() => setShowJoinModal(false)}
           onJoinSuccess={() => {
             // router.back() 없이 dialog만 직접 닫기

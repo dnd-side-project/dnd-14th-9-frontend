@@ -15,6 +15,9 @@ import type {
   SessionListParams,
   SessionListResponse,
   SessionReportResponse,
+  SubmitSessionResultRequest,
+  SubmitSessionResultResponse,
+  ToggleMyStatusResponse,
   WaitingRoomResponse,
 } from "./types";
 
@@ -85,6 +88,32 @@ export const sessionApi = {
     return api.post<ApiSuccessResponse<SendReactionResponse>>(
       `/api/sessions/${sessionId}/reaction`,
       body
+    );
+  },
+  kickMembers: async (
+    sessionId: string,
+    memberIds: number[]
+  ): Promise<ApiSuccessResponse<null>> => {
+    return api.delete<ApiSuccessResponse<null>>(`/api/sessions/${sessionId}/members`, {
+      memberIds,
+    });
+  },
+
+  submitResult: async (
+    sessionId: string,
+    body: SubmitSessionResultRequest
+  ): Promise<ApiSuccessResponse<SubmitSessionResultResponse>> => {
+    return api.post<ApiSuccessResponse<SubmitSessionResultResponse>>(
+      `/api/sessions/${sessionId}/results`,
+      body
+    );
+  },
+
+  toggleMyStatus: async (
+    sessionId: string
+  ): Promise<ApiSuccessResponse<ToggleMyStatusResponse>> => {
+    return api.patch<ApiSuccessResponse<ToggleMyStatusResponse>>(
+      `/api/sessions/${sessionId}/me/status`
     );
   },
 };
