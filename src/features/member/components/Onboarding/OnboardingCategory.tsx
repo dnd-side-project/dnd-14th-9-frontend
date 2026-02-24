@@ -123,7 +123,7 @@ export function OnboardingCategory({
                 isSelected={isSelected}
                 onClick={() => toggleCategory(category)}
                 className={cn(
-                  "h-14 w-full rounded-lg px-4 py-3 text-center text-base",
+                  "gap-2xs h-14 w-full rounded-lg px-4 py-3 text-center text-base",
                   ONBOARDING_CATEGORY_SPAN_CLASS[category],
                   isSelected
                     ? "text-text-brand-default bg-[#27EA671F]"
