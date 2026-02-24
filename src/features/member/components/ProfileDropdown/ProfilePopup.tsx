@@ -2,24 +2,33 @@
 
 import { usePathname } from "next/navigation";
 
-import { Badge } from "@/components/Badge/Badge";
-import { ButtonLink } from "@/components/Button/ButtonLink";
 import { BarGraphIcon } from "@/components/Icon/BarGraphIcon";
 import { EditContainedIcon } from "@/components/Icon/EditContainedIcon";
 import { LogoutIcon } from "@/components/Icon/LogoutIcon";
-import { getCategoryLabel } from "@/lib/constants/category";
-import type { Category } from "@/lib/constants/category";
 import { cn } from "@/lib/utils/utils";
 
+import { PATHS } from "./constants";
 import { FocusStatusItem } from "./FocusStatusItem";
-import { MenuItem, MenuItemContent, menuItemBaseClassName } from "./MenuItem";
+import { InterestBadges } from "./InterestBadges";
+import { MenuLink } from "./MenuLink";
 import { ProfileHeader } from "./ProfileHeader";
 
 import type { MemberProfileView } from "../../types";
 
-const PROFILE_SETTINGS_PATH = "/profile/settings";
-const PROFILE_REPORT_PATH = "/profile/report";
-const FEEDBACK_PATH = "/feedback";
+const MENU_ITEMS = [
+  {
+    href: PATHS.PROFILE_REPORT,
+    icon: <BarGraphIcon size="xsmall" className="h-5 w-5" />,
+    label: "기록 리포트",
+    callbackKey: "onReportClick",
+  },
+  {
+    href: PATHS.FEEDBACK,
+    icon: <EditContainedIcon size="xsmall" className="h-5 w-5" />,
+    label: "피드백 남기기",
+    callbackKey: "onFeedbackClick",
+  },
+] as const;
 
 interface ProfilePopupProps {
   className?: string;
@@ -35,116 +44,77 @@ export function ProfilePopup({
   className,
   profile,
   onClose,
-  onProfileSettingsClick,
   onReportClick,
   onFeedbackClick,
   onLogoutClick,
 }: ProfilePopupProps) {
-  const {
-    nickname,
-    email,
-    profileImageUrl,
-    focusedTime,
-    totalParticipationTime,
-    completedTodoCount,
-    totalTodoCount,
-    firstInterestCategory,
-    secondInterestCategory,
-    thirdInterestCategory,
-  } = profile;
-
-  const handleMenuItemClick = (callback?: () => void) => () => {
-    onClose?.();
-    callback?.();
-  };
-
   const pathname = usePathname();
 
-  const getLinkClassName = (href: string) =>
-    cn(
-      menuItemBaseClassName,
-      "border-color-default hover:border-border-default pr-md pl-lg py-md",
-      pathname === href && "bg-surface-strong!"
-    );
+  const callbacks: Record<string, (() => void) | undefined> = {
+    onReportClick,
+    onFeedbackClick,
+  };
+
+  const handleMenuItemClick = (callbackKey: string) => () => {
+    onClose?.();
+    callbacks[callbackKey]?.();
+  };
+
+  const handleLogout = () => {
+    onClose?.();
+    onLogoutClick?.();
+  };
 
   return (
     <div
       className={cn(
-        "px-lg py-md gap-sm border-border-default bg-surface-default flex w-[428px] flex-col rounded-lg border",
+        "px-lg py-md gap-sm border-border-default bg-surface-default flex w-107 flex-col rounded-lg border",
         className
       )}
     >
       <ProfileHeader
-        nickname={nickname}
-        email={email}
-        profileImageUrl={profileImageUrl}
+        nickname={profile.nickname}
+        email={profile.email}
+        profileImageUrl={profile.profileImageUrl}
         onClose={onClose}
       />
 
       <div className="gap-md flex flex-col">
-        <div className="gap-xs flex">
-          {firstInterestCategory && (
-            <div className="gap-xs flex items-center">
-              <p className="text-text-primary text-xs font-semibold">1순위</p>
-              <Badge>{getCategoryLabel(firstInterestCategory as Category)}</Badge>
-            </div>
-          )}
-          {secondInterestCategory && (
-            <div className="gap-xs flex items-center">
-              <p className="text-text-primary text-xs font-semibold">2순위</p>
-              <Badge>{getCategoryLabel(secondInterestCategory as Category)}</Badge>
-            </div>
-          )}
-          {thirdInterestCategory && (
-            <div className="gap-xs flex items-center">
-              <p className="text-text-primary text-xs font-semibold">3순위</p>
-              <Badge>{getCategoryLabel(thirdInterestCategory as Category)}</Badge>
-            </div>
-          )}
-        </div>
+        <InterestBadges profile={profile} />
 
         <FocusStatusItem
-          focusedTime={focusedTime}
-          totalParticipationTime={totalParticipationTime}
-          completedTodoCount={completedTodoCount}
-          totalTodoCount={totalTodoCount}
+          focusedTime={profile.focusedTime}
+          totalParticipationTime={profile.totalParticipationTime}
+          completedTodoCount={profile.completedTodoCount}
+          totalTodoCount={profile.totalTodoCount}
         />
 
-        <ButtonLink
-          href={PROFILE_REPORT_PATH}
-          onClick={handleMenuItemClick(onReportClick)}
-          variant="ghost"
-          colorScheme="secondary"
-          className={cn(getLinkClassName(PROFILE_REPORT_PATH), "justify-start")}
-        >
-          <MenuItemContent
-            icon={<BarGraphIcon size="xsmall" className="h-[20px] w-[20px]" />}
-            label="기록 리포트"
-            isActive={pathname === PROFILE_REPORT_PATH}
+        {MENU_ITEMS.map(({ href, icon, label, callbackKey }) => (
+          <MenuLink
+            key={href}
+            href={href}
+            icon={icon}
+            label={label}
+            isActive={pathname === href}
+            onClick={handleMenuItemClick(callbackKey)}
           />
-        </ButtonLink>
-
-        <ButtonLink
-          href={FEEDBACK_PATH}
-          onClick={handleMenuItemClick(onFeedbackClick)}
-          variant="ghost"
-          colorScheme="secondary"
-          className={cn(getLinkClassName(FEEDBACK_PATH), "justify-start")}
-        >
-          <MenuItemContent
-            icon={<EditContainedIcon size="xsmall" className="h-[20px] w-[20px]" />}
-            label="피드백 남기기"
-            isActive={pathname === FEEDBACK_PATH}
-          />
-        </ButtonLink>
+        ))}
 
         <div className="flex justify-end">
-          <MenuItem
-            icon={<LogoutIcon size="xsmall" className="h-[20px] w-[20px]" />}
-            label="로그아웃"
-            onClick={handleMenuItemClick(onLogoutClick)}
-            className="bg-surface-strong pl-md gap-sm text-text-muted! justify-center border-none py-[12px] pr-[20px]"
-          />
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="group gap-sm bg-surface-strong pl-md text-text-tertiary flex items-center justify-center rounded-md py-3 pr-5"
+          >
+            <div className="gap-sm flex items-center">
+              <div className="text-text-muted relative flex shrink-0 items-center justify-center rounded-full transition-colors">
+                <LogoutIcon size="xsmall" className="h-5 w-5" />
+              </div>
+              <p className="text-text-muted text-[14px] font-semibold transition-colors">
+                로그아웃
+              </p>
+            </div>
+          </button>
         </div>
       </div>
     </div>

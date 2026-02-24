@@ -24,7 +24,7 @@ export function FocusStatusItem({
     <div className="p-lg gap-md border-border-subtle bg-surface-strong flex flex-col rounded-md border">
       <div className="flex items-center justify-between">
         <div className="gap-2xs flex h-[56px] w-[241px] flex-col items-start">
-          <p className="text-text=primary text-xs font-semibold">집중도</p>
+          <p className="text-text-primary text-xs font-semibold">집중도</p>
           <p className="font-pretendard text-text-brand-subtle text-lg leading-[1.4]">
             <span className="font-bold">총 {focusedTime}분 </span>
             <span className="text-text-muted text-sm font-semibold">

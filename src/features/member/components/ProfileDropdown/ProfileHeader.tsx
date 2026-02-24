@@ -1,11 +1,9 @@
 "use client";
 
 import { Avatar } from "@/components/Avatar/Avatar";
-import { Button } from "@/components/Button/Button";
+import { ButtonLink } from "@/components/Button/ButtonLink";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { EditIcon } from "@/components/Icon/EditIcon";
-
-import { ButtonLink } from "../../../../components/Button/ButtonLink";
 
 interface ProfileHeaderProps {
   nickname: string;
