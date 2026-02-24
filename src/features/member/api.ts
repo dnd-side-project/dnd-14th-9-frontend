@@ -96,9 +96,9 @@ export const memberApi = {
     page: number;
     size: number;
   }): Promise<GetMyReportSessionsResponse> => {
-    return api.get<GetMyReportSessionsResponse>(
-      `/api/members/me/report-sessions?page=${params.page}&size=${params.size}`
-    );
+    return api.get<GetMyReportSessionsResponse>("/api/members/me/report-sessions", {
+      params,
+    });
   },
 
   deleteMe: async (): Promise<DeleteMeResponse> => {
