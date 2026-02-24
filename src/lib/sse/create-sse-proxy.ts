@@ -4,23 +4,22 @@ import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 
 const SERVER_API_URL = process.env.BACKEND_API_BASE ?? process.env.NEXT_PUBLIC_BACKEND_API_BASE;
 
-interface CreateSSEProxyHandlerOptions {
-  buildBackendUrl: (baseUrl: string, sessionId: string) => string;
+interface CreateSSEProxyHandlerOptions<TParams extends Record<string, string>> {
+  buildBackendUrl: (baseUrl: string, params: TParams) => string;
 }
 
-export function createSSEProxyHandler(options: CreateSSEProxyHandlerOptions) {
-  return async function GET(
-    request: NextRequest,
-    { params }: { params: Promise<{ sessionId: string }> }
-  ) {
-    const { sessionId } = await params;
+export function createSSEProxyHandler<TParams extends Record<string, string>>(
+  options: CreateSSEProxyHandlerOptions<TParams>
+) {
+  return async function GET(request: NextRequest, { params }: { params: Promise<TParams> }) {
+    const resolvedParams = await params;
     const rawToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
 
     if (!rawToken) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    const backendUrl = options.buildBackendUrl(SERVER_API_URL ?? "", sessionId);
+    const backendUrl = options.buildBackendUrl(SERVER_API_URL ?? "", resolvedParams);
     const abortController = new AbortController();
 
     request.signal.addEventListener("abort", () => {

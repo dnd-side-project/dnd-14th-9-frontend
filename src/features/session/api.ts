@@ -8,6 +8,9 @@ import type {
   InProgressEventData,
   JoinSessionRequest,
   JoinSessionResponse,
+  MyReportResponse,
+  SendReactionRequest,
+  SendReactionResponse,
   SessionDetailResponse,
   SessionListParams,
   SessionListResponse,
@@ -74,6 +77,19 @@ export const sessionApi = {
     return api.delete<ApiSuccessResponse<null>>(`/api/sessions/${sessionId}/leave`);
   },
 
+  getMyReport: async (sessionId: string): Promise<ApiSuccessResponse<MyReportResponse>> => {
+    return api.get<ApiSuccessResponse<MyReportResponse>>(`/api/sessions/${sessionId}/me/report`);
+  },
+
+  sendReaction: async (
+    sessionId: string,
+    body: SendReactionRequest
+  ): Promise<ApiSuccessResponse<SendReactionResponse>> => {
+    return api.post<ApiSuccessResponse<SendReactionResponse>>(
+      `/api/sessions/${sessionId}/reaction`,
+      body
+    );
+  },
   kickMembers: async (
     sessionId: string,
     memberIds: number[]

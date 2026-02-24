@@ -18,15 +18,18 @@ import { sessionApi } from "../api";
 import { useInProgressMembersSSE } from "./useInProgressMembersSSE";
 
 import type {
-  InProgressEventData,
-  SessionListParams,
-  SessionListResponse,
-  SessionDetailResponse,
-  SessionReportResponse,
   CreateSessionRequest,
   CreateSessionResponse,
+  InProgressEventData,
   JoinSessionRequest,
   JoinSessionResponse,
+  MyReportResponse,
+  SendReactionRequest,
+  SendReactionResponse,
+  SessionDetailResponse,
+  SessionListParams,
+  SessionListResponse,
+  SessionReportResponse,
   WaitingRoomResponse,
   SubmitSessionResultRequest,
   SubmitSessionResultResponse,
@@ -52,6 +55,7 @@ export const sessionKeys = {
   report: (id: string) => ["session", "report", id] as const,
   waitingRoom: (id: string) => ["session", "waitingRoom", id] as const,
   inProgress: (id: string) => ["session", "inProgress", id] as const,
+  myReport: (id: string) => ["session", "myReport", id] as const,
 };
 
 export const useSessionList = sessionCrud.useList;
@@ -228,6 +232,37 @@ export function useToggleSubtaskCompletion() {
   });
 }
 
+// ============================================
+// Session Result (리포트 + 리액션)
+// ============================================
+
+interface UseMyReportOptions {
+  enabled?: boolean;
+}
+
+/**
+ * 나의 리포트 조회 훅
+ */
+export function useMyReport(sessionId: string, options?: UseMyReportOptions) {
+  return useQuery<ApiSuccessResponse<MyReportResponse>>({
+    queryKey: sessionKeys.myReport(sessionId),
+    queryFn: () => sessionApi.getMyReport(sessionId),
+    enabled: options?.enabled ?? true,
+  });
+}
+
+/**
+ * 리액션 보내기 mutation 훅
+ */
+export function useSendReaction() {
+  return useMutation<
+    ApiSuccessResponse<SendReactionResponse>,
+    ApiError,
+    { sessionId: string; body: SendReactionRequest }
+  >({
+    mutationFn: ({ sessionId, body }) => sessionApi.sendReaction(sessionId, body),
+  });
+}
 /**
  * 세션 결과 제출 mutation 훅
  *

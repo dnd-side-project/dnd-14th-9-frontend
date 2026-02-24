@@ -307,26 +307,111 @@ export interface ReportTodoItem {
   isCompleted: boolean;
 }
 
-// 리포트 내 참여자 정보
-export interface ReportParticipant {
-  memberId: string;
+// ============================================
+// 이모지 관련 공통 타입
+// ============================================
+
+export type EmojiType = "HEART" | "STAR" | "THUMBS_UP" | "THUMBS_DOWN";
+
+// 이모지 결과 (멤버별 카운트)
+export interface MemberEmojiResult {
+  heartCount: number;
+  starCount: number;
+  thumbsUpCount: number;
+  thumbsDownCount: number;
+}
+
+// ============================================
+// 나의 리포트 조회 API 관련 타입
+// ============================================
+
+export interface MyReportTodoItem {
+  subtaskId: number;
+  content: string;
+  isCompleted: boolean;
+}
+
+export interface MyReportTask {
+  taskId: number;
+  goal: string;
+  todos: MyReportTodoItem[];
+}
+
+export interface MyReportMemberResult {
+  memberId: number;
   nickname: string;
   profileImageUrl?: string;
-  focusTimeMinutes: number;
+  role: SessionRole;
+  focusRate: number;
+  totalFocusSeconds: number;
+  overallFocusSeconds: number;
+  achievementRate: number;
+  task: MyReportTask | null;
+  emojiResult: MemberEmojiResult;
+}
+
+export interface MyReportResponse {
+  sessionId: number;
+  currentParticipants: number;
+  sessionMemberResult: MyReportMemberResult;
+}
+
+// ============================================
+// 세션 참여자 전체 리포트 조회 API 관련 타입
+// ============================================
+
+export interface SessionReportMember {
+  memberId: number;
+  nickname: string;
+  profileImageUrl?: string;
+  role: SessionRole;
+  goal: string;
+  focusRate: number;
   achievementRate: number;
 }
 
-// 리포트 응답
-// TODO(장근호): 서버 응답 확정 후 수정 필요
 export interface SessionReportResponse {
-  sessionId: string;
-  totalDurationMinutes: number; // 총 세션 시간
-  focusTimeMinutes: number; // 집중 시간
-  focusRate: number; // 집중률 (0-100)
-  goal: string; // 목표
-  todoList: ReportTodoItem[]; // todo 목록
-  todoAchievementRate: number; // todo 달성률 (0-100)
-  participants: ReportParticipant[]; // 참여자 정보
+  averageTotalFocusSeconds: number;
+  averageOverallSeconds: number;
+  averageAchievementRate: number;
+  averageFocusRate: number;
+  members: SessionReportMember[];
+  emojiResult: MemberEmojiResult;
+}
+
+// ============================================
+// 리액션 API 관련 타입
+// ============================================
+
+export interface SendReactionRequest {
+  targetMemberId: number;
+  emojiType: EmojiType;
+}
+
+export interface SendReactionResponse {
+  targetMemberId: number;
+  emojiType: EmojiType;
+  result: string;
+}
+
+// ============================================
+// 리액션 SSE 이벤트 타입
+// ============================================
+
+// 특정 사용자 리액션 SSE 이벤트 데이터
+export interface MemberReactionEventData {
+  heartCount: number;
+  starCount: number;
+  thumbsUpCount: number;
+  thumbsDownCount: number;
+}
+
+// 전체 참여자 리액션 SSE 이벤트 데이터
+export interface SessionReactionEventData {
+  heart: number;
+  star: number;
+  thumbsUp: number;
+  thumbsDown: number;
 }
 
 // ============================================
