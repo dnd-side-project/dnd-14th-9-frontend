@@ -1,5 +1,3 @@
-"use client";
-
 import { Badge } from "@/components/Badge/Badge";
 import { Thumbnail } from "@/components/Thumbnail/Thumbnail";
 
