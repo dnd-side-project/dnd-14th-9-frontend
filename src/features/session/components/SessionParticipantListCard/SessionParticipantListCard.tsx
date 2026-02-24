@@ -79,7 +79,7 @@ export function SessionParticipantListCard({
             const isExpanded = expandedId === member.memberId;
             const todos = member.task?.todos ?? [];
             const completedCount = todos.filter((t) => t.isCompleted).length;
-            const isFocusing = member.status === "FOCUS";
+            const isFocusing = member.status === "FOCUSED";
             const isHost = member.role === "HOST";
 
             return (

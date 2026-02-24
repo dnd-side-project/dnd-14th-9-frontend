@@ -56,7 +56,7 @@ export default function ReceivedEmojiCard({ data }: ReceivedEmojiCardProps) {
             return (
               <div
                 key={emoji.emojiName}
-                className="gap-xs py-lg px-md bg-surface-strong flex flex-col items-center justify-center self-end rounded-sm"
+                className="gap-xs py-lg px-md bg-surface-strong flex flex-1 flex-col items-center justify-center self-end rounded-sm"
               >
                 <p className="px-lg py-sm flex items-center justify-center">
                   {Icon ? (
