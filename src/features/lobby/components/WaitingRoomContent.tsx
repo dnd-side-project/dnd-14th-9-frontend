@@ -83,11 +83,13 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   const session = data.result;
 
   const myMemberId = meData?.result?.id;
-  // SSE 데이터가 있으면 우선, 없으면 초기 REST API 데이터 사용
+  // 참여자 목록: SSE 데이터가 있으면 우선, 없으면 초기 REST API 데이터 사용
   const members: WaitingMember[] = (sseWaitingData?.members ??
     initialWaitingData?.result?.members ??
     []) as WaitingMember[];
-  const myTask = members.find((m) => m.memberId === myMemberId)?.task;
+  // 내 할 일: REST API 데이터에서 가져옴 (SSE는 참여자 상태만 업데이트)
+  const myTask =
+    initialWaitingData?.result?.members?.find((m) => m.memberId === myMemberId)?.task ?? null;
   const maxParticipants = session.maxParticipants;
 
   return (
@@ -105,7 +107,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
         />
         <SessionInfoCard session={session} />
         <div className="gap-lg flex">
-          <GoalAndTodoCard sessionId={sessionId} task={myTask ?? null} />
+          <GoalAndTodoCard sessionId={sessionId} task={myTask} />
           <ParticipantListCard
             sessionId={sessionId}
             members={members}

@@ -63,7 +63,7 @@ export function SessionGoalAndTodoCard({
         {todos.length === 0 ? (
           <p className="text-text-muted py-md text-center text-[14px]">등록된 할 일이 없습니다</p>
         ) : (
-          <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+          <ul className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
             {todos.map((todo) => (
               <li
                 key={todo.subtaskId}

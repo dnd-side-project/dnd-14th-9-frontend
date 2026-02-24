@@ -96,7 +96,7 @@ export const sessionApi = {
   toggleMyStatus: async (
     sessionId: string
   ): Promise<ApiSuccessResponse<ToggleMyStatusResponse>> => {
-    return api.post<ApiSuccessResponse<ToggleMyStatusResponse>>(
+    return api.patch<ApiSuccessResponse<ToggleMyStatusResponse>>(
       `/api/sessions/${sessionId}/me/status`
     );
   },

@@ -8,7 +8,14 @@ import { Button } from "@/components/Button/Button";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { TextInput } from "@/components/Input/TextInput";
-import { useDeleteTodo, useUpdateGoal, useUpdateTodo } from "@/features/task/hooks/useTaskHooks";
+import {
+  useCreateTodo,
+  useDeleteTodo,
+  useUpdateGoal,
+  useUpdateTodo,
+} from "@/features/task/hooks/useTaskHooks";
+
+import { lobbyKeys } from "../hooks/useLobbyHooks";
 
 import type { WaitingMemberTask, WaitingTodoItem } from "../types";
 
@@ -32,6 +39,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
   const updateGoalMutation = useUpdateGoal();
   const updateTodoMutation = useUpdateTodo();
   const deleteTodoMutation = useDeleteTodo();
+  const createTodoMutation = useCreateTodo();
 
   // props에서 파생된 기본값
   const taskId = task?.taskId ?? null;
@@ -80,7 +88,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
 
       // 2. 변경된 todo 업데이트
       for (const draft of draftTodos) {
-        if (draft.isNew) continue; // 새로 추가된 항목은 별도 API 필요 (현재 미지원)
+        if (draft.isNew) continue;
 
         const original = todos.find((t) => t.subtaskId === draft.subtaskId);
         if (original && original.content !== draft.content.trim()) {
@@ -91,17 +99,34 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
         }
       }
 
-      // 3. 삭제된 todo 처리
+      // 3. 새로 추가된 todo 생성 (배열로 한 번에 전송)
+      const newTodos = draftTodos
+        .filter((draft) => draft.isNew && draft.content.trim())
+        .map((draft) => ({ todoContent: draft.content.trim() }));
+
+      if (newTodos.length > 0) {
+        await createTodoMutation.mutateAsync({
+          taskId,
+          body: newTodos,
+        });
+      }
+
+      // 4. 삭제된 todo 처리
       for (const subtaskId of deletedTodoIds) {
         await deleteTodoMutation.mutateAsync({ subtaskId });
       }
 
       setIsEditing(false);
       setDeletedTodoIds([]);
-      // 저장 후 waitingRoom 쿼리 무효화로 최신 데이터 반영
-      await queryClient.invalidateQueries({
-        queryKey: ["session", "waitingRoom", sessionId],
-      });
+      // 저장 후 waitingRoom 및 참여자 목록 쿼리 무효화로 최신 데이터 반영
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["session", "waitingRoom", sessionId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: lobbyKeys.waitingMembers(sessionId),
+        }),
+      ]);
     } catch (error) {
       console.error("저장 실패:", error);
     } finally {
@@ -191,7 +216,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
                 />
               </div>
             ) : (
-              <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+              <ul className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
                 {draftTodos.map((todo, index) => {
                   const isFirst = index === 0;
                   const canAdd = draftTodos.length < 5;
@@ -236,7 +261,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
         ) : displayTodos.length === 0 ? (
           <p className="text-text-muted py-md text-center text-[14px]">등록된 할 일이 없습니다</p>
         ) : (
-          <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+          <ul className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
             {todos.map((todo) => (
               <li
                 key={todo.subtaskId}
