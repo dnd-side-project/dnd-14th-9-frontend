@@ -68,7 +68,7 @@ export const memberQueries = {
   report: () =>
     queryOptions({
       queryKey: memberKeys.report(),
-      queryFn: memberApi.getMyReport,
+      queryFn: memberApi.getMyReportStats,
     }),
 };
 

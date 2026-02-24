@@ -4,7 +4,7 @@ import type {
   GetMeResponse,
   MemberProfileMutationResponse,
   MemberProfileView,
-  MemberReport,
+  MemberReportStats,
   UpdateInterestCategoriesRequest,
 } from "@/features/member/types";
 import { api } from "@/lib/api/api";
@@ -62,23 +62,23 @@ const mockMemberMutationResponse: MemberProfileMutationResponse = {
   ...mockMemberEditResponse,
 };
 
-const mockReportResponse: ApiSuccessResponse<MemberReport> = {
+const mockReportResponse: ApiSuccessResponse<MemberReportStats> = {
   isSuccess: true,
   code: "COMMON200",
   message: "성공적으로 요청을 처리했습니다.",
   result: {
     totalParticipationTime: 40,
     focusedTime: 30,
-    completedSessionCount: 5,
     todoCompletionRate: 70,
-    devSessionParticipationRate: 20,
-    designParticipationRate: 20,
-    planningPmParticipationRate: 10,
-    careerSelfDevelopmentParticipationRate: 10,
-    studyReadingParticipationRate: 10,
-    creativeParticipationRate: 10,
-    teamProjectParticipationRate: 10,
-    freeParticipationRate: 10,
+    focusRate: 75,
+    sessionParticipationStats: [
+      { categoryName: "DEVELOPMENT", count: 2, rate: 40 },
+      { categoryName: "DESIGN", count: 1, rate: 20 },
+    ],
+    receivedEmojis: [
+      { emojiName: "HEART", count: 3 },
+      { emojiName: "STAR", count: 1 },
+    ],
   },
 };
 
@@ -147,7 +147,7 @@ describe("memberApi", () => {
 
     await memberApi.getMe();
     await memberApi.getMeForEdit();
-    await memberApi.getMyReport();
+    await memberApi.getMyReportStats();
     await memberApi.deleteMe();
 
     expect(mockedApi.get).toHaveBeenNthCalledWith(1, "/api/members/me/profile", {
@@ -158,7 +158,7 @@ describe("memberApi", () => {
       retry: { maxRetries: 0 },
       timeout: 5000,
     });
-    expect(mockedApi.get).toHaveBeenNthCalledWith(3, "/api/members/me/report");
+    expect(mockedApi.get).toHaveBeenNthCalledWith(3, "/api/members/me/report-stats");
     expect(mockedApi.delete).toHaveBeenCalledWith("/api/members/me");
   });
 });

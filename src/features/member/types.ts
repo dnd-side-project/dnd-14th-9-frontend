@@ -39,20 +39,74 @@ export interface MemberEditInfo {
   thirdInterestCategory: MemberInterestCategory | null;
 }
 
-// TODO(이경환) : 추후 백엔드 명세서에 맞게 수정 필요
-export interface MemberReport {
-  totalParticipationTime: number;
+// Report 관련 타입 정의
+
+// Activity Summary
+export interface ActivitySummaryData {
+  focusedTime: number; // seconds
+  totalParticipationTime: number; // seconds
+  focusRate: number; // percentage (0-100)
+}
+
+// Category Participation
+export interface CategoryParticipationItem {
+  categoryName: Category; // 기존 Category 타입 재사용
+  count: number; // session count
+  rate: number; // percentage (0-100)
+}
+
+// Emoji
+export type EmojiName = "HEART" | "THUMBS_UP" | "THUMBS_DOWN" | "STAR";
+
+export interface ReceivedEmojiItem {
+  emojiName: EmojiName;
+  count: number; // numeric count
+}
+
+// Session Performance
+export interface SessionPerformanceData {
+  todoCompletionRate: number; // percentage (0-100)
+  focusRate: number; // percentage (0-100)
+}
+
+// Session History
+export interface SessionHistoryItem {
+  sessionId: string;
+  title: string;
+  category: Category; // 기존 Category 타입 재사용
+  currentCount: number;
+  maxCapacity: number;
+  durationTime: number; // seconds
+  startTime: string; // ISO datetime
+  focusedTime: number; // seconds
+  focusRate: number; // percentage (0-100)
+  todoCompletionRate: number; // percentage (0-100)
+}
+
+export interface SessionHistoryPagination {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalElements: number;
+}
+
+// Report Stats (통계 정보) — 실제 API 응답의 flat 구조
+export interface MemberReportStats {
   focusedTime: number;
-  completedSessionCount: number;
+  totalParticipationTime: number;
   todoCompletionRate: number;
-  devSessionParticipationRate: number;
-  designParticipationRate: number;
-  planningPmParticipationRate: number;
-  careerSelfDevelopmentParticipationRate: number;
-  studyReadingParticipationRate: number;
-  creativeParticipationRate: number;
-  teamProjectParticipationRate: number;
-  freeParticipationRate: number;
+  focusRate: number;
+  sessionParticipationStats: CategoryParticipationItem[];
+  receivedEmojis: ReceivedEmojiItem[];
+}
+
+// Report Sessions (세션 히스토리)
+export interface MemberReportSessions {
+  sessions: SessionHistoryItem[];
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalElements: number;
 }
 
 // Request 타입
@@ -87,6 +141,7 @@ export type UpdateProfileImageResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateNicknameResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateMeResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateInterestCategoriesResponse = ApiSuccessResponse<MemberEditInfo>;
-export type GetMyReportResponse = ApiSuccessResponse<MemberReport>;
+export type GetMyReportStatsResponse = ApiSuccessResponse<MemberReportStats>;
+export type GetMyReportSessionsResponse = ApiSuccessResponse<MemberReportSessions>;
 export type DeleteMeResponse = ApiSuccessResponse<null>;
 export type DeleteProfileImageResponse = ApiSuccessResponse<null>;

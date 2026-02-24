@@ -5,7 +5,8 @@ import type {
   DeleteProfileImageResponse,
   GetMeForEditResponse,
   GetMeResponse,
-  GetMyReportResponse,
+  GetMyReportSessionsResponse,
+  GetMyReportStatsResponse,
   UpdateInterestCategoriesRequest,
   UpdateInterestCategoriesResponse,
   UpdateMeRequest,
@@ -87,8 +88,17 @@ export const memberApi = {
     return api.patch<UpdateInterestCategoriesResponse>("/api/members/me/interest-categories", body);
   },
 
-  getMyReport: async (): Promise<GetMyReportResponse> => {
-    return api.get<GetMyReportResponse>("/api/members/me/report");
+  getMyReportStats: async (): Promise<GetMyReportStatsResponse> => {
+    return api.get<GetMyReportStatsResponse>("/api/members/me/report-stats");
+  },
+
+  getMyReportSessions: async (params: {
+    page: number;
+    size: number;
+  }): Promise<GetMyReportSessionsResponse> => {
+    return api.get<GetMyReportSessionsResponse>("/api/members/me/report-sessions", {
+      params,
+    });
   },
 
   deleteMe: async (): Promise<DeleteMeResponse> => {
