@@ -5,7 +5,9 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/Button/Button";
+import { ButtonGroup } from "@/components/ButtonGroup/ButtonGroup";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
+import { PencilIcon } from "@/components/Icon/PencilIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { TextInput } from "@/components/Input/TextInput";
 import {
@@ -78,43 +80,51 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
     setIsSaving(true);
 
     try {
-      // 1. 목표가 변경되었으면 업데이트
-      if (draftGoal.trim() !== goal) {
-        await updateGoalMutation.mutateAsync({
-          taskId,
-          body: { goalContent: draftGoal.trim() },
-        });
-      }
+      // 1. 목표 업데이트
+      const updateGoalPromise =
+        draftGoal.trim() !== goal
+          ? updateGoalMutation.mutateAsync({
+              taskId,
+              body: { goalContent: draftGoal.trim() },
+            })
+          : Promise.resolve();
 
       // 2. 변경된 todo 업데이트
-      for (const draft of draftTodos) {
-        if (draft.isNew) continue;
-
-        const original = todos.find((t) => t.subtaskId === draft.subtaskId);
-        if (original && original.content !== draft.content.trim()) {
-          await updateTodoMutation.mutateAsync({
+      const updateTodoPromises = draftTodos
+        .filter((draft) => {
+          if (draft.isNew) return false;
+          const original = todos.find((t) => t.subtaskId === draft.subtaskId);
+          return original && original.content !== draft.content.trim();
+        })
+        .map((draft) =>
+          updateTodoMutation.mutateAsync({
             subtaskId: draft.subtaskId,
             body: { todoContent: draft.content.trim() },
-          });
-        }
-      }
+          })
+        );
 
       // 3. 새로 추가된 todo 생성 (배열로 한 번에 전송)
       const newTodos = draftTodos
         .filter((draft) => draft.isNew && draft.content.trim())
         .map((draft) => ({ todoContent: draft.content.trim() }));
 
-      if (newTodos.length > 0) {
-        await createTodoMutation.mutateAsync({
-          taskId,
-          body: newTodos,
-        });
-      }
+      const createTodoPromise =
+        newTodos.length > 0
+          ? createTodoMutation.mutateAsync({ taskId, body: newTodos })
+          : Promise.resolve();
 
       // 4. 삭제된 todo 처리
-      for (const subtaskId of deletedTodoIds) {
-        await deleteTodoMutation.mutateAsync({ subtaskId });
-      }
+      const deleteTodoPromises = deletedTodoIds.map((subtaskId) =>
+        deleteTodoMutation.mutateAsync({ subtaskId })
+      );
+
+      // 모든 요청을 병렬로 실행
+      await Promise.all([
+        updateGoalPromise,
+        ...updateTodoPromises,
+        createTodoPromise,
+        ...deleteTodoPromises,
+      ]);
 
       setIsEditing(false);
       setDeletedTodoIds([]);
@@ -157,13 +167,22 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
   return (
     <div className="gap-lg border-gray p-lg flex h-157 flex-6 flex-col rounded-lg border">
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-end justify-between">
         <div className="flex flex-col gap-1">
-          <h2 className="text-text-primary text-[24px] font-bold">내 목표와 할 일</h2>
-          <p className="text-text-secondary text-[16px]">이번 세션에서 집중할 할 일이에요</p>
+          <h2 className="text-text-primary text-[24px] font-bold">나의 목표</h2>
+          <p className="text-text-secondary text-[16px] font-normal">
+            이번 세션에서 해야할 일을 작성해 주세요
+          </p>
         </div>
         {!isEditing && (
-          <Button variant="outlined" colorScheme="primary" size="medium" onClick={handleEdit}>
+          <Button
+            variant="outlined"
+            colorScheme="secondary"
+            size="small"
+            className="text-xs font-semibold"
+            leftIcon={<PencilIcon size="xsmall" />}
+            onClick={handleEdit}
+          >
             수정하기
           </Button>
         )}
@@ -178,86 +197,65 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
             onChange={(e) => setDraftGoal(e.target.value)}
             onClear={() => setDraftGoal("")}
             placeholder="목표를 입력하세요"
-            className="text-text-muted"
+            className="h-13.5 focus:bg-transparent"
             fullWidth
             showCharacterCount
             maxLength={50}
           />
         ) : (
-          <div className="bg-surface-strong border-border-subtle p-xs text-text-muted flex h-13.5 items-center rounded-sm border text-[16px]">
+          <div className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-[16px]">
             {goal}
           </div>
         )}
       </div>
 
-      {/* 구분선 */}
-      <div className="bg-divider-default h-px w-full" />
-
       {/* Todo */}
-      <div className="gap-sm flex min-h-0 flex-1 flex-col">
-        <span className="text-text-secondary text-[14px] font-semibold">
-          To do <span className="text-green-600">{displayTodos.length}</span>
-        </span>
+      <div className="gap-sm mt-sm flex min-h-0 flex-1 flex-col">
+        <div className="flex items-center justify-between">
+          <span className="text-text-secondary text-[14px] font-semibold">
+            투두리스트 <span className="text-green-600">{displayTodos.length}</span>
+          </span>
+          {isEditing && draftTodos.length < 5 && (
+            <Button
+              variant="outlined"
+              colorScheme="secondary"
+              size="small"
+              leftIcon={<PlusIcon size="xsmall" />}
+              onClick={handleAddTodo}
+            >
+              추가하기
+            </Button>
+          )}
+        </div>
 
         {isEditing ? (
-          <>
-            {draftTodos.length === 0 ? (
-              <div className="flex flex-col items-center gap-2">
-                <p className="text-text-muted py-md text-center text-[14px]">
-                  등록된 할 일이 없습니다
-                </p>
-                <Button
-                  iconOnly
-                  size="large"
-                  variant="ghost"
-                  colorScheme="secondary"
-                  leftIcon={<PlusIcon className="text-border-primary-default" />}
-                  onClick={handleAddTodo}
+          <ul className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+            {draftTodos.map((todo, index) => (
+              <li key={todo.subtaskId} className="flex shrink-0 items-start gap-2">
+                <TextInput
+                  value={todo.content}
+                  onChange={(e) => handleTodoChange(index, e.target.value)}
+                  onClear={() => handleTodoChange(index, "")}
+                  placeholder="할 일을 입력하세요"
+                  className="h-13.5 focus:bg-transparent"
+                  fullWidth
+                  containerClassName="flex-1"
+                  showCharacterCount
+                  maxLength={50}
                 />
-              </div>
-            ) : (
-              <ul className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
-                {draftTodos.map((todo, index) => {
-                  const isFirst = index === 0;
-                  const canAdd = draftTodos.length < 5;
-                  return (
-                    <li key={todo.subtaskId} className="flex shrink-0 items-start gap-2">
-                      <TextInput
-                        value={todo.content}
-                        onChange={(e) => handleTodoChange(index, e.target.value)}
-                        onClear={() => handleTodoChange(index, "")}
-                        placeholder="할 일을 입력하세요"
-                        className="text-text-muted"
-                        fullWidth
-                        containerClassName="flex-1"
-                        showCharacterCount
-                        maxLength={50}
-                      />
-                      {isFirst && canAdd ? (
-                        <Button
-                          iconOnly
-                          size="large"
-                          variant="outlined"
-                          colorScheme="primary"
-                          leftIcon={<PlusIcon className="text-border-primary-default" />}
-                          onClick={handleAddTodo}
-                        />
-                      ) : (
-                        <Button
-                          iconOnly
-                          size="large"
-                          variant="outlined"
-                          colorScheme="secondary"
-                          leftIcon={<MinusIcon />}
-                          onClick={() => handleRemoveTodo(index)}
-                        />
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </>
+                {draftTodos.length > 1 && (
+                  <Button
+                    iconOnly
+                    variant="ghost"
+                    colorScheme="secondary"
+                    className="mt-1.25 h-11 w-11 min-w-0 p-0"
+                    leftIcon={<MinusIcon size="small" />}
+                    onClick={() => handleRemoveTodo(index)}
+                  />
+                )}
+              </li>
+            ))}
+          </ul>
         ) : displayTodos.length === 0 ? (
           <p className="text-text-muted py-md text-center text-[14px]">등록된 할 일이 없습니다</p>
         ) : (
@@ -276,13 +274,14 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
 
       {/* 하단 버튼 (수정 모드) */}
       {isEditing && (
-        <div className="flex gap-2">
+        <ButtonGroup className="self-end">
           <Button
-            variant="outlined"
-            colorScheme="secondary"
+            variant="solid"
+            colorScheme="tertiary"
             size="medium"
-            className="flex-1"
+            className="text-sm"
             onClick={handleCancel}
+            disabled={isSaving}
           >
             그만두기
           </Button>
@@ -290,13 +289,13 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
             variant="solid"
             colorScheme="primary"
             size="medium"
-            className="flex-1"
+            className="text-sm"
             onClick={handleSave}
             disabled={isSaving}
           >
             {isSaving ? "저장 중..." : "저장하기"}
           </Button>
-        </div>
+        </ButtonGroup>
       )}
     </div>
   );

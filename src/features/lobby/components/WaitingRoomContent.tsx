@@ -36,8 +36,8 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
     const handlePopState = () => {
       if (isLeavingRef.current) return;
       setShowLeaveDialog(true);
-      // 뒤로 가기를 취소하기 위해 앞으로 가기
-      window.history.go(1);
+      // 뒤로 가기를 취소하기 위해 더미 엔트리 재추가 (go(1)은 Next.js 라우터와 충돌하여 새로고침 발생)
+      window.history.pushState({ preventBack: true }, "", window.location.href);
     };
 
     window.addEventListener("popstate", handlePopState);
