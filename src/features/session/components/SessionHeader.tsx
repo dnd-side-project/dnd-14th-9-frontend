@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { Portal } from "@/components/Portal/Portal";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
@@ -83,6 +84,8 @@ function LeaveConfirmDialog({
   isPending,
   serverError,
 }: LeaveConfirmDialogProps) {
+  useBodyScrollLock();
+
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   const setDialogRef = useCallback((node: HTMLDialogElement | null) => {

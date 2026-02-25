@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useBodyScrollLock } from "./useBodyScrollLock";
+
 /**
  * 모달 dialog 공통 로직을 캡슐화하는 커스텀 훅
  *
@@ -18,6 +20,8 @@ export function useDialog(fallbackPath: string = "/") {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
 
+  useBodyScrollLock();
+
   const handleClose = useCallback(() => {
     if (window.history.length > 1) {
       router.back();
@@ -31,8 +35,15 @@ export function useDialog(fallbackPath: string = "/") {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    dialog.showModal();
-    return () => dialog.close();
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+
+    return () => {
+      if (dialog.open) {
+        dialog.close();
+      }
+    };
   }, []);
 
   const handleBackdropClick = useCallback(

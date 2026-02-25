@@ -6,6 +6,7 @@ import { Button } from "@/components/Button/Button";
 import { ChevronLeftIcon } from "@/components/Icon/ChevronLeftIcon";
 import { Portal } from "@/components/Portal/Portal";
 import { useLeaveSession } from "@/features/session/hooks/useSessionHooks";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
@@ -94,6 +95,8 @@ function LeaveConfirmDialog({
   isPending,
   serverError,
 }: LeaveConfirmDialogProps) {
+  useBodyScrollLock();
+
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   const setDialogRef = useCallback((node: HTMLDialogElement | null) => {
