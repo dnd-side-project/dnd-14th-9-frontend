@@ -9,7 +9,7 @@ import {
 } from "@/features/session/utils/reportMappers";
 
 import { GoalAchievementSection } from "./GoalAchievementSection";
-import { RealtimeReceivedEmojiCard } from "./RealtimeReceivedEmojiCard";
+import { RealtimeMemberEmojiCard } from "./RealtimeMemberEmojiCard";
 import { ResultNavigationButtons } from "./ResultNavigationButtons";
 
 interface SessionResultContentProps {
@@ -58,7 +58,7 @@ export async function SessionResultContent({ sessionId }: SessionResultContentPr
           achievementRate={memberResult.achievementRate}
           achievementRateLabel="목표 달성율"
         />
-        <RealtimeReceivedEmojiCard
+        <RealtimeMemberEmojiCard
           sessionId={sessionId}
           memberId={memberResult.memberId}
           initialEmojis={initialEmojis}

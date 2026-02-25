@@ -6,17 +6,17 @@ import type { ReceivedEmojiItem } from "@/features/member/types";
 import { useMemberReactionSSE } from "../../hooks/useMemberReactionSSE";
 import { mapEmojiResultToItems } from "../../utils/reportMappers";
 
-interface RealtimeReceivedEmojiCardProps {
+interface RealtimeMemberEmojiCardProps {
   sessionId: string;
   memberId: number;
   initialEmojis: ReceivedEmojiItem[];
 }
 
-export function RealtimeReceivedEmojiCard({
+export function RealtimeMemberEmojiCard({
   sessionId,
   memberId,
   initialEmojis,
-}: RealtimeReceivedEmojiCardProps) {
+}: RealtimeMemberEmojiCardProps) {
   const { data: sseData } = useMemberReactionSSE({
     sessionId,
     memberId: String(memberId),
