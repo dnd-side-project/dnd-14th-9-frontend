@@ -126,6 +126,16 @@ export function useSessionListFilters() {
     [updateFilters]
   );
 
+  const resetFilters = useCallback(() => {
+    updateFilters({
+      startDate: null,
+      endDate: null,
+      timeSlots: null,
+      durationRange: null,
+      participants: null,
+    });
+  }, [updateFilters]);
+
   return {
     values,
     updateFilters,
@@ -136,5 +146,6 @@ export function useSessionListFilters() {
     setSort,
     toggleSort,
     setPage,
+    resetFilters,
   };
 }

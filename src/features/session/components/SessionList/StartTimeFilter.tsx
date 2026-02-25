@@ -41,7 +41,10 @@ export function StartTimeFilter({
         isOpen={isOpen}
         aria-haspopup="dialog"
         onClick={() => onOpenChange(!isOpen)}
-        className={cn("w-auto shrink-0", hasTimeSlotSelection && "text-text-primary")}
+        className={cn(
+          "hover:text-text-primary w-auto shrink-0",
+          hasTimeSlotSelection && "text-text-primary bg-surface-strong"
+        )}
       >
         {timeSlotLabel}
       </Filter>
@@ -63,13 +66,13 @@ export function StartTimeFilter({
                     role="checkbox"
                     aria-checked={isSelected}
                     onClick={() => onToggleTimeSlot(option.value)}
-                    className="focus-visible:ring-primary text-text-secondary hover:text-text-primary gap-xs flex w-full items-center rounded-[4px] text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                    className="focus-visible:ring-primary text-text-secondary hover:text-text-primary gap-xs flex w-full cursor-pointer items-center rounded-[4px] text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
                   >
                     <span
                       className={cn(
                         "flex h-5 w-5 items-center justify-center rounded-[4px] border border-solid",
                         isSelected
-                          ? "border-primary-default bg-surface-primary-alpha-subtle text-text-brand-default"
+                          ? "border-border-primary-default bg-surface-primary-alpha-subtle text-text-brand-default"
                           : "border-border-strong bg-transparent text-transparent"
                       )}
                     >

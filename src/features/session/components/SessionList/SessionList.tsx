@@ -32,6 +32,7 @@ export function SessionList() {
     setParticipantsCount,
     setSort,
     setPage,
+    resetFilters,
   } = useSessionListFilters();
   const searchParams = useSearchParams();
 
@@ -75,6 +76,7 @@ export function SessionList() {
             onSetDurationRange={setDurationRange}
             onSetParticipants={setParticipantsCount}
             onSetSort={setSort}
+            onResetFilters={resetFilters}
           />
         </div>
       </div>

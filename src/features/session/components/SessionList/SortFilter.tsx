@@ -44,7 +44,7 @@ export function SortFilter({ isOpen, value, onOpenChange, onSelect, className }:
         <div
           role="dialog"
           aria-label="정렬 선택"
-          className="p-sm border-border-subtle bg-surface-default absolute top-full right-0 z-20 mt-3 rounded-md border shadow-[0px_0px_2px_0px_#00000014,0px_16px_24px_0px_#0000001F]"
+          className="p-sm border-border-subtle bg-surface-default absolute top-full right-0 z-20 mt-2 rounded-md border shadow-[0px_0px_2px_0px_#00000014,0px_16px_24px_0px_#0000001F]"
         >
           <ul role="radiogroup" className="gap-2xs flex flex-col">
             {SORT_OPTIONS.map((option) => {
