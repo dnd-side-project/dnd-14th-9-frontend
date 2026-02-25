@@ -13,11 +13,11 @@ export function createSSEProxyHandler<TParams extends Record<string, string>>(
 ) {
   return async function GET(request: NextRequest, { params }: { params: Promise<TParams> }) {
     const resolvedParams = await params;
-    const rawToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
+    // const rawToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
 
-    if (!rawToken) {
-      return new Response("Unauthorized", { status: 401 });
-    }
+    // if (!rawToken) {
+    //   return new Response("Unauthorized", { status: 401 });
+    // }
 
     const backendUrl = options.buildBackendUrl(SERVER_API_URL ?? "", resolvedParams);
     const abortController = new AbortController();
@@ -29,7 +29,7 @@ export function createSSEProxyHandler<TParams extends Record<string, string>>(
     try {
       const response = await fetch(backendUrl, {
         headers: {
-          Authorization: `Bearer ${rawToken}`,
+          // Authorization: `Bearer ${rawToken}`,
           Accept: "text/event-stream",
         },
         cache: "no-store",
