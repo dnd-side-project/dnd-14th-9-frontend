@@ -13,7 +13,7 @@ import { useSessionStatusSSE } from "../hooks/useSessionStatusSSE";
 import { clearTimerState, getTimerState } from "../hooks/useSessionTimer";
 
 import { SessionDetailSection } from "./SessionDetailSection";
-import { SessionGoalAndTodoCard } from "./SessionGoalAndTodoCard";
+import { SessionGoalAndTodoCard } from "./SessionGoalAndTodoCard/SessionGoalAndTodoCard";
 import { SessionHeader } from "./SessionHeader";
 import { SessionParticipantListCard } from "./SessionParticipantListCard";
 import { SessionTimerSection } from "./SessionTimerSection";
