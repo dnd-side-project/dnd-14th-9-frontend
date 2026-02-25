@@ -15,11 +15,6 @@ const ProfilePopup = dynamic(() => loadProfilePopup().then((mod) => mod.ProfileP
   ssr: false,
 });
 
-// 클라이언트 마운트 상태를 외부 시스템으로 취급
-const subscribe = () => () => {};
-const getSnapshot = () => true;
-const getServerSnapshot = () => false;
-
 export function ProfileDropdown() {
   const router = useRouter();
 
@@ -77,7 +72,7 @@ export function ProfileDropdown() {
         aria-label="프로필 메뉴"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        aria-controls={dialogId}
+        aria-controls={isOpen ? dialogId : undefined}
         onMouseEnter={handlePrefetchPopup}
         onFocus={handlePrefetchPopup}
         onClick={toggleDropdown}
