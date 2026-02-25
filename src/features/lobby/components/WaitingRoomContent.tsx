@@ -25,7 +25,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const isLeavingRef = useRef(false);
 
-  const { data, isLoading, error } = useSessionDetail(sessionId);
+  const { data, isLoading, error, refetch } = useSessionDetail(sessionId);
   const { data: meData } = useMe();
   // 초기 데이터: REST API로 조회
   const { data: initialWaitingData } = useWaitingRoom(sessionId);
@@ -80,7 +80,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
           title="세션 정보를 불러올 수 없어요"
           description="데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요."
           buttonLabel="다시 시도하기"
-          onRetry={() => window.location.reload()}
+          onRetry={() => void refetch()}
         />
       </div>
     );
