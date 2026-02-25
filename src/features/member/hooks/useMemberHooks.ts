@@ -25,6 +25,7 @@ import type {
   GetMeForEditResponse,
   MemberProfileMutationResponse,
   MemberProfileView,
+  UpdateEmailRequest,
   UpdateInterestCategoriesRequest,
   UpdateMeRequest,
   UpdateNicknameRequest,
@@ -168,4 +169,8 @@ export function useDeleteProfileImage() {
 
 export const useUpdateMe = createMemberProfileMutation<UpdateMeRequest>((body) =>
   memberApi.updateMe(body)
+);
+
+export const useUpdateEmail = createMemberProfileMutation<UpdateEmailRequest>((body) =>
+  memberApi.updateEmail(body)
 );
