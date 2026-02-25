@@ -7,6 +7,7 @@ import type {
   MyReportTodoItem,
   ReportTodoItem,
   SessionDetailResponse,
+  SessionReactionEventData,
   SessionReportMember,
   SessionReportResponse,
 } from "../types";
@@ -62,6 +63,18 @@ export function mapSessionDetailToProps(detail: SessionDetailResponse) {
     sessionDate: detail.startTime,
     notice: detail.notice,
   };
+}
+
+/**
+ * SessionReactionEventData → ReceivedEmojiItem[]
+ */
+export function mapSessionReactionToItems(data: SessionReactionEventData): ReceivedEmojiItem[] {
+  return [
+    { emojiName: "HEART", count: data.heart },
+    { emojiName: "THUMBS_UP", count: data.thumbsUp },
+    { emojiName: "THUMBS_DOWN", count: data.thumbsDown },
+    { emojiName: "STAR", count: data.star },
+  ];
 }
 
 /**
