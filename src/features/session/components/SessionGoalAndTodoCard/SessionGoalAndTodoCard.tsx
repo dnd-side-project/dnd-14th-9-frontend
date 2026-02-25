@@ -1,6 +1,9 @@
 "use client";
 
 import { CheckIcon } from "@/components/Icon/CheckIcon";
+import { ApiError } from "@/lib/api/api-client";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { toast } from "@/lib/toast";
 
 import { useToggleSubtaskCompletion } from "../../hooks/useSessionHooks";
 
@@ -22,7 +25,15 @@ export function SessionGoalAndTodoCard({
   const { mutate: toggleSubtask } = useToggleSubtaskCompletion();
 
   const handleToggleTodo = (subtaskId: number) => {
-    toggleSubtask({ subtaskId });
+    toggleSubtask(
+      { subtaskId },
+      {
+        onError: (error) => {
+          const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+          toast.error(message);
+        },
+      }
+    );
   };
 
   const completedCount = todos.filter((todo) => todo.isCompleted).length;

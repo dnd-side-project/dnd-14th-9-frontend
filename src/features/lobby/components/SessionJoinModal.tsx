@@ -12,6 +12,7 @@ import { useJoinSession } from "@/features/session/hooks/useSessionHooks";
 import type { ReportTodoItem } from "@/features/session/types";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { toast } from "@/lib/toast";
 
 const MAX_TODOS = 5;
 
@@ -102,6 +103,7 @@ export function SessionJoinModal({
     } catch (error) {
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
       setServerError(message);
+      toast.error(message);
     }
   };
 

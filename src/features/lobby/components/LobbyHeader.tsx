@@ -9,6 +9,7 @@ import { useLeaveSession } from "@/features/session/hooks/useSessionHooks";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
+import { toast } from "@/lib/toast";
 
 interface LobbyHeaderProps {
   sessionId: string;
@@ -40,6 +41,7 @@ export function LobbyHeader({
       isLeavingRef.current = false;
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
       setServerError(message);
+      toast.error(message);
     }
   };
 

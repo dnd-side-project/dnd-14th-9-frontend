@@ -9,6 +9,9 @@ import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
 import { HostBadgeIcon } from "@/components/Icon/HostBadgeIcon";
 import { useKickMembers } from "@/features/session/hooks/useSessionHooks";
+import { ApiError } from "@/lib/api/api-client";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { toast } from "@/lib/toast";
 
 import type { WaitingMember } from "../types";
 
@@ -53,6 +56,10 @@ export function ParticipantListCard({
         onSuccess: () => {
           setIsKicking(false);
           setSelectedIds(new Set());
+        },
+        onError: (error) => {
+          const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+          toast.error(message);
         },
       }
     );
