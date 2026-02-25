@@ -61,7 +61,7 @@ export function SortFilter({ isOpen, value, onOpenChange, onSelect, className }:
                       onOpenChange(false);
                     }}
                     className={cn(
-                      "px-md py-2xs hover:bg-surface-strong hover:text-text-primary flex w-full items-center justify-center rounded-xs text-[13px] leading-[1.4] transition-colors focus-visible:outline-none",
+                      "px-md py-2xs hover:bg-surface-strong hover:text-text-primary flex w-full cursor-pointer items-center justify-center rounded-xs text-[13px] leading-[1.4] transition-colors focus-visible:outline-none",
                       isSelected
                         ? "text-text-primary font-semibold"
                         : "text-text-secondary font-pretendard font-regular"
