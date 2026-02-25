@@ -34,26 +34,25 @@ export function SessionGoalAndTodoCard({
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
-          <h2 className="text-text-primary text-[24px] font-bold">내 목표와 할 일</h2>
-          <p className="text-text-secondary text-[16px]">이번 세션에서 집중할 할 일이에요</p>
+          <h2 className="text-text-primary text-[24px] font-bold">나의 목표</h2>
+          <p className="text-text-secondary text-[16px] font-normal">
+            이번 세션에서 집중할 할 일이에요
+          </p>
         </div>
       </div>
 
       {/* 목표 */}
       <div className="flex w-full flex-col gap-2">
         <span className="text-text-secondary text-[14px] font-semibold">목표</span>
-        <div className="bg-surface-strong border-border-subtle p-xs text-text-muted flex h-13.5 items-center rounded-sm border text-[16px]">
+        <div className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-[16px]">
           {goal ?? "목표가 설정되지 않았습니다"}
         </div>
       </div>
 
-      {/* 구분선 */}
-      <div className="bg-divider-default h-px w-full" />
-
       {/* Todo */}
-      <div className="gap-sm flex min-h-0 flex-1 flex-col">
+      <div className="gap-sm mt-sm flex min-h-0 flex-1 flex-col">
         <span className="text-text-secondary text-[14px] font-semibold">
-          To do{" "}
+          투두리스트{" "}
           <span className="text-green-600">
             {completedCount}/{todos.length}
           </span>{" "}
