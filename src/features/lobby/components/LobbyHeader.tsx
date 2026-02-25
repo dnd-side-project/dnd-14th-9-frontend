@@ -34,7 +34,12 @@ export function LobbyHeader({
   const handleLeave = async () => {
     setServerError(null);
     isLeavingRef.current = true;
+
     try {
+      await leaveSessionMutation.mutateAsync({ sessionRoomId: sessionId });
+      onCloseDialog();
+      // 하드 네비게이션으로 캐시 클리어 및 SSE 연결 정리
+      navigateWithHardReload("/");
     } catch (error: unknown) {
       isLeavingRef.current = false;
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
