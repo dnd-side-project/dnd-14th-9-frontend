@@ -408,10 +408,10 @@ export interface MemberReactionEventData {
 
 // 전체 참여자 리액션 SSE 이벤트 데이터
 export interface SessionReactionEventData {
-  heart: number;
-  star: number;
-  thumbsUp: number;
-  thumbsDown: number;
+  heartCount: number;
+  starCount: number;
+  thumbsUpCount: number;
+  thumbsDownCount: number;
 }
 
 // ============================================

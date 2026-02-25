@@ -21,6 +21,7 @@ export class SSEClient<TEventType extends string = string> {
   private registeredEvents = new Set<string>(); // EventSource에 등록된 이벤트 타입 추적
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private stableConnectionTimer: ReturnType<typeof setTimeout> | null = null;
   private options: Required<SSEClientOptions>;
   private url: string | null = null;
   private intentionalDisconnect = false;
@@ -64,6 +65,13 @@ export class SSEClient<TEventType extends string = string> {
     });
   }
 
+  private clearStableConnectionTimer(): void {
+    if (this.stableConnectionTimer) {
+      clearTimeout(this.stableConnectionTimer);
+      this.stableConnectionTimer = null;
+    }
+  }
+
   private emitError(code: SSEErrorCode, message: string): void {
     const error: SSEError = { code, message };
     this.emit("error", error);
@@ -81,12 +89,19 @@ export class SSEClient<TEventType extends string = string> {
     this.eventSource.onopen = () => {
       this.log("Connected");
       this.setStatus("connected");
-      this.reconnectAttempts = 0;
+
+      // 연결이 안정적으로 유지된 후에만 재연결 카운터를 리셋한다.
+      // 즉시 리셋하면 연결 직후 끊기는 경우 무한 재연결 루프에 빠진다.
+      this.clearStableConnectionTimer();
+      this.stableConnectionTimer = setTimeout(() => {
+        this.reconnectAttempts = 0;
+      }, 3000);
     };
 
     this.eventSource.onerror = () => {
       if (this.intentionalDisconnect) return;
 
+      this.clearStableConnectionTimer();
       this.log("Connection error", "error");
       this.eventSource?.close();
       this.setStatus("disconnected");
@@ -192,6 +207,7 @@ export class SSEClient<TEventType extends string = string> {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+    this.clearStableConnectionTimer();
 
     this.url = url;
     this.reconnectAttempts = 0;
@@ -210,6 +226,7 @@ export class SSEClient<TEventType extends string = string> {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+    this.clearStableConnectionTimer();
 
     if (this.eventSource) {
       this.eventSource.close();

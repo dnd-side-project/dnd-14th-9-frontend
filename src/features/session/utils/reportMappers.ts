@@ -70,10 +70,10 @@ export function mapSessionDetailToProps(detail: SessionDetailResponse) {
  */
 export function mapSessionReactionToItems(data: SessionReactionEventData): ReceivedEmojiItem[] {
   return [
-    { emojiName: "HEART", count: data.heart },
-    { emojiName: "THUMBS_UP", count: data.thumbsUp },
-    { emojiName: "THUMBS_DOWN", count: data.thumbsDown },
-    { emojiName: "STAR", count: data.star },
+    { emojiName: "HEART", count: data.heartCount },
+    { emojiName: "THUMBS_UP", count: data.thumbsUpCount },
+    { emojiName: "THUMBS_DOWN", count: data.thumbsDownCount },
+    { emojiName: "STAR", count: data.starCount },
   ];
 }
 
