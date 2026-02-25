@@ -20,6 +20,7 @@ const PUBLIC_API_ROUTE_PATTERNS = [
   /^\/api\/auth\/callback(?:\/[^/]+)?$/,
   /^\/api\/sessions$/,
   /^\/api\/sessions\/\d+$/,
+  /^\/api\/sse\//,
 ];
 
 // 토큰 갱신 임계값 (5분)

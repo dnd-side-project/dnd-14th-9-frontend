@@ -38,7 +38,9 @@ export async function ParticipantsReportContent({ sessionId }: ParticipantsRepor
   const activitySummary = sessionReport
     ? mapSessionReportToActivitySummary(sessionReport)
     : { focusedTime: 0, totalParticipationTime: 0, focusRate: 0 };
-  const initialEmojis = mapEmojiResultToItems(memberResult.emojiResult);
+  const initialEmojis = mapEmojiResultToItems(
+    sessionReport?.emojiResult ?? memberResult.emojiResult
+  );
   const detailProps = mapSessionDetailToProps(sessionDetail);
 
   const participants = (sessionReport?.members ?? []).map((member) => ({

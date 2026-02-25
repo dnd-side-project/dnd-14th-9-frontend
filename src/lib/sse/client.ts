@@ -21,6 +21,7 @@ export class SSEClient<TEventType extends string = string> {
   private registeredEvents = new Set<string>(); // EventSource에 등록된 이벤트 타입 추적
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private stableConnectionTimer: ReturnType<typeof setTimeout> | null = null;
   private options: Required<SSEClientOptions>;
   private url: string | null = null;
   private intentionalDisconnect = false;
@@ -64,6 +65,13 @@ export class SSEClient<TEventType extends string = string> {
     });
   }
 
+  private clearStableConnectionTimer(): void {
+    if (this.stableConnectionTimer) {
+      clearTimeout(this.stableConnectionTimer);
+      this.stableConnectionTimer = null;
+    }
+  }
+
   private emitError(code: SSEErrorCode, message: string): void {
     const error: SSEError = { code, message };
     this.emit("error", error);
@@ -81,12 +89,19 @@ export class SSEClient<TEventType extends string = string> {
     this.eventSource.onopen = () => {
       this.log("Connected");
       this.setStatus("connected");
-      this.reconnectAttempts = 0;
+
+      // 연결이 안정적으로 유지된 후에만 재연결 카운터를 리셋한다.
+      // 즉시 리셋하면 연결 직후 끊기는 경우 무한 재연결 루프에 빠진다.
+      this.clearStableConnectionTimer();
+      this.stableConnectionTimer = setTimeout(() => {
+        this.reconnectAttempts = 0;
+      }, 3000);
     };
 
     this.eventSource.onerror = () => {
       if (this.intentionalDisconnect) return;
 
+      this.clearStableConnectionTimer();
       this.log("Connection error", "error");
       this.eventSource?.close();
       this.setStatus("disconnected");
@@ -108,6 +123,11 @@ export class SSEClient<TEventType extends string = string> {
   }
 
   private tryReconnect(): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
     if (this.reconnectAttempts >= this.options.maxReconnectAttempts) {
       this.log("Max reconnect attempts reached");
       this.emitError("MAX_RECONNECT_REACHED", "Maximum reconnection attempts reached");
@@ -122,10 +142,11 @@ export class SSEClient<TEventType extends string = string> {
     this.reconnectAttempts++;
     this.setStatus("reconnecting");
 
-    // 지수 백오프: 1초 -> 2초 -> 4초 -> 8초 -> 16초 -> 최대 30초
+    // 지수 백오프 + jitter: thundering herd 방지
     const exponentialDelay =
       this.options.reconnectInterval * Math.pow(2, this.reconnectAttempts - 1);
-    const delay = Math.min(exponentialDelay, this.options.maxReconnectDelay);
+    const jitter = 0.75 + Math.random() * 0.5; // 0.75 ~ 1.25 범위
+    const delay = Math.min(exponentialDelay * jitter, this.options.maxReconnectDelay);
     this.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
 
     this.reconnectTimer = setTimeout(() => {
@@ -166,8 +187,11 @@ export class SSEClient<TEventType extends string = string> {
   }
 
   connect(url: string): void {
-    if (this.eventSource?.readyState === EventSource.OPEN) {
-      this.log("Already connected");
+    if (
+      this.eventSource?.readyState === EventSource.OPEN ||
+      this.eventSource?.readyState === EventSource.CONNECTING
+    ) {
+      this.log("Already connected or connecting");
       return;
     }
 
@@ -183,8 +207,10 @@ export class SSEClient<TEventType extends string = string> {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+    this.clearStableConnectionTimer();
 
     this.url = url;
+    this.reconnectAttempts = 0;
     this.setStatus("connecting");
     this.log(`Connecting to: ${this.url}`);
 
@@ -200,6 +226,7 @@ export class SSEClient<TEventType extends string = string> {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+    this.clearStableConnectionTimer();
 
     if (this.eventSource) {
       this.eventSource.close();
@@ -230,8 +257,14 @@ export class SSEClient<TEventType extends string = string> {
   off(eventName: TEventType | "error" | "message", callback?: SSEEventCallback<unknown>): void {
     if (callback) {
       this.listeners.get(eventName)?.delete(callback);
+      // 해당 이벤트의 리스너가 모두 제거되면 정리
+      if (this.listeners.get(eventName)?.size === 0) {
+        this.listeners.delete(eventName);
+        this.registeredEvents.delete(eventName);
+      }
     } else {
       this.listeners.delete(eventName);
+      this.registeredEvents.delete(eventName);
     }
   }
 
@@ -243,6 +276,7 @@ export class SSEClient<TEventType extends string = string> {
   removeAllListeners(): void {
     this.listeners.clear();
     this.statusListeners.clear();
+    this.registeredEvents.clear();
   }
 }
 
