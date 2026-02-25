@@ -80,43 +80,51 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
     setIsSaving(true);
 
     try {
-      // 1. 목표가 변경되었으면 업데이트
-      if (draftGoal.trim() !== goal) {
-        await updateGoalMutation.mutateAsync({
-          taskId,
-          body: { goalContent: draftGoal.trim() },
-        });
-      }
+      // 1. 목표 업데이트
+      const updateGoalPromise =
+        draftGoal.trim() !== goal
+          ? updateGoalMutation.mutateAsync({
+              taskId,
+              body: { goalContent: draftGoal.trim() },
+            })
+          : Promise.resolve();
 
       // 2. 변경된 todo 업데이트
-      for (const draft of draftTodos) {
-        if (draft.isNew) continue;
-
-        const original = todos.find((t) => t.subtaskId === draft.subtaskId);
-        if (original && original.content !== draft.content.trim()) {
-          await updateTodoMutation.mutateAsync({
+      const updateTodoPromises = draftTodos
+        .filter((draft) => {
+          if (draft.isNew) return false;
+          const original = todos.find((t) => t.subtaskId === draft.subtaskId);
+          return original && original.content !== draft.content.trim();
+        })
+        .map((draft) =>
+          updateTodoMutation.mutateAsync({
             subtaskId: draft.subtaskId,
             body: { todoContent: draft.content.trim() },
-          });
-        }
-      }
+          })
+        );
 
       // 3. 새로 추가된 todo 생성 (배열로 한 번에 전송)
       const newTodos = draftTodos
         .filter((draft) => draft.isNew && draft.content.trim())
         .map((draft) => ({ todoContent: draft.content.trim() }));
 
-      if (newTodos.length > 0) {
-        await createTodoMutation.mutateAsync({
-          taskId,
-          body: newTodos,
-        });
-      }
+      const createTodoPromise =
+        newTodos.length > 0
+          ? createTodoMutation.mutateAsync({ taskId, body: newTodos })
+          : Promise.resolve();
 
       // 4. 삭제된 todo 처리
-      for (const subtaskId of deletedTodoIds) {
-        await deleteTodoMutation.mutateAsync({ subtaskId });
-      }
+      const deleteTodoPromises = deletedTodoIds.map((subtaskId) =>
+        deleteTodoMutation.mutateAsync({ subtaskId })
+      );
+
+      // 모든 요청을 병렬로 실행
+      await Promise.all([
+        updateGoalPromise,
+        ...updateTodoPromises,
+        createTodoPromise,
+        ...deleteTodoPromises,
+      ]);
 
       setIsEditing(false);
       setDeletedTodoIds([]);
