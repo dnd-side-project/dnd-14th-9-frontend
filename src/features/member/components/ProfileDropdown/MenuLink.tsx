@@ -21,7 +21,8 @@ export function MenuLink({ href, icon, label, isActive, onClick }: MenuLinkProps
       className={cn(
         "border-border-default bg-surface-default text-text-tertiary group flex items-center rounded-md border",
         "border-color-default hover:border-border-default pr-md pl-lg py-md justify-start",
-        isActive && "bg-surface-strong"
+        isActive && "bg-surface-strong",
+        "active:bg-surface-strong"
       )}
     >
       <div className="gap-sm flex items-center">

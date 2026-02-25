@@ -12,6 +12,7 @@ import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
 import { useSessionDetail, useWaitingRoom } from "../../hooks/useSessionHooks";
 import { Card } from "../Card/Card";
+import { CardSkeleton } from "../Card/CardSkeleton";
 
 import { getSessionStatusDisplay } from "./utils";
 
@@ -68,7 +69,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
       ref={dialogRef}
       onCancel={handleClose}
       onClick={handleBackdropClick}
-      className="fixed inset-0 m-auto w-full max-w-[360px] rounded-lg bg-transparent p-0 backdrop:bg-(--color-overlay-default) md:max-w-[400px] lg:max-w-[440px]"
+      className="fixed inset-0 m-auto w-full max-w-90 rounded-lg bg-transparent p-0 backdrop:bg-(--color-overlay-default) md:max-w-100 lg:max-w-110"
     >
       <div className="gap-2xl p-3xl bg-surface-default relative flex flex-col rounded-2xl">
         {/* 닫기 버튼 */}
@@ -92,7 +93,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
         </div>
 
         {/* 카드 영역 */}
-        {session && (
+        {session ? (
           <Card
             className="max-w-full"
             thumbnailSrc={session.imageUrl}
@@ -106,6 +107,8 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
             durationMinutes={session.sessionDurationMinutes}
             sessionDate={session.startTime}
           />
+        ) : (
+          <CardSkeleton className="max-w-full" />
         )}
 
         {/* 버튼 영역 */}
@@ -128,7 +131,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
             size="medium"
             className="w-full"
           >
-            로그인하기
+            로그인하고 참여하기
           </ButtonLink>
         )}
       </div>

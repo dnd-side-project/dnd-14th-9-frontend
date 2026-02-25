@@ -14,14 +14,14 @@ export default async function ProfileReportPage({
   const page = Number(pageParam) || 1;
 
   return (
-    <div className="flex flex-col gap-[80px]">
+    <div className="flex flex-col gap-20">
       <Suspense fallback={<StatsSkeleton />}>
         <StatsContent />
       </Suspense>
 
-      {/* <Suspense fallback={<SessionHistorySkeleton />}>
+      <Suspense fallback={<SessionHistorySkeleton />}>
         <SessionHistoryContent page={page} />
-      </Suspense> */}
+      </Suspense>
     </div>
   );
 }

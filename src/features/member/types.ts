@@ -85,8 +85,8 @@ export interface SessionHistoryItem {
 
 export interface SessionHistoryPagination {
   currentPage: number;
-  totalPages: number;
-  pageSize: number;
+  totalPage: number;
+  listSize: number;
   totalElements: number;
 }
 
@@ -103,10 +103,11 @@ export interface MemberReportStats {
 // Report Sessions (세션 히스토리)
 export interface MemberReportSessions {
   sessions: SessionHistoryItem[];
-  currentPage: number;
-  totalPages: number;
-  pageSize: number;
+  totalPage: number;
+  listSize: number;
   totalElements: number;
+  first: boolean;
+  last: boolean;
 }
 
 // Request 타입

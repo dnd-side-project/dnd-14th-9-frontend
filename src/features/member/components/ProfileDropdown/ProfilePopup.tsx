@@ -1,7 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-
+import { Button } from "@/components/Button/Button";
 import { BarGraphIcon } from "@/components/Icon/BarGraphIcon";
 import { EditContainedIcon } from "@/components/Icon/EditContainedIcon";
 import { LogoutIcon } from "@/components/Icon/LogoutIcon";
@@ -48,8 +47,6 @@ export function ProfilePopup({
   onFeedbackClick,
   onLogoutClick,
 }: ProfilePopupProps) {
-  const pathname = usePathname();
-
   const callbacks: Record<string, (() => void) | undefined> = {
     onReportClick,
     onFeedbackClick,
@@ -95,26 +92,23 @@ export function ProfilePopup({
             href={href}
             icon={icon}
             label={label}
-            isActive={pathname === href}
+            isActive={false}
             onClick={handleMenuItemClick(callbackKey)}
           />
         ))}
 
         <div className="flex justify-end">
-          <button
+          <Button
             type="button"
+            variant="solid"
+            colorScheme="tertiary"
+            size="medium"
             onClick={handleLogout}
-            className="group gap-sm bg-surface-strong pl-md text-text-tertiary flex items-center justify-center rounded-md py-3 pr-5"
+            leftIcon={<LogoutIcon size="xsmall" className="h-5 w-5" />}
+            className="text-[14px]"
           >
-            <div className="gap-sm flex items-center">
-              <div className="text-text-muted relative flex shrink-0 items-center justify-center rounded-full transition-colors">
-                <LogoutIcon size="xsmall" className="h-5 w-5" />
-              </div>
-              <p className="text-text-muted text-[14px] font-semibold transition-colors">
-                로그아웃
-              </p>
-            </div>
-          </button>
+            로그아웃
+          </Button>
         </div>
       </div>
     </div>

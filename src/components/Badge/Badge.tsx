@@ -2,6 +2,7 @@ import { forwardRef, type HTMLAttributes } from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
+import { XIcon } from "@/components/Icon/XIcon";
 import { cn } from "@/lib/utils/utils";
 
 const BADGE_VARIANTS = cva(
@@ -45,13 +46,30 @@ const BADGE_VARIANTS = cva(
 export interface BadgeProps
   extends HTMLAttributes<HTMLSpanElement>, VariantProps<typeof BADGE_VARIANTS> {
   children: React.ReactNode;
+  showIcon?: boolean;
+  onIconClick?: () => void;
 }
 
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, status, radius, children, ...props }, ref) => {
+  ({ className, status, radius, showIcon = false, onIconClick, children, ...props }, ref) => {
+    const canRenderIconButton = showIcon && typeof onIconClick === "function";
+
     return (
-      <span ref={ref} className={cn(BADGE_VARIANTS({ status, radius, className }))} {...props}>
+      <span
+        ref={ref}
+        className={cn(
+          BADGE_VARIANTS({ status, radius }),
+          canRenderIconButton && "gap-1",
+          className
+        )}
+        {...props}
+      >
         {children}
+        {canRenderIconButton && (
+          <button type="button" onClick={onIconClick} className="inline-flex items-center">
+            <XIcon size="xsmall" />
+          </button>
+        )}
       </span>
     );
   }

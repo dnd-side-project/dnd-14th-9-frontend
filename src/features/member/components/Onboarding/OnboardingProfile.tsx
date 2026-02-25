@@ -107,32 +107,31 @@ export function OnboardingProfile({
   return (
     <div
       className={cn(
-        "bg-surface-default flex w-[440px] flex-col items-center gap-8 rounded-lg border border-gray-900 p-10 shadow-[0px_0px_80px_0px_rgba(0,0,0,0.3)]",
+        "p-3xl gap-3xl border-sm border-border-default bg-surface-default flex w-110 flex-col rounded-lg shadow-[0_0_2px_0_rgba(0,0,0,0.08),0_16px_24px_0_rgba(0,0,0,0.12)]",
         className
       )}
     >
       {/* Header */}
-      <div className="flex w-full flex-col gap-1 text-left">
-        <h1 className="text-text-primary text-2xl font-bold">
-          반가워요, <br />
-          프로필을 설정해 주세요
+      <div className="gap-2xs flex flex-col justify-center">
+        <h1 className="text-text-primary text-[24px] font-bold">
+          반가워요, 프로필을 설정해 주세요
         </h1>
-        <p className="text-text-secondary text-base">
+        <p className="text-text-secondary font-regular text-[16px]">
           프로필을 설정하면 나에게 맞는 세션을 추천해 드려요.
         </p>
       </div>
 
       {/* Profile Setup */}
-      <div className="flex w-full flex-col items-center gap-3">
+      <div className="gap-sm flex flex-col items-center">
         {/* Avatar with image upload */}
-        <div className="relative">
+        <div>
           <button type="button" onClick={handleAvatarClick} className="cursor-pointer">
             <Avatar
               size="xlarge"
               type={previewUrl ? "image" : "empty"}
               src={previewUrl ?? undefined}
               edit
-              className="size-20"
+              className="h-16 w-16"
             />
           </button>
           <input
@@ -145,7 +144,7 @@ export function OnboardingProfile({
         </div>
 
         {/* TextInput */}
-        <div className="gap-sm flex w-full flex-col">
+        <div className="flex w-full flex-col gap-2">
           <TextInput
             label="닉네임"
             placeholder="10글자 이내"
@@ -155,16 +154,15 @@ export function OnboardingProfile({
             error={!!nicknameError}
             errorMessage={nicknameError ?? undefined}
           />
-          <p className="font-pretendard text-text-tertiary text-sm">or</p>
         </div>
       </div>
 
       {/* ButtonGroup */}
       <div className="flex w-full gap-4">
         <Button
-          variant="ghost"
-          colorScheme="secondary"
-          className="text-text-muted hover:text-text-secondary h-11 flex-1"
+          variant="solid"
+          colorScheme="tertiary"
+          className="text-text-muted flex-1 text-[14px] font-semibold"
           onClick={onSkip}
           disabled={isLoading}
         >
