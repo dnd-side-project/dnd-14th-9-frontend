@@ -1,8 +1,17 @@
 import { withThemeByClassName } from "@storybook/addon-themes";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import type { Preview } from "@storybook/nextjs-vite";
 
 import "../src/app/globals.css";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 const preview: Preview = {
   parameters: {
@@ -28,6 +37,11 @@ const preview: Preview = {
       },
       defaultTheme: "dark",
     }),
+    (Story) => (
+      <QueryClientProvider client={queryClient}>
+        <Story />
+      </QueryClientProvider>
+    ),
   ],
 };
 
