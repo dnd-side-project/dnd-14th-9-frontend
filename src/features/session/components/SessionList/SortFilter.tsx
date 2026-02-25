@@ -35,7 +35,7 @@ export function SortFilter({ isOpen, value, onOpenChange, onSelect, className }:
         isOpen={isOpen}
         aria-haspopup="dialog"
         onClick={() => onOpenChange(!isOpen)}
-        className="min-w-20"
+        className={cn("min-w-20", isOpen && "border-transparent! bg-transparent!")}
       >
         {triggerLabel}
       </Filter>
