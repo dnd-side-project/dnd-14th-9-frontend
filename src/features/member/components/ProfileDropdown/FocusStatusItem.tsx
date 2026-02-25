@@ -38,7 +38,7 @@ export function FocusStatusItem({
             size={56}
             strokeWidth={2.8}
             trackClassName="stroke-border-inverse"
-            progressClassName="text-text-brand-subtle"
+            progressClassName="stroke-text-brand-subtle"
           >
             <span className="font-pretendard text-text-brand-subtle text-sm font-semibold">
               {Math.round(focusPercentage)}%
