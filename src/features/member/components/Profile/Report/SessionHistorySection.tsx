@@ -19,12 +19,10 @@ interface SessionHistorySectionProps {
 export default function SessionHistorySection({ items, pagination }: SessionHistorySectionProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [expandedSessionIds, setExpandedSessionIds] = useState<string[]>([]);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
-  const toggleExpand = (sessionId: string) => {
-    setExpandedSessionIds((prev) =>
-      prev.includes(sessionId) ? prev.filter((id) => id !== sessionId) : [...prev, sessionId]
-    );
+  const toggleExpand = (index: number) => {
+    setExpandedIndex((prev) => (prev === index ? null : index));
   };
 
   const handlePageChange = (page: number) => {
@@ -42,12 +40,12 @@ export default function SessionHistorySection({ items, pagination }: SessionHist
       ) : (
         <>
           <div className="gap-lg flex flex-col">
-            {items.map((session) => (
+            {items.map((session, index) => (
               <SessionHistoryCard
-                key={session.sessionId}
+                key={`${session.sessionId}-${index}`}
                 session={session}
-                isExpanded={expandedSessionIds.includes(session.sessionId)}
-                onToggle={() => toggleExpand(session.sessionId)}
+                isExpanded={expandedIndex === index}
+                onToggle={() => toggleExpand(index)}
               />
             ))}
           </div>

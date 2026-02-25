@@ -51,7 +51,10 @@ export function ParticipantsFilter({
         isOpen={isOpen}
         aria-haspopup="dialog"
         onClick={() => onOpenChange(!isOpen)}
-        className={cn("w-auto shrink-0", hasSelection && "text-text-primary")}
+        className={cn(
+          "hover:text-text-primary w-auto shrink-0",
+          hasSelection && "text-text-primary bg-surface-strong"
+        )}
       >
         {triggerLabel}
       </Filter>

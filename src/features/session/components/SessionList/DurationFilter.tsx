@@ -35,7 +35,10 @@ export function DurationFilter({ isOpen, value, onOpenChange, onSelect }: Durati
         isOpen={isOpen}
         aria-haspopup="dialog"
         onClick={() => onOpenChange(!isOpen)}
-        className={cn("w-auto shrink-0", hasSelection && "text-text-primary")}
+        className={cn(
+          "hover:text-text-primary w-auto shrink-0",
+          hasSelection && "text-text-primary bg-surface-strong"
+        )}
       >
         {triggerLabel}
       </Filter>
@@ -58,16 +61,15 @@ export function DurationFilter({ isOpen, value, onOpenChange, onSelect }: Durati
                     aria-checked={isSelected}
                     onClick={() => {
                       onSelect(option.value);
-                      onOpenChange(false);
                     }}
-                    className="focus-visible:ring-primary text-text-secondary hover:text-text-primary gap-xs flex w-full items-center rounded-[4px] text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                    className="focus-visible:ring-primary text-text-secondary hover:text-text-primary gap-xs flex w-full cursor-pointer items-center rounded-[4px] text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
                   >
                     <span
                       className={cn(
                         "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-solid bg-transparent",
                         isSelected
-                          ? "border-border-primary-default border-[4px]"
-                          : "border-border-strong border-[1px]"
+                          ? "border-border-primary-default border-4"
+                          : "border-border-strong border"
                       )}
                     />
                     <span className="text-[15px] leading-[1.4]">{option.label}</span>

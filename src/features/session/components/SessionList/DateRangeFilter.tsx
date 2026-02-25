@@ -37,7 +37,10 @@ export function DateRangeFilter({
         radius="sm"
         isOpen={isOpen}
         onClick={() => onOpenChange(!isOpen)}
-        className={cn("w-auto max-w-[280px] shrink-0", hasSelection && "text-text-primary")}
+        className={cn(
+          "hover:text-text-primary w-auto max-w-[280px] shrink-0",
+          hasSelection && "text-text-primary bg-surface-strong"
+        )}
       >
         {label}
       </Filter>
