@@ -207,9 +207,10 @@ export function SessionJoinModal({
         {/* 하단 버튼 */}
         <ButtonGroup className="self-end">
           <Button
-            variant="ghost"
-            colorScheme="secondary"
+            variant="solid"
+            colorScheme="tertiary"
             size="medium"
+            className="text-sm"
             onClick={onClose}
             disabled={joinSessionMutation.isPending}
           >
@@ -219,10 +220,11 @@ export function SessionJoinModal({
             variant="solid"
             colorScheme="primary"
             size="medium"
+            className="text-sm"
             onClick={handleJoin}
             disabled={joinSessionMutation.isPending}
           >
-            {joinSessionMutation.isPending ? "참여 중..." : "세션 참여하기"}
+            {joinSessionMutation.isPending ? "참여 중..." : "작성 완료"}
           </Button>
         </ButtonGroup>
       </dialog>
