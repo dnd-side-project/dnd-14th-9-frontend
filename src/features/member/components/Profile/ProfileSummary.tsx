@@ -41,8 +41,11 @@ export function ProfileSummary() {
           toast.success("프로필 이미지가 수정되었습니다.");
         },
         onError: (error) => {
-          const err = error as Error;
-          toast.error(err.message || "프로필 이미지 수정 중 오류가 발생했습니다.");
+          const message =
+            error instanceof Error && error.message
+              ? error.message
+              : "프로필 이미지 수정 중 오류가 발생했습니다.";
+          toast.error(message);
         },
       }
     );
