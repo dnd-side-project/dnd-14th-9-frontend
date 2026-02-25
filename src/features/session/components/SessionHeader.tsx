@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
+import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { Portal } from "@/components/Portal/Portal";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
@@ -29,18 +30,13 @@ export function SessionHeader({
 }: SessionHeaderProps) {
   const [serverError, setServerError] = useState<string | null>(null);
   const leaveSessionMutation = useLeaveSession();
+  const leaveButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleLeave = async () => {
     setServerError(null);
     isLeavingRef.current = true;
     try {
-      await leaveSessionMutation.mutateAsync({ sessionRoomId: sessionId });
-      // 타이머 상태 초기화
-      clearTimerState(sessionId);
-      onCloseDialog();
-      // 하드 네비게이션으로 캐시 클리어 및 SSE 연결 정리
-      navigateWithHardReload("/");
-    } catch (error) {
+    } catch (error: unknown) {
       isLeavingRef.current = false;
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
       setServerError(message);
@@ -55,14 +51,23 @@ export function SessionHeader({
           <h1 className="text-[24px] leading-[140%] font-bold text-gray-50">진행 중인 세션</h1>
         </div>
 
-        <Button variant="outlined" colorScheme="secondary" size="small" onClick={onShowDialog}>
+        <Button
+          ref={leaveButtonRef}
+          variant="outlined"
+          colorScheme="secondary"
+          size="small"
+          onClick={onShowDialog}
+        >
           나가기
         </Button>
       </header>
 
       {showDialog && (
         <LeaveConfirmDialog
-          onClose={onCloseDialog}
+          onClose={() => {
+            onCloseDialog();
+            leaveButtonRef.current?.focus();
+          }}
           onConfirm={handleLeave}
           isPending={leaveSessionMutation.isPending}
           serverError={serverError}
@@ -115,7 +120,8 @@ function LeaveConfirmDialog({
         </div>
 
         {serverError && (
-          <div className="rounded-sm bg-red-500/10 px-4 py-3 text-sm text-red-500">
+          <div className="flex animate-[fadeIn_0.2s_ease-out] items-center gap-2 rounded-sm bg-red-500/10 px-4 py-3 text-sm text-red-500">
+            <AlertIcon className="h-4 w-4 shrink-0" />
             {serverError}
           </div>
         )}

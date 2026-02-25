@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ButtonLink } from "@/components/Button/ButtonLink";
+import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
 import { useIsAuthenticated, useMe } from "@/features/member/hooks/useMemberHooks";
@@ -22,7 +23,7 @@ interface SessionDetailModalProps {
 
 export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
   const { dialogRef, handleClose, handleBackdropClick } = useDialog("/");
-  const { data } = useSessionDetail(sessionId);
+  const { data, isLoading, error: sessionError } = useSessionDetail(sessionId);
   const isAuthenticated = useIsAuthenticated();
   const [showJoinModal, setShowJoinModal] = useState(false);
 
@@ -93,7 +94,12 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
         </div>
 
         {/* 카드 영역 */}
-        {session ? (
+        {sessionError ? (
+          <div className="flex animate-[fadeIn_0.2s_ease-out] flex-col items-center gap-3 rounded-lg border border-gray-800 py-10">
+            <AlertIcon className="text-text-muted h-8 w-8" />
+            <p className="text-text-secondary text-sm">세션 정보를 불러오지 못했어요</p>
+          </div>
+        ) : session ? (
           <Card
             className="max-w-full"
             thumbnailSrc={session.imageUrl}
@@ -112,7 +118,17 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
         )}
 
         {/* 버튼 영역 */}
-        {isAuthenticated ? (
+        {sessionError ? (
+          <Button
+            variant="solid"
+            colorScheme="secondary"
+            size="medium"
+            className="w-full"
+            onClick={handleClose}
+          >
+            닫기
+          </Button>
+        ) : isAuthenticated ? (
           <Button
             variant="solid"
             colorScheme="primary"
