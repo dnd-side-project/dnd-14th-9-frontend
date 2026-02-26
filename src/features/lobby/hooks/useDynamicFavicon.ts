@@ -2,18 +2,17 @@
 
 import { useEffect } from "react";
 
-const DEFAULT_FAVICON = "/favicon.ico";
-const RED_FAVICON = "/favicon-red.ico";
+import { FAVICON_DEFAULT, FAVICON_URGENT } from "@/lib/constants/assets";
 
 export function useDynamicFavicon(isUrgent: boolean) {
   useEffect(() => {
     const iconLink = document.querySelector<HTMLLinkElement>("link[rel='icon']");
     if (!iconLink) return;
 
-    iconLink.href = isUrgent ? RED_FAVICON : DEFAULT_FAVICON;
+    iconLink.href = isUrgent ? FAVICON_URGENT : FAVICON_DEFAULT;
 
     return () => {
-      iconLink.href = DEFAULT_FAVICON;
+      iconLink.href = FAVICON_DEFAULT;
     };
   }, [isUrgent]);
 }

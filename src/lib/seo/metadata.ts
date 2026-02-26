@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { APPLE_TOUCH_ICON, FAVICON_DEFAULT } from "@/lib/constants/assets";
 import { OG_IMAGES, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/constants/seo";
 
 const INDEXABLE_ROBOTS = {
@@ -62,8 +63,8 @@ export const rootMetadata: Metadata = {
     images: OG_IMAGES.map((img) => img.url),
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    icon: FAVICON_DEFAULT,
+    apple: [{ url: APPLE_TOUCH_ICON, sizes: "180x180", type: "image/png" }],
   },
   appleWebApp: {
     capable: true,
