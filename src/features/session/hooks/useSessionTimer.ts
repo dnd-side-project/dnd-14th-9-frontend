@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface TimerState {
   elapsedSeconds: number;
@@ -147,25 +147,27 @@ export function useSessionTimer({
   maxSeconds,
   autoStart = true,
 }: UseSessionTimerOptions): UseSessionTimerReturn {
-  const [state, setState] = useState<TimerState>(SSR_DEFAULT);
+  const [state, setState] = useState<TimerState>(() => {
+    if (typeof window === "undefined") return SSR_DEFAULT;
+    return restoreTimerState(sessionId, maxSeconds, autoStart);
+  });
+  const lastTickRef = useRef<number>(0);
 
-  // 클라이언트 mount 후 localStorage에서 복원 (hydration mismatch 방지)
-  useEffect(() => {
-    setState(restoreTimerState(sessionId, maxSeconds, autoStart));
-  }, [sessionId, maxSeconds, autoStart]);
-
-  // 매 초 타이머 틱 + localStorage 저장 (단일 setState 콜백 내에서 처리)
-  useEffect(() => {
-    if (!state.isRunning) return;
-
-    const interval = setInterval(() => {
+  // 시간 델타를 적용하는 공통 함수
+  const applyDelta = useCallback(
+    (delta: number, countFocus: boolean) => {
       setState((prev) => {
-        const nextElapsed = prev.elapsedSeconds + 1;
+        if (!prev.isRunning) return prev;
+
+        const nextElapsed = Math.min(prev.elapsedSeconds + delta, maxSeconds);
+        const focusDelta = countFocus && prev.isFocusing ? delta : 0;
+        const nextFocused = Math.min(prev.focusedSeconds + focusDelta, nextElapsed);
 
         if (nextElapsed >= maxSeconds) {
           const next: TimerState = {
             ...prev,
             elapsedSeconds: maxSeconds,
+            focusedSeconds: nextFocused,
             isRunning: false,
             isFocusing: false,
           };
@@ -176,15 +178,58 @@ export function useSessionTimer({
         const next: TimerState = {
           ...prev,
           elapsedSeconds: nextElapsed,
-          focusedSeconds: prev.isFocusing ? prev.focusedSeconds + 1 : prev.focusedSeconds,
+          focusedSeconds: nextFocused,
         };
         saveTimerState(sessionId, next);
         return next;
       });
+    },
+    [maxSeconds, sessionId]
+  );
+
+  // 매 초 타이머 틱 - 시간 델타 기반으로 백그라운드 탭에서도 정확한 시간 계산
+  useEffect(() => {
+    if (!state.isRunning) return;
+
+    lastTickRef.current = Date.now();
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const delta = Math.floor((now - lastTickRef.current) / 1000);
+      if (delta < 1) return;
+      lastTickRef.current += delta * 1000;
+
+      const isVisible = document.visibilityState === "visible";
+      applyDelta(delta, isVisible);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [state.isRunning, maxSeconds, sessionId]);
+  }, [state.isRunning, maxSeconds, sessionId, applyDelta]);
+
+  // 탭이 다시 보일 때 즉시 시간 보정
+  useEffect(() => {
+    if (!state.isRunning) return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        // 백그라운드에서 경과한 시간을 elapsedSeconds에만 반영 (집중 시간 미포함)
+        const now = Date.now();
+        const delta = Math.floor((now - lastTickRef.current) / 1000);
+        if (delta < 1) return;
+        lastTickRef.current += delta * 1000;
+        applyDelta(delta, false);
+      } else {
+        // 탭이 숨겨질 때 현재 상태를 localStorage에 저장 (탭 종료 대비)
+        setState((prev) => {
+          saveTimerState(sessionId, prev);
+          return prev;
+        });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [state.isRunning, maxSeconds, sessionId, applyDelta]);
 
   const start = useCallback(() => {
     setState((prev) => {
