@@ -27,22 +27,22 @@ export default function ActivitySummaryCard({
       <div className="p-xl gap-2xl border-border-subtle flex flex-1 flex-col rounded-md border">
         <div className="gap-2xl flex">
           <div className="flex flex-col">
-            <h3 className="text-[16px] font-semibold">{focusedTimeLabel}</h3>
+            <h3 className="text-base font-semibold">{focusedTimeLabel}</h3>
             <p className="text-text-brand-default text-[32px] font-bold">
               {formatHHMMSS(data.focusedTime)}
             </p>
           </div>
           <div className="flex flex-col">
-            <h3 className="text-[16px] font-semibold">{participationTimeLabel}</h3>
+            <h3 className="text-base font-semibold">{participationTimeLabel}</h3>
             <p className="text-text-secondary text-[32px] font-bold">
               {formatHHMMSS(data.totalParticipationTime)}
             </p>
           </div>
           {achievementRate !== undefined && (
             <>
-              <span className="text-text-disabled flex items-start text-[24px]">|</span>
+              <span className="text-text-disabled flex items-start text-2xl">|</span>
               <div className="flex flex-col">
-                <h3 className="text-[16px] font-semibold">{achievementRateLabel}</h3>
+                <h3 className="text-base font-semibold">{achievementRateLabel}</h3>
                 <p className="text-text-secondary text-[32px] font-bold">{achievementRate}%</p>
               </div>
             </>
@@ -51,8 +51,8 @@ export default function ActivitySummaryCard({
 
         <div className="bg-surface-strong px-lg py-md flex flex-col gap-[8px] rounded-sm">
           <div className="flex justify-between">
-            <p className="text-text-secondary text-[16px] font-semibold">평균 집중도</p>
-            <p className="text-text-primary text-[16px] font-semibold">{data.focusRate}%</p>
+            <p className="text-text-secondary text-base font-semibold">평균 집중도</p>
+            <p className="text-text-primary text-base font-semibold">{data.focusRate}%</p>
           </div>
           <ProgressBar
             progress={data.focusRate}

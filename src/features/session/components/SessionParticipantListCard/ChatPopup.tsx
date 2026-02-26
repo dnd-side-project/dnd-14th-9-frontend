@@ -84,7 +84,7 @@ export function ChatPopup({ isOpen, onClose }: ChatPopupProps) {
     <div className="fixed right-6 bottom-6 z-50 flex h-[500px] w-[360px] flex-col overflow-hidden rounded-2xl bg-gray-900 shadow-2xl">
       {/* 헤더 */}
       <div className="border-border-subtle flex items-center justify-between border-b px-4 py-3">
-        <h3 className="text-text-primary text-[18px] font-bold">채팅</h3>
+        <h3 className="text-text-primary text-lg font-bold">채팅</h3>
         <button
           type="button"
           className="text-text-muted hover:text-text-primary cursor-pointer p-1 transition-colors"
@@ -102,11 +102,9 @@ export function ChatPopup({ isOpen, onClose }: ChatPopupProps) {
             key={message.id}
             className={`flex flex-col gap-1 ${message.isMe ? "items-end" : "items-start"}`}
           >
-            {!message.isMe && (
-              <span className="text-text-secondary text-[12px]">{message.sender}</span>
-            )}
+            {!message.isMe && <span className="text-text-secondary text-xs">{message.sender}</span>}
             <div
-              className={`max-w-[80%] rounded-lg px-3 py-2 text-[14px] ${
+              className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
                 message.isMe
                   ? "text-common-white bg-green-600"
                   : "bg-surface-strong text-text-primary"

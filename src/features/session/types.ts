@@ -194,12 +194,23 @@ export interface ToggleTodoResponse {
 // 세션 상세 조회 API 관련 타입
 // ============================================
 
+/** 백엔드가 한글로 응답하는 세션 상태 문자열 */
+export type SessionDetailStatus = "대기" | "진행중" | "진행 중" | "종료";
+
+export function isWaitingStatus(status: SessionDetailStatus): boolean {
+  return status === "대기";
+}
+
+export function isInProgressStatus(status: SessionDetailStatus): boolean {
+  return status === "진행중" || status === "진행 중";
+}
+
 export interface SessionDetailResponse {
   sessionId: number;
   category: string; // 한글로 응답됨 (예: "개발")
   title: string;
   hostNickname: string;
-  status: string; // 한글로 응답됨 (예: "대기")
+  status: SessionDetailStatus;
   currentParticipants: number;
   maxParticipants: number;
   sessionDurationMinutes: number;

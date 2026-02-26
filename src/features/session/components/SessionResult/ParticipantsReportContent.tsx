@@ -30,7 +30,7 @@ export async function ParticipantsReportContent({ sessionId }: ParticipantsRepor
   if (!memberResult || !sessionDetail) {
     return (
       <div className="flex min-h-100 items-center justify-center">
-        <p className="text-text-secondary text-[16px]">리포트 데이터를 불러올 수 없습니다.</p>
+        <p className="text-text-secondary text-base">리포트 데이터를 불러올 수 없습니다.</p>
       </div>
     );
   }
@@ -71,15 +71,15 @@ export async function ParticipantsReportContent({ sessionId }: ParticipantsRepor
       <section className="gap-lg border-border-subtle p-lg flex flex-col rounded-lg border">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
-            <h2 className="text-text-primary text-[24px] font-bold">참여자 목록</h2>
-            <p className="text-text-secondary text-[16px]">이번 세션에 함께한 참여자들이에요</p>
+            <h2 className="text-text-primary text-2xl font-bold">참여자 목록</h2>
+            <p className="text-text-secondary text-base">이번 세션에 함께한 참여자들이에요</p>
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-text-disabled text-[14px] font-semibold">
+          <span className="text-text-disabled text-sm font-semibold">
             총 {participants.length}명
           </span>
-          <span className="text-text-secondary text-[14px]">
+          <span className="text-text-secondary text-sm">
             평균 목표 달성률{" "}
             <span className="font-semibold text-green-600">{averageAchievementRate}%</span>
           </span>

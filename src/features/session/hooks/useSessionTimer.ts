@@ -69,7 +69,8 @@ export function clearTimerState(sessionId: string) {
  * 세션 완료 시 결과 전송을 위해 사용됩니다.
  */
 export function getTimerState(
-  sessionId: string
+  sessionId: string,
+  maxSeconds: number
 ): { focusedSeconds: number; elapsedSeconds: number } | null {
   const state = loadTimerState(sessionId);
   if (!state) return null;
@@ -81,11 +82,14 @@ export function getTimerState(
   if (state.isRunning && state.lastSavedAt > 0) {
     const gap = Math.floor((Date.now() - state.lastSavedAt) / 1000);
     const addedTime = Math.max(0, gap);
-    savedElapsed = savedElapsed + addedTime;
+    savedElapsed = Math.min(savedElapsed + addedTime, maxSeconds);
     if (state.isFocusing) {
       savedFocused = savedFocused + addedTime;
     }
   }
+
+  // focusedSeconds는 elapsedSeconds를 초과할 수 없다
+  savedFocused = Math.min(savedFocused, savedElapsed);
 
   return { focusedSeconds: savedFocused, elapsedSeconds: savedElapsed };
 }
@@ -119,6 +123,9 @@ function restoreTimerState(sessionId: string, maxSeconds: number, autoStart: boo
       savedFocused = savedFocused + addedTime;
     }
   }
+
+  // focusedSeconds는 elapsedSeconds를 초과할 수 없다
+  savedFocused = Math.min(savedFocused, savedElapsed);
 
   return {
     elapsedSeconds: savedElapsed,
@@ -198,7 +205,7 @@ export function useSessionTimer({
   const progress = maxSeconds > 0 ? Math.min((state.elapsedSeconds / maxSeconds) * 100, 100) : 0;
   const focusRate =
     state.elapsedSeconds > 0
-      ? Math.round((state.focusedSeconds / state.elapsedSeconds) * 100)
+      ? Math.min(Math.round((state.focusedSeconds / state.elapsedSeconds) * 100), 100)
       : 100;
   const formatted = formatTime(state.elapsedSeconds);
 

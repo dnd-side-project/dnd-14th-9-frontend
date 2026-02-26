@@ -1,4 +1,5 @@
 import type { BadgeProps } from "@/components/Badge/Badge";
+import type { SessionDetailStatus } from "@/features/session/types";
 
 type SessionStatusDisplay = {
   text: string;
@@ -8,7 +9,7 @@ type SessionStatusDisplay = {
 /**
  * API에서 한글로 응답되는 세션 상태를 디스플레이용 텍스트와 Badge status로 변환
  */
-export function getSessionStatusDisplay(status: string): SessionStatusDisplay {
+export function getSessionStatusDisplay(status: SessionDetailStatus): SessionStatusDisplay {
   switch (status) {
     case "대기":
       return { text: "진행 전", badgeStatus: "recruiting" };

@@ -55,7 +55,7 @@ export function SessionHeader({
     <>
       <header className="mb-2xl flex items-start justify-between">
         <div>
-          <h1 className="text-[24px] leading-[140%] font-bold text-gray-50">진행 중인 세션</h1>
+          <h1 className="text-2xl leading-[140%] font-bold text-gray-50">진행 중인 세션</h1>
         </div>
 
         <Button

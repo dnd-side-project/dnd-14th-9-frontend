@@ -31,7 +31,7 @@ export function MenuLink({ href, icon, label, isActive, onClick }: MenuLinkProps
         </div>
         <p
           className={cn(
-            "text-[14px] font-semibold transition-colors",
+            "text-sm font-semibold transition-colors",
             isActive ? "text-text-primary" : "text-text-tertiary group-hover:text-text-primary"
           )}
         >

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils/utils";
 import type { DropdownOptionProps } from "./Dropdown.types";
 
 const SIZE_STYLES = {
-  full: { text: "text-[16px]", container: "px-xs h-14", showIcon: true },
+  full: { text: "text-base", container: "px-xs h-14", showIcon: true },
   large: { text: "text-sm", container: "px-sm h-10", showIcon: false },
   medium: { text: "text-xs", container: "px-sm h-7", showIcon: false },
 } as const;

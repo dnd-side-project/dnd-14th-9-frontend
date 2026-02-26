@@ -49,7 +49,7 @@ export function Dropdown({
         disabled={disabled}
         aria-haspopup="listbox"
         className={cn(
-          hasSelection && ["text-text-primary", "text-[16px]"],
+          hasSelection && ["text-text-primary", "text-base"],
           isOpen && ["border-text-brand-default", "shadow-[0_0_8px_0_#27EA674D]"]
         )}
       >

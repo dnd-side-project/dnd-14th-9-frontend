@@ -62,7 +62,7 @@ export function LobbyHeader({
           </button>
 
           <div>
-            <h1 className="text-[24px] leading-[140%] font-bold text-gray-50">세션 시작 대기 방</h1>
+            <h1 className="text-2xl leading-[140%] font-bold text-gray-50">세션 시작 대기 방</h1>
             <p className="mt-2xs text-base text-gray-500">
               세션 시작 전 대기 방이에요. 세션은 시간이 되면 자동 시작되요
             </p>
