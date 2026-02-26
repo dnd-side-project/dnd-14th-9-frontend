@@ -133,6 +133,13 @@
   body {
     @apply bg-background-default text-foreground;
   }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
 }
 
 @layer utilities {
@@ -145,5 +152,16 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

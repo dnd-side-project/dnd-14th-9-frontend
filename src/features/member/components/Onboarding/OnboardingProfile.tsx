@@ -113,10 +113,8 @@ export function OnboardingProfile({
     >
       {/* Header */}
       <div className="gap-2xs flex flex-col justify-center">
-        <h1 className="text-text-primary text-[24px] font-bold">
-          반가워요, 프로필을 설정해 주세요
-        </h1>
-        <p className="text-text-secondary font-regular text-[16px]">
+        <h1 className="text-text-primary text-2xl font-bold">반가워요, 프로필을 설정해 주세요</h1>
+        <p className="text-text-secondary font-regular text-base">
           프로필을 설정하면 나에게 맞는 세션을 추천해 드려요.
         </p>
       </div>
@@ -162,7 +160,7 @@ export function OnboardingProfile({
         <Button
           variant="solid"
           colorScheme="tertiary"
-          className="text-text-muted flex-1 text-[14px] font-semibold"
+          className="text-text-muted flex-1 text-sm font-semibold"
           onClick={onSkip}
           disabled={isLoading}
         >

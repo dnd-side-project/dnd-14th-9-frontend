@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ButtonLink } from "@/components/Button/ButtonLink";
+import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
 import { useIsAuthenticated, useMe } from "@/features/member/hooks/useMemberHooks";
@@ -11,6 +12,7 @@ import { useDialog } from "@/hooks/useDialog";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
 import { useSessionDetail, useWaitingRoom } from "../../hooks/useSessionHooks";
+import { isInProgressStatus, isWaitingStatus } from "../../types";
 import { Card } from "../Card/Card";
 import { CardSkeleton } from "../Card/CardSkeleton";
 
@@ -22,7 +24,7 @@ interface SessionDetailModalProps {
 
 export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
   const { dialogRef, handleClose, handleBackdropClick } = useDialog("/");
-  const { data } = useSessionDetail(sessionId);
+  const { data, isLoading, error: sessionError } = useSessionDetail(sessionId);
   const isAuthenticated = useIsAuthenticated();
   const [showJoinModal, setShowJoinModal] = useState(false);
 
@@ -42,22 +44,22 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
     waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false;
 
   // 세션이 대기 상태인지 확인
-  const isWaitingStatus = session?.status === "대기";
+  const isWaiting = session ? isWaitingStatus(session.status) : false;
 
   // 세션이 진행 중 상태인지 확인
-  const isOngoingStatus = session?.status === "진행중" || session?.status === "진행 중";
+  const isOngoing = session ? isInProgressStatus(session.status) : false;
 
   // 자동 리다이렉트: 이미 참여 중이면 해당 세션 페이지로 이동
   // Intercepting Route(@modal) 컨텍스트에서 벗어나기 위해 하드 네비게이션 사용
   useEffect(() => {
-    if (isParticipant && isWaitingStatus) {
+    if (isParticipant && isWaiting) {
       dialogRef.current?.close();
       navigateWithHardReload(`/session/${sessionId}/waiting`);
-    } else if (isParticipant && isOngoingStatus) {
+    } else if (isParticipant && isOngoing) {
       dialogRef.current?.close();
       navigateWithHardReload(`/session/${sessionId}`);
     }
-  }, [isParticipant, isWaitingStatus, isOngoingStatus, sessionId, dialogRef]);
+  }, [isParticipant, isWaiting, isOngoing, sessionId, dialogRef]);
 
   // 참여 여부 확인 중인지 여부
   const isCheckingParticipation = isAuthenticated && isWaitingRoomLoading;
@@ -93,7 +95,12 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
         </div>
 
         {/* 카드 영역 */}
-        {session ? (
+        {sessionError ? (
+          <div className="flex animate-[fadeIn_0.2s_ease-out] flex-col items-center gap-3 rounded-lg border border-gray-800 py-10">
+            <AlertIcon className="text-text-muted h-8 w-8" />
+            <p className="text-text-secondary text-sm">세션 정보를 불러오지 못했어요</p>
+          </div>
+        ) : session ? (
           <Card
             className="max-w-full"
             thumbnailSrc={session.imageUrl}
@@ -112,7 +119,17 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
         )}
 
         {/* 버튼 영역 */}
-        {isAuthenticated ? (
+        {sessionError ? (
+          <Button
+            variant="solid"
+            colorScheme="secondary"
+            size="medium"
+            className="w-full"
+            onClick={handleClose}
+          >
+            닫기
+          </Button>
+        ) : isAuthenticated ? (
           <Button
             variant="solid"
             colorScheme="primary"

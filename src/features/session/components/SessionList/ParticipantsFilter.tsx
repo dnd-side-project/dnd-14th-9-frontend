@@ -32,8 +32,12 @@ export function ParticipantsFilter({
   onChange,
 }: ParticipantsFilterProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const closeFilter = useCallback(() => onOpenChange(false), [onOpenChange]);
+  const closeFilter = useCallback(() => {
+    onOpenChange(false);
+    triggerRef.current?.focus();
+  }, [onOpenChange]);
   useClickOutside(containerRef, closeFilter, isOpen);
 
   const selectedParticipants = Number(
@@ -46,6 +50,7 @@ export function ParticipantsFilter({
   return (
     <div ref={containerRef} className="relative shrink-0">
       <Filter
+        ref={triggerRef}
         size="large"
         radius="sm"
         isOpen={isOpen}

@@ -3,7 +3,10 @@
 import { useState } from "react";
 
 import type { UpdateInterestCategoriesRequest } from "@/features/member/types";
+import { ApiError } from "@/lib/api/api-client";
 import { type Category } from "@/lib/constants/category";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { toast } from "@/lib/toast";
 
 import {
   useUpdateInterestCategories,
@@ -64,6 +67,8 @@ export function OnboardingModal({
       setStep("category");
     } catch (error) {
       console.error("프로필 업데이트 실패:", error);
+      const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+      toast.error(message || "프로필 업데이트에 실패했습니다.");
     }
   };
 
@@ -79,6 +84,8 @@ export function OnboardingModal({
       setStep("confirm");
     } catch (error) {
       console.error("관심 카테고리 업데이트 실패:", error);
+      const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+      toast.error(message || "카테고리 업데이트에 실패했습니다.");
     }
   };
 

@@ -33,14 +33,14 @@ export function TotalTimer({
       <div className="flex flex-1 flex-col gap-3">
         {/* 제목 + 시간 */}
         <div className="flex flex-col gap-1">
-          <h2 className="text-[20px] font-bold text-gray-50">전체 타이머</h2>
+          <h2 className="text-xl font-bold text-gray-50">전체 타이머</h2>
           <span className="text-[32px] font-bold text-gray-50">
             {isExpired ? "종료" : formatted}
           </span>
         </div>
 
         {/* 집중 인원 표시 */}
-        <span className="text-[14px] text-gray-400">
+        <span className="text-sm text-gray-400">
           <span className="font-semibold text-green-600">{focusingCount}</span>
           <span>/{totalCount}명 집중 중</span>
         </span>
@@ -55,7 +55,7 @@ export function TotalTimer({
           trackClassName="stroke-border-inverse"
           progressClassName="stroke-border-error-default"
         >
-          <span className="text-text-disabled text-[24px] font-bold">
+          <span className="text-text-disabled text-2xl font-bold">
             {isExpired ? "종료" : formatted}
           </span>
         </ProgressRing>

@@ -16,6 +16,9 @@ import {
   useUpdateGoal,
   useUpdateTodo,
 } from "@/features/task/hooks/useTaskHooks";
+import { ApiError } from "@/lib/api/api-client";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { toast } from "@/lib/toast";
 
 import { lobbyKeys } from "../hooks/useLobbyHooks";
 
@@ -139,6 +142,8 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
       ]);
     } catch (error) {
       console.error("저장 실패:", error);
+      const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+      toast.error(message || "투두 저장에 실패했습니다.");
     } finally {
       setIsSaving(false);
     }
@@ -169,8 +174,8 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
       {/* 헤더 */}
       <div className="flex items-end justify-between">
         <div className="flex flex-col gap-1">
-          <h2 className="text-text-primary text-[24px] font-bold">나의 목표</h2>
-          <p className="text-text-secondary text-[16px] font-normal">
+          <h2 className="text-text-primary text-2xl font-bold">나의 목표</h2>
+          <p className="text-text-secondary text-base font-normal">
             이번 세션에서 해야할 일을 작성해 주세요
           </p>
         </div>
@@ -190,7 +195,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
 
       {/* 목표 */}
       <div className="flex w-full flex-col gap-2">
-        <span className="text-text-secondary text-[14px] font-semibold">목표</span>
+        <span className="text-text-secondary text-sm font-semibold">목표</span>
         {isEditing ? (
           <TextInput
             value={draftGoal}
@@ -203,7 +208,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
             maxLength={50}
           />
         ) : (
-          <div className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-[16px]">
+          <div className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-base">
             {goal}
           </div>
         )}
@@ -212,7 +217,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
       {/* Todo */}
       <div className="gap-sm mt-sm flex min-h-0 flex-1 flex-col">
         <div className="flex items-center justify-between">
-          <span className="text-text-secondary text-[14px] font-semibold">
+          <span className="text-text-secondary text-sm font-semibold">
             투두리스트 <span className="text-green-600">{displayTodos.length}</span>
           </span>
           {isEditing && draftTodos.length < 5 && (
@@ -251,19 +256,20 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
                     className="mt-1.25 h-11 w-11 min-w-0 p-0"
                     leftIcon={<MinusIcon size="small" />}
                     onClick={() => handleRemoveTodo(index)}
+                    aria-label={`할 일 ${index + 1} 삭제`}
                   />
                 )}
               </li>
             ))}
           </ul>
         ) : displayTodos.length === 0 ? (
-          <p className="text-text-muted py-md text-center text-[14px]">등록된 할 일이 없습니다</p>
+          <p className="text-text-muted py-md text-center text-sm">등록된 할 일이 없습니다</p>
         ) : (
           <ul className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
             {todos.map((todo) => (
               <li
                 key={todo.subtaskId}
-                className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 shrink-0 items-center rounded-sm border text-[16px]"
+                className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 shrink-0 items-center rounded-sm border text-base"
               >
                 {todo.content}
               </li>

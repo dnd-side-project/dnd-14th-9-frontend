@@ -55,7 +55,7 @@ export function FocusStatusItem({
 
         <div className="gap-xs flex flex-col">
           <div className="flex w-full items-center justify-between">
-            <span className="text-text-brand-default text-[18px] font-semibold">
+            <span className="text-text-brand-default text-lg font-semibold">
               {Math.round(todoPercentage)}%
             </span>
             <span className="font-pretendard text-text-muted text-xs font-semibold">

@@ -48,7 +48,7 @@ export function PaginationFraction({
         <ChevronLeftIcon className="text-text-disabled size-6" />
       </button>
 
-      <div className="gap-2xs text-text-muted flex items-center justify-center text-[16px] font-semibold">
+      <div className="gap-2xs text-text-muted flex items-center justify-center text-base font-semibold">
         <span>{normalizedCurrentPage}</span>
         <span>/</span>
         <span>{normalizedTotalPage}</span>

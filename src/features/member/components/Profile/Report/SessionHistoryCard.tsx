@@ -46,7 +46,7 @@ export default function SessionHistoryCard({
       {/* 헤더 영역 */}
       <div className="flex w-full items-start justify-between">
         <div className="gap-xs flex flex-col">
-          <p className="text-text-primary text-[16px] font-semibold">{session.title}</p>
+          <p className="text-text-primary text-base font-semibold">{session.title}</p>
           <div className="gap-sm flex items-center">
             <Badge radius="xs" className="border-0">
               {getCategoryLabel(session.category as CategoryFilter)}
