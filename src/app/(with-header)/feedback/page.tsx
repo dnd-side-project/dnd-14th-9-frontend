@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "피드백",
   description: "각 서비스에 대한 피드백을 남겨주세요.",
-};
+  noIndex: true,
+});
 
 export default function FeedbackPage() {
   return (

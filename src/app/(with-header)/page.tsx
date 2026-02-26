@@ -1,7 +1,5 @@
 import { Suspense } from "react";
 
-import type { Metadata } from "next";
-
 import { Banner } from "@/features/session/components/Banner/Banner";
 import { RecommendedSection } from "@/features/session/components/RecommendedSection/RecommendedSection";
 import { RecommendedSectionSkeleton } from "@/features/session/components/RecommendedSection/RecommendedSectionSkeleton";
@@ -14,11 +12,13 @@ import {
   parseSessionListSearchParams,
   toURLSearchParams,
 } from "@/features/session/utils/parseSessionListSearchParams";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "홈",
   description: "모집 중인 모각작 세션을 찾아보고 참여하세요.",
-};
+  pathname: "/",
+});
 
 /**
  * 홈 화면 (메인 페이지)
