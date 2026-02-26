@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
 
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/constants/seo";
-
-const DEFAULT_TITLE = `${SITE_NAME} - 모여서 각자 작업`;
-
-const OG_IMAGES = [
-  { url: "/og-image.png", width: 1200, height: 630 },
-  { url: "/og-image-square.png", width: 600, height: 600 },
-];
+import { OG_IMAGES, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/constants/seo";
 
 const INDEXABLE_ROBOTS = {
   index: true,
@@ -47,24 +40,24 @@ export const rootMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     template: "%s | 각",
-    default: DEFAULT_TITLE,
+    default: SITE_TITLE,
   },
   description: SITE_DESCRIPTION,
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: DEFAULT_TITLE,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     siteName: SITE_NAME,
     locale: "ko_KR",
     type: "website",
-    images: OG_IMAGES,
+    images: [...OG_IMAGES],
   },
   twitter: {
     card: "summary_large_image",
-    title: DEFAULT_TITLE,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     images: OG_IMAGES.map((img) => img.url),
   },
@@ -86,6 +79,11 @@ export const rootMetadata: Metadata = {
   robots: INDEXABLE_ROBOTS,
 };
 
+/**
+ * 정적 페이지(Static Metadata) 전용 헬퍼
+ *
+ * `export const metadata = createPageMetadata({ ... })` 형태로 사용
+ */
 export function createPageMetadata({
   title,
   description,
@@ -93,7 +91,61 @@ export function createPageMetadata({
   noIndex = false,
   openGraph,
 }: PageMetadataOptions): Metadata {
-  const ogImages = openGraph?.images && openGraph.images.length > 0 ? openGraph.images : OG_IMAGES;
+  const ogImages =
+    openGraph?.images && openGraph.images.length > 0 ? openGraph.images : [...OG_IMAGES];
+  const ogTitle = openGraph?.title ?? title;
+  const ogDescription = openGraph?.description ?? description;
+
+  return {
+    title,
+    description,
+    alternates: pathname ? { canonical: pathname } : undefined,
+    openGraph: {
+      title: ogTitle,
+      description: ogDescription,
+      url: openGraph?.url ?? toAbsoluteUrl(pathname),
+      siteName: SITE_NAME,
+      locale: "ko_KR",
+      type: openGraph?.type ?? "website",
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ogTitle,
+      description: ogDescription,
+      images: ogImages.map((img) => img.url),
+    },
+    robots: noIndex ? NO_INDEX_ROBOTS : undefined,
+  };
+}
+
+/**
+ * 동적 페이지(generateMetadata) 전용 헬퍼
+ *
+ * `generateMetadata` 함수 내에서 API 결과를 기반으로 일관된 metadata를 생성할 때 사용
+ *
+ * @example
+ * ```ts
+ * export async function generateMetadata({ params }) {
+ *   const data = await fetchData(params.id);
+ *   return createDynamicPageMetadata({
+ *     title: data.title,
+ *     description: data.summary,
+ *     pathname: `/session/${params.id}`,
+ *     openGraph: { images: data.imageUrl ? [{ url: data.imageUrl }] : undefined },
+ *   });
+ * }
+ * ```
+ */
+export function createDynamicPageMetadata({
+  title,
+  description,
+  pathname,
+  noIndex = false,
+  openGraph,
+}: PageMetadataOptions): Metadata {
+  const ogImages =
+    openGraph?.images && openGraph.images.length > 0 ? openGraph.images : [...OG_IMAGES];
   const ogTitle = openGraph?.title ?? title;
   const ogDescription = openGraph?.description ?? description;
 

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { sessionApi } from "@/features/session/api";
 import { SessionPageContent } from "@/features/session/components/SessionPageContent";
-import { SITE_NAME, SITE_URL } from "@/lib/constants/seo";
+import { createDynamicPageMetadata } from "@/lib/seo/metadata";
 
 interface SessionPageProps {
   params: Promise<{ sessionId: string }>;
@@ -13,22 +13,19 @@ export async function generateMetadata({ params }: SessionPageProps): Promise<Me
 
   try {
     const { result } = await sessionApi.getDetail(sessionId);
-    return {
+    return createDynamicPageMetadata({
       title: result.title,
       description: result.summary || `${result.category} 세션에 참여하세요.`,
+      pathname: `/session/${sessionId}`,
       openGraph: {
-        title: result.title,
-        description: result.summary || `${result.category} 세션에 참여하세요.`,
-        url: `${SITE_URL}/session/${sessionId}`,
-        siteName: SITE_NAME,
-        images: result.imageUrl ? [{ url: result.imageUrl }] : [],
+        images: result.imageUrl ? [{ url: result.imageUrl }] : undefined,
       },
-    };
+    });
   } catch {
-    return {
+    return createDynamicPageMetadata({
       title: "세션 상세",
       description: "모각작 세션 정보를 확인하세요.",
-    };
+    });
   }
 }
 

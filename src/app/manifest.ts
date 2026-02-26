@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
 
+import { SITE_SHORT_DESCRIPTION, SITE_TITLE } from "@/lib/constants/seo";
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "각 (GAK) - 모여서 각자 작업",
+    name: SITE_TITLE,
     short_name: "각",
-    description: "링크 하나로 모여서 함께 집중하는 모각작 플랫폼",
+    description: SITE_SHORT_DESCRIPTION,
     lang: "ko",
     start_url: "/",
     scope: "/",
