@@ -1,5 +1,5 @@
 import { ToastViewport } from "@/components/Toast/ToastViewport";
-import GoogleAnalytics from "@/lib/GooglaAnalytics";
+import GoogleAnalytics from "@/lib/GoogleAnalytics";
 import { rootMetadata } from "@/lib/seo/metadata";
 import { QueryProvider } from "@/providers/QueryProvider";
 
