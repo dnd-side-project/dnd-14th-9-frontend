@@ -22,7 +22,6 @@ const textInputVariants = cva(
     "rounded-sm",
     "border",
     "text-base",
-    "font-pretendard",
     "transition-[border-color,box-shadow]",
     "outline-none",
     "placeholder:text-text-muted",

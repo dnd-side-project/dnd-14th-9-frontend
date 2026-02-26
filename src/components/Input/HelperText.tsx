@@ -29,7 +29,7 @@ export function HelperText({ id, text, type = "default", className }: HelperText
       ) : (
         <InfoIcon className="h-4 w-4 shrink-0" />
       )}
-      <p className="font-pretendard text-xs tracking-[0.12px]">{text}</p>
+      <p className="text-xs tracking-[0.12px]">{text}</p>
     </div>
   );
 }

@@ -10,7 +10,7 @@ const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
     "inline-flex items-center justify-center",
     "bg-surface-strong",
     "text-text-muted",
-    "text-sm font-semibold font-pretendard",
+    "text-sm font-semibold",
     "py-sm px-md",
     "rounded-sm",
     "cursor-pointer",

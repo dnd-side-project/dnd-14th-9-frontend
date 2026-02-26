@@ -38,7 +38,7 @@ export function SocialLoginButton({
       ) : (
         <span
           className={cn(
-            "font-pretendard px-lg flex flex-[1_0_0] items-center justify-center text-center text-lg leading-[140%] font-semibold",
+            "px-lg flex flex-[1_0_0] items-center justify-center text-center text-lg leading-[140%] font-semibold",
             config.labelClassName
           )}
         >

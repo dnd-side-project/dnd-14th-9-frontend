@@ -13,7 +13,6 @@ const BADGE_VARIANTS = cva(
     "px-3",
     "py-1",
     "text-xs",
-    "font-pretendard",
     "font-semibold",
     "border",
     "whitespace-nowrap",

@@ -12,7 +12,6 @@ const FILTER_VARIANTS = cva(
     "cursor-pointer",
     "items-center",
     "justify-between",
-    "font-pretendard",
     "font-semibold",
     "text-gray-200",
     "transition-colors",
