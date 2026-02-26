@@ -1,4 +1,5 @@
 import { ToastViewport } from "@/components/Toast/ToastViewport";
+import GoogleAnalytics from "@/lib/GooglaAnalytics";
 import { rootMetadata } from "@/lib/seo/metadata";
 import { QueryProvider } from "@/providers/QueryProvider";
 
@@ -19,6 +20,9 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${pretendard.variable} bg-background-default font-sans antialiased`}
       >
+        {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ? (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS} />
+        ) : null}
         <QueryProvider>
           {children}
           {modal}
