@@ -31,6 +31,11 @@ const meta = {
       options: ["none", "sm", "md", "lg", "xl"],
       description: "모서리 둥글기",
     },
+    border: {
+      control: "select",
+      options: ["none", "sm"],
+      description: "테두리 스타일",
+    },
     fallbackSrc: {
       control: "text",
       description: "로드 실패 시 대체 이미지 URL",
