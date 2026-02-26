@@ -6,6 +6,7 @@ import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
 import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
+import { MAIN_SCROLL_ID } from "@/hooks/useBodyScrollLock";
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 
 const OnboardingModalWrapper = dynamic(() =>
@@ -45,10 +46,14 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex h-screen flex-col">
         <Header isAuthenticated={isAuthenticated} />
-        <main className="mx-auto w-full max-w-7xl flex-1">{children}</main>
-        <Footer />
+        <div id={MAIN_SCROLL_ID} className="flex-1 overflow-y-auto">
+          <div className="flex min-h-full flex-col">
+            <main className="mx-auto w-full max-w-7xl flex-1">{children}</main>
+            <Footer />
+          </div>
+        </div>
       </div>
       {memberProfile?.firstLogin ? (
         <OnboardingModalWrapper

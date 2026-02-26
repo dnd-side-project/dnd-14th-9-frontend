@@ -1,15 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { type ChangeEvent, useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
 import { Badge } from "@/components/Badge/Badge";
-import { useMe } from "@/features/member/hooks/useMemberHooks";
+import { useMe, useUpdateProfileImage } from "@/features/member/hooks/useMemberHooks";
+import { toast } from "@/lib/toast";
+import { formatSecondsToHours } from "@/lib/utils/format";
+
+const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_PROFILE_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+const validateProfileImageFile = (file: File): string | null => {
+  if (file.size > MAX_PROFILE_IMAGE_SIZE) return "5MB 이하 파일만 업로드 가능해요";
+  if (!ALLOWED_PROFILE_IMAGE_TYPES.has(file.type)) return "jpg, png, webp만 지원해요";
+  return null;
+};
 
 export function ProfileSummary() {
   const { data } = useMe();
+  const { mutate: updateProfileImage, isPending: isUpdatingProfileImage } = useUpdateProfileImage();
   const profile = data?.result;
   const [isHovered, setIsHovered] = useState(false);
+
+  const handleProfileImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) return;
+
+    const fileError = validateProfileImageFile(file);
+    if (fileError) {
+      toast.error(fileError);
+      return;
+    }
+
+    updateProfileImage(
+      { profileImage: file },
+      {
+        onSuccess: () => {
+          toast.success("프로필 이미지가 수정되었습니다.");
+        },
+        onError: (error) => {
+          const message =
+            error instanceof Error && error.message
+              ? error.message
+              : "프로필 이미지 수정 중 오류가 발생했습니다.";
+          toast.error(message);
+        },
+      }
+    );
+  };
 
   if (!profile) return null;
 
@@ -23,14 +64,19 @@ export function ProfileSummary() {
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          {/* TODO: 구현에 따라 커스텀 업로드 핸들러 연동 */}
-          <input type="file" className="hidden" accept="image/*" />
+          <input
+            type="file"
+            className="hidden"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleProfileImageChange}
+            disabled={isUpdatingProfileImage}
+          />
           <Avatar
             src={profile.profileImageUrl ?? undefined}
             alt={profile.nickname}
             size="xlarge"
             type={profile.profileImageUrl ? "image" : "empty"}
-            edit={isHovered}
+            edit={!isUpdatingProfileImage && isHovered}
             className="h-full w-full"
           />
         </label>
@@ -68,7 +114,7 @@ export function ProfileSummary() {
                 누적 시간
               </span>
               <span className="text-text-secondary font-pretendard text-lg font-semibold">
-                {profile.totalParticipationTime ?? 0}시간
+                {formatSecondsToHours(profile.totalParticipationTime ?? 0)}
               </span>
             </div>
             <div className="flex w-[88px] flex-col items-start gap-1">

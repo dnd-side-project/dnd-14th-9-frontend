@@ -10,8 +10,9 @@ import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { TextInput } from "@/components/Input/TextInput";
 import { Portal } from "@/components/Portal/Portal";
 import { useJoinSession } from "@/features/session/hooks/useSessionHooks";
-import type { ReportTodoItem, SessionDetailStatus } from "@/features/session/types";
 import { isInProgressStatus } from "@/features/session/types";
+import type { ReportTodoItem, SessionDetailStatus } from "@/features/session/types";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { toast } from "@/lib/toast";
@@ -31,6 +32,8 @@ export function SessionJoinModal({
   onClose,
   onJoinSuccess,
 }: SessionJoinModalProps) {
+  useBodyScrollLock();
+
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [goal, setGoal] = useState("");
   const [todos, setTodos] = useState<ReportTodoItem[]>([

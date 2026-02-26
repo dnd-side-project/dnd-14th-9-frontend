@@ -10,6 +10,7 @@ import { PATCH as patchInterestCategories } from "@/app/api/members/me/interest-
 import { PATCH as patchNickname } from "@/app/api/members/me/nickname/route";
 import { GET as getMeProfile } from "@/app/api/members/me/profile/route";
 import { PATCH as patchProfileImage } from "@/app/api/members/me/profile-image/route";
+import { GET as getMyReportSessions } from "@/app/api/members/me/report-sessions/route";
 import type { UpdateInterestCategoriesRequest } from "@/features/member/types";
 import { forwardToBackend } from "@/lib/api/api-route-forwarder";
 
@@ -114,6 +115,23 @@ describe("member route handlers", () => {
       method: "PATCH",
       pathWithQuery: "/members/me/profile-image",
       includeRequestBody: "formData",
+      forwardRequestCookies: true,
+    });
+  });
+
+  it("report-sessions 라우트는 쿼리 문자열을 포함해 forwardToBackend를 호출해야 한다", async () => {
+    mockedForwardToBackend.mockResolvedValueOnce(NextResponse.json({}, { status: 200 }));
+    const request = new NextRequest(
+      "http://localhost:3000/api/members/me/report-sessions?page=2&size=4",
+      { method: "GET" }
+    );
+
+    await getMyReportSessions(request);
+
+    expect(mockedForwardToBackend).toHaveBeenCalledWith({
+      request,
+      method: "GET",
+      pathWithQuery: "/members/me/report-sessions?page=2&size=4",
       forwardRequestCookies: true,
     });
   });

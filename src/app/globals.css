@@ -143,6 +143,9 @@
 }
 
 @layer utilities {
+  .scroll-lock {
+    overflow: hidden !important;
+  }
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

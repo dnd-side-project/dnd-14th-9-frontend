@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   return forwardToBackend({
     request,
     method: "GET",
-    pathWithQuery: "/members/me/report-sessions",
+    pathWithQuery: `/members/me/report-sessions${request.nextUrl.search}`,
     forwardRequestCookies: true,
   });
 }

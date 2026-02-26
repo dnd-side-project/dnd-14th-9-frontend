@@ -68,8 +68,11 @@ export function ProfileEditForm() {
           reset(values);
         },
         onError: (error) => {
-          const err = error as Error;
-          toast.error(err.message || "프로필 정보 저장 중 오류가 발생했습니다.");
+          const message =
+            error instanceof Error && error.message
+              ? error.message
+              : "프로필 정보 저장 중 오류가 발생했습니다.";
+          toast.error(message);
         },
       }
     );
