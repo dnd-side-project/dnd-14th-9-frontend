@@ -80,64 +80,11 @@ export const rootMetadata: Metadata = {
 };
 
 /**
- * 정적 페이지(Static Metadata) 전용 헬퍼
+ * 페이지 metadata 생성 헬퍼
  *
- * `export const metadata = createPageMetadata({ ... })` 형태로 사용
+ * 정적(`export const metadata`) 및 동적(`generateMetadata`) 페이지 모두에서 사용
  */
 export function createPageMetadata({
-  title,
-  description,
-  pathname,
-  noIndex = false,
-  openGraph,
-}: PageMetadataOptions): Metadata {
-  const ogImages =
-    openGraph?.images && openGraph.images.length > 0 ? openGraph.images : [...OG_IMAGES];
-  const ogTitle = openGraph?.title ?? title;
-  const ogDescription = openGraph?.description ?? description;
-
-  return {
-    title,
-    description,
-    alternates: pathname ? { canonical: pathname } : undefined,
-    openGraph: {
-      title: ogTitle,
-      description: ogDescription,
-      url: openGraph?.url ?? toAbsoluteUrl(pathname),
-      siteName: SITE_NAME,
-      locale: "ko_KR",
-      type: openGraph?.type ?? "website",
-      images: ogImages,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: ogTitle,
-      description: ogDescription,
-      images: ogImages.map((img) => img.url),
-    },
-    robots: noIndex ? NO_INDEX_ROBOTS : undefined,
-  };
-}
-
-/**
- * 동적 페이지(generateMetadata) 전용 헬퍼
- *
- * `generateMetadata` 함수 내에서 API 결과를 기반으로 일관된 metadata를 생성할 때 사용
- *
- * @example
- * ```ts
- * export async function generateMetadata({ params }) {
- *   const data = await fetchData(params.id);
- *   return createDynamicPageMetadata({
- *     title: data.title,
- *     description: data.summary,
- *     pathname: `/session/${params.id}`,
- *     openGraph: { images: data.imageUrl ? [{ url: data.imageUrl }] : undefined },
- *   });
- * }
- * ```
- */
-export function createDynamicPageMetadata({
   title,
   description,
   pathname,
