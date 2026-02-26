@@ -180,8 +180,6 @@ export function SessionJoinModal({
                   containerClassName="flex-1"
                   showCharacterCount
                   maxLength={50}
-                  error={todoError && index === 0}
-                  errorMessage="할 일을 1개 이상 입력해주세요"
                 />
                 {todos.length > 1 && (
                   <Button
@@ -196,6 +194,11 @@ export function SessionJoinModal({
               </li>
             ))}
           </ul>
+          {todoError && (
+            <p className="text-text-status-negative-default text-sm">
+              할 일을 1개 이상 입력해주세요
+            </p>
+          )}
         </div>
 
         {/* 서버 에러 메시지 */}
