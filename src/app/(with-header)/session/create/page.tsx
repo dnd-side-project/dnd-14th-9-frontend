@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
+
 import { SessionCreateForm } from "@/features/session/components/SessionCreateForm";
+
+export const metadata: Metadata = {
+  title: "세션 만들기",
+  description: "함께 집중할 모각작 세션을 만들어보세요.",
+};
 
 export default function SessionCreatePage() {
   return (

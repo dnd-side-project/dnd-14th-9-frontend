@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "피드백",
+  description: "각 서비스에 대한 피드백을 남겨주세요.",
+};
+
 export default function FeedbackPage() {
   return (
     <main className="mx-auto w-full max-w-7xl px-6 py-16">
