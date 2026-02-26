@@ -3,6 +3,7 @@
 import { ClockIcon } from "@/components/Icon/ClockIcon";
 
 import { useCountdown } from "../hooks/useCountdown";
+import { useDynamicFavicon } from "../hooks/useDynamicFavicon";
 
 interface CountdownBannerProps {
   targetTime?: Date;
@@ -11,7 +12,9 @@ interface CountdownBannerProps {
 const TEST_TARGET = new Date("2025-12-31T23:59:59");
 
 export function CountdownBanner({ targetTime = TEST_TARGET }: CountdownBannerProps) {
-  const { formatted, isExpired } = useCountdown(targetTime);
+  const { formatted, isExpired, hours } = useCountdown(targetTime);
+  const isUnderOneHour = hours === 0 && !isExpired;
+  useDynamicFavicon(isUnderOneHour);
 
   return (
     <div className="bg-surface-strong px-md py-sm text-center">
