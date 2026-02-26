@@ -20,8 +20,12 @@ interface SortFilterProps {
 
 export function SortFilter({ isOpen, value, onOpenChange, onSelect, className }: SortFilterProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const closeFilter = useCallback(() => onOpenChange(false), [onOpenChange]);
+  const closeFilter = useCallback(() => {
+    onOpenChange(false);
+    triggerRef.current?.focus();
+  }, [onOpenChange]);
   useClickOutside(containerRef, closeFilter, isOpen);
 
   const triggerLabel = getOptionLabel(SORT_OPTIONS, value, "정렬");
@@ -29,6 +33,7 @@ export function SortFilter({ isOpen, value, onOpenChange, onSelect, className }:
   return (
     <div ref={containerRef} className={cn("relative shrink-0", className)}>
       <Filter
+        ref={triggerRef}
         size="medium"
         radius="sm"
         bordered={false}

@@ -20,6 +20,7 @@ import { useClickOutside } from "@/hooks/useClickOutside";
 import { ApiError } from "@/lib/api/api-client";
 import { ONBOARDING_CATEGORIES, CATEGORY_LABELS, type Category } from "@/lib/constants/category";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { toast } from "@/lib/toast";
 import { formatDateTimeDisplay, formatDurationKorean, formatLocalDateTime } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
 
@@ -133,6 +134,7 @@ export function SessionCreateForm() {
         onError: (error) => {
           const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
           setServerError(message);
+          toast.error(message);
         },
       }
     );

@@ -4,6 +4,9 @@ import { useCallback } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ProgressRing } from "@/components/ProgressRing/ProgressRing";
+import { ApiError } from "@/lib/api/api-client";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { toast } from "@/lib/toast";
 
 import { useToggleMyStatus } from "../../hooks/useSessionHooks";
 import { useSessionTimer } from "../../hooks/useSessionTimer";
@@ -50,6 +53,8 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
         },
         onError: (error) => {
           console.error("[MyTimer] 상태 전환 실패:", error);
+          const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+          toast.error(message);
           // 롤백: 이전 상태로 복원
           if (wasRunning) {
             start();

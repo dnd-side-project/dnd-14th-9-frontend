@@ -26,8 +26,12 @@ export function StartTimeFilter({
   onToggleTimeSlot,
 }: StartTimeFilterProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const closeFilter = useCallback(() => onOpenChange(false), [onOpenChange]);
+  const closeFilter = useCallback(() => {
+    onOpenChange(false);
+    triggerRef.current?.focus();
+  }, [onOpenChange]);
   useClickOutside(containerRef, closeFilter, isOpen);
 
   const hasTimeSlotSelection = selectedTimeSlots.length > 0;
@@ -36,6 +40,7 @@ export function StartTimeFilter({
   return (
     <div ref={containerRef} className="relative shrink-0">
       <Filter
+        ref={triggerRef}
         size="large"
         radius="sm"
         isOpen={isOpen}
