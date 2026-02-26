@@ -116,15 +116,15 @@ export function SessionJoinModal({
       >
         {/* 헤더 */}
         <div className="flex flex-col gap-1">
-          <h2 className="text-text-primary text-[24px] font-bold">나의 목표</h2>
-          <p className="text-text-secondary text-[16px] font-normal">
+          <h2 className="text-text-primary text-2xl font-bold">나의 목표</h2>
+          <p className="text-text-secondary text-base font-normal">
             목표와 투두리스트를 작성해야 세션에 참여할 수 있어요!
           </p>
         </div>
 
         {/* 목표 */}
         <div className="flex w-full flex-col gap-2">
-          <span className="text-text-secondary text-[14px] font-semibold">
+          <span className="text-text-secondary text-sm font-semibold">
             목표 <span className="text-text-status-negative-default">*</span>
           </span>
           <TextInput
@@ -147,7 +147,7 @@ export function SessionJoinModal({
         {/* Todo */}
         <div className="gap-sm flex flex-col">
           <div className="flex items-center justify-between">
-            <span className="text-text-secondary text-[14px] font-semibold">
+            <span className="text-text-secondary text-sm font-semibold">
               투두리스트 <span className="text-green-600">{todos.length}</span>{" "}
               <span className="text-text-status-negative-default">*</span>
             </span>

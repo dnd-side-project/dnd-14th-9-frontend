@@ -44,9 +44,7 @@ const DatePickerRange = forwardRef<HTMLDivElement, DatePickerRangeProps>(
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-text-secondary text-[18px] font-semibold">
-              {displayYearMonth}
-            </span>
+            <span className="text-text-secondary text-lg font-semibold">{displayYearMonth}</span>
             <div className="text-text-disabled flex items-center gap-1 text-[13px]">
               <CalendarIcon size="xsmall" />
               <span>{displayText}</span>
@@ -199,7 +197,7 @@ const DatePickerSingle = forwardRef<HTMLDivElement, DatePickerSingleProps>(
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-text-secondary text-[18px] font-semibold">
+                <span className="text-text-secondary text-lg font-semibold">
                   {displayYearMonth}
                 </span>
                 <div className="text-text-disabled flex items-center gap-1 text-[13px]">
@@ -278,7 +276,7 @@ const DatePickerSingle = forwardRef<HTMLDivElement, DatePickerSingleProps>(
           {/* Time Picker Section */}
           {showTimePicker && (
             <div className="border-divider-subtle flex flex-col border-l pl-4">
-              <span className="text-text-secondary mb-4 text-[18px] font-semibold">시간</span>
+              <span className="text-text-secondary mb-4 text-lg font-semibold">시간</span>
               <TimePickerPanel
                 hour={hour}
                 minute={minute}

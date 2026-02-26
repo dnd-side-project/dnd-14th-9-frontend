@@ -75,8 +75,8 @@ export function ParticipantListCard({
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
-          <h2 className="text-text-primary text-[24px] font-bold">참여자 목록</h2>
-          <p className="text-text-secondary text-[16px]">이번 세션에서 함께할 참여자들이에요</p>
+          <h2 className="text-text-primary text-2xl font-bold">참여자 목록</h2>
+          <p className="text-text-secondary text-base">이번 세션에서 함께할 참여자들이에요</p>
         </div>
         {!isKicking && (
           <Button variant="outlined" colorScheme="primary" size="medium" onClick={handleStartKick}>
@@ -86,7 +86,7 @@ export function ParticipantListCard({
       </div>
 
       {/* 참여자 수 */}
-      <span className="text-text-secondary text-[14px] font-semibold">
+      <span className="text-text-secondary text-sm font-semibold">
         총{" "}
         <span className="text-green-600">
           {members.length}/{maxParticipants}
@@ -141,18 +141,18 @@ export function ParticipantListCard({
 
                 {/* 정보 */}
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <span className="text-[16px] font-semibold text-gray-50">
+                  <span className="text-base font-semibold text-gray-50">
                     {participant.nickname}
                   </span>
-                  <span className="truncate text-[12px] font-bold text-gray-500">
+                  <span className="truncate text-xs font-bold text-gray-500">
                     {participant.task?.goal ?? ""}
                   </span>
                   <div className="mt-md flex items-center gap-2">
-                    <span className="text-[12px] text-gray-500">달성도</span>
+                    <span className="text-xs text-gray-500">달성도</span>
                     <Badge status="recruiting" radius="max">
                       {participant.achievementRate}%
                     </Badge>
-                    <span className="text-[12px] text-gray-500">집중도</span>
+                    <span className="text-xs text-gray-500">집중도</span>
                     <Badge status="closing" radius="max">
                       {participant.focusRate}%
                     </Badge>

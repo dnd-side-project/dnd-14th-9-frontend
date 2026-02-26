@@ -28,7 +28,7 @@ export async function SessionResultContent({ sessionId }: SessionResultContentPr
   if (!memberResult || !sessionDetail) {
     return (
       <div className="flex min-h-100 items-center justify-center">
-        <p className="text-text-secondary text-[16px]">리포트 데이터를 불러올 수 없습니다.</p>
+        <p className="text-text-secondary text-base">리포트 데이터를 불러올 수 없습니다.</p>
       </div>
     );
   }

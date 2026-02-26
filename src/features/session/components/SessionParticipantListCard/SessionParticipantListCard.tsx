@@ -48,8 +48,8 @@ export function SessionParticipantListCard({
         {/* 헤더 */}
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
-            <h2 className="text-text-primary text-[24px] font-bold">참여자 목록</h2>
-            <p className="text-text-secondary text-[16px]">이번 세션에서 함께할 참여자들이에요</p>
+            <h2 className="text-text-primary text-2xl font-bold">참여자 목록</h2>
+            <p className="text-text-secondary text-base">이번 세션에서 함께할 참여자들이에요</p>
           </div>
           {/* 채팅 아이콘 */}
           <button
@@ -64,10 +64,8 @@ export function SessionParticipantListCard({
 
         {/* 참여자 수 + 평균 목표 달성률 */}
         <div className="flex items-center justify-between">
-          <span className="text-text-disabled text-[14px] font-semibold">
-            총 {participantCount}명
-          </span>
-          <span className="text-text-secondary text-[14px]">
+          <span className="text-text-disabled text-sm font-semibold">총 {participantCount}명</span>
+          <span className="text-text-secondary text-sm">
             평균 목표 달성률{" "}
             <span className="font-semibold text-green-600">{averageAchievementRate}%</span>
           </span>
@@ -105,16 +103,14 @@ export function SessionParticipantListCard({
 
                   {/* 정보 */}
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
-                    <span className="text-[16px] font-semibold text-gray-50">
-                      {member.nickname}
-                    </span>
-                    <span className="truncate text-[12px] font-bold text-gray-500">
+                    <span className="text-base font-semibold text-gray-50">{member.nickname}</span>
+                    <span className="truncate text-xs font-bold text-gray-500">
                       {member.task?.goal}
                     </span>
                     <div className="mt-md flex items-center gap-2">
                       {/* 현재 상태 (집중 중 / 자리 비움) */}
                       <span
-                        className={`flex items-center gap-1 text-[12px] ${
+                        className={`flex items-center gap-1 text-xs ${
                           isFocusing ? "text-text-status-positive-default" : "text-text-tertiary"
                         }`}
                       >
@@ -125,9 +121,9 @@ export function SessionParticipantListCard({
                       </span>
 
                       {/* 목표 달성률 */}
-                      <span className="text-text-disabled text-[12px]">|</span>
-                      <span className="text-text-secondary text-[12px]">달성률</span>
-                      <span className="px-xs py-2xs text-text-secondary rounded-xs bg-white/8 text-[12px]">
+                      <span className="text-text-disabled text-xs">|</span>
+                      <span className="text-text-secondary text-xs">달성률</span>
+                      <span className="px-xs py-2xs text-text-secondary rounded-xs bg-white/8 text-xs">
                         {member.achievementRate}%
                       </span>
                     </div>

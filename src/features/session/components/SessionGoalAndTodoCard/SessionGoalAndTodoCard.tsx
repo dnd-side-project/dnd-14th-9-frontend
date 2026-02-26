@@ -34,8 +34,8 @@ export function SessionGoalAndTodoCard({
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
-          <h2 className="text-text-primary text-[24px] font-bold">나의 목표</h2>
-          <p className="text-text-secondary text-[16px] font-normal">
+          <h2 className="text-text-primary text-2xl font-bold">나의 목표</h2>
+          <p className="text-text-secondary text-base font-normal">
             이번 세션에서 집중할 할 일이에요
           </p>
         </div>
@@ -43,15 +43,15 @@ export function SessionGoalAndTodoCard({
 
       {/* 목표 */}
       <div className="flex w-full flex-col gap-2">
-        <span className="text-text-secondary text-[14px] font-semibold">목표</span>
-        <div className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-[16px]">
+        <span className="text-text-secondary text-sm font-semibold">목표</span>
+        <div className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-base">
           {goal ?? "목표가 설정되지 않았습니다"}
         </div>
       </div>
 
       {/* Todo */}
       <div className="gap-sm mt-sm flex min-h-0 flex-1 flex-col">
-        <span className="text-text-secondary text-[14px] font-semibold">
+        <span className="text-text-secondary text-sm font-semibold">
           투두리스트{" "}
           <span className="text-green-600">
             {completedCount}/{todos.length}
@@ -60,7 +60,7 @@ export function SessionGoalAndTodoCard({
         </span>
 
         {todos.length === 0 ? (
-          <p className="text-text-muted py-md text-center text-[14px]">등록된 할 일이 없습니다</p>
+          <p className="text-text-muted py-md text-center text-sm">등록된 할 일이 없습니다</p>
         ) : (
           <ul className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
             {todos.map((todo) => (
@@ -84,7 +84,7 @@ export function SessionGoalAndTodoCard({
 
                 {/* 내용 */}
                 <span
-                  className={`text-[16px] ${
+                  className={`text-base ${
                     todo.isCompleted ? "text-text-disabled line-through" : "text-text-primary"
                   }`}
                 >

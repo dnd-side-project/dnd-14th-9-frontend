@@ -68,7 +68,7 @@ export function OnboardingCategory({
     >
       {/* Header */}
       <div className="gap-md flex w-full flex-col">
-        <h1 className="text-text-primary text-[24px] font-bold">
+        <h1 className="text-text-primary text-2xl font-bold">
           {nickname}님! <br />
           요즘 관심있는 카테고리는 무엇인가요?
         </h1>
@@ -80,7 +80,7 @@ export function OnboardingCategory({
             return (
               <div key={index} className="gap-xs flex items-center">
                 <div className="flex items-center justify-center gap-1">
-                  <span className="text-text-primary text-[12px] font-semibold">
+                  <span className="text-text-primary text-xs font-semibold">
                     {RANK_LABELS[index]}
                   </span>
                   {isFirst && (

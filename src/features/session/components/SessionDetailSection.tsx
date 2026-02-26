@@ -43,10 +43,10 @@ export function SessionDetailSection({
         </Badge>
 
         {/* 제목 */}
-        <h2 className="text-[24px] font-bold text-gray-50">{title}</h2>
+        <h2 className="text-2xl font-bold text-gray-50">{title}</h2>
 
         {/* 방 소개 */}
-        <p className="text-[16px] text-gray-200">{description}</p>
+        <p className="text-base text-gray-200">{description}</p>
 
         {/* 메타 정보 */}
         <CardMeta
@@ -54,13 +54,13 @@ export function SessionDetailSection({
           maxParticipants={maxParticipants}
           durationMinutes={durationMinutes}
           sessionDate={sessionDate}
-          className="text-[14px]"
+          className="text-sm"
         />
 
         {/* 공지사항 */}
         <div className="px-lg py-lg gap-md mt-auto flex flex-row rounded-lg bg-gray-900">
-          <p className="text-common-white text-[16px] font-semibold">공지사항</p>
-          <p className="text-[16px] text-gray-400">{notice}</p>
+          <p className="text-common-white text-base font-semibold">공지사항</p>
+          <p className="text-base text-gray-400">{notice}</p>
         </div>
       </div>
     </section>

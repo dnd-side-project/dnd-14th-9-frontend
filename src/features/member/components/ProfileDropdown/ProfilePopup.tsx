@@ -105,7 +105,7 @@ export function ProfilePopup({
             size="medium"
             onClick={handleLogout}
             leftIcon={<LogoutIcon size="xsmall" className="h-5 w-5" />}
-            className="text-[14px]"
+            className="text-sm"
           >
             로그아웃
           </Button>

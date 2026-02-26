@@ -21,9 +21,9 @@ const FILTER_VARIANTS = cva(
   {
     variants: {
       size: {
-        full: ["w-full", "h-14", "text-[16px]", "px-xs"],
-        large: ["w-[89px]", "h-10", "text-[14px]", "py-xs", "pr-xs", "pl-md"],
-        medium: ["w-[74px]", "h-7", "text-[12px]", "py-2xs", "pr-2xs", "pl-xs"],
+        full: ["w-full", "h-14", "text-base", "px-xs"],
+        large: ["w-[89px]", "h-10", "text-sm", "py-xs", "pr-xs", "pl-md"],
+        medium: ["w-[74px]", "h-7", "text-xs", "py-2xs", "pr-2xs", "pl-xs"],
       },
       radius: {
         max: "rounded-max",

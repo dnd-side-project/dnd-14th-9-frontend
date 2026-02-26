@@ -44,7 +44,7 @@ export function ProfileSummary() {
               <Badge
                 status="closed"
                 radius="xs"
-                className="bg-alpha-white-8 text-text-secondary px-xs py-2xs border-none text-[12px] font-semibold"
+                className="bg-alpha-white-8 text-text-secondary px-xs py-2xs border-none text-xs font-semibold"
               >
                 {profile.email}
               </Badge>
