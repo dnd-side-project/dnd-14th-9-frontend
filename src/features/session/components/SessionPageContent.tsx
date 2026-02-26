@@ -31,9 +31,12 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const { data: meData } = useMe();
   const submitResultMutation = useSubmitSessionResult();
 
+  const sessionDurationMinutes = sessionData?.result?.sessionDurationMinutes;
+
   // 세션 완료 시 결과 제출 및 페이지 이동
   const handleSessionComplete = useCallback(async () => {
-    const timerState = getTimerState(sessionId);
+    const maxSeconds = (sessionDurationMinutes ?? 0) * 60;
+    const timerState = getTimerState(sessionId, maxSeconds);
 
     // 타이머 상태가 있으면 결과 전송
     if (timerState) {
@@ -57,7 +60,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     // 타이머 상태 정리 후 이동
     clearTimerState(sessionId);
     window.location.replace(`/session/${sessionId}/result`);
-  }, [sessionId, submitResultMutation]);
+  }, [sessionId, sessionDurationMinutes, submitResultMutation]);
 
   // 브라우저 뒤로 가기 감지
   useEffect(() => {

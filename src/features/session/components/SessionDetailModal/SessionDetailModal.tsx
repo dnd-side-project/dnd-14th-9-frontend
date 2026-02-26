@@ -11,6 +11,7 @@ import { useDialog } from "@/hooks/useDialog";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
 import { useSessionDetail, useWaitingRoom } from "../../hooks/useSessionHooks";
+import { isInProgressStatus, isWaitingStatus } from "../../types";
 import { Card } from "../Card/Card";
 import { CardSkeleton } from "../Card/CardSkeleton";
 
@@ -42,22 +43,22 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
     waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false;
 
   // 세션이 대기 상태인지 확인
-  const isWaitingStatus = session?.status === "대기";
+  const isWaiting = session ? isWaitingStatus(session.status) : false;
 
   // 세션이 진행 중 상태인지 확인
-  const isOngoingStatus = session?.status === "진행중" || session?.status === "진행 중";
+  const isOngoing = session ? isInProgressStatus(session.status) : false;
 
   // 자동 리다이렉트: 이미 참여 중이면 해당 세션 페이지로 이동
   // Intercepting Route(@modal) 컨텍스트에서 벗어나기 위해 하드 네비게이션 사용
   useEffect(() => {
-    if (isParticipant && isWaitingStatus) {
+    if (isParticipant && isWaiting) {
       dialogRef.current?.close();
       navigateWithHardReload(`/session/${sessionId}/waiting`);
-    } else if (isParticipant && isOngoingStatus) {
+    } else if (isParticipant && isOngoing) {
       dialogRef.current?.close();
       navigateWithHardReload(`/session/${sessionId}`);
     }
-  }, [isParticipant, isWaitingStatus, isOngoingStatus, sessionId, dialogRef]);
+  }, [isParticipant, isWaiting, isOngoing, sessionId, dialogRef]);
 
   // 참여 여부 확인 중인지 여부
   const isCheckingParticipation = isAuthenticated && isWaitingRoomLoading;

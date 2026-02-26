@@ -9,7 +9,8 @@ import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { TextInput } from "@/components/Input/TextInput";
 import { Portal } from "@/components/Portal/Portal";
 import { useJoinSession } from "@/features/session/hooks/useSessionHooks";
-import type { ReportTodoItem } from "@/features/session/types";
+import type { ReportTodoItem, SessionDetailStatus } from "@/features/session/types";
+import { isInProgressStatus } from "@/features/session/types";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 
@@ -17,7 +18,7 @@ const MAX_TODOS = 5;
 
 interface SessionJoinModalProps {
   sessionId: string;
-  sessionStatus?: string;
+  sessionStatus?: SessionDetailStatus;
   onClose: () => void;
   onJoinSuccess?: () => void;
 }
@@ -91,7 +92,7 @@ export function SessionJoinModal({
       onJoinSuccess?.();
       onClose();
 
-      const isInProgress = sessionStatus?.includes("진행") || sessionStatus === "IN_PROGRESS";
+      const isInProgress = sessionStatus ? isInProgressStatus(sessionStatus) : false;
       if (isInProgress) {
         // 진행 중인 세션이면 바로 세션 페이지로 이동
         window.location.replace(`/session/${sessionId}`);
