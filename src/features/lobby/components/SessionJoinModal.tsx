@@ -12,7 +12,6 @@ import { Portal } from "@/components/Portal/Portal";
 import { useJoinSession } from "@/features/session/hooks/useSessionHooks";
 import { isInProgressStatus } from "@/features/session/types";
 import type { ReportTodoItem, SessionDetailStatus } from "@/features/session/types";
-import type { ReportTodoItem } from "@/features/session/types";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
