@@ -251,6 +251,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
                     className="mt-1.25 h-11 w-11 min-w-0 p-0"
                     leftIcon={<MinusIcon size="small" />}
                     onClick={() => handleRemoveTodo(index)}
+                    aria-label={`할 일 ${index + 1} 삭제`}
                   />
                 )}
               </li>
