@@ -29,6 +29,7 @@ export function ProfileEditForm() {
     resolver: zodResolver(profileEditSchema),
     defaultValues: {
       nickname: "",
+      email: "",
       bio: "",
       interestCategories: [],
     },
@@ -39,6 +40,7 @@ export function ProfileEditForm() {
     if (profile) {
       reset({
         nickname: profile.nickname,
+        email: profile.email ?? "",
         bio: profile.bio ?? "",
         interestCategories: [
           profile.firstInterestCategory,
@@ -99,6 +101,27 @@ export function ProfileEditForm() {
             />
           )}
         />
+
+        {/* TODO(temp): 이메일 수정은 API만 유지하고 폼 노출은 잠시 비활성화합니다.
+        <Controller
+          name="email"
+          control={control}
+          render={({ field: { value, onChange, ref, onBlur } }) => (
+            <TextInput
+              ref={ref}
+              type="email"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              label="이메일"
+              placeholder="이메일을 입력해 주세요"
+              error={!!errors.email}
+              errorMessage={errors.email?.message}
+              fullWidth
+            />
+          )}
+        />
+        */}
 
         <Controller
           name="bio"

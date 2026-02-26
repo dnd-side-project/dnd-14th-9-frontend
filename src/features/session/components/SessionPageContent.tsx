@@ -2,8 +2,14 @@
 
 import { useCallback } from "react";
 
+import { notFound } from "next/navigation";
+
+import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
+import { ApiError } from "@/lib/api/api-client";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { toast } from "@/lib/toast";
 
 import {
   useInProgressData,
@@ -26,7 +32,7 @@ interface SessionPageContentProps {
 export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const { showLeaveDialog, setShowLeaveDialog, isLeavingRef } = usePreventBackNavigation();
 
-  const { data: sessionData, isLoading, error } = useSessionDetail(sessionId);
+  const { data: sessionData, isLoading, error, refetch } = useSessionDetail(sessionId);
   const { data: inProgressData } = useInProgressData({ sessionId });
   const { data: meData } = useMe();
   const submitResultMutation = useSubmitSessionResult();
@@ -49,10 +55,9 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
           },
         });
       } catch (error) {
-        // [임시] 결과 전송 실패 시 상세 로그 출력 및 페이지 이동 중단
+        const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
         console.error("[SessionPageContent] 결과 전송 실패:", error);
-        console.error("[SessionPageContent] timerState:", timerState);
-        console.error("[SessionPageContent] sessionId:", sessionId);
+        toast.error(message);
         return; // 페이지 이동 중단
       }
     }
@@ -84,10 +89,19 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     );
   }
 
+  if (error instanceof ApiError && error.status === 404) {
+    notFound();
+  }
+
   if (error || !sessionData?.result) {
     return (
-      <div className="flex min-h-100 items-center justify-center">
-        <p className="text-status-danger">세션 정보를 불러오는데 실패했습니다.</p>
+      <div className="flex h-[calc(100vh-200px)] min-h-[400px] items-center justify-center">
+        <ErrorFallbackUI
+          title="세션 정보를 불러올 수 없어요"
+          description="데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요."
+          buttonLabel="다시 시도하기"
+          onRetry={() => void refetch()}
+        />
       </div>
     );
   }

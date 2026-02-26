@@ -128,6 +128,10 @@ export interface UpdateMeRequest {
   thirdInterestCategory?: string | null;
 }
 
+export interface UpdateEmailRequest {
+  email: string | null;
+}
+
 export interface UpdateInterestCategoriesRequest {
   firstInterestCategory: MemberInterestCategory | null;
   secondInterestCategory: MemberInterestCategory | null;
@@ -141,6 +145,7 @@ export type MemberProfileMutationResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateProfileImageResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateNicknameResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateMeResponse = ApiSuccessResponse<MemberEditInfo>;
+export type UpdateEmailResponse = ApiSuccessResponse<MemberEditInfo>;
 export type UpdateInterestCategoriesResponse = ApiSuccessResponse<MemberEditInfo>;
 export type GetMyReportStatsResponse = ApiSuccessResponse<MemberReportStats>;
 export type GetMyReportSessionsResponse = ApiSuccessResponse<MemberReportSessions>;

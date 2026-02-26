@@ -9,6 +9,8 @@ import type {
   GetMyReportStatsResponse,
   UpdateInterestCategoriesRequest,
   UpdateInterestCategoriesResponse,
+  UpdateEmailRequest,
+  UpdateEmailResponse,
   UpdateMeRequest,
   UpdateMeResponse,
   UpdateNicknameRequest,
@@ -80,6 +82,10 @@ export const memberApi = {
 
   updateMe: async (body: UpdateMeRequest): Promise<UpdateMeResponse> => {
     return api.patch<UpdateMeResponse>("/api/members/me", body);
+  },
+
+  updateEmail: async (body: UpdateEmailRequest): Promise<UpdateEmailResponse> => {
+    return api.patch<UpdateEmailResponse>("/api/members/me/email", body);
   },
 
   updateInterestCategories: async (

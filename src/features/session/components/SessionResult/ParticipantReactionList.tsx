@@ -1,5 +1,7 @@
 "use client";
 
+import { ApiError } from "@/lib/api/api-client";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { toast } from "@/lib/toast";
 
 import { useSendReaction } from "../../hooks/useSessionHooks";
@@ -35,7 +37,8 @@ export function ParticipantReactionList({ sessionId, participants }: Participant
       },
       {
         onError: (error) => {
-          toast.error(error.message || "리액션을 보내는 중 오류가 발생했습니다.");
+          const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+          toast.error(message);
         },
       }
     );

@@ -16,6 +16,9 @@ import {
   useUpdateGoal,
   useUpdateTodo,
 } from "@/features/task/hooks/useTaskHooks";
+import { ApiError } from "@/lib/api/api-client";
+import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { toast } from "@/lib/toast";
 
 import { lobbyKeys } from "../hooks/useLobbyHooks";
 
@@ -139,6 +142,8 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
       ]);
     } catch (error) {
       console.error("저장 실패:", error);
+      const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+      toast.error(message || "투두 저장에 실패했습니다.");
     } finally {
       setIsSaving(false);
     }

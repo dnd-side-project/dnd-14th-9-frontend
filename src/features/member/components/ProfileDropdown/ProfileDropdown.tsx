@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
 import { Avatar } from "@/components/Avatar/Avatar";
+import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { useLogout } from "@/features/auth/hooks/useAuthHooks";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 
@@ -58,12 +59,18 @@ export function ProfileDropdown() {
       프로필 정보를 불러오는 중입니다.
     </div>
   ) : isError ? (
-    <div className="bg-surface-default text-text-secondary min-w-[220px] rounded-md border border-gray-700 p-4 text-sm">
-      프로필 정보를 불러오지 못했습니다.
+    <div className="bg-surface-default min-w-[220px] rounded-md border border-gray-700 p-4">
+      <div className="flex items-center gap-2 text-sm text-red-400">
+        <AlertIcon className="h-4 w-4 shrink-0" />
+        프로필 정보를 불러오지 못했습니다.
+      </div>
     </div>
   ) : !profile ? (
-    <div className="bg-surface-default text-text-secondary min-w-[220px] rounded-md border border-gray-700 p-4 text-sm">
-      프로필 정보가 없습니다.
+    <div className="bg-surface-default min-w-[220px] rounded-md border border-gray-700 p-4">
+      <div className="text-text-secondary flex items-center gap-2 text-sm">
+        <AlertIcon className="h-4 w-4 shrink-0" />
+        프로필 정보가 없습니다.
+      </div>
     </div>
   ) : (
     <ProfilePopup profile={profile} onClose={closeDropdown} onLogoutClick={handleLogout} />

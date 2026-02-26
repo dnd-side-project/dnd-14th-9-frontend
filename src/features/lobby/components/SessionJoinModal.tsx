@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ButtonGroup } from "@/components/ButtonGroup/ButtonGroup";
+import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { TextInput } from "@/components/Input/TextInput";
@@ -13,6 +14,7 @@ import type { ReportTodoItem, SessionDetailStatus } from "@/features/session/typ
 import { isInProgressStatus } from "@/features/session/types";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { toast } from "@/lib/toast";
 
 const MAX_TODOS = 5;
 
@@ -103,6 +105,7 @@ export function SessionJoinModal({
     } catch (error) {
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
       setServerError(message);
+      toast.error(message);
     }
   };
 
@@ -204,7 +207,8 @@ export function SessionJoinModal({
 
         {/* 서버 에러 메시지 */}
         {serverError && (
-          <div className="rounded-sm bg-red-500/10 px-4 py-3 text-sm text-red-500">
+          <div className="flex animate-[fadeIn_0.2s_ease-out] items-center gap-2 rounded-sm bg-red-500/10 px-4 py-3 text-sm text-red-500">
+            <AlertIcon className="h-4 w-4 shrink-0" />
             {serverError}
           </div>
         )}
