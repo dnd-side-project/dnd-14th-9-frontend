@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
@@ -18,9 +19,16 @@ export function Header({ isAuthenticated }: HeaderProps) {
         <Link
           href="/"
           aria-label="홈으로 이동"
-          className="text-common-white focus-visible:ring-primary text-[27px] leading-[120%] font-bold transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:outline-none"
+          className="focus-visible:ring-primary transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:outline-none"
         >
-          GAK
+          <Image
+            src="/header-logo.svg"
+            alt="GAK"
+            width={90}
+            height={24}
+            className="h-4 w-[60px] md:h-6 md:w-[90px]"
+            priority
+          />
         </Link>
 
         <div className="gap-sm flex items-center justify-end">

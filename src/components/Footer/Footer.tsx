@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { getCurrentYear } from "@/lib/utils/date";
@@ -18,9 +19,16 @@ export function Footer() {
         {/* Top Section */}
         <div className="gap-2xs md:gap-xs flex w-full flex-col items-start">
           {/* Logo */}
-          <div className="flex flex-col items-start rounded-sm p-[8px]">
+          <div className="p-sm flex flex-col items-start rounded-sm">
             <Link href="/" aria-label="GAK 홈으로 이동">
-              <span className="text-text-disabled text-2xl leading-[1.2] font-bold">GAK</span>
+              <Image
+                src="/footer-logo.svg"
+                alt="GAK"
+                width={105}
+                height={40}
+                className="h-9 w-[90px] md:h-10 md:w-[105px]"
+                priority
+              />
             </Link>
           </div>
 
@@ -66,7 +74,11 @@ export function Footer() {
         {/* Info Area */}
         <div className="flex w-full flex-col items-start px-[8px]">
           <p className="text-text-disabled text-xs leading-[1.4] whitespace-pre-wrap">
-            footer에 들어갈 내용을 작성해 주세요.
+            GAK 문의 / 제휴: dnd9team@gmail.com
+          </p>
+          <br />
+          <p className="text-text-disabled text-xs leading-[1.4] whitespace-pre-wrap">
+            모든 제작물의 저작건은 GAK의 소유이므로 사전 허가 없이 무단복제, 도용을 금합니다.
           </p>
         </div>
 
@@ -74,8 +86,8 @@ export function Footer() {
         <div className="flex w-full flex-col items-start justify-center px-[8px]">
           <div className="bg-border-subtle h-px w-full shrink-0" />
           <div className="py-sm flex w-full items-center">
-            <p className="text-[10px] leading-[1.4] text-gray-700 md:text-[11px]">
-              © {currentYear} GAK. all rights reserved.
+            <p className="font-regular text-[10px] leading-[1.4] text-gray-700 md:text-[11px]">
+              © {currentYear} GAK by DND 9team. All Rights Reserved.
             </p>
           </div>
         </div>
