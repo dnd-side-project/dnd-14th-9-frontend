@@ -59,7 +59,12 @@ export function Card({
 
   return (
     <div className={cn("flex w-full max-w-69 flex-col gap-4", className)}>
-      <Thumbnail src={thumbnailSrc} alt={title} />
+      <Thumbnail
+        src={thumbnailSrc}
+        alt={title}
+        className="border-border-default border-sm"
+        radius="xs"
+      />
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">

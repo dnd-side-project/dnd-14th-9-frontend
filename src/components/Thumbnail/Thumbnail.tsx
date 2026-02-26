@@ -8,7 +8,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils/utils";
 
-const DEFAULT_PLACEHOLDER = "/images/thumbnail-placeholder.svg";
+const DEFAULT_PLACEHOLDER = "/images/thumbnail-fallback.svg";
 
 const THUMBNAIL_VARIANTS = cva(
   ["relative", "overflow-hidden", "bg-surface-subtle", "w-full", "aspect-[276/146]"],
@@ -20,6 +20,7 @@ const THUMBNAIL_VARIANTS = cva(
         md: "rounded-md",
         lg: "rounded-lg",
         xl: "rounded-xl",
+        xs: "rounded-xs",
       },
     },
     defaultVariants: {
