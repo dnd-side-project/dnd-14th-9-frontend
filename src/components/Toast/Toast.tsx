@@ -46,7 +46,7 @@ export function Toast({ id, type, message, duration = 3000, onClose }: ToastProp
   return (
     <div
       className={cn(
-        "pointer-events-auto flex max-w-md min-w-[320px] items-center gap-3 rounded-lg border p-4 shadow-lg transition-all",
+        "pointer-events-auto flex max-w-md min-w-[320px] items-center gap-3 rounded-lg border p-4 shadow-lg transition-[opacity,transform]",
         "bg-surface-default border-border-subtle",
         isClosing
           ? "animate-out fade-out slide-out-to-top-2 duration-200"

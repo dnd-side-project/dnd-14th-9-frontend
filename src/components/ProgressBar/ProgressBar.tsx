@@ -37,7 +37,7 @@ export const ProgressBar = forwardRef<HTMLDivElement, ProgressBarProps>(
         {...props}
       >
         <div
-          className={cn("h-full transition-all duration-300 ease-in-out", indicatorClassName)}
+          className={cn("h-full transition-[width] duration-300 ease-in-out", indicatorClassName)}
           style={{ width: `${clampedProgress}%` }}
         />
       </div>

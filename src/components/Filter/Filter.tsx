@@ -15,7 +15,7 @@ const FILTER_VARIANTS = cva(
     "font-pretendard",
     "font-semibold",
     "text-gray-200",
-    "transition-all",
+    "transition-colors",
     "focus-visible:outline-none",
   ],
   {
