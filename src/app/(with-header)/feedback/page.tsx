@@ -1,11 +1,4 @@
-import { createPageMetadata } from "@/lib/seo/metadata";
-
-export const metadata = createPageMetadata({
-  title: "피드백",
-  description: "각 서비스에 대한 피드백을 남겨주세요.",
-  pathname: "/feedback",
-  noIndex: true,
-});
+export const metadata = { title: "피드백" };
 
 export default function FeedbackPage() {
   return (

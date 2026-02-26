@@ -4,14 +4,8 @@ import SessionHistoryContent from "@/features/member/components/Profile/Report/S
 import SessionHistorySkeleton from "@/features/member/components/Profile/Report/SessionHistorySkeleton";
 import StatsContent from "@/features/member/components/Profile/Report/StatsContent";
 import StatsSkeleton from "@/features/member/components/Profile/Report/StatsSkeleton";
-import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = createPageMetadata({
-  title: "기록 리포트",
-  description: "나의 활동 통계와 세션 참여 기록을 확인하세요.",
-  pathname: "/profile/report",
-  noIndex: true,
-});
+export const metadata = { title: "기록 리포트" };
 
 export default async function ProfileReportPage({
   searchParams,

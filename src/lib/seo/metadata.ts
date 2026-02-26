@@ -39,7 +39,7 @@ function toAbsoluteUrl(pathname?: string): string {
 export const rootMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    template: "%s | 각",
+    template: `%s | ${SITE_TITLE}`,
     default: SITE_TITLE,
   },
   description: SITE_DESCRIPTION,

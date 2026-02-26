@@ -1,12 +1,6 @@
 import { ProfileEditForm } from "@/features/member/components/Profile/ProfileEditForm";
-import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = createPageMetadata({
-  title: "설정",
-  description: "프로필 및 계정 설정을 관리하세요.",
-  pathname: "/profile/settings",
-  noIndex: true,
-});
+export const metadata = { title: "설정" };
 
 export default function ProfileSettingsPage() {
   return (
