@@ -89,8 +89,8 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
           <h2 className="text-text-primary font-pretendard text-2xl leading-[140%] font-bold">
             세션 참여하기
           </h2>
-          <p className="text-text-secondary font-pretendard text-base leading-[140%] font-normal">
-            원하는 세션에서 몰입의 경험을 함께보세요!
+          <p className="text-text-secondary font-pretendard font-regular text-base leading-[140%]">
+            원하는 세션에서 함께 몰입해 보세요!
           </p>
         </div>
 
