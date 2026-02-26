@@ -5,6 +5,8 @@ import SessionHistorySkeleton from "@/features/member/components/Profile/Report/
 import StatsContent from "@/features/member/components/Profile/Report/StatsContent";
 import StatsSkeleton from "@/features/member/components/Profile/Report/StatsSkeleton";
 
+export const metadata = { title: "기록 리포트" };
+
 export default async function ProfileReportPage({
   searchParams,
 }: {

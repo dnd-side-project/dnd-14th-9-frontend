@@ -1,5 +1,7 @@
 import { SessionCreateForm } from "@/features/session/components/SessionCreateForm";
 
+export const metadata = { title: "세션 만들기" };
+
 export default function SessionCreatePage() {
   return (
     <main className="p-3xl mx-auto w-full max-w-7xl">

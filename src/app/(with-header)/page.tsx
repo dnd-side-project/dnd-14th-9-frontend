@@ -12,6 +12,13 @@ import {
   parseSessionListSearchParams,
   toURLSearchParams,
 } from "@/features/session/utils/parseSessionListSearchParams";
+import { createPageMetadata } from "@/lib/seo/metadata";
+
+export const metadata = createPageMetadata({
+  title: "홈",
+  description: "모집 중인 모각작 세션을 찾아보고 참여하세요.",
+  pathname: "/",
+});
 
 /**
  * 홈 화면 (메인 페이지)

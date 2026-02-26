@@ -1,3 +1,5 @@
+export const metadata = { title: "피드백" };
+
 export default function FeedbackPage() {
   return (
     <main className="mx-auto w-full max-w-7xl px-6 py-16">
