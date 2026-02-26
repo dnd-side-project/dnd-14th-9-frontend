@@ -20,13 +20,13 @@ export function useBodyScrollLock(enabled: boolean = true) {
 
     lockCount += 1;
     if (lockCount === 1) {
-      el.style.overflow = "hidden";
+      el.classList.add("scroll-lock");
     }
 
     return () => {
       lockCount -= 1;
       if (lockCount === 0) {
-        el.style.overflow = "";
+        el.classList.remove("scroll-lock");
       }
     };
   }, [enabled]);
