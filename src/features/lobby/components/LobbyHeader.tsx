@@ -7,6 +7,7 @@ import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { ChevronLeftIcon } from "@/components/Icon/ChevronLeftIcon";
 import { Portal } from "@/components/Portal/Portal";
 import { useLeaveSession } from "@/features/session/hooks/useSessionHooks";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
@@ -62,7 +63,7 @@ export function LobbyHeader({
           </button>
 
           <div>
-            <h1 className="text-[24px] leading-[140%] font-bold text-gray-50">세션 시작 대기 방</h1>
+            <h1 className="text-2xl leading-[140%] font-bold text-gray-50">세션 시작 대기 방</h1>
             <p className="mt-2xs text-base text-gray-500">
               세션 시작 전 대기 방이에요. 세션은 시간이 되면 자동 시작되요
             </p>
@@ -108,6 +109,8 @@ function LeaveConfirmDialog({
   isPending,
   serverError,
 }: LeaveConfirmDialogProps) {
+  useBodyScrollLock();
+
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   const setDialogRef = useCallback((node: HTMLDialogElement | null) => {

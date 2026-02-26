@@ -19,9 +19,9 @@ export function SessionInfoCard({ session }: SessionInfoCardProps) {
     <section className="gap-lg p-lg border-gray flex flex-col rounded-lg border">
       <div className="gap-lg flex">
         <div className="gap-sm flex flex-1 flex-col">
-          <h2 className="text-[24px] font-bold text-gray-50">{session.title}</h2>
-          <p className="text-[16px] text-gray-200">{session.summary}</p>
-          <div className="flex items-center gap-4 text-[16px] text-gray-400">
+          <h2 className="text-2xl font-bold text-gray-50">{session.title}</h2>
+          <p className="text-base text-gray-200">{session.summary}</p>
+          <div className="flex items-center gap-4 text-base text-gray-400">
             <span className="flex items-center gap-1">
               <UsersIcon size="small" />
               <span>
@@ -49,15 +49,15 @@ export function SessionInfoCard({ session }: SessionInfoCardProps) {
       </div>
 
       <div className="px-lg py-lg rounded-lg bg-gray-900">
-        <p className="text-common-white text-[16px] font-semibold">공지사항</p>
-        <p className="mt-sm text-[16px] font-semibold text-gray-400">{session.notice}</p>
+        <p className="text-common-white text-base font-semibold">공지사항</p>
+        <p className="mt-sm text-base font-semibold text-gray-400">{session.notice}</p>
       </div>
 
       <div className="gap-lg flex">
         <div className="px-lg py-lg flex flex-1 items-center justify-between rounded-lg bg-gray-900">
           <div className="flex flex-col gap-1">
-            <p className="text-[16px] font-semibold text-gray-50">To do 달성도 범위 기준</p>
-            <p className="text-[16px] text-gray-500">해당 달성도의 사용자만 참여할 수 있어요</p>
+            <p className="text-base font-semibold text-gray-50">To do 달성도 범위 기준</p>
+            <p className="text-base text-gray-500">해당 달성도의 사용자만 참여할 수 있어요</p>
           </div>
           <div className="flex w-50 shrink-0 flex-col items-end gap-1">
             <span className="text-common-white text-[15px] font-bold">
@@ -68,8 +68,8 @@ export function SessionInfoCard({ session }: SessionInfoCardProps) {
         </div>
         <div className="px-lg py-lg flex flex-1 items-center justify-between rounded-lg bg-gray-900">
           <div className="flex flex-col gap-1">
-            <p className="text-[16px] font-semibold text-gray-50">세션 집중도 범위 기준</p>
-            <p className="text-[16px] text-gray-500">해당 집중도의 사용자만 참여할 수 있어요</p>
+            <p className="text-base font-semibold text-gray-50">세션 집중도 범위 기준</p>
+            <p className="text-base text-gray-500">해당 집중도의 사용자만 참여할 수 있어요</p>
           </div>
           <div className="flex w-50 shrink-0 flex-col items-end gap-1">
             <span className="text-common-white text-[15px] font-bold">{requiredFocusRate}%</span>

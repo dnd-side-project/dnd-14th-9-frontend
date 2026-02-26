@@ -35,7 +35,7 @@ export function OnboardingConfirm({
     >
       {/* Header */}
       <div className="gap-2xs flex flex-col justify-center">
-        <h1 className="text-text-primary text-[24px] font-bold">프로필 설정 완료!</h1>
+        <h1 className="text-text-primary text-2xl font-bold">프로필 설정 완료!</h1>
         <p className="text-text-secondary text-sm">이제 맞춤 추천 세션을 찾아볼까요?</p>
       </div>
 
@@ -63,7 +63,7 @@ export function OnboardingConfirm({
           {categories.map((category, index) => (
             <div key={category} className="gap-xs flex items-center">
               <div className="flex items-center justify-center gap-1">
-                <span className="text-text-primary text-[12px] font-semibold">
+                <span className="text-text-primary text-xs font-semibold">
                   {RANK_LABELS[index]}
                 </span>
                 {index === 0 && (
@@ -85,7 +85,7 @@ export function OnboardingConfirm({
         <Button
           variant="solid"
           colorScheme="tertiary"
-          className="flex-1 items-center justify-center px-5 py-3 text-[14px] font-semibold"
+          className="flex-1 items-center justify-center px-5 py-3 text-sm font-semibold"
           onClick={onBack}
         >
           뒤로가기
@@ -93,7 +93,7 @@ export function OnboardingConfirm({
         <Button
           variant="solid"
           colorScheme="primary"
-          className="flex-1 items-center justify-center px-5 py-3 text-[14px] font-semibold"
+          className="flex-1 items-center justify-center px-5 py-3 text-sm font-semibold"
           onClick={onConfirm}
         >
           확인

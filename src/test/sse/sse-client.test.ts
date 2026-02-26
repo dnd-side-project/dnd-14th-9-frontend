@@ -288,11 +288,16 @@ describe("SSEClient", () => {
   });
 
   describe("재연결", () => {
+    let randomSpy: jest.SpyInstance;
+
     beforeEach(() => {
       jest.useFakeTimers();
+      // jitter를 결정적으로 만들기 위해 Math.random 고정 (0.5 → jitter 1.0)
+      randomSpy = jest.spyOn(Math, "random").mockReturnValue(0.5);
     });
 
     afterEach(() => {
+      randomSpy.mockRestore();
       jest.useRealTimers();
     });
 

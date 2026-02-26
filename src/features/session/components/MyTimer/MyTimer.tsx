@@ -72,14 +72,14 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
       <div className="flex flex-1 flex-col gap-3">
         {/* 제목 + 시간 */}
         <div className="flex flex-col gap-1">
-          <h2 className="text-[20px] font-bold text-gray-50">내 타이머</h2>
+          <h2 className="text-xl font-bold text-gray-50">내 타이머</h2>
           <span className="text-text-brand-subtle text-[32px] font-bold">{formatted}</span>
         </div>
 
         {/* 상태 + 집중도 */}
         <div className="gap-md flex items-center">
           <span
-            className={`flex items-center gap-1 text-[14px] ${isFocusing ? "text-text-status-positive-default" : "text-text-tertiary"}`}
+            className={`flex items-center gap-1 text-sm ${isFocusing ? "text-text-status-positive-default" : "text-text-tertiary"}`}
           >
             <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
               <circle cx="3" cy="3" r="3" />
@@ -126,7 +126,7 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
           trackClassName="stroke-gray-700"
           progressClassName="stroke-green-600"
         >
-          <span className="text-text-secondary text-[24px] font-bold">{formatted}</span>
+          <span className="text-text-secondary text-2xl font-bold">{formatted}</span>
         </ProgressRing>
       </div>
     </div>

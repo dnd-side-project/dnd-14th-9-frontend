@@ -27,7 +27,7 @@ const imageUploaderVariants = cva(
     "rounded-lg",
     "border-2",
     "cursor-pointer",
-    "transition-all",
+    "transition-colors",
     "duration-200",
     "outline-none",
     "focus-visible:ring-2",

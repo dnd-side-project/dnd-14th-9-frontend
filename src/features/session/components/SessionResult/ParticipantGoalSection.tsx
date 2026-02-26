@@ -54,18 +54,18 @@ export function ParticipantGoalSection({
 
         {/* 정보 */}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <span className="text-[16px] font-semibold text-gray-50">{participantName}</span>
-          <span className="truncate text-[12px] font-bold text-gray-500">{goal}</span>
+          <span className="text-base font-semibold text-gray-50">{participantName}</span>
+          <span className="truncate text-xs font-bold text-gray-500">{goal}</span>
           <div className="mt-md flex items-center gap-2">
             {/* 달성률 */}
-            <span className="text-text-secondary text-[12px]">달성률</span>
-            <span className="px-xs py-2xs text-text-secondary rounded-xs bg-white/8 text-[12px]">
+            <span className="text-text-secondary text-xs">달성률</span>
+            <span className="px-xs py-2xs text-text-secondary rounded-xs bg-white/8 text-xs">
               {todoAchievementRate}%
             </span>
-            <span className="text-text-disabled text-[12px]">|</span>
+            <span className="text-text-disabled text-xs">|</span>
             {/* 집중도 */}
-            <span className="text-text-secondary text-[12px]">집중도</span>
-            <span className="px-xs py-2xs rounded-xs bg-red-600/20 text-[12px] text-red-500">
+            <span className="text-text-secondary text-xs">집중도</span>
+            <span className="px-xs py-2xs rounded-xs bg-red-600/20 text-xs text-red-500">
               {focusRate}%
             </span>
           </div>

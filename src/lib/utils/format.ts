@@ -56,6 +56,13 @@ export function formatHHMMSS(seconds: number): string {
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
+/**
+ * 초 단위 값을 반올림하여 "X시간" 형태로 변환합니다.
+ */
+export function formatSecondsToHours(seconds: number): string {
+  return `${Math.round(seconds / SECONDS_IN_HOUR)}시간`;
+}
+
 export function formatSessionStartDateTime(dateString: string): string {
   const date = new Date(dateString);
   const month = String(date.getMonth() + 1).padStart(2, "0");

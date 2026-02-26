@@ -14,6 +14,11 @@ const loadProfilePopup = () => import("@/features/member/components/ProfileDropd
 
 const ProfilePopup = dynamic(() => loadProfilePopup().then((mod) => mod.ProfilePopup), {
   ssr: false,
+  loading: () => (
+    <div className="bg-surface-default text-text-secondary min-w-[220px] rounded-md border border-gray-700 p-4 text-sm">
+      프로필 정보를 불러오는 중입니다.
+    </div>
+  ),
 });
 
 export function ProfileDropdown() {

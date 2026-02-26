@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback } from "react";
 
 import { notFound } from "next/navigation";
 
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
+import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { toast } from "@/lib/toast";
@@ -29,17 +30,19 @@ interface SessionPageContentProps {
 }
 
 export function SessionPageContent({ sessionId }: SessionPageContentProps) {
-  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
-  const isLeavingRef = useRef(false);
+  const { showLeaveDialog, setShowLeaveDialog, isLeavingRef } = usePreventBackNavigation();
 
   const { data: sessionData, isLoading, error, refetch } = useSessionDetail(sessionId);
   const { data: inProgressData } = useInProgressData({ sessionId });
   const { data: meData } = useMe();
   const submitResultMutation = useSubmitSessionResult();
 
+  const sessionDurationMinutes = sessionData?.result?.sessionDurationMinutes;
+
   // 세션 완료 시 결과 제출 및 페이지 이동
   const handleSessionComplete = useCallback(async () => {
-    const timerState = getTimerState(sessionId);
+    const maxSeconds = (sessionDurationMinutes ?? 0) * 60;
+    const timerState = getTimerState(sessionId, maxSeconds);
 
     // 타이머 상태가 있으면 결과 전송
     if (timerState) {
@@ -62,26 +65,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     // 타이머 상태 정리 후 이동
     clearTimerState(sessionId);
     window.location.replace(`/session/${sessionId}/result`);
-  }, [sessionId, submitResultMutation]);
-
-  // 브라우저 뒤로 가기 감지
-  useEffect(() => {
-    const handlePopState = () => {
-      if (isLeavingRef.current) return;
-      setShowLeaveDialog(true);
-      // 뒤로 가기를 취소하기 위해 더미 엔트리 재추가 (go(1)은 Next.js 라우터와 충돌하여 새로고침 발생)
-      window.history.pushState({ preventBack: true }, "", window.location.href);
-    };
-
-    window.addEventListener("popstate", handlePopState);
-
-    // 히스토리 엔트리 추가 (뒤로 가기 시 go(1)로 돌아올 수 있도록)
-    window.history.pushState({ preventBack: true }, "", window.location.href);
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, []);
+  }, [sessionId, sessionDurationMinutes, submitResultMutation]);
 
   // 세션 상태 SSE - 진행 중 상태가 아니면 적절한 페이지로 이동
   useSessionStatusSSE({

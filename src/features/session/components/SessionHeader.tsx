@@ -5,6 +5,7 @@ import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/Button/Button";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { Portal } from "@/components/Portal/Portal";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
@@ -55,7 +56,7 @@ export function SessionHeader({
     <>
       <header className="mb-2xl flex items-start justify-between">
         <div>
-          <h1 className="text-[24px] leading-[140%] font-bold text-gray-50">진행 중인 세션</h1>
+          <h1 className="text-2xl leading-[140%] font-bold text-gray-50">진행 중인 세션</h1>
         </div>
 
         <Button
@@ -97,6 +98,8 @@ function LeaveConfirmDialog({
   isPending,
   serverError,
 }: LeaveConfirmDialogProps) {
+  useBodyScrollLock();
+
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   const setDialogRef = useCallback((node: HTMLDialogElement | null) => {

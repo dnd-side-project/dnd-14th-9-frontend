@@ -28,7 +28,7 @@ export function GoalAchievementSection({
         <div className="gap-lg flex">
           {/* 나의 목표 달성률 */}
           <div className="flex flex-col">
-            <span className="text-text-secondary text-[16px] font-semibold">나의 목표 달성률</span>
+            <span className="text-text-secondary text-base font-semibold">나의 목표 달성률</span>
             <span className="text-text-brand-default text-[32px] font-bold">
               {todoAchievementRate}%
             </span>
@@ -36,7 +36,7 @@ export function GoalAchievementSection({
 
           {/* 나의 목표 */}
           <div className="flex flex-col">
-            <span className="text-text-secondary text-[16px] font-semibold">나의 목표</span>
+            <span className="text-text-secondary text-base font-semibold">나의 목표</span>
             <span className="text-[32px] font-bold">
               <span className="text-text-brand-default">{completedCount}</span>
               <span className="text-text-secondary">/{todoList.length}</span>
@@ -46,7 +46,7 @@ export function GoalAchievementSection({
 
         {/* 목표 섹션 */}
         <div className="mt-lg flex flex-col gap-2">
-          <span className="text-text-secondary text-[16px] font-semibold">목표</span>
+          <span className="text-text-secondary text-base font-semibold">목표</span>
           <div className="bg-surface-strong rounded-sm p-3">
             <span className="text-text-primary text-base">{goal}</span>
           </div>
@@ -57,7 +57,7 @@ export function GoalAchievementSection({
 
         {/* Todo 목록 */}
         <div className="gap-sm flex flex-col">
-          <span className="text-text-primary text-[16px] font-semibold">투두리스트</span>
+          <span className="text-text-primary text-base font-semibold">투두리스트</span>
 
           {todoList.length === 0 ? (
             <p className="py-md text-center text-sm text-gray-500">등록된 할 일이 없습니다</p>

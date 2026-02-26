@@ -20,7 +20,7 @@ export function Footer() {
           {/* Logo */}
           <div className="flex flex-col items-start rounded-sm p-[8px]">
             <Link href="/" aria-label="GAK 홈으로 이동">
-              <span className="text-text-disabled text-[24px] leading-[1.2] font-bold">GAK</span>
+              <span className="text-text-disabled text-2xl leading-[1.2] font-bold">GAK</span>
             </Link>
           </div>
 
@@ -30,7 +30,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/terms"
-                  className="text-text-muted hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-[12px] leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                  className="text-text-muted hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-xs leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   이용약관
                 </Link>
@@ -38,7 +38,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/privacy"
-                  className="text-text-disabled hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-[12px] leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                  className="text-text-disabled hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-xs leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   개인정보 처리방침
                 </Link>
@@ -46,7 +46,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/cookie-policy"
-                  className="text-text-muted hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-[12px] leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                  className="text-text-muted hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-xs leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   쿠키 정책
                 </Link>
@@ -54,7 +54,7 @@ export function Footer() {
               <li>
                 <button
                   type="button"
-                  className="text-text-muted hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-[12px] leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                  className="text-text-muted hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-xs leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   쿠키 설정
                 </button>
@@ -65,7 +65,7 @@ export function Footer() {
 
         {/* Info Area */}
         <div className="flex w-full flex-col items-start px-[8px]">
-          <p className="text-text-disabled text-[12px] leading-[1.4] whitespace-pre-wrap">
+          <p className="text-text-disabled text-xs leading-[1.4] whitespace-pre-wrap">
             footer에 들어갈 내용을 작성해 주세요.
           </p>
         </div>

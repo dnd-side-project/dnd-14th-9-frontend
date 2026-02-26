@@ -28,7 +28,7 @@ const textareaVariants = cva(
     "border",
     "text-base",
     "font-pretendard",
-    "transition-all",
+    "transition-[border-color,box-shadow]",
     "outline-none",
     "placeholder:text-text-muted",
     "bg-surface-strong",

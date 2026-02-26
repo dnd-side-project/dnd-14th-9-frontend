@@ -42,12 +42,14 @@ export function isPastTime(date: Date | string): boolean {
 export function formatRelativeTime(date: Date | string): string {
   const d = date instanceof Date ? date : new Date(date);
   const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
+  const diffMs = Math.abs(now.getTime() - d.getTime());
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffHours / 24);
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays >= 1) return `${diffDays}일 전`;
   if (diffHours >= 1) return `${diffHours}시간 전`;
+  if (diffMinutes >= 30) return `${diffMinutes}분 전`;
   return "마감임박";
 }
 
