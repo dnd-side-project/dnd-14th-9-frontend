@@ -6,6 +6,7 @@ import { Avatar } from "@/components/Avatar/Avatar";
 import { Badge } from "@/components/Badge/Badge";
 import { useMe, useUpdateProfileImage } from "@/features/member/hooks/useMemberHooks";
 import { toast } from "@/lib/toast";
+import { formatSecondsToHours } from "@/lib/utils/format";
 
 const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_PROFILE_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -113,7 +114,7 @@ export function ProfileSummary() {
                 누적 시간
               </span>
               <span className="text-text-secondary font-pretendard text-lg font-semibold">
-                {profile.totalParticipationTime ?? 0}시간
+                {formatSecondsToHours(profile.totalParticipationTime ?? 0)}
               </span>
             </div>
             <div className="flex w-[88px] flex-col items-start gap-1">
