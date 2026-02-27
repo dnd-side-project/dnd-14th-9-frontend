@@ -25,7 +25,7 @@ export default function CookiePolicyPage() {
           <h2 className="text-text-primary text-xl font-bold">쿠키란 무엇인가요?</h2>
           <p className="text-text-secondary mt-3 leading-7">
             쿠키는 웹사이트가 이용자의 브라우저에 저장하는 작은 텍스트 파일입니다. 서비스 이용 시
-            로그인 로그인 상태 유지, 사용자 설정 기억 등을 위해 사용됩니다.
+            로그인 상태 유지, 사용자 설정 기억 등을 위해 사용됩니다.
           </p>
         </section>
 
@@ -108,7 +108,7 @@ export default function CookiePolicyPage() {
           <h2 className="text-text-primary text-xl font-bold">3. 분석 쿠키 (제3자)</h2>
           <p className="text-text-secondary mt-3 leading-7">
             서비스 개선을 위해 Google Analytics 4(GA4)를 사용합니다. GA4는 이용자의 서비스 이용
-            패턴을 패턴을 분석하기 위해 쿠키를 설정할 수 있습니다.
+            패턴을 분석하기 위해 쿠키를 설정할 수 있습니다.
           </p>
           <ul className="text-text-secondary mt-2 list-inside list-disc space-y-1 leading-7">
             <li>수집 항목: 페이지 조회, 방문 시간, 이용 경로 등 (비식별 통계)</li>
@@ -131,7 +131,7 @@ export default function CookiePolicyPage() {
           <h2 className="text-text-primary text-xl font-bold">4. 쿠키 관리 방법</h2>
           <p className="text-text-secondary mt-3 leading-7">
             이용자는 브라우저 설정을 통해 쿠키를 관리할 수 있습니다. 다만, 필수 쿠키를 차단하면
-            로그인 로그인 등 서비스의 일부 기능을 이용할 수 없습니다.
+            로그인 등 서비스의 일부 기능을 이용할 수 없습니다.
           </p>
 
           <h3 className="text-text-primary mt-4 font-semibold">브라우저별 쿠키 설정 방법</h3>
@@ -145,7 +145,7 @@ export default function CookiePolicyPage() {
           <h3 className="text-text-primary mt-4 font-semibold">로컬 저장소 삭제 방법</h3>
           <p className="text-text-secondary mt-2 leading-7">
             브라우저 개발자 도구(F12) &gt; Application &gt; Local Storage에서 gak.today 항목을
-            삭제할 삭제할 수 있습니다.
+            삭제할 수 있습니다.
           </p>
         </section>
 
