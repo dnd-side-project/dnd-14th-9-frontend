@@ -2,6 +2,7 @@
 
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
 import { ProgressRing } from "@/components/ProgressRing/ProgressRing";
+import { formatSecondsToMinutes } from "@/lib/utils/format";
 
 interface FocusStatusItemProps {
   focusedTime: number;
@@ -26,9 +27,9 @@ export function FocusStatusItem({
         <div className="gap-2xs flex h-[56px] w-[241px] flex-col items-start">
           <p className="text-text-primary text-xs font-semibold">집중도</p>
           <p className="text-text-brand-subtle text-lg leading-[1.4]">
-            <span className="font-bold">총 {focusedTime}분 </span>
+            <span className="font-bold">총 {formatSecondsToMinutes(focusedTime)}분 </span>
             <span className="text-text-muted text-sm font-semibold">
-              / {totalParticipationTime}분
+              / {formatSecondsToMinutes(totalParticipationTime)}분
             </span>
           </p>
         </div>

@@ -63,6 +63,13 @@ export function formatSecondsToHours(seconds: number): string {
   return `${Math.round(seconds / SECONDS_IN_HOUR)}시간`;
 }
 
+/**
+ * 초 단위 값을 반올림하여 분 단위 숫자로 변환합니다.
+ */
+export function formatSecondsToMinutes(seconds: number): number {
+  return Math.round(seconds / 60);
+}
+
 export function formatSessionStartDateTime(dateString: string): string {
   const date = new Date(dateString);
   const month = String(date.getMonth() + 1).padStart(2, "0");
