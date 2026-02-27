@@ -11,12 +11,12 @@ import {
   useQuery,
   useSuspenseQuery,
   useQueryClient,
-  QueryClient,
   dehydrate,
   queryOptions,
 } from "@tanstack/react-query";
 
 import { createSingletonHooks } from "@/hooks/createSingletonHooks";
+import { getQueryClient } from "@/lib/getQueryClient";
 
 import { memberApi } from "../api";
 
@@ -93,7 +93,7 @@ export function useIsAuthenticated() {
 export const useDeleteMe = memberCore.useDelete!;
 
 export async function prefetchMe() {
-  const queryClient = new QueryClient();
+  const queryClient = getQueryClient();
   await queryClient.prefetchQuery(memberQueries.me());
   return dehydrate(queryClient);
 }
@@ -106,7 +106,7 @@ export function useSuspenseMeForEdit() {
 }
 
 export async function prefetchMeForEdit() {
-  const queryClient = new QueryClient();
+  const queryClient = getQueryClient();
   await queryClient.prefetchQuery(memberQueries.edit());
   return dehydrate(queryClient);
 }
@@ -117,7 +117,7 @@ export function useMyReport() {
 }
 
 export async function prefetchMyReport() {
-  const queryClient = new QueryClient();
+  const queryClient = getQueryClient();
   await queryClient.prefetchQuery(memberQueries.report());
   return dehydrate(queryClient);
 }

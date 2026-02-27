@@ -14,7 +14,7 @@ interface ParticipantGoalSectionProps {
   goal: string;
   todoAchievementRate: number;
   focusRate: number;
-  onEmojiClick?: (emoji: "heart" | "thumbsUp" | "thumbsDown" | "star") => void;
+  onEmojiClick?: (emoji: "heart" | "thumbsUp" | "thumbsDown" | "star") => void | Promise<void>;
 }
 
 const EMOJI_CONFIG = [
@@ -34,9 +34,14 @@ export function ParticipantGoalSection({
 }: ParticipantGoalSectionProps) {
   const [activeEmoji, setActiveEmoji] = useState<string | null>(null);
 
-  const handleEmojiClick = (emoji: "heart" | "thumbsUp" | "thumbsDown" | "star") => {
+  const handleEmojiClick = async (emoji: "heart" | "thumbsUp" | "thumbsDown" | "star") => {
+    const previousEmoji = activeEmoji;
     setActiveEmoji(activeEmoji === emoji ? null : emoji);
-    onEmojiClick?.(emoji);
+    try {
+      await onEmojiClick?.(emoji);
+    } catch {
+      setActiveEmoji(previousEmoji);
+    }
   };
 
   return (

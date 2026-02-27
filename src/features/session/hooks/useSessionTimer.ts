@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 interface TimerState {
   elapsedSeconds: number;
   focusedSeconds: number;
+  focusRate: number;
   isFocusing: boolean;
   isRunning: boolean;
 }
@@ -108,7 +109,13 @@ function restoreTimerState(sessionId: string, maxSeconds: number, autoStart: boo
   const saved = loadTimerState(sessionId);
 
   if (!saved) {
-    return { elapsedSeconds: 0, focusedSeconds: 0, isFocusing: autoStart, isRunning: autoStart };
+    return {
+      elapsedSeconds: 0,
+      focusedSeconds: 0,
+      focusRate: 0,
+      isFocusing: autoStart,
+      isRunning: autoStart,
+    };
   }
 
   let savedElapsed = saved.elapsedSeconds;
@@ -127,9 +134,13 @@ function restoreTimerState(sessionId: string, maxSeconds: number, autoStart: boo
   // focusedSeconds는 elapsedSeconds를 초과할 수 없다
   savedFocused = Math.min(savedFocused, savedElapsed);
 
+  const focusRate =
+    maxSeconds > 0 ? Math.min(Math.round((savedElapsed / maxSeconds) * 100), 100) : 0;
+
   return {
     elapsedSeconds: savedElapsed,
     focusedSeconds: savedFocused,
+    focusRate,
     isFocusing: saved.isFocusing,
     isRunning: savedElapsed < maxSeconds ? saved.isRunning : false,
   };
@@ -138,6 +149,7 @@ function restoreTimerState(sessionId: string, maxSeconds: number, autoStart: boo
 const SSR_DEFAULT: TimerState = {
   elapsedSeconds: 0,
   focusedSeconds: 0,
+  focusRate: 0,
   isFocusing: true,
   isRunning: false,
 };
@@ -163,11 +175,16 @@ export function useSessionTimer({
         const focusDelta = countFocus && prev.isFocusing ? delta : 0;
         const nextFocused = Math.min(prev.focusedSeconds + focusDelta, nextElapsed);
 
+        const nextFocusRate =
+          maxSeconds > 0 ? Math.min(Math.round((nextElapsed / maxSeconds) * 100), 100) : 0;
+        const focusRateChanged = Math.abs(nextFocusRate - prev.focusRate) >= 1;
+
         if (nextElapsed >= maxSeconds) {
           const next: TimerState = {
             ...prev,
             elapsedSeconds: maxSeconds,
             focusedSeconds: nextFocused,
+            focusRate: nextFocusRate,
             isRunning: false,
             isFocusing: false,
           };
@@ -179,6 +196,7 @@ export function useSessionTimer({
           ...prev,
           elapsedSeconds: nextElapsed,
           focusedSeconds: nextFocused,
+          focusRate: focusRateChanged ? nextFocusRate : prev.focusRate,
         };
         saveTimerState(sessionId, next);
         return next;
@@ -248,10 +266,6 @@ export function useSessionTimer({
   }, [sessionId]);
 
   const progress = maxSeconds > 0 ? Math.min((state.elapsedSeconds / maxSeconds) * 100, 100) : 0;
-  const focusRate =
-    state.elapsedSeconds > 0
-      ? Math.min(Math.round((state.focusedSeconds / state.elapsedSeconds) * 100), 100)
-      : 100;
   const formatted = formatTime(state.elapsedSeconds);
 
   return {
@@ -260,7 +274,7 @@ export function useSessionTimer({
     isFocusing: state.isFocusing,
     isRunning: state.isRunning,
     formatted,
-    focusRate,
+    focusRate: state.focusRate,
     progress,
     start,
     pause,
