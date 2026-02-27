@@ -1,21 +1,17 @@
 "use client";
 
-import { useCallback, useState } from "react";
-
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ChevronRightIcon } from "@/components/Icon/ChevronRightIcon";
-import { useLogout } from "@/features/auth/hooks/useAuthHooks";
 import { useDeleteAccountFlow } from "@/features/member/hooks/useDeleteAccountFlow";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
-import { getApiErrorMessage } from "@/lib/error/api-error-utils";
-import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils/utils";
 
 import { AccountProfileCard } from "./AccountProfileCard";
 import { DeleteAccountAgreement } from "./DeleteAccountAgreement";
 import { DeleteAccountWarnings } from "./DeleteAccountWarnings";
+import { LogoutModal } from "./LogoutModal";
 
 // ─── 로컬 컴포넌트 ────────────────────────────────────────────────────────────────
 
@@ -57,26 +53,12 @@ function SidebarNavButton({
 // ─── 메인 컴포넌트 ───────────────────────────────────────────────────────────────
 
 export function ProfileAccountContent() {
-  const router = useRouter();
   const [isAgreed, setIsAgreed] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
   const { data, isPending: isProfilePending } = useMe();
   const profile = data?.result;
-  const { mutate: logout, isPending: isLoggingOut } = useLogout();
   const { deleteAccount, isDeleting } = useDeleteAccountFlow();
-
-  const handleLogout = useCallback(() => {
-    if (isLoggingOut) return;
-
-    logout(undefined, {
-      onSuccess: () => {
-        router.replace("/");
-        router.refresh();
-      },
-      onError: (error: unknown) => {
-        toast.error(getApiErrorMessage(error));
-      },
-    });
-  }, [isLoggingOut, logout, router]);
 
   return (
     <div className="flex flex-col items-center gap-32">
@@ -85,9 +67,7 @@ export function ProfileAccountContent() {
         <div className="gap-lg flex w-full">
           <aside className="gap-sm flex flex-col">
             <SidebarNavButton isActive>회원 탈퇴</SidebarNavButton>
-            <SidebarNavButton isPending={isLoggingOut} onClick={handleLogout}>
-              {isLoggingOut ? "로그아웃 중..." : "로그아웃"}
-            </SidebarNavButton>
+            <SidebarNavButton onClick={() => setIsLogoutModalOpen(true)}>로그아웃</SidebarNavButton>
           </aside>
           <div className="px-3xl flex flex-1 flex-col gap-20">
             <DeleteAccountWarnings />
@@ -107,6 +87,8 @@ export function ProfileAccountContent() {
       >
         {isDeleting ? "탈퇴 중..." : "회원 탈퇴하기"}
       </Button>
+
+      {isLogoutModalOpen && <LogoutModal onClose={() => setIsLogoutModalOpen(false)} />}
     </div>
   );
 }
