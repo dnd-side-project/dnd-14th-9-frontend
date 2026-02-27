@@ -14,7 +14,6 @@ import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
 import { useSessionDetail, useWaitingRoom } from "../../hooks/useSessionHooks";
 import { useShareSession } from "../../hooks/useShareSession";
-import { isInProgressStatus, isWaitingStatus } from "../../types";
 import { Card } from "../Card/Card";
 import { CardSkeleton } from "../Card/CardSkeleton";
 
@@ -46,23 +45,15 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
   const isParticipant =
     waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false;
 
-  // 세션이 대기 상태인지 확인
-  const isWaiting = session ? isWaitingStatus(session.status) : false;
-
-  // 세션이 진행 중 상태인지 확인
-  const isOngoing = session ? isInProgressStatus(session.status) : false;
-
-  // 자동 리다이렉트: 이미 참여 중이면 해당 세션 페이지로 이동
+  // 자동 리다이렉트: 이미 참여 중이면 세션 페이지로 이동
+  // 서버 컴포넌트가 세션 상태에 따라 적절한 페이지(대기실/진행중)로 라우팅
   // Intercepting Route(@modal) 컨텍스트에서 벗어나기 위해 하드 네비게이션 사용
   useEffect(() => {
-    if (isParticipant && isWaiting) {
-      dialogRef.current?.close();
-      navigateWithHardReload(`/session/${sessionId}/waiting`);
-    } else if (isParticipant && isOngoing) {
+    if (isParticipant) {
       dialogRef.current?.close();
       navigateWithHardReload(`/session/${sessionId}`);
     }
-  }, [isParticipant, isWaiting, isOngoing, sessionId, dialogRef]);
+  }, [isParticipant, sessionId, dialogRef]);
 
   // 참여 여부 확인 중인지 여부
   const isCheckingParticipation = isAuthenticated && isWaitingRoomLoading;
@@ -167,7 +158,6 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
       {showJoinModal && (
         <SessionJoinModal
           sessionId={sessionId}
-          sessionStatus={session?.status}
           onClose={() => setShowJoinModal(false)}
           onJoinSuccess={() => {
             // router.back() 없이 dialog만 직접 닫기

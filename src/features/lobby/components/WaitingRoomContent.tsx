@@ -98,13 +98,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
 
   // 미참여자 → SessionJoinModal 표시
   if (!isParticipant) {
-    return (
-      <SessionJoinModal
-        sessionId={sessionId}
-        sessionStatus={session.status}
-        onClose={() => window.location.replace("/")}
-      />
-    );
+    return <SessionJoinModal sessionId={sessionId} onClose={() => window.location.replace("/")} />;
   }
   // 참여자 목록: SSE 데이터가 있으면 우선, 없으면 초기 REST API 데이터 사용
   const members: WaitingMember[] = (sseWaitingData?.members ??

@@ -10,8 +10,7 @@ import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { TextInput } from "@/components/Input/TextInput";
 import { Portal } from "@/components/Portal/Portal";
 import { useJoinSession } from "@/features/session/hooks/useSessionHooks";
-import { isInProgressStatus } from "@/features/session/types";
-import type { ReportTodoItem, SessionDetailStatus } from "@/features/session/types";
+import type { ReportTodoItem } from "@/features/session/types";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
@@ -21,17 +20,11 @@ const MAX_TODOS = 5;
 
 interface SessionJoinModalProps {
   sessionId: string;
-  sessionStatus?: SessionDetailStatus;
   onClose: () => void;
   onJoinSuccess?: () => void;
 }
 
-export function SessionJoinModal({
-  sessionId,
-  sessionStatus,
-  onClose,
-  onJoinSuccess,
-}: SessionJoinModalProps) {
+export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJoinModalProps) {
   useBodyScrollLock();
 
   const dialogRef = useRef<HTMLDialogElement | null>(null);
@@ -93,18 +86,11 @@ export function SessionJoinModal({
         body: { goal: goal.trim(), todos: validTodos },
       });
 
-      // 성공 시: 모달 닫고 세션 상태에 따라 이동
+      // 성공 시: 모달 닫고 세션 페이지로 이동
+      // 서버 컴포넌트가 세션 상태에 따라 적절한 페이지(대기실/진행중)로 라우팅
       onJoinSuccess?.();
       onClose();
-
-      const isInProgress = sessionStatus ? isInProgressStatus(sessionStatus) : false;
-      if (isInProgress) {
-        // 진행 중인 세션이면 바로 세션 페이지로 이동
-        window.location.replace(`/session/${sessionId}`);
-      } else {
-        // 대기 중인 세션이면 대기방으로 이동
-        window.location.replace(`/session/${sessionId}/waiting`);
-      }
+      window.location.replace(`/session/${sessionId}`);
     } catch (error) {
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
       setServerError(message);
