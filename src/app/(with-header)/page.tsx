@@ -12,12 +12,16 @@ import {
   parseSessionListSearchParams,
   toURLSearchParams,
 } from "@/features/session/utils/parseSessionListSearchParams";
+import { SITE_TITLE } from "@/lib/constants/seo";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
   title: "홈",
   description: "모집 중인 모각작 세션을 찾아보고 참여하세요.",
   pathname: "/",
+  openGraph: {
+    title: SITE_TITLE,
+  },
 });
 
 /**
