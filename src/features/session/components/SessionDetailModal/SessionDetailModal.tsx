@@ -6,12 +6,14 @@ import { Button } from "@/components/Button/Button";
 import { ButtonLink } from "@/components/Button/ButtonLink";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
+import { ShareIcon } from "@/components/Icon/ShareIcon";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
 import { useIsAuthenticated, useMe } from "@/features/member/hooks/useMemberHooks";
 import { useDialog } from "@/hooks/useDialog";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
 import { useSessionDetail, useWaitingRoom } from "../../hooks/useSessionHooks";
+import { useShareSession } from "../../hooks/useShareSession";
 import { isInProgressStatus, isWaitingStatus } from "../../types";
 import { Card } from "../Card/Card";
 import { CardSkeleton } from "../Card/CardSkeleton";
@@ -25,6 +27,7 @@ interface SessionDetailModalProps {
 export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
   const { dialogRef, handleClose, handleBackdropClick } = useDialog("/");
   const { data, isLoading, error: sessionError } = useSessionDetail(sessionId);
+  const { shareSession } = useShareSession();
   const isAuthenticated = useIsAuthenticated();
   const [showJoinModal, setShowJoinModal] = useState(false);
 
@@ -74,15 +77,25 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
       className="fixed inset-0 m-auto w-full max-w-90 rounded-lg bg-transparent p-0 backdrop:bg-(--color-overlay-default) md:max-w-100 lg:max-w-110"
     >
       <div className="gap-2xl p-3xl bg-surface-default relative flex flex-col rounded-2xl">
-        {/* 닫기 버튼 */}
-        <button
-          type="button"
-          onClick={handleClose}
-          className="text-text-muted hover:text-text-primary focus-visible:ring-text-muted p-xs top-lg right-lg gap-none absolute flex cursor-pointer items-center rounded-sm focus-visible:ring-2"
-          aria-label="닫기"
-        >
-          <CloseIcon />
-        </button>
+        {/* 공유 · 닫기 버튼 */}
+        <div className="top-lg right-lg absolute flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => shareSession(Number(sessionId))}
+            className="text-text-muted hover:text-text-primary focus-visible:ring-text-muted p-xs flex cursor-pointer items-center rounded-sm focus-visible:ring-2"
+            aria-label="세션 링크 복사"
+          >
+            <ShareIcon />
+          </button>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="text-text-muted hover:text-text-primary focus-visible:ring-text-muted p-xs flex cursor-pointer items-center rounded-sm focus-visible:ring-2"
+            aria-label="닫기"
+          >
+            <CloseIcon />
+          </button>
+        </div>
 
         {/* 제목 영역 */}
         <div className="gap-xs flex flex-col">

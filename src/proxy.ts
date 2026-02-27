@@ -12,7 +12,14 @@ import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/toke
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 
 // 공개 페이지 라우트 (인증 불필요)
-const PUBLIC_PAGE_ROUTES = [/^\/$/, /^\/login$/, /^\/session\/\d+$/];
+const PUBLIC_PAGE_ROUTES = [
+  /^\/$/,
+  /^\/login$/,
+  /^\/session\/\d+$/,
+  /^\/terms$/,
+  /^\/privacy$/,
+  /^\/cookie-policy$/,
+];
 
 // 공개 API 라우트 (인증 불필요)
 const PUBLIC_API_ROUTE_PATTERNS = [

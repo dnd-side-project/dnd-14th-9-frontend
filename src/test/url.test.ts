@@ -1,21 +1,21 @@
 import { getSessionShareUrl, buildQueryString, parseQueryString } from "@/lib/utils/url";
 
 describe("getSessionShareUrl", () => {
-  it("sessionId를 포함한 URL을 생성해야 합니다", () => {
-    const url = getSessionShareUrl("abc123");
-    expect(url).toContain("/session/abc123");
-    expect(url).toMatch(/^https?:\/\/.+\/session\/abc123$/);
+  it("sessionId를 base62 인코딩한 단축 URL을 생성해야 합니다", () => {
+    const url = getSessionShareUrl(12345);
+    expect(url).toContain("/s/");
+    expect(url).toMatch(/^https?:\/\/.+\/s\/[0-9a-zA-Z]+$/);
   });
 
-  it("다양한 sessionId 형식을 처리해야 합니다", () => {
-    expect(getSessionShareUrl("simple")).toContain("/session/simple");
-    expect(getSessionShareUrl("with-dash")).toContain("/session/with-dash");
-    expect(getSessionShareUrl("123456")).toContain("/session/123456");
+  it("다양한 sessionId를 처리해야 합니다", () => {
+    expect(getSessionShareUrl(1)).toContain("/s/");
+    expect(getSessionShareUrl(0)).toContain("/s/");
+    expect(getSessionShareUrl(999999)).toContain("/s/");
   });
 
   it("URL 형식이 올바른지 확인해야 합니다", () => {
-    const url = getSessionShareUrl("test-id");
-    expect(url).toMatch(/^https?:\/\/.+\/session\/test-id$/);
+    const url = getSessionShareUrl(42);
+    expect(url).toMatch(/^https?:\/\/.+\/s\/[0-9a-zA-Z]+$/);
   });
 });
 

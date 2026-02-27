@@ -4,17 +4,21 @@ import { useCallback } from "react";
 
 import { notFound } from "next/navigation";
 
+import { ButtonLink } from "@/components/Button/ButtonLink";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
-import { useMe } from "@/features/member/hooks/useMemberHooks";
+import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
+import { useIsAuthenticated, useMe } from "@/features/member/hooks/useMemberHooks";
 import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
+import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 import { toast } from "@/lib/toast";
 
 import {
   useInProgressData,
   useSessionDetail,
   useSubmitSessionResult,
+  useWaitingRoom,
 } from "../hooks/useSessionHooks";
 import { useSessionStatusSSE } from "../hooks/useSessionStatusSSE";
 import { clearTimerState, getTimerState } from "../hooks/useSessionTimer";
@@ -32,9 +36,13 @@ interface SessionPageContentProps {
 export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const { showLeaveDialog, setShowLeaveDialog, isLeavingRef } = usePreventBackNavigation();
 
+  const isAuthenticated = useIsAuthenticated();
   const { data: sessionData, isLoading, error, refetch } = useSessionDetail(sessionId);
   const { data: inProgressData } = useInProgressData({ sessionId });
   const { data: meData } = useMe();
+  const { data: waitingRoomData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
+    enabled: isAuthenticated,
+  });
   const submitResultMutation = useSubmitSessionResult();
 
   const sessionDurationMinutes = sessionData?.result?.sessionDurationMinutes;
@@ -80,8 +88,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     },
   });
 
-  if (isLoading) {
-    console.warn("[SessionPageContent] 로딩 중...");
+  if (isLoading || (isAuthenticated && isWaitingRoomLoading)) {
     return (
       <div className="flex min-h-100 items-center justify-center">
         <p className="text-text-secondary">세션 정보를 불러오는 중...</p>
@@ -95,7 +102,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
 
   if (error || !sessionData?.result) {
     return (
-      <div className="flex h-[calc(100vh-200px)] min-h-[400px] items-center justify-center">
+      <div className="flex h-[calc(100vh-200px)] min-h-100 items-center justify-center">
         <ErrorFallbackUI
           title="세션 정보를 불러올 수 없어요"
           description="데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요."
@@ -108,7 +115,34 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
 
   const session = sessionData.result;
 
+  // 비로그인 사용자 → 로그인 유도
+  if (!isAuthenticated) {
+    return (
+      <div className="flex h-[calc(100vh-200px)] min-h-100 flex-col items-center justify-center gap-4">
+        <p className="text-text-secondary text-lg">세션에 참여하려면 로그인이 필요합니다</p>
+        <ButtonLink href="/login" variant="solid" colorScheme="primary" size="medium">
+          로그인하고 참여하기
+        </ButtonLink>
+      </div>
+    );
+  }
+
+  // 참여 여부 확인
   const myMemberId = meData?.result?.id;
+  const isParticipant =
+    waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false;
+
+  // 미참여자 → SessionJoinModal 표시
+  if (!isParticipant) {
+    return (
+      <SessionJoinModal
+        sessionId={sessionId}
+        sessionStatus={session.status}
+        onClose={() => navigateWithHardReload("/")}
+      />
+    );
+  }
+
   const myMember = inProgressData?.members.find((m) => m.memberId === myMemberId);
 
   return (
