@@ -52,13 +52,24 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
 
       {/* Image Container: GAK 로고타입 + 기하학 라인 */}
       <div className="relative h-full w-[54%] shrink-0 overflow-hidden">
-        {/* GAK 로고타입 */}
+        {/* GAK 로고타입 — hover 시 채워진 버전으로 점차 전환 */}
         <div className="absolute top-[99px] left-[207px] h-[64px] w-[240px]">
+          {/* 기본 상태: 아웃라인 로고 */}
           <Image
             src="/images/banner/gak-logotype.svg"
             alt="GAK"
             fill
             className="object-contain"
+            priority
+          />
+          {/* hover 상태: 채워진 로고 (opacity 전환) */}
+          <Image
+            src="/images/banner/Logotype.svg"
+            alt=""
+            fill
+            className={`object-contain transition-opacity duration-700 ${
+              isHovered ? "opacity-100" : "opacity-0"
+            }`}
             priority
           />
         </div>
