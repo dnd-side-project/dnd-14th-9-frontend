@@ -117,9 +117,11 @@ export function RecommendedSectionContent() {
   const renderHeader = (action?: ReactNode) => (
     <div className="flex items-center justify-between">
       <div className="gap-xs flex flex-col">
-        <h2 className="text-text-primary text-2xl font-bold">{nickname}님을 위한 추천 세션</h2>
+        <h2 className="text-text-primary text-2xl font-bold">
+          <span className="text-text-brand-default">{nickname}</span> 님을 위한 추천 세션
+        </h2>
         <p className="text-text-disabled text-base">
-          마이페이지에서 설정한 카테고리를 기반해서 방을 추천해드려요
+          설정한 관심 카테고리를 기준으로 세션을 추천해 드려요
         </p>
       </div>
       {action}
