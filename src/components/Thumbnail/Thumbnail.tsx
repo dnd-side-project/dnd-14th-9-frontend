@@ -8,10 +8,17 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils/utils";
 
-const DEFAULT_PLACEHOLDER = "/images/thumbnail-placeholder.svg";
+const DEFAULT_PLACEHOLDER = "/images/thumbnail-fallback.svg";
 
 const THUMBNAIL_VARIANTS = cva(
-  ["relative", "overflow-hidden", "bg-surface-subtle", "w-full", "aspect-[276/146]"],
+  [
+    "relative",
+    "overflow-hidden",
+    "bg-surface-subtle",
+    "w-full",
+    "aspect-[276/146]",
+    "border-border-default",
+  ],
   {
     variants: {
       radius: {
@@ -20,10 +27,16 @@ const THUMBNAIL_VARIANTS = cva(
         md: "rounded-md",
         lg: "rounded-lg",
         xl: "rounded-xl",
+        xs: "rounded-xs",
+      },
+      border: {
+        none: "",
+        sm: "border-sm",
       },
     },
     defaultVariants: {
       radius: "lg",
+      border: "none",
     },
   }
 );
@@ -72,14 +85,17 @@ const ThumbnailImage = ({ src, alt, fallbackSrc, onLoadingChange }: ThumbnailIma
 };
 
 export const Thumbnail = forwardRef<HTMLDivElement, ThumbnailProps>(
-  ({ className, radius, src, alt, fallbackSrc = DEFAULT_PLACEHOLDER, ...props }, ref) => {
+  ({ className, radius, border, src, alt, fallbackSrc = DEFAULT_PLACEHOLDER, ...props }, ref) => {
     const [isLoading, setIsLoading] = useState(true);
     const imageSrc = src || fallbackSrc;
 
     return (
       <div
         ref={ref}
-        className={cn(THUMBNAIL_VARIANTS({ radius, className }), isLoading && "animate-pulse")}
+        className={cn(
+          THUMBNAIL_VARIANTS({ radius, border, className }),
+          isLoading && "animate-pulse"
+        )}
         {...props}
       >
         <ThumbnailImage
