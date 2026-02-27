@@ -26,22 +26,20 @@ interface ParticipantReactionListProps {
 export function ParticipantReactionList({ sessionId, participants }: ParticipantReactionListProps) {
   const sendReaction = useSendReaction();
 
-  const handleEmojiClick = (
+  const handleEmojiClick = async (
     emoji: "heart" | "thumbsUp" | "thumbsDown" | "star",
     targetMemberId: number
   ) => {
-    sendReaction.mutate(
-      {
+    try {
+      await sendReaction.mutateAsync({
         sessionId,
         body: { targetMemberId, emojiType: mapEmojiKeyToType(emoji) },
-      },
-      {
-        onError: (error) => {
-          const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
-          toast.error(message);
-        },
-      }
-    );
+      });
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+      toast.error(message);
+      throw error;
+    }
   };
 
   return (

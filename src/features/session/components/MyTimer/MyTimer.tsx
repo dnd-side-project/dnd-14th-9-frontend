@@ -86,10 +86,10 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
             </svg>
             {isFocusing ? "집중 중" : "자리 비움"}
           </span>
-          <div className="flex flex-col">
-            <span className="text-text-disabled text-[13px] font-semibold">전체 시간 대비</span>
-            <span className="text-text-primary text-[13px] font-semibold">{focusRate}% 집중</span>
-          </div>
+          <span className="inline-flex gap-2 text-[13px] font-semibold">
+            <span className="text-text-disabled">전체 시간 대비</span>
+            <span className="text-text-primary">{focusRate}% 집중</span>
+          </span>
         </div>
 
         {/* 정지/시작 버튼 */}

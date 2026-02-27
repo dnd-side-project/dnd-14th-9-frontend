@@ -5,6 +5,8 @@ export interface StepperSlideProps {
   onChange: (value: number) => void;
   /** "내 집중도" 값 (0-100) - 별도 마커로 표시 */
   myFocusValue?: number;
+  /** 마커 말풍선 라벨 (기본값: "내 집중도") */
+  myFocusLabel?: string;
   /** 최소값 (기본값: 0) */
   min?: number;
   /** 최대값 (기본값: 100) */

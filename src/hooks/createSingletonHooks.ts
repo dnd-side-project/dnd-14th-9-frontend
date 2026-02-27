@@ -19,7 +19,6 @@
  */
 
 import {
-  QueryClient,
   dehydrate,
   useMutation,
   useQuery,
@@ -30,6 +29,7 @@ import {
   type UseQueryResult,
 } from "@tanstack/react-query";
 
+import { getQueryClient } from "@/lib/getQueryClient";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
 interface SingletonHooksConfig<TResponse, TUpdateData, TResponseData> {
@@ -91,7 +91,7 @@ export function createSingletonHooks<
   }
 
   async function prefetch() {
-    const queryClient = new QueryClient();
+    const queryClient = getQueryClient();
     await queryClient.prefetchQuery({
       queryKey: keys.data(),
       queryFn: config.get,

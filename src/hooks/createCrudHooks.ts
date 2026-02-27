@@ -53,13 +53,13 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
-  QueryClient,
   dehydrate,
   type UseQueryResult,
   type UseMutationResult,
   type DehydratedState,
 } from "@tanstack/react-query";
 
+import { getQueryClient } from "@/lib/getQueryClient";
 import { ApiSuccessResponse } from "@/types/shared/types";
 
 interface CrudHooksConfig<
@@ -152,7 +152,7 @@ export function createCrudHooks<
   }
 
   async function prefetch(params: TListParams) {
-    const queryClient = new QueryClient();
+    const queryClient = getQueryClient();
     await queryClient.prefetchQuery({
       queryKey: keys.list(params),
       queryFn: () => config.getList(params),
