@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils/utils";
 const TABS = [
   { name: "내 정보", href: "/profile/settings" },
   { name: "기록 리포트", href: "/profile/report" },
+  { name: "계정 관리", href: "/profile/account" },
 ];
 
 export function ProfileTabs() {
