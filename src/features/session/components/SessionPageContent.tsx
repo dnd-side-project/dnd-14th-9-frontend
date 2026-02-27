@@ -134,13 +134,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
 
   // 미참여자 → SessionJoinModal 표시
   if (!isParticipant) {
-    return (
-      <SessionJoinModal
-        sessionId={sessionId}
-        sessionStatus={session.status}
-        onClose={() => navigateWithHardReload("/")}
-      />
-    );
+    return <SessionJoinModal sessionId={sessionId} onClose={() => navigateWithHardReload("/")} />;
   }
 
   const myMember = inProgressData?.members.find((m) => m.memberId === myMemberId);

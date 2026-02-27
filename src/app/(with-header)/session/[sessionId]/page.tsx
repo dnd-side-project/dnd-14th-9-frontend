@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
 
+import { redirect } from "next/navigation";
+
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
 import { sessionApi } from "@/features/session/api";
 import { SessionPageContent } from "@/features/session/components/SessionPageContent";
+import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
+import { isWaitingStatus } from "@/features/session/types";
+import { hasAuthCookies } from "@/lib/auth/hasAuthCookies";
+import { getQueryClient } from "@/lib/getQueryClient";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 interface SessionPageProps {
@@ -31,6 +39,22 @@ export async function generateMetadata({ params }: SessionPageProps): Promise<Me
 
 export default async function SessionPage({ params }: SessionPageProps) {
   const { sessionId } = await params;
+  const queryClient = getQueryClient();
 
-  return <SessionPageContent sessionId={sessionId} />;
+  const sessionData = await queryClient.fetchQuery(sessionQueries.detail(sessionId));
+
+  // 대기 중인 세션이면 대기실로 리다이렉트
+  if (isWaitingStatus(sessionData.result.status)) {
+    redirect(`/session/${sessionId}/waiting`);
+  }
+
+  if (await hasAuthCookies()) {
+    await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
+  }
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <SessionPageContent sessionId={sessionId} />
+    </HydrationBoundary>
+  );
 }
