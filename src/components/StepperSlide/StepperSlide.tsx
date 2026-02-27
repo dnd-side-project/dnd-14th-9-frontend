@@ -11,7 +11,19 @@ import type { StepperSlideProps } from "./StepperSlide.types";
 const TICK_VALUES = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] as const;
 
 export const StepperSlide = forwardRef<HTMLDivElement, StepperSlideProps>(
-  ({ value, onChange, myFocusValue, min = 0, max = 100, disabled = false, className }, ref) => {
+  (
+    {
+      value,
+      onChange,
+      myFocusValue,
+      myFocusLabel = "내 집중도",
+      min = 0,
+      max = 100,
+      disabled = false,
+      className,
+    },
+    ref
+  ) => {
     const { isDragging, percentage, trackRef, handleMouseDown, handleTrackClick, handleKeyDown } =
       useStepperSlide({
         value,
@@ -47,7 +59,7 @@ export const StepperSlide = forwardRef<HTMLDivElement, StepperSlideProps>(
                   "after:border-4 after:border-transparent after:border-t-gray-700 after:content-['']"
                 )}
               >
-                <span className="px-xs box-border text-xs">내 집중도</span>
+                <span className="px-xs box-border text-xs">{myFocusLabel}</span>
               </div>
             </div>
           )}

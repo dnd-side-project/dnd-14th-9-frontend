@@ -16,6 +16,7 @@ import { Textarea } from "@/components/Input/Textarea";
 import { TextInput } from "@/components/Input/TextInput";
 import { NumericStepper } from "@/components/NumericStepper/NumericStepper";
 import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
+import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { ApiError } from "@/lib/api/api-client";
 import { ONBOARDING_CATEGORIES, CATEGORY_LABELS, type Category } from "@/lib/constants/category";
@@ -39,6 +40,9 @@ import { validateSessionForm, type SessionFormErrors } from "../utils/validateSe
 import type { CreateSessionRequest } from "../types";
 
 export function SessionCreateForm() {
+  const { data: meData } = useMe();
+  const myProfile = meData?.result;
+
   const [roomName, setRoomName] = useState("");
   const [roomDescription, setRoomDescription] = useState("");
   const [notice, setNotice] = useState("");
@@ -50,6 +54,7 @@ export function SessionCreateForm() {
   const [duration, setDuration] = useState(SESSION_DURATION_MINUTES_DEFAULT); // 기본값 1시간 30분
   const [participants, setParticipants] = useState(SESSION_PARTICIPANTS_DEFAULT); // 기본값 5명
   const [achievementRange, setAchievementRange] = useState(50); // To do 달성도 범위
+  const [focusRange, setFocusRange] = useState(50); // 집중도 범위
 
   // DatePicker 팝업 상태
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -107,6 +112,7 @@ export function SessionCreateForm() {
       sessionDurationMinutes: duration,
       maxParticipants: participants,
       requiredAchievementRate: achievementRange,
+      requiredFocusRate: focusRange,
     });
 
     if (!validation.success) {
@@ -123,7 +129,7 @@ export function SessionCreateForm() {
       startTime: formatLocalDateTime(validation.data.startTime),
       sessionDurationMinutes: validation.data.sessionDurationMinutes,
       maxParticipants: validation.data.maxParticipants,
-      requiredFocusRate: 0,
+      requiredFocusRate: validation.data.requiredFocusRate,
       requiredAchievementRate: validation.data.requiredAchievementRate,
     };
 
@@ -352,14 +358,35 @@ export function SessionCreateForm() {
             <StepperSlide
               value={achievementRange}
               onChange={setAchievementRange}
-              myFocusValue={70}
+              myFocusValue={myProfile?.todoCompletionRate}
+              myFocusLabel="내 달성률"
               className="w-[80%]"
             />
           </div>
         </div>
-        {/* 상단 진행시간/참여인원과 너비 맞춤 */}
-        <div className="w-45 shrink-0" aria-hidden="true" />
-        <div className="w-45 shrink-0" aria-hidden="true" />
+        {/* 집중도 범위 설정 */}
+        <div className="flex flex-1 flex-col gap-2">
+          <div className="flex items-center gap-1">
+            <span className="text-text-secondary text-base leading-none">집중도 범위 설정</span>
+            <div className="group relative flex items-center">
+              <InfoIcon size="xsmall" className="text-text-muted cursor-pointer" />
+              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="rounded-sm bg-gray-700 px-3 py-2 text-xs whitespace-nowrap text-gray-200">
+                  내 집중도보다 높은 범위는 설정할 수 없어요.
+                </div>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700" />
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-center rounded-sm border border-gray-700 p-4">
+            <StepperSlide
+              value={focusRange}
+              onChange={setFocusRange}
+              myFocusValue={myProfile?.focusRate}
+              className="w-[80%]"
+            />
+          </div>
+        </div>
       </div>
 
       {/* 서버 에러 배너 */}
