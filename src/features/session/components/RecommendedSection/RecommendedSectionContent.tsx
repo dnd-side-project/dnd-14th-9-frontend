@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { useSearchParams } from "next/navigation";
 
@@ -13,6 +13,7 @@ import { useRecommendedCarousel } from "../../hooks/useRecommendedCarousel";
 
 import { EmptyRecommendedSessionPlaceholder } from "./EmptyRecommendedSessionPlaceholder";
 import { RecommendedGrid } from "./RecommendedGrid";
+import { RecommendedGridSkeleton } from "./RecommendedGridSkeleton";
 import { collectInterestCategories, resolveRecommendedView } from "./recommendedSection.model";
 
 export function RecommendedSectionContent() {
@@ -81,20 +82,22 @@ export function RecommendedSectionContent() {
             onPageChange={handleSearchPageChange}
           />
         </div>
-        <RecommendedGrid
-          keyword={keyword}
-          category={category !== "ALL" ? category : undefined}
-          filters={{
-            startDate: startDate ?? undefined,
-            endDate: endDate ?? undefined,
-            timeSlots: timeSlots.length > 0 ? timeSlots : undefined,
-            durationRange: durationRange ?? undefined,
-            participants: participants ?? undefined,
-          }}
-          page={searchPage}
-          onMetaChange={handleMetaChange}
-          emptyMessage="바로 참여 가능한 세션이 없습니다"
-        />
+        <Suspense fallback={<RecommendedGridSkeleton />}>
+          <RecommendedGrid
+            keyword={keyword}
+            category={category !== "ALL" ? category : undefined}
+            filters={{
+              startDate: startDate ?? undefined,
+              endDate: endDate ?? undefined,
+              timeSlots: timeSlots.length > 0 ? timeSlots : undefined,
+              durationRange: durationRange ?? undefined,
+              participants: participants ?? undefined,
+            }}
+            page={searchPage}
+            onMetaChange={handleMetaChange}
+            emptyMessage="바로 참여 가능한 세션이 없습니다"
+          />
+        </Suspense>
       </section>
     );
   }
@@ -139,14 +142,18 @@ export function RecommendedSectionContent() {
               onPageChange={handlePageChange}
             />
           )}
-          <RecommendedGrid category={view.category} />
+          <Suspense fallback={<RecommendedGridSkeleton />}>
+            <RecommendedGrid category={view.category} />
+          </Suspense>
         </section>
       );
     case "single":
       return (
         <section className="gap-xl flex flex-col">
           {renderHeader()}
-          <RecommendedGrid category={view.category} />
+          <Suspense fallback={<RecommendedGridSkeleton />}>
+            <RecommendedGrid category={view.category} />
+          </Suspense>
         </section>
       );
     case "empty":

@@ -16,7 +16,7 @@ const THUMBNAIL_VARIANTS = cva(
     "overflow-hidden",
     "bg-surface-subtle",
     "w-full",
-    "aspect-[276/146]",
+    "aspect-276/146",
     "border-border-default",
   ],
   {
