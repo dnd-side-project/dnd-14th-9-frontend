@@ -41,7 +41,7 @@ function SidebarNavButton({
       aria-busy={isPending}
       aria-current={isActive ? "page" : undefined}
       className={cn(
-        "text-text-primary py-md pr-md pl-lg w-[220px] justify-between border text-[14px] font-semibold",
+        "text-text-primary py-md pr-md pl-lg w-full justify-between border text-[14px] font-semibold",
         isActive ? "border-border-strong" : "bg-surface-default border-border-default"
       )}
     >
@@ -65,7 +65,7 @@ export function ProfileAccountContent() {
       <div className="gap-xl flex w-full flex-col">
         <h4 className="text-text-primary text-lg font-bold">계정 관리</h4>
         <div className="gap-lg flex w-full">
-          <aside className="gap-sm flex flex-col">
+          <aside className="gap-sm flex w-[276px] flex-col">
             <SidebarNavButton isActive>회원 탈퇴</SidebarNavButton>
             <SidebarNavButton onClick={() => setIsLogoutModalOpen(true)}>로그아웃</SidebarNavButton>
           </aside>

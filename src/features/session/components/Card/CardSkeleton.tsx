@@ -8,7 +8,7 @@ export function CardSkeleton({ className }: CardSkeletonProps) {
   return (
     <div className={cn("flex w-full max-w-69 animate-pulse flex-col gap-4", className)}>
       {/* Thumbnail */}
-      <div className="bg-surface-strong h-40 w-full rounded-lg" />
+      <div className="bg-surface-strong aspect-276/146 w-full rounded-lg" />
 
       <div className="flex flex-col gap-2">
         {/* Badge 행 */}
