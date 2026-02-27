@@ -1,6 +1,6 @@
 export const PATHS = {
   PROFILE_REPORT: "/profile/report",
-  FEEDBACK: "/feedback",
+  FEEDBACK: "https://forms.gle/T8dyZ7WKoG9tBLsG6",
 } as const;
 
 export const INTEREST_RANKS = [
