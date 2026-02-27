@@ -1,13 +1,14 @@
 import dynamic from "next/dynamic";
 import { cookies } from "next/headers";
 
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
 import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
 import { MAIN_SCROLL_ID } from "@/hooks/useBodyScrollLock";
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+import { getQueryClient } from "@/lib/getQueryClient";
 
 const OnboardingModalWrapper = dynamic(() =>
   import("@/features/member/components/Onboarding/OnboardingModalWrapper").then(
@@ -25,7 +26,7 @@ const OnboardingModalWrapper = dynamic(() =>
  * - OnboardingModal: firstLogin 시 자동 표시
  */
 export default async function Layout({ children }: { children: React.ReactNode }) {
-  const queryClient = new QueryClient();
+  const queryClient = getQueryClient();
   let isAuthenticated = false;
   let memberProfile = null;
   const cookieStore = await cookies();

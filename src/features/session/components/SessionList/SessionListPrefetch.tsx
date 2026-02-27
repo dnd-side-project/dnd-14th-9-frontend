@@ -1,8 +1,9 @@
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { sessionApi } from "@/features/session/api";
 import { sessionKeys } from "@/features/session/hooks/useSessionHooks";
 import type { SessionListParams } from "@/features/session/types";
+import { getQueryClient } from "@/lib/getQueryClient";
 
 import { SessionList } from "./SessionList";
 
@@ -11,7 +12,7 @@ interface SessionListPrefetchProps {
 }
 
 export async function SessionListPrefetch({ listParams }: SessionListPrefetchProps) {
-  const queryClient = new QueryClient();
+  const queryClient = getQueryClient();
 
   await queryClient.prefetchQuery({
     queryKey: sessionKeys.list(listParams),
