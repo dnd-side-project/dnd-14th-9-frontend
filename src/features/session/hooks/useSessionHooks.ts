@@ -82,6 +82,8 @@ export function useSuspenseSessionList(params: SessionListParams) {
   return useSuspenseQuery({
     queryKey: sessionKeys.list(params),
     queryFn: () => sessionApi.getList(params),
+    // staleTime: 0,
+    refetchOnWindowFocus: "always",
   });
 }
 export const useSessionDetail = sessionCrud.useDetail!;
