@@ -69,9 +69,7 @@ export function SessionList() {
       <div className="flex flex-col gap-[10px]">
         <h2 className="text-text-primary text-2xl font-bold">지금 모집 중인 세션</h2>
         <div className="flex justify-between">
-          <p className="text-text-disabled text-base">
-            마이페이지에서 설정한 카테고리를 기반해서 방을 추천해드려요
-          </p>
+          <p className="text-text-disabled text-base">현재 모집 중인 세션에 바로 참여해 보세요</p>
           <SessionListFilterBar
             values={values}
             onSetDateRange={setDateRange}
