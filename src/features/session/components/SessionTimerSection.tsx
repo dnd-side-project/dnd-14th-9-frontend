@@ -2,8 +2,13 @@
 
 import { useMemo } from "react";
 
+import dynamic from "next/dynamic";
+
 import { MyTimer } from "./MyTimer/MyTimer";
-import { TotalTimer } from "./TotalTimer/TotalTimer";
+
+const TotalTimer = dynamic(() => import("./TotalTimer/TotalTimer").then((mod) => mod.TotalTimer), {
+  ssr: false,
+});
 
 interface SessionTimerSectionProps {
   sessionId: string;

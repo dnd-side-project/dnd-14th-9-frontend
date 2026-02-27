@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { OAuthProviderItem } from "@/features/auth/components/OAuthProviderItem";
 import {
@@ -16,9 +16,14 @@ interface OAuthLoginFormProps {
 export function OAuthLoginForm({ nextPath }: OAuthLoginFormProps) {
   const [googleProvider, kakaoProvider] = LOGIN_PROVIDERS;
   const [loadingProvider, setLoadingProvider] = useState<LoginProvider | null>(null);
-  const [lastLoginProvider, setLastLoginProvider] = useState<LoginProvider | null>(
-    getLastLoginProvider
-  );
+  const [lastLoginProvider, setLastLoginProvider] = useState<LoginProvider | null>(null);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setLastLoginProvider(getLastLoginProvider());
+    }, 0);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   const handleSubmit = (provider: LoginProvider) => {
     saveLastLoginProvider(provider);

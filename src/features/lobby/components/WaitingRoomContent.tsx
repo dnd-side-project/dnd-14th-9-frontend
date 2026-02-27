@@ -1,5 +1,7 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useSessionDetail, useWaitingRoom } from "@/features/session/hooks/useSessionHooks";
@@ -8,13 +10,19 @@ import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
 
 import { useWaitingMembersSSE } from "../hooks/useWaitingMembersSSE";
 
-import { CountdownBanner } from "./CountdownBanner";
 import { GoalAndTodoCard } from "./GoalAndTodoCard";
 import { LobbyHeader } from "./LobbyHeader";
 import { ParticipantListCard } from "./ParticipantListCard";
 import { SessionInfoCard } from "./SessionInfoCard";
 
 import type { WaitingMember } from "../types";
+
+const CountdownBanner = dynamic(
+  () => import("./CountdownBanner").then((mod) => mod.CountdownBanner),
+  {
+    ssr: false,
+  }
+);
 
 interface WaitingRoomContentProps {
   sessionId: string;

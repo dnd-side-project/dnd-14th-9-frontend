@@ -3,12 +3,9 @@
 import { useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
-import { ChatIcon } from "@/components/Icon/ChatIcon";
 import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
 import { HostBadgeIcon } from "@/components/Icon/HostBadgeIcon";
-
-import { ChatPopup } from "./ChatPopup";
 
 import type { InProgressMember } from "../../types";
 
@@ -26,18 +23,8 @@ export function SessionParticipantListCard({
   className,
 }: SessionParticipantListCardProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-
   const handleToggle = (memberId: number) => {
     setExpandedId((prev) => (prev === memberId ? null : memberId));
-  };
-
-  const handleOpenChat = () => {
-    setIsChatOpen(true);
-  };
-
-  const handleCloseChat = () => {
-    setIsChatOpen(false);
   };
 
   return (
@@ -51,15 +38,7 @@ export function SessionParticipantListCard({
             <h2 className="text-text-primary text-2xl font-bold">참여자 목록</h2>
             <p className="text-text-secondary text-base">이번 세션에서 함께할 참여자들이에요</p>
           </div>
-          {/* 채팅 아이콘 */}
-          <button
-            type="button"
-            className="text-surface-primary-default flex size-10 cursor-pointer items-center justify-center rounded-xs bg-[#27EA671A] transition-colors hover:bg-[#27EA6733]"
-            onClick={handleOpenChat}
-            aria-label="채팅 열기"
-          >
-            <ChatIcon size="large" />
-          </button>
+          {/* TODO: 채팅 기능 활성화 시 복원 */}
         </div>
 
         {/* 참여자 수 + 평균 목표 달성률 */}
@@ -184,9 +163,6 @@ export function SessionParticipantListCard({
           })}
         </ul>
       </div>
-
-      {/* Floating 채팅 팝업 */}
-      <ChatPopup isOpen={isChatOpen} onClose={handleCloseChat} />
     </>
   );
 }
