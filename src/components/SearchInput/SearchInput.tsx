@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils/utils";
 
 const searchInputContainerVariants = cva(
   [
+    "group",
     "flex",
     "items-center",
     "w-full",
@@ -17,11 +18,16 @@ const searchInputContainerVariants = cva(
     "py-xs",
     "gap-xs",
     "border",
-    "border-border-gray-subtler",
-    "rounded-sm",
-    "bg-gray-950",
-    "transition-colors",
-    "focus-within:border-text-brand-default",
+    "border-border-gray-default",
+    "rounded-md",
+    "bg-surface-strong",
+    "transition-all",
+    "duration-300",
+    "has-[:not(:placeholder-shown)]:border-border-gray-strong",
+    "has-[:not(:placeholder-shown)]:bg-surface-default",
+    "focus-within:!border-text-brand-default",
+    "focus-within:!bg-surface-default",
+    "focus-within:!shadow-[0_0_16px_0_rgba(39,234,103,0.30)]",
   ].join(" ")
 );
 
@@ -50,13 +56,22 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   ({ className, onSearchClick, ...props }, ref) => {
     return (
       <div className={cn(searchInputContainerVariants(), className)}>
-        <input ref={ref} type="text" className={searchInputVariants()} {...props} />
+        <input
+          ref={ref}
+          type="text"
+          className={searchInputVariants()}
+          placeholder={props.placeholder ?? " "}
+          {...props}
+        />
         <button
           type="button"
           onClick={onSearchClick}
           className="p-xs flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors hover:bg-gray-800"
         >
-          <SearchIcon size="small" className="text-gray-300" />
+          <SearchIcon
+            size="small"
+            className="group-focus-within:text-text-primary text-gray-300 transition-colors"
+          />
         </button>
       </div>
     );
