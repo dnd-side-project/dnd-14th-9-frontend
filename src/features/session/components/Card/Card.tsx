@@ -3,6 +3,7 @@
 import { Badge } from "@/components/Badge/Badge";
 import { RelativeTimeBadge } from "@/components/RelativeTime/RelativeTimeBadge";
 import { Thumbnail } from "@/components/Thumbnail/Thumbnail";
+import { isPastTime } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
 
 import { CardMeta } from "./CardMeta";
@@ -41,9 +42,17 @@ export function Card({
   durationMinutes,
   sessionDate,
 }: CardProps) {
+  // 세션 시작 시간이 이미 지났으면 inProgress 뱃지 우선 표시
   // statusText가 명시적으로 제공되면 직접 Badge 사용
   // 그 외에 createdAt이 있으면 RelativeTimeBadge 사용 (hydration 안전)
   const renderStatusBadge = () => {
+    if (isPastTime(sessionDate)) {
+      return (
+        <Badge radius="max" status="inProgress">
+          진행중
+        </Badge>
+      );
+    }
     if (statusText) {
       return (
         <Badge radius="max" status={statusBadgeStatus ?? "recruiting"}>
