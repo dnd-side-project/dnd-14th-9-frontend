@@ -41,7 +41,7 @@ function SidebarNavButton({
       aria-busy={isPending}
       aria-current={isActive ? "page" : undefined}
       className={cn(
-        "text-text-primary py-md pr-md pl-lg gap-[160px] border text-[14px] font-semibold",
+        "text-text-primary py-md pr-md pl-lg w-[220px] justify-between border text-[14px] font-semibold",
         isActive ? "border-border-strong" : "bg-surface-default border-border-default"
       )}
     >
