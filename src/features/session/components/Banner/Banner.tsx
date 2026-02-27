@@ -1,42 +1,129 @@
-import { ButtonLink } from "@/components/Button/ButtonLink";
-import { ChevronRightIcon } from "@/components/Icon/ChevronRightIcon";
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { motion } from "motion/react";
+
+import { DefaultBanner } from "./DefaultBanner";
+import { FeedbackBanner } from "./FeedbackBanner";
+
+/** 자동 롤링 간격 (ms) */
+const AUTO_ROLL_INTERVAL = 4_000;
 
 /**
- * Banner - 피드백 참여 유도 CTA 배너
+ * Banner — 자동 롤링 배너 캐러셀 (Motion 기반)
  *
- * 역할:
- * - 사용자 피드백 참여를 유도하는 정적 배너
- * - 데이터 fetching 없음 (Server Component)
+ * 전환 방식:
+ * - Default → Feedback: 좌측 슬라이드 (두 배너가 동시에 이동)
+ * - Feedback → Default: 페이드 아웃 (Feedback만 사라짐)
+ * - 4초 간격 자동 롤링, hover 시 일시 정지
  */
 export function Banner() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [direction, setDirection] = useState<"forward" | "backward">("forward");
+
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const clearAutoRoll = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  const startAutoRoll = useCallback(() => {
+    clearAutoRoll();
+    intervalRef.current = setInterval(() => {
+      setActiveIndex((prev) => {
+        const next = (prev + 1) % 2;
+        setDirection(next === 1 ? "forward" : "backward");
+        return next;
+      });
+    }, AUTO_ROLL_INTERVAL);
+  }, [clearAutoRoll]);
+
+  useEffect(() => {
+    if (isHovered) {
+      clearAutoRoll();
+    } else {
+      startAutoRoll();
+    }
+    return clearAutoRoll;
+  }, [isHovered, startAutoRoll, clearAutoRoll]);
+
+  const goTo = useCallback((index: number) => {
+    setDirection(index === 1 ? "forward" : "backward");
+    setActiveIndex(index);
+  }, []);
+
+  const isDefault = activeIndex === 0;
+
   return (
-    <section className="p-4xl relative flex h-[264px] w-full flex-col justify-center overflow-hidden rounded-sm bg-[linear-gradient(180deg,_var(--color-gray-800,_#33363D)_-30.1%,_var(--color-gray-900,_#1E2124)_100%)]">
-      {/* 배경 오버레이: 정적 이미지 의존을 제거해 404 요청을 방지한다. */}
-      <div className="absolute inset-0 bg-[radial-gradient(80%_120%_at_0%_0%,rgba(255,255,255,0.18),transparent_65%),radial-gradient(70%_90%_at_100%_10%,rgba(255,255,255,0.12),transparent_70%)] mix-blend-overlay" />
-
-      <div className="relative z-10 flex flex-col items-start gap-6">
-        <div className="flex flex-col items-start gap-1">
-          <h2 className="text-text-primary text-2xl leading-[1.4] font-bold whitespace-pre-wrap">
-            GAK, 사용해보고 느낀 점을 알려주세요
-            <br />
-            지금은 피드백 각!
-          </h2>
-        </div>
-
-        {/* TODO(이경환): 외부 구글 폼 URL 확정 후 href 교체 */}
-        <ButtonLink
-          href="https://forms.gle/placeholder"
-          target="_blank"
-          rel="noopener noreferrer"
-          variant="outlined"
-          colorScheme="secondary"
-          className="gap-xs py-sm pr-sm pl-lg rounded-sm"
-          rightIcon={<ChevronRightIcon />}
-          size="medium"
+    <div
+      className="relative w-full"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* 배너 슬라이드 영역 */}
+      <div className="relative h-[264px] w-full overflow-hidden rounded-sm">
+        {/* DefaultBanner — z-0, 항상 렌더링 */}
+        <motion.div
+          className="absolute inset-0"
+          animate={{ x: isDefault ? "0%" : "-100%", opacity: 1 }}
+          transition={{
+            x:
+              direction === "forward"
+                ? { duration: 0.6, ease: "easeInOut" as const }
+                : { duration: 0 },
+            opacity: { duration: 0 },
+          }}
+          style={{ zIndex: 0 }}
         >
-          피드백 남기기
-        </ButtonLink>
+          <DefaultBanner isHovered={isDefault && isHovered} />
+        </motion.div>
+
+        {/* FeedbackBanner — z-1, 항상 렌더링 */}
+        <motion.div
+          className="absolute inset-0"
+          initial={{ x: "100%", opacity: 0 }}
+          animate={{
+            x: isDefault ? "100%" : "0%",
+            opacity: isDefault ? 0 : 1,
+          }}
+          transition={{
+            x:
+              direction === "forward"
+                ? { type: "spring" as const, stiffness: 60, damping: 12 }
+                : { duration: 0, delay: 1 },
+            opacity:
+              direction === "backward"
+                ? { duration: 1, ease: "easeInOut" as const }
+                : { duration: 0 },
+          }}
+          style={{ zIndex: 1, pointerEvents: isDefault ? "none" : "auto" }}
+        >
+          <FeedbackBanner isHovered={!isDefault && isHovered} />
+        </motion.div>
       </div>
-    </section>
+
+      {/* 인디케이터 */}
+      {/* <div className="mt-md gap-xs flex justify-center">
+        {[0, 1].map((index) => (
+          <button
+            key={index}
+            type="button"
+            aria-label={`배너 ${index + 1}로 이동`}
+            className={`h-[6px] rounded-full transition-all duration-300 ${
+              index === activeIndex ? "bg-text-secondary w-[24px]" : "bg-surface-subtle w-[6px]"
+            }`}
+            onClick={() => {
+              goTo(index);
+              if (!isHovered) startAutoRoll();
+            }}
+          />
+        ))}
+      </div> */}
+    </div>
   );
 }

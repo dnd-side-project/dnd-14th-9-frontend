@@ -203,7 +203,9 @@ describe("RecommendedSectionContent", () => {
 
     render(<RecommendedSectionContent />);
 
-    expect(screen.getByText("테스터님을 위한 추천 세션")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /테스터\s*님을 위한 추천 세션/ })
+    ).toBeInTheDocument();
     expect(mockUseSuspenseMeForEdit).toHaveBeenCalledTimes(1);
     expect(mockRecommendedGrid).toHaveBeenCalledWith("DEVELOPMENT");
     expect(screen.queryByText("지금 바로 참여할 수 있는 세션")).not.toBeInTheDocument();

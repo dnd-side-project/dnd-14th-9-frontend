@@ -67,7 +67,7 @@ export function SearchFilterSection() {
           ref={inputRef}
           name="q"
           defaultValue={currentQuery}
-          placeholder="관심 있는 세션을 검색해 보세요"
+          placeholder="관심 분야의 세션을 검색해 보세요"
           onSearchClick={handleSearchClick}
         />
       </form>
