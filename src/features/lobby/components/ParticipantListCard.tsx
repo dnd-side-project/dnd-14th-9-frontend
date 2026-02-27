@@ -21,12 +21,14 @@ interface ParticipantListCardProps {
   sessionId: string;
   members: WaitingMember[];
   maxParticipants: number;
+  isHost: boolean;
 }
 
 export function ParticipantListCard({
   sessionId,
   members,
   maxParticipants,
+  isHost,
 }: ParticipantListCardProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isKicking, setIsKicking] = useState(false);
@@ -101,7 +103,7 @@ export function ParticipantListCard({
           <h2 className="text-text-primary text-2xl font-bold">참여자 목록</h2>
           <p className="text-text-secondary text-base">이번 세션에서 함께할 참여자들이에요</p>
         </div>
-        {!isKicking && (
+        {isHost && !isKicking && (
           <Button variant="outlined" colorScheme="primary" size="medium" onClick={handleStartKick}>
             강퇴 하기
           </Button>

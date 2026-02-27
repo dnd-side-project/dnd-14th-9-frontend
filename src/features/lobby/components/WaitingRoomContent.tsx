@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import dynamic from "next/dynamic";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
@@ -9,10 +11,12 @@ import { useIsAuthenticated, useMe } from "@/features/member/hooks/useMemberHook
 import { useSessionDetail, useWaitingRoom } from "@/features/session/hooks/useSessionHooks";
 import { useSessionStatusSSE } from "@/features/session/hooks/useSessionStatusSSE";
 import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
+import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
 import { useWaitingMembersSSE } from "../hooks/useWaitingMembersSSE";
 
 import { GoalAndTodoCard } from "./GoalAndTodoCard";
+import { KickedDialog } from "./KickedDialog";
 import { LobbyHeader } from "./LobbyHeader";
 import { ParticipantListCard } from "./ParticipantListCard";
 import { SessionInfoCard } from "./SessionInfoCard";
@@ -31,6 +35,9 @@ interface WaitingRoomContentProps {
 }
 
 export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
+  const [isKicked, setIsKicked] = useState(false);
+  const [wasParticipant, setWasParticipant] = useState(false);
+
   const { showLeaveDialog, setShowLeaveDialog, isLeavingRef } = usePreventBackNavigation();
 
   const isAuthenticated = useIsAuthenticated();
@@ -40,6 +47,8 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   const { data: initialWaitingData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId);
   // 실시간 업데이트: SSE로 수신
   const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
+
+  const myMemberId = meData?.result?.id;
 
   // 세션 상태 SSE - 대기 상태가 아니면 적절한 페이지로 이동
   // hard navigation을 사용하여 modal interceptor routing 우회
@@ -54,6 +63,28 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
       }
     },
   });
+
+  // 참여 여부 확인 (useEffect보다 먼저 계산)
+  const isParticipant =
+    initialWaitingData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false;
+
+  // 한번 참여자로 확인되면 wasParticipant를 true로 유지 (나가기 시 flash 방지)
+  if (isParticipant && !wasParticipant) {
+    setWasParticipant(true);
+  }
+
+  // SSE를 통한 강퇴 감지 (참여자였는데 멤버 목록에서 사라진 경우)
+  if (wasParticipant && sseWaitingData && myMemberId && !isKicked) {
+    const isStillMember = sseWaitingData.members.some((m) => m.memberId === myMemberId);
+    if (!isStillMember) {
+      setIsKicked(true);
+    }
+  }
+
+  // 강퇴된 경우 dialog 표시
+  if (isKicked) {
+    return <KickedDialog onConfirm={() => navigateWithHardReload("/")} />;
+  }
 
   if (isLoading || (isAuthenticated && isWaitingRoomLoading)) {
     return (
@@ -90,14 +121,8 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
     );
   }
 
-  const myMemberId = meData?.result?.id;
-
-  // 참여 여부 확인
-  const isParticipant =
-    initialWaitingData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false;
-
-  // 미참여자 → SessionJoinModal 표시
-  if (!isParticipant) {
+  // 미참여자 → SessionJoinModal 표시 (이전에 참여자였으면 표시 안 함)
+  if (!isParticipant && !wasParticipant) {
     return <SessionJoinModal sessionId={sessionId} onClose={() => window.location.replace("/")} />;
   }
   // 참여자 목록: SSE 데이터가 있으면 우선, 없으면 초기 REST API 데이터 사용
@@ -108,6 +133,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   const myTask =
     initialWaitingData?.result?.members?.find((m) => m.memberId === myMemberId)?.task ?? null;
   const maxParticipants = session.maxParticipants;
+  const isHost = members.some((m) => m.memberId === myMemberId && m.role === "HOST");
 
   return (
     <>
@@ -129,6 +155,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
             sessionId={sessionId}
             members={members}
             maxParticipants={maxParticipants}
+            isHost={isHost}
           />
         </div>
       </div>
