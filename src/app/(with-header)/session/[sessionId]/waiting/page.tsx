@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
@@ -6,7 +5,7 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { WaitingRoomContent } from "@/features/lobby/components/WaitingRoomContent";
 import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
 import { isInProgressStatus } from "@/features/session/types";
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+import { hasAuthCookies } from "@/lib/auth/hasAuthCookies";
 import { getQueryClient } from "@/lib/getQueryClient";
 
 export const metadata = { title: "대기실" };
@@ -26,12 +25,7 @@ export default async function WaitingRoomPage({ params }: WaitingRoomPageProps) 
     redirect(`/session/${sessionId}`);
   }
 
-  const cookieStore = await cookies();
-  const hasAuthCookie = Boolean(
-    cookieStore.get(ACCESS_TOKEN_COOKIE)?.value || cookieStore.get(REFRESH_TOKEN_COOKIE)?.value
-  );
-
-  if (hasAuthCookie) {
+  if (await hasAuthCookies()) {
     await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
   }
 
