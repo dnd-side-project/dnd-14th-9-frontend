@@ -5,11 +5,13 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
+import { ShareIcon } from "@/components/Icon/ShareIcon";
 import { PaginationList } from "@/components/Pagination/PaginationList";
 
 import { SESSION_LIST_PAGE_SIZE } from "../../constants/pagination";
 import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
 import { useSessionListFilters } from "../../hooks/useSessionListFilters";
+import { useShareSession } from "../../hooks/useShareSession";
 import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
 import { Card } from "../Card/Card";
 
@@ -35,6 +37,7 @@ export function SessionList() {
     resetFilters,
   } = useSessionListFilters();
   const searchParams = useSearchParams();
+  const { shareSession } = useShareSession();
 
   // URL 파라미터 파싱
   const { keyword, category, page } = parseSessionListSearchParams(searchParams);
@@ -88,19 +91,29 @@ export function SessionList() {
       ) : (
         <div className="grid grid-cols-4 gap-x-[24px] gap-y-[48px]">
           {sessions.map((session) => (
-            <Link key={session.sessionId} href={`/session/${session.sessionId}`} scroll={false}>
-              <Card
-                thumbnailSrc={session.imageUrl}
-                category={session.category}
-                createdAt={session.startTime}
-                title={session.title}
-                nickname={session.hostNickname}
-                currentParticipants={session.currentParticipants}
-                maxParticipants={session.maxParticipants}
-                durationMinutes={session.sessionDurationMinutes}
-                sessionDate={session.startTime}
-              />
-            </Link>
+            <div key={session.sessionId} className="relative">
+              <Link href={`/session/${session.sessionId}`} scroll={false}>
+                <Card
+                  thumbnailSrc={session.imageUrl}
+                  category={session.category}
+                  createdAt={session.startTime}
+                  title={session.title}
+                  nickname={session.hostNickname}
+                  currentParticipants={session.currentParticipants}
+                  maxParticipants={session.maxParticipants}
+                  durationMinutes={session.sessionDurationMinutes}
+                  sessionDate={session.startTime}
+                />
+              </Link>
+              <button
+                type="button"
+                className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 flex cursor-pointer items-center justify-center rounded-full p-1.5 backdrop-blur-sm transition-colors"
+                onClick={() => shareSession(session.sessionId)}
+                aria-label="세션 링크 복사"
+              >
+                <ShareIcon size="small" className="text-text-secondary" />
+              </button>
+            </div>
           ))}
         </div>
       )}
