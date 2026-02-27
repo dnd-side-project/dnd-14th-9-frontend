@@ -6,7 +6,13 @@
  * 추가 query/mutation(report, join, setGoal, addTodos, toggleTodo)은 별도 구현합니다.
  */
 
-import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+  queryOptions,
+} from "@tanstack/react-query";
 
 import { createCrudHooks } from "@/hooks/createCrudHooks";
 import { ApiError } from "@/lib/api/api-client";
@@ -56,6 +62,19 @@ export const sessionKeys = {
   waitingRoom: (id: string) => ["session", "waitingRoom", id] as const,
   inProgress: (id: string) => ["session", "inProgress", id] as const,
   myReport: (id: string) => ["session", "myReport", id] as const,
+};
+
+export const sessionQueries = {
+  detail: (sessionId: string) =>
+    queryOptions({
+      queryKey: sessionKeys.detail(sessionId),
+      queryFn: () => sessionApi.getDetail(sessionId),
+    }),
+  waitingRoom: (sessionId: string) =>
+    queryOptions({
+      queryKey: sessionKeys.waitingRoom(sessionId),
+      queryFn: () => sessionApi.getWaitingRoom(sessionId),
+    }),
 };
 
 export const useSessionList = sessionCrud.useList;
