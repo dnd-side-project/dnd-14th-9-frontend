@@ -1,8 +1,11 @@
-export function getSessionShareUrl(sessionId: string): string {
+import { encodeBase62 } from "./base62";
+
+export function getSessionShareUrl(sessionId: number): string {
   const baseUrl =
     typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL;
 
-  return `${baseUrl}/session/${sessionId}`;
+  const code = encodeBase62(sessionId);
+  return `${baseUrl}/s/${code}`;
 }
 
 type QueryParamValue = string | number | boolean | undefined | null;
