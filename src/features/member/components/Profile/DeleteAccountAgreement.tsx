@@ -1,18 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { cn } from "@/lib/utils/utils";
 
 interface CheckboxItemProps {
-  id: string;
   label: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
 }
 
-function CheckboxItem({ id, label, checked, onChange }: CheckboxItemProps) {
+function CheckboxItem({ label, checked, onChange }: CheckboxItemProps) {
   return (
     <button
       type="button"
@@ -47,23 +46,21 @@ export function DeleteAccountAgreement({ onAgreementChange }: DeleteAccountAgree
   });
 
   const handleToggle = (key: keyof typeof agreements) => {
-    setAgreements((prev) => {
-      const next = { ...prev, [key]: !prev[key] };
-      onAgreementChange?.(Object.values(next).every(Boolean));
-      return next;
-    });
+    setAgreements((prev) => ({ ...prev, [key]: !prev[key] }));
   };
+
+  useEffect(() => {
+    onAgreementChange?.(Object.values(agreements).every(Boolean));
+  }, [agreements, onAgreementChange]);
 
   return (
     <div className="gap-md flex flex-col">
       <CheckboxItem
-        id="notice"
         label="회원 탈퇴 이후 참여 세션 기록, 목표 및 통계 데이터가 영구적으로 삭제됨을 이해하고 동의합니다."
         checked={agreements.notice}
         onChange={() => handleToggle("notice")}
       />
       <CheckboxItem
-        id="data"
         label="계정 및 프로필 정보가 모두 삭제되며 복구할 수 없음에 동의합니다."
         checked={agreements.data}
         onChange={() => handleToggle("data")}
