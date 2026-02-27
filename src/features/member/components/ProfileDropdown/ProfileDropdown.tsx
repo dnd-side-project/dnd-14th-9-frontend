@@ -15,15 +15,13 @@ import { useProfileDropdownDialog } from "../../hooks/useProfileDropdownDialog";
 
 import { ProfilePopupSkeleton } from "./ProfilePopupSkeleton";
 
-function PopupStatusMessage({
-  children,
-  icon,
-  variant = "default",
-}: {
+interface PopupStatusMessageProps {
   children: ReactNode;
   icon?: ReactNode;
   variant?: "default" | "error";
-}) {
+}
+
+function PopupStatusMessage({ children, icon, variant = "default" }: PopupStatusMessageProps) {
   return (
     <div className="border-border-default bg-surface-default min-w-[220px] rounded-md border p-4">
       <div
