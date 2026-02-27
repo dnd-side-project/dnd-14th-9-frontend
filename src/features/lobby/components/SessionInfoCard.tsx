@@ -1,8 +1,10 @@
 import { CalendarIcon } from "@/components/Icon/CalendarIcon";
 import { ClockIcon } from "@/components/Icon/ClockIcon";
+import { ShareIcon } from "@/components/Icon/ShareIcon";
 import { UsersIcon } from "@/components/Icon/UsersIcon";
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
 import { Thumbnail } from "@/components/Thumbnail/Thumbnail";
+import { useShareSession } from "@/features/session/hooks/useShareSession";
 import type { SessionDetailResponse } from "@/features/session/types";
 import { formatSessionDateTime } from "@/lib/utils/date";
 import { formatParticipantCount, formatSessionDuration } from "@/lib/utils/format";
@@ -12,6 +14,7 @@ interface SessionInfoCardProps {
 }
 
 export function SessionInfoCard({ session }: SessionInfoCardProps) {
+  const { shareSession } = useShareSession();
   const requiredAchievementRate = session.requiredAchievementRate ?? 0;
   const requiredFocusRate = session.requiredFocusRate ?? 0;
 
@@ -19,7 +22,17 @@ export function SessionInfoCard({ session }: SessionInfoCardProps) {
     <section className="gap-lg p-lg border-gray flex flex-col rounded-lg border">
       <div className="gap-lg flex">
         <div className="gap-sm flex flex-1 flex-col">
-          <h2 className="text-2xl font-bold text-gray-50">{session.title}</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-50">{session.title}</h2>
+            <button
+              type="button"
+              onClick={() => shareSession(session.sessionId)}
+              className="text-text-muted hover:text-text-primary cursor-pointer rounded-sm p-1 transition-colors"
+              aria-label="세션 링크 복사"
+            >
+              <ShareIcon size="small" />
+            </button>
+          </div>
           <p className="text-base text-gray-200">{session.summary}</p>
           <div className="flex items-center gap-4 text-base text-gray-400">
             <span className="flex items-center gap-1">
