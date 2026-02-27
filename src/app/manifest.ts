@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { FAVICON_DEFAULT, PWA_ICON_192, PWA_ICON_512 } from "@/lib/constants/assets";
 import { SITE_SHORT_DESCRIPTION, SITE_TITLE } from "@/lib/constants/seo";
 
 export default function manifest(): MetadataRoute.Manifest {
@@ -15,10 +16,10 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#000000",
     theme_color: "#000000",
     icons: [
-      { src: "/favicon.ico", sizes: "any", type: "image/x-icon" },
-      { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
-      { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: FAVICON_DEFAULT, sizes: "any", type: "image/x-icon" },
+      { src: PWA_ICON_192, sizes: "192x192", type: "image/png" },
+      { src: PWA_ICON_512, sizes: "512x512", type: "image/png" },
+      { src: PWA_ICON_512, sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }
