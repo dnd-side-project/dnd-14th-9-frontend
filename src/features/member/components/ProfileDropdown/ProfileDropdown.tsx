@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
@@ -7,18 +9,41 @@ import { Avatar } from "@/components/Avatar/Avatar";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { useLogout } from "@/features/auth/hooks/useAuthHooks";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
+import { cn } from "@/lib/utils/utils";
 
 import { useProfileDropdownDialog } from "../../hooks/useProfileDropdownDialog";
+
+import { ProfilePopupSkeleton } from "./ProfilePopupSkeleton";
+
+function PopupStatusMessage({
+  children,
+  icon,
+  variant = "default",
+}: {
+  children: ReactNode;
+  icon?: ReactNode;
+  variant?: "default" | "error";
+}) {
+  return (
+    <div className="border-border-default bg-surface-default min-w-[220px] rounded-md border p-4">
+      <div
+        className={cn(
+          "flex items-center gap-2 text-sm",
+          variant === "error" ? "text-red-400" : "text-text-secondary"
+        )}
+      >
+        {icon}
+        {children}
+      </div>
+    </div>
+  );
+}
 
 const loadProfilePopup = () => import("@/features/member/components/ProfileDropdown/ProfilePopup");
 
 const ProfilePopup = dynamic(() => loadProfilePopup().then((mod) => mod.ProfilePopup), {
   ssr: false,
-  loading: () => (
-    <div className="bg-surface-default text-text-secondary min-w-[220px] rounded-md border border-gray-700 p-4 text-sm">
-      프로필 정보를 불러오는 중입니다.
-    </div>
-  ),
+  loading: () => <ProfilePopupSkeleton />,
 });
 
 export function ProfileDropdown() {
@@ -54,27 +79,29 @@ export function ProfileDropdown() {
     void loadProfilePopup();
   };
 
-  const popupContent = isPending ? (
-    <div className="bg-surface-default text-text-secondary min-w-[220px] rounded-md border border-gray-700 p-4 text-sm">
-      프로필 정보를 불러오는 중입니다.
-    </div>
-  ) : isError ? (
-    <div className="bg-surface-default min-w-[220px] rounded-md border border-gray-700 p-4">
-      <div className="flex items-center gap-2 text-sm text-red-400">
-        <AlertIcon className="h-4 w-4 shrink-0" />
-        프로필 정보를 불러오지 못했습니다.
-      </div>
-    </div>
-  ) : !profile ? (
-    <div className="bg-surface-default min-w-[220px] rounded-md border border-gray-700 p-4">
-      <div className="text-text-secondary flex items-center gap-2 text-sm">
-        <AlertIcon className="h-4 w-4 shrink-0" />
-        프로필 정보가 없습니다.
-      </div>
-    </div>
-  ) : (
-    <ProfilePopup profile={profile} onClose={closeDropdown} onLogoutClick={handleLogout} />
-  );
+  const renderPopupContent = () => {
+    if (isPending) {
+      return <ProfilePopupSkeleton />;
+    }
+
+    if (isError) {
+      return (
+        <PopupStatusMessage variant="error" icon={<AlertIcon className="h-4 w-4 shrink-0" />}>
+          프로필 정보를 불러오지 못했습니다.
+        </PopupStatusMessage>
+      );
+    }
+
+    if (!profile) {
+      return (
+        <PopupStatusMessage icon={<AlertIcon className="h-4 w-4 shrink-0" />}>
+          프로필 정보가 없습니다.
+        </PopupStatusMessage>
+      );
+    }
+
+    return <ProfilePopup profile={profile} onClose={closeDropdown} onLogoutClick={handleLogout} />;
+  };
 
   return (
     <div ref={containerRef} className="relative z-50">
@@ -112,7 +139,7 @@ export function ProfileDropdown() {
           <h2 id={dialogTitleId} className="sr-only">
             프로필 메뉴
           </h2>
-          {popupContent}
+          {renderPopupContent()}
         </div>
       )}
     </div>
