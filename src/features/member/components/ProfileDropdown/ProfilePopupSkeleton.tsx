@@ -1,5 +1,8 @@
 import { cn } from "@/lib/utils/utils";
 
+const SKELETON_INTEREST_COUNT = 3;
+const SKELETON_MENU_COUNT = 2;
+
 interface ProfilePopupSkeletonProps {
   className?: string;
 }
@@ -27,7 +30,7 @@ export function ProfilePopupSkeleton({ className }: ProfilePopupSkeletonProps) {
       <div className="gap-md flex flex-col">
         {/* InterestBadges */}
         <div className="gap-xs flex">
-          {[1, 2, 3].map((i) => (
+          {Array.from({ length: SKELETON_INTEREST_COUNT }, (_, i) => (
             <div key={i} className="gap-xs flex items-center">
               <div className="bg-surface-strong h-4 w-8 rounded-md" />
               <div className="bg-surface-strong h-6 w-14 rounded-full" />
@@ -56,7 +59,7 @@ export function ProfilePopupSkeleton({ className }: ProfilePopupSkeletonProps) {
         </div>
 
         {/* MenuLinks */}
-        {[1, 2].map((i) => (
+        {Array.from({ length: SKELETON_MENU_COUNT }, (_, i) => (
           <div
             key={i}
             className="border-border-default bg-surface-default pr-md pl-lg py-md flex items-center rounded-md border"
