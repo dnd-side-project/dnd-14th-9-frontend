@@ -107,7 +107,7 @@ export function SessionList() {
               </Link>
               <button
                 type="button"
-                className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 cursor-pointer rounded-full p-1.5 backdrop-blur-sm transition-colors"
+                className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 flex cursor-pointer items-center justify-center rounded-full p-1.5 backdrop-blur-sm transition-colors"
                 onClick={() => shareSession(session.sessionId)}
                 aria-label="세션 링크 복사"
               >
