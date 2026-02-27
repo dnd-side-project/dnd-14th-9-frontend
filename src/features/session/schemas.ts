@@ -47,6 +47,8 @@ export const createSessionFormSchema = z.object({
   maxParticipants: z.number().min(SESSION_PARTICIPANTS_MIN).max(SESSION_PARTICIPANTS_MAX),
 
   requiredAchievementRate: z.number().min(0).max(100).default(0),
+
+  requiredFocusRate: z.number().min(0).max(100).default(0),
 });
 
 export type CreateSessionFormData = z.infer<typeof createSessionFormSchema>;
