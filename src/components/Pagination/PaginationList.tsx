@@ -45,8 +45,10 @@ export function PaginationList({
         onClick={goToPreviousPage}
         disabled={isFirstPage}
         className={cn(
-          "text-text-disabled flex items-center gap-2 text-base transition-colors",
-          isFirstPage ? "cursor-not-allowed opacity-50" : "hover:text-text-secondary cursor-pointer"
+          "text-text-muted text-semibold px-sm py-xs flex items-center gap-2 rounded-[8px] transition-colors",
+          isFirstPage
+            ? "cursor-not-allowed opacity-50"
+            : "hover:text-text-secondary active:bg-surface-strong cursor-pointer"
         )}
         aria-label="Previous page"
       >
@@ -76,9 +78,9 @@ export function PaginationList({
               onClick={() => handlePageChange(page)}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "font-regular flex size-8 items-center justify-center rounded-[8px] text-base transition-colors",
+                "text-semibold px-sm py-xs flex items-center justify-center rounded-[8px] leading-4 transition-colors",
                 isActive
-                  ? "bg-surface-subtle text-text-primary cursor-default"
+                  ? "bg-surface-strong text-text-primary cursor-default"
                   : "text-text-disabled hover:bg-surface-subtle cursor-pointer"
               )}
             >
@@ -93,8 +95,10 @@ export function PaginationList({
         onClick={goToNextPage}
         disabled={isLastPage}
         className={cn(
-          "text-text-disabled flex items-center gap-2 text-base transition-colors",
-          isLastPage ? "cursor-not-allowed opacity-50" : "hover:text-text-secondary cursor-pointer"
+          "text-text-muted text-semibold px-sm py-xs flex items-center gap-2 rounded-[8px] transition-colors",
+          isLastPage
+            ? "cursor-not-allowed opacity-50"
+            : "hover:text-text-secondary active:bg-surface-strong cursor-pointer"
         )}
         aria-label="Next page"
       >

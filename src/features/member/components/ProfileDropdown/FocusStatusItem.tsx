@@ -25,7 +25,7 @@ export function FocusStatusItem({
       <div className="flex items-center justify-between">
         <div className="gap-2xs flex h-[56px] w-[241px] flex-col items-start">
           <p className="text-text-primary text-xs font-semibold">집중도</p>
-          <p className="font-pretendard text-text-brand-subtle text-lg leading-[1.4]">
+          <p className="text-text-brand-subtle text-lg leading-[1.4]">
             <span className="font-bold">총 {focusedTime}분 </span>
             <span className="text-text-muted text-sm font-semibold">
               / {totalParticipationTime}분
@@ -40,7 +40,7 @@ export function FocusStatusItem({
             trackClassName="stroke-border-inverse"
             progressClassName="stroke-text-brand-subtle"
           >
-            <span className="font-pretendard text-text-brand-subtle text-sm font-semibold">
+            <span className="text-text-brand-subtle text-sm font-semibold">
               {Math.round(focusPercentage)}%
             </span>
           </ProgressRing>
@@ -58,7 +58,7 @@ export function FocusStatusItem({
             <span className="text-text-brand-default text-lg font-semibold">
               {Math.round(todoPercentage)}%
             </span>
-            <span className="font-pretendard text-text-muted text-xs font-semibold">
+            <span className="text-text-muted text-xs font-semibold">
               {completedTodoCount}/{totalTodoCount}
             </span>
           </div>

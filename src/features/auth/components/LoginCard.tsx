@@ -23,18 +23,16 @@ export function LoginCard({ reasonMessage, nextPath, onClose }: LoginCardProps) 
 
       <div className="w-full">
         <div className="mb-lg gap-2xs flex flex-col text-left">
-          <h2 className="font-pretendard text-text-primary text-2xl leading-[140%] font-semibold">
+          <h2 className="text-text-primary text-2xl leading-[140%] font-semibold">
             회원가입 / 로그인
           </h2>
-          <p className="font-pretendard text-text-secondary text-base leading-[140%] font-normal">
+          <p className="text-text-secondary text-base leading-[140%] font-normal">
             쉽게 가입하고 간편하게 로그인하세요!
           </p>
         </div>
 
         {reasonMessage ? (
-          <p className="font-pretendard text-text-status-negative-default text-left text-sm">
-            {reasonMessage}
-          </p>
+          <p className="text-text-status-negative-default text-left text-sm">{reasonMessage}</p>
         ) : null}
       </div>
 

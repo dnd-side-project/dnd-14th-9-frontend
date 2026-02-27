@@ -28,7 +28,7 @@ export function ProfileTabs() {
                 : "text-text-muted hover:text-text-primary mb-[-2px] border-transparent"
             )}
           >
-            <span className="font-pretendard text-base font-semibold">{tab.name}</span>
+            <span className="text-base font-semibold">{tab.name}</span>
           </Link>
         );
       })}

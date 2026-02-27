@@ -33,7 +33,6 @@ const searchInputVariants = cva(
     "text-gray-50",
     "text-base",
     "font-weight-semibold",
-    "font-pretendard",
     "placeholder:text-gray-300",
     "focus:outline-none",
     "min-w-0",

@@ -51,6 +51,12 @@ export function SessionListFilterBar({
 
   const dateFilterLabel = formatDateRangeFilterLabel(selectedDateRange);
   const hasDateSelection = Boolean(selectedDateRange.startDate);
+  const hasTimeSlotSelection = values.timeSlots.length > 0;
+  const hasDurationSelection = Boolean(values.durationRange);
+  const hasParticipantsSelection = Boolean(values.participants);
+
+  const hasAnyFilter =
+    hasDateSelection || hasTimeSlotSelection || hasDurationSelection || hasParticipantsSelection;
 
   const handleDateRangeChange = (range: DateRange) => {
     onSetDateRange(range.startDate, range.endDate);
@@ -82,7 +88,7 @@ export function SessionListFilterBar({
         <div className="bg-overlay-default fixed inset-0 z-10 w-full" />
       )}
       <div className="gap-md relative z-20 flex flex-col">
-        <div className="gap-xs flex items-center justify-end">
+        <div className="flex items-center justify-end">
           <div className="flex items-center gap-[15px]">
             <DateRangeFilter
               isOpen={isDatePickerOpen}
@@ -114,15 +120,21 @@ export function SessionListFilterBar({
               onChange={onSetParticipants}
             />
           </div>
-          <Button
-            size="small"
-            variant="ghost"
-            colorScheme="secondary"
-            iconOnly
-            leftIcon={<ArrowRotateRightIcon />}
-            className="text-text-tertiary hover:text-text-primary active:bg-surface-strong active:text-text-primary h-[32px] w-[32px] p-[8px]!"
-            onClick={onResetFilters}
-          />
+          <div
+            className={`flex items-center overflow-hidden transition-all duration-300 ease-in-out ${
+              hasAnyFilter ? "ml-xs max-w-[40px] opacity-100" : "ml-0 max-w-0 opacity-0"
+            }`}
+          >
+            <Button
+              size="small"
+              variant="ghost"
+              colorScheme="secondary"
+              iconOnly
+              leftIcon={<ArrowRotateRightIcon />}
+              className="text-text-tertiary hover:text-text-primary active:bg-surface-strong active:text-text-primary h-[32px] w-[32px] shrink-0 p-[8px]!"
+              onClick={onResetFilters}
+            />
+          </div>
         </div>
 
         <SortFilter
