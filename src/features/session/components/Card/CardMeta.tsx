@@ -23,19 +23,19 @@ export function CardMeta({
   return (
     <div
       className={cn(
-        "text-text-disabled flex items-center gap-4 text-[11px] leading-none",
+        "text-text-disabled flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] leading-none",
         className
       )}
     >
-      <span className="flex items-center gap-1">
+      <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
         <UsersIcon size="xsmall" />
         <span>{formatParticipantCount(currentParticipants, maxParticipants)}</span>
       </span>
-      <span className="flex items-center gap-1">
+      <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
         <ClockIcon size="xsmall" />
         <span>{formatSessionDuration(durationMinutes)}</span>
       </span>
-      <span className="flex items-center gap-1">
+      <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
         <CalendarIcon size="xsmall" />
         <span>{formatSessionDateTime(sessionDate)}</span>
       </span>
