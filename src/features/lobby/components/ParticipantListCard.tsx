@@ -13,6 +13,8 @@ import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { toast } from "@/lib/toast";
 
+import { KickConfirmDialog } from "./KickConfirmDialog";
+
 import type { WaitingMember } from "../types";
 
 interface ParticipantListCardProps {
@@ -29,6 +31,8 @@ export function ParticipantListCard({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isKicking, setIsKicking] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [showKickDialog, setShowKickDialog] = useState(false);
+  const [kickServerError, setKickServerError] = useState<string | null>(null);
 
   const kickMembersMutation = useKickMembers();
 
@@ -46,20 +50,32 @@ export function ParticipantListCard({
     setSelectedIds(new Set());
   };
 
-  const handleConfirmKick = () => {
+  const handleOpenKickDialog = () => {
     if (selectedIds.size === 0) return;
+    setKickServerError(null);
+    setShowKickDialog(true);
+  };
 
+  const handleCloseKickDialog = () => {
+    setShowKickDialog(false);
+    setKickServerError(null);
+  };
+
+  const handleConfirmKick = () => {
+    setKickServerError(null);
     const memberIds = Array.from(selectedIds).map(Number);
     kickMembersMutation.mutate(
       { sessionId, memberIds },
       {
         onSuccess: () => {
+          setShowKickDialog(false);
           setIsKicking(false);
           setSelectedIds(new Set());
+          toast.success("강퇴 되었습니다.");
         },
         onError: (error) => {
           const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
-          toast.error(message);
+          setKickServerError(message);
         },
       }
     );
@@ -220,12 +236,21 @@ export function ParticipantListCard({
             colorScheme="primary"
             size="medium"
             className="flex-1"
-            onClick={handleConfirmKick}
-            disabled={kickMembersMutation.isPending || selectedIds.size === 0}
+            onClick={handleOpenKickDialog}
+            disabled={selectedIds.size === 0}
           >
-            {kickMembersMutation.isPending ? "강퇴 중..." : "강퇴하기"}
+            강퇴하기
           </Button>
         </div>
+      )}
+
+      {showKickDialog && (
+        <KickConfirmDialog
+          onClose={handleCloseKickDialog}
+          onConfirm={handleConfirmKick}
+          isPending={kickMembersMutation.isPending}
+          serverError={kickServerError}
+        />
       )}
     </div>
   );
