@@ -13,6 +13,7 @@ interface LobbyHeaderProps {
   onShowDialog: () => void;
   onCloseDialog: () => void;
   isLeavingRef: React.MutableRefObject<boolean>;
+  onLeaveStart: () => void;
 }
 
 export function LobbyHeader({
@@ -21,6 +22,7 @@ export function LobbyHeader({
   onShowDialog,
   onCloseDialog,
   isLeavingRef,
+  onLeaveStart,
 }: LobbyHeaderProps) {
   const leaveButtonRef = useRef<HTMLButtonElement>(null);
   const { handleLeave, isPending, serverError } = useLeaveSessionHandler({
@@ -68,7 +70,10 @@ export function LobbyHeader({
             onCloseDialog();
             leaveButtonRef.current?.focus();
           }}
-          onConfirm={handleLeave}
+          onConfirm={() => {
+            onLeaveStart();
+            handleLeave();
+          }}
           isPending={isPending}
           serverError={serverError}
         />
