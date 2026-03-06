@@ -1,140 +1,174 @@
 # GAK (모여서 각자 작업)
 
-![Project Status](https://img.shields.io/badge/status-active-success)
+![MVP](https://img.shields.io/badge/MVP-v1-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-16.1.4-black)
+![React](https://img.shields.io/badge/React-19.2.3-149eca)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38b2ac)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-> **"혼자 하면 흐트러지기 쉬운 작업 시간, 누구나 빠르게 모각작 모임을 생성하고 함께할 사람들을 모을 수 있는 웹 기반 플랫폼"**
+> 링크 하나로 빠르게 모여서, 제한된 시간 동안 각자 작업에 몰입하는 협업 플랫폼
 
-## 📝 개요
+## MVP 상태
 
-**GAK**은 시간 제한, 개인 목표 설정, 상호 결과 검증을 통해 제한된 상호작용 속에서도 높은 집중도를 유지하며 짧고 밀도 있는 작업 세션을 제공하는 서비스입니다.
+- 2026년 3월 기준 1차 MVP 개발 완료
+- 단일 README에서 서비스 가치, 구현 범위, 재현 방법, 품질 검증 근거를 함께 제공
+- 1순위 독자: 채용/포트폴리오 리뷰어 및 신규 기여자
 
-복잡한 절차 없이 **링크 공유** 하나만으로 즉시 모여서 작업에 몰입할 수 있는 환경을 만듭니다.
+## 핵심 사용자 흐름 (현재 구현 기준)
 
----
+1. **로그인**
+   - Google / Kakao OAuth 로그인
+2. **세션 탐색 및 생성**
+   - 홈에서 세션 검색/필터/추천 목록 조회
+   - 세션 생성 폼으로 카테고리, 시작 시간, 진행 시간, 목표 기준 설정
+3. **세션 참여 및 대기방**
+   - 목표/할 일 설정 후 입장
+   - 대기 인원 상태를 SSE로 실시간 반영
+4. **세션 진행**
+   - 동기화된 타이머 기반 집중 진행
+   - 참여자 상태(집중/자리 비움), 할 일 진행률, 리액션 이벤트 반영
+5. **세션 종료 및 결과**
+   - 집중 시간/참여 시간 제출
+   - 세션 결과 화면과 참여자 리포트 확인
+6. **프로필/마이페이지**
+   - 프로필 정보 수정, 관심 카테고리 관리
+   - 개인 리포트(세션 히스토리/통계) 확인
 
-## 🚩 배경 및 기획 의도
+## 현재 범위 외 (후속 계획)
 
-### 배경
+- 세션 내 실시간 채팅: 실험용 UI 컴포넌트만 존재, 현재 프로덕션 플로우에서는 비활성
+- BGM(노동요): 아직 미구현
 
-1. 개인 작업자들은 혼자 작업할 때 집중이 쉽게 깨집니다.
-2. 기존 모각작은 사전 관계 형성(연락처 공유 등)이 필요하여 진입 장벽이 높습니다.
-3. 지인 중심의 폐쇄적 모임이 많아 일회성·비정기적 참여가 어렵습니다.
+## 기술 스택
 
-### 해결하고자 하는 문제 (Hypothesis & Solution)
+| 분류            | 기술                                 |
+| --------------- | ------------------------------------ |
+| Framework       | Next.js 16 (App Router)              |
+| UI              | React 19, Tailwind CSS v4, Storybook |
+| Language        | TypeScript                           |
+| Data/State      | TanStack Query, Zustand              |
+| Validation/Form | Zod, React Hook Form                 |
+| Realtime        | SSE (Server-Sent Events)             |
+| Test            | Jest, Vitest, Testing Library        |
+| CI/CD           | GitHub Actions, Chromatic, Docker    |
 
-- **집중력 저하** → 작업 전 목표 선언과 공유된 타이머로 강제성 부여
-- **높은 진입 장벽** → 연락처 없이 링크만으로 참여 가능한 익명성 보장
-- **유연성 부족** → 방 생성과 종료가 명확한 시간 제한형 구조 제공
+## 아키텍처 요약
 
----
+1. **App Router 기반 렌더링**
+   - 페이지/레이아웃은 `src/app`에서 구성하고, 서버/클라이언트 컴포넌트를 역할에 따라 분리
+2. **BFF 레이어**
+   - `src/app/api/**/route.ts`에서 프런트 전용 API 경계를 제공
+   - `src/lib/api/api-route-forwarder.ts`를 통해 인증 쿠키 전달, 에러 응답 형식, 백엔드 요청 처리를 일관되게 관리
+3. **프록시 기반 인증 처리**
+   - `src/proxy.ts`에서 공개/보호 경로 분기, 토큰 만료 임박 시 리프레시 자동 시도
+4. **SSE 실시간 이벤트**
+   - 대기방/진행상태/리액션 이벤트를 `src/app/api/sse/**` + 클라이언트 훅으로 구독
+5. **데이터 계층**
+   - React Query 기반으로 도메인별 query key 규칙과 공통 훅 패턴을 사용해 조회/캐시 무효화 로직을 표준화
 
-## ✨ 주요 기능
+### 구조적 포인트
 
-### 1. 링크 기반 모각작 방 생성
+> 이 프로젝트는 기능 구현뿐 아니라, 프런트엔드에서 반복적으로 발생하는 API 호출/캐시 관리 문제를 일관된 규칙으로 다루는 데 초점을 맞췄습니다.
 
-- 작업 시간 설정 후 즉시 방 생성
-- 초대 링크를 통한 간편한 참여 (로그인/연락처 교환 불필요)
+- **API Layer**
+  - Route Handler와 공통 forwarder를 통해 인증 쿠키 전달, 백엔드 포워딩, 에러 응답 형식을 프런트 전용 API 경계에서 일관되게 관리합니다.
+- **Factory 기반 아키텍처**
+  - 반복되는 CRUD/Singleton Query 훅 패턴은 공통 factory 형태로 추상화해 도메인별 훅 구현에서 중복을 줄이고 동일한 사용 방식을 유지하도록 구성했습니다.
+- **Query Key 자동 생성 로직**
+  - 도메인별 query key는 계층 구조로 생성해 목록, 상세, 단일 리소스 캐시를 예측 가능한 규칙으로 무효화할 수 있도록 정리했습니다.
 
-### 2. 개인 목표 설정 및 입장
+## 시작하기
 
-- 세션 시작 전, 각자의 작업 목표 선언
-- 종료 후 상호 검증의 기준으로 활용
+### Prerequisites
 
-### 3. 시간 동기화 공동 작업
+- Node.js `22.21.1` (`.nvmrc`)
+- Corepack (Node.js 내장)
+- pnpm `10.27.0` (`packageManager`)
 
-- 모든 참여자의 타이머가 동기화되어 진행
-- 제한된 시간 동안 몰입 환경 제공
-
-### 4. 최소한의 상호작용
-
-- 작업 방해를 최소화하는 제한된 채팅
-- 함께 듣는 노동요(BGM) 기능
-
-### 5. 결과 검증 및 피드백
-
-- 타이머 종료 시 상호 목표 달성 여부 체크
-
----
-
-## 🛠️ 기술 스택
-
-| 분류          | 기술                                   | 비고                 |
-| ------------- | -------------------------------------- | -------------------- |
-| **Framework** | Next.js 16 (App Router)                |                      |
-| **Language**  | TypeScript                             |                      |
-| **Styling**   | Tailwind CSS 4, shadcn/ui              |                      |
-| **State Mgt** | React Query (Server), Zustand (Client) |                      |
-| **Form**      | React Hook Form + Zod                  |                      |
-| **Test**      | Jest, Vitest, Playwright               | Unit/Interaction/E2E |
-| **Docs**      | Storybook                              | UI 컴포넌트 문서화   |
-| **CI/CD**     | GitHub Actions                         | Docker 빌드 포함     |
-
----
-
-## 🚀 시작하기
-
-### 필요 조건 (Prerequisites)
-
-- [Node.js 22+](https://nodejs.org/)
-- [Corepack](https://nodejs.org/api/corepack.html) (Node.js 16.9+ 기본 포함)
-
-> **Note**: 이 프로젝트는 `packageManager` 필드를 통해 pnpm 버전을 강제합니다. Corepack을 활성화하면 자동으로 올바른 pnpm 버전이 사용됩니다.
-
-### 설치 및 실행
+### 설치 및 로컬 실행
 
 ```bash
 # 1. 저장소 클론
 git clone https://github.com/dnd-side-project/dnd-14th-9-frontend.git
+cd dnd-14th-9-frontend
 
-# 2. Corepack 활성화 (최초 1회)
+# 2. pnpm 활성화
 corepack enable
 
-# 3. 의존성 설치 (pnpm 버전 자동 관리)
+# 3. 의존성 설치
 pnpm install
 
-# 4. Husky 설정 (최초 1회)
+# 4. Git hooks 설정 (최초 1회)
 pnpm prepare
 
-# 5. 개발 서버 실행
+# 5. 개발 서버 실행 (토큰 빌드 watch + Next dev 동시 실행)
 pnpm dev
 ```
 
-### 환경 변수 설정
+### 주요 스크립트
 
-`.env.example`을 참고하여 `.env.local`을 설정해주세요.
-_(추후 필수 환경 변수 목록이 확정되면 업데이트 예정입니다)_
+| 명령어                 | 설명                                   |
+| ---------------------- | -------------------------------------- |
+| `pnpm dev`             | 토큰 watch + Next 개발 서버 실행       |
+| `pnpm build`           | 디자인 토큰 생성 후 프로덕션 빌드      |
+| `pnpm start`           | 프로덕션 서버 실행                     |
+| `pnpm storybook`       | Storybook 로컬 실행 (`:6006`)          |
+| `pnpm build-storybook` | Storybook 정적 빌드                    |
+| `pnpm test`            | Jest 테스트 실행                       |
+| `pnpm test:coverage`   | 커버리지 포함 테스트                   |
+| `pnpm lint`            | ESLint 검사                            |
+| `pnpm typecheck`       | TypeScript 타입 검사                   |
+| `pnpm codegen`         | Orval 기반 API 클라이언트 코드 생성    |
+| `pnpm tokens`          | Style Dictionary 기반 디자인 토큰 생성 |
 
----
+## 환경 변수 계약 (`.env.local`)
 
-## 📚 Storybook
+이 프로젝트는 `.env.example` 대신 실제 사용 키를 기준으로 환경을 구성합니다.  
+아래 키를 `.env.local`에 설정하세요.
 
-이 프로젝트는 UI 컴포넌트의 문서화와 독립적인 개발 환경을 위해 Storybook을 사용합니다.
+> 보안 원칙
+>
+> - 실제 토큰/시크릿 값은 절대 저장소에 커밋하지 않습니다.
+> - `NEXT_PUBLIC_*` 변수는 브라우저에 노출되므로 비밀값을 넣지 않습니다.
+> - `.env*`는 기본적으로 `.gitignore`에 포함되어 있습니다.
 
-### Storybook 실행
+| 키                                | 필수 | 예시                           | 용도                                               |
+| --------------------------------- | ---- | ------------------------------ | -------------------------------------------------- |
+| `BACKEND_API_BASE`                | 필수 | `https://<backend-api-origin>` | 서버 측 API 호출 기본 URL, 프록시 토큰 재발급 호출 |
+| `BACKEND_ORIGIN`                  | 필수 | `https://<backend-origin>`     | OAuth 인가 URL 생성 기준 origin                    |
+| `FRONTEND_ORIGIN`                 | 필수 | `http://localhost:3000`        | 서버 측 프런트 오리진 참조                         |
+| `NEXT_PUBLIC_BACKEND_API_BASE`    | 필수 | `https://<backend-api-origin>` | 클라이언트/API 호출 및 sitemap 데이터 소스         |
+| `NEXT_PUBLIC_BACKEND_ORIGIN`      | 필수 | `https://<backend-origin>`     | 백엔드 origin 공개값 (OAuth fallback)              |
+| `NEXT_PUBLIC_FRONTEND_ORIGIN`     | 필수 | `https://<frontend-origin>`    | SEO canonical, metadata base URL                   |
+| `NEXT_PUBLIC_ENABLE_DEVTOOLS`     | 선택 | `true`                         | 개발 환경 React Query Devtools 노출 제어           |
+| `NEXT_PUBLIC_GOOGLE_ANALYTICS`    | 선택 | `G-XXXXXXXXXX`                 | Google Analytics 스크립트 주입                     |
+| `NEXT_PUBLIC_GOOGLE_VERIFICATION` | 선택 | `<google-verification-token>`  | Google Search Console 검증                         |
+| `NEXT_PUBLIC_NAVER_VERIFICATION`  | 선택 | `<naver-verification-token>`   | 네이버 웹마스터 검증                               |
+| `NEXT_PUBLIC_WS_URL`              | 선택 | `ws://localhost:8080`          | 웹소켓 클라이언트 기본 주소                        |
+| `BACKEND_URL`                     | 선택 | `https://<backend-origin>`     | `BACKEND_ORIGIN` 미지정 시 fallback                |
+| `NEXT_PUBLIC_BACKEND_URL`         | 선택 | `https://<backend-origin>`     | `NEXT_PUBLIC_BACKEND_ORIGIN` 미지정 시 fallback    |
+| `NEXT_PUBLIC_API_URL`             | 선택 | `https://<backend-api-origin>` | API URL 호환용 fallback                            |
+| `NEXT_PUBLIC_APP_URL`             | 선택 | `http://localhost:3000`        | URL 유틸 함수 fallback                             |
 
-```bash
-# Storybook 개발 서버 실행 (포트 6006)
-pnpm storybook
-```
+## 품질 보증 현황 (2026-03-06 기준)
 
-브라우저에서 [http://localhost:6006](http://localhost:6006)으로 접속하여 컴포넌트를 확인할 수 있습니다.
+- **CI 파이프라인** (`.github/workflows/ci.yml`)
+  - `main` push 시 `lint` -> `test --ci --coverage` -> `build` -> `docker build` 실행
+- **UI 변경 검증** (`.github/workflows/chromatic.yml`)
+  - 스토리/디자인 토큰/스토리북 설정 변경 시 Chromatic 자동 실행
+- **테스트 및 스토리 자산 규모**
+  - 테스트 파일: `27`개 (`src/test/**`)
+  - 스토리 파일: `24`개 (`src/stories/**/*.stories.tsx|ts`)
+- **배포 빌드**
+  - Next.js standalone output + 멀티스테이지 Docker 빌드 구성
 
-### Storybook 빌드
+## 관련 링크
 
-```bash
-# Storybook 정적 파일 빌드
-pnpm build-storybook
-```
+- 서비스: [https://gak.today](https://gak.today)
+- API 문서: [https://api.gak.today/swagger-ui/index.html#/](https://api.gak.today/swagger-ui/index.html#/)
+- Figma: [https://www.figma.com/design/GoML3n63duEnEfUIE07xD7/GAK?node-id=385-4980&p=f&t=OpqQI31vIcVR6cop-0](https://www.figma.com/design/GoML3n63duEnEfUIE07xD7/GAK?node-id=385-4980&p=f&t=OpqQI31vIcVR6cop-0)
 
-빌드된 파일은 `storybook-static` 폴더에 생성됩니다.
-
----
-
-## 🤝 팀원 (Contributors)
+## 팀원 (Contributors)
 
 | 역할   | 이름   | GitHub                                              |
 | ------ | ------ | --------------------------------------------------- |
@@ -145,16 +179,6 @@ pnpm build-storybook
 | Design | 김시라 | -                                                   |
 | Design | 임세원 | -                                                   |
 
----
+## 라이선스
 
-## 관련 링크
-
-- **배포 URL**: _(준비 중)_
-- **API 문서**: _(준비 중)_
-- **디자인(Figma)**: _(준비 중)_
-
----
-
-## 📜 라이선스
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License. 자세한 내용은 [LICENSE](LICENSE)를 참고하세요.
