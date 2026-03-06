@@ -88,20 +88,20 @@
 ### 설치 및 로컬 실행
 
 ```bash
-# 1) 저장소 클론
+# 1. 저장소 클론
 git clone https://github.com/dnd-side-project/dnd-14th-9-frontend.git
 cd dnd-14th-9-frontend
 
-# 2) pnpm 활성화
+# 2. pnpm 활성화
 corepack enable
 
-# 3) 의존성 설치
+# 3. 의존성 설치
 pnpm install
 
-# 4) Git hooks 설정 (최초 1회)
+# 4. Git hooks 설정 (최초 1회)
 pnpm prepare
 
-# 5) 개발 서버 실행 (토큰 빌드 watch + Next dev 동시 실행)
+# 5. 개발 서버 실행 (토큰 빌드 watch + Next dev 동시 실행)
 pnpm dev
 ```
 
