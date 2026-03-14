@@ -1,17 +1,26 @@
 import {
+  COOKIE_POLICY_ROUTE,
+  FEEDBACK_ROUTE,
+  LOGIN_ROUTE,
+  PRIVACY_ROUTE,
+  ROOT_ROUTE,
+  TERMS_ROUTE,
+} from "@/lib/routes/route-paths";
+
+import {
   PROFILE_ROUTE_PREFIX,
   SESSION_CREATE_ROUTE,
   SESSION_MEMBER_ONLY_SUFFIXES,
 } from "./auth-route-groups";
 
 const KNOWN_PUBLIC_PAGE_ROUTE_PATTERNS = [
-  /^\/$/,
-  /^\/login$/,
-  /^\/feedback$/,
+  new RegExp(`^${ROOT_ROUTE}$`),
+  new RegExp(`^${LOGIN_ROUTE}$`),
+  new RegExp(`^${FEEDBACK_ROUTE}$`),
   /^\/session\/\d+$/,
-  /^\/terms$/,
-  /^\/privacy$/,
-  /^\/cookie-policy$/,
+  new RegExp(`^${TERMS_ROUTE}$`),
+  new RegExp(`^${PRIVACY_ROUTE}$`),
+  new RegExp(`^${COOKIE_POLICY_ROUTE}$`),
 ];
 
 const PROTECTED_PAGE_ROUTE_PATTERNS = [

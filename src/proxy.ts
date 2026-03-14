@@ -12,6 +12,7 @@ import { setRedirectAfterLoginCookie } from "@/lib/auth/redirect-after-login-coo
 import { isKnownPublicPageRoute, isProtectedPageRoute } from "@/lib/auth/route-access-policy";
 import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
+import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
 
 // 공개 API 라우트 (인증 불필요)
 const PUBLIC_API_ROUTE_PATTERNS = [
@@ -143,7 +144,7 @@ function redirectToLoginRoute(
 ): NextResponse {
   const loginUrl = options?.reason
     ? buildLoginRedirectUrl(request, options.reason)
-    : new URL("/login", request.url);
+    : new URL(LOGIN_ROUTE, request.url);
   const response = NextResponse.redirect(loginUrl);
   if (shouldPersistRedirectAfterLogin(request.nextUrl.pathname)) {
     setRedirectAfterLoginCookie(response, `${request.nextUrl.pathname}${request.nextUrl.search}`);

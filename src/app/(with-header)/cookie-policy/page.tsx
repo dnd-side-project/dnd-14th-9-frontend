@@ -1,11 +1,12 @@
 import Link from "next/link";
 
+import { COOKIE_POLICY_ROUTE, PRIVACY_ROUTE } from "@/lib/routes/route-paths";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
   title: "쿠키 정책",
   description: "GAK 서비스 쿠키 정책입니다.",
-  pathname: "/cookie-policy",
+  pathname: COOKIE_POLICY_ROUTE,
 });
 
 export default function CookiePolicyPage() {
@@ -162,7 +163,7 @@ export default function CookiePolicyPage() {
           </p>
           <p className="text-text-secondary mt-4 leading-7">
             개인정보 처리에 관한 자세한 내용은{" "}
-            <Link href="/privacy" className="text-text-brand-default underline">
+            <Link href={PRIVACY_ROUTE} className="text-text-brand-default underline">
               개인정보 처리방침
             </Link>
             을 참고해 주세요.

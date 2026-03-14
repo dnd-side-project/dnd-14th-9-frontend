@@ -12,6 +12,7 @@ import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
+import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
 import { toast } from "@/lib/toast";
 
 import {
@@ -120,7 +121,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     return (
       <div className="flex h-[calc(100vh-200px)] min-h-100 flex-col items-center justify-center gap-4">
         <p className="text-text-secondary text-lg">세션에 참여하려면 로그인이 필요합니다</p>
-        <ButtonLink href="/login" variant="solid" colorScheme="primary" size="medium">
+        <ButtonLink href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
           로그인하고 참여하기
         </ButtonLink>
       </div>

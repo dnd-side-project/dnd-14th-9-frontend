@@ -1,11 +1,12 @@
 import Link from "next/link";
 
+import { PRIVACY_ROUTE, TERMS_ROUTE } from "@/lib/routes/route-paths";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
   title: "이용약관",
   description: "GAK 서비스 이용약관입니다.",
-  pathname: "/terms",
+  pathname: TERMS_ROUTE,
 });
 
 export default function TermsPage() {
@@ -161,7 +162,7 @@ export default function TermsPage() {
             <li>이용자는 언제든지 서비스 내 설정을 통해 탈퇴를 요청할 수 있습니다.</li>
             <li>
               탈퇴 시 이용자의 개인정보는{" "}
-              <Link href="/privacy" className="text-text-brand-default underline">
+              <Link href={PRIVACY_ROUTE} className="text-text-brand-default underline">
                 개인정보 처리방침
               </Link>
               에 따라 처리됩니다.

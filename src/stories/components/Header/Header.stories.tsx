@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
 import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
+import { LOGIN_ROUTE, ROOT_ROUTE } from "@/lib/routes/route-paths";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { Viewport } from "storybook/viewport";
@@ -10,7 +11,7 @@ function HeaderStory({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <header className="border-border-subtle bg-surface-default px-lg md:px-xl md:py-sm mx-auto flex h-full max-w-[1280px] items-center justify-between border-b py-[15px] lg:px-[50px]">
       <Link
-        href="/"
+        href={ROOT_ROUTE}
         aria-label="홈으로 이동"
         className="text-common-white focus-visible:ring-primary text-[27px] leading-[120%] font-bold transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:outline-none"
       >
@@ -34,7 +35,7 @@ function HeaderStory({ isAuthenticated }: { isAuthenticated: boolean }) {
           </>
         ) : (
           <ButtonLink
-            href="/login"
+            href={LOGIN_ROUTE}
             aria-label="로그인"
             size="small"
             variant="outlined"

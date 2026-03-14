@@ -1,6 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import {
+  COOKIE_POLICY_ROUTE,
+  PRIVACY_ROUTE,
+  ROOT_ROUTE,
+  TERMS_ROUTE,
+} from "@/lib/routes/route-paths";
 import { getCurrentYear } from "@/lib/utils/date";
 
 /**
@@ -20,7 +26,7 @@ export function Footer() {
         <div className="gap-2xs md:gap-xs flex w-full flex-col items-start">
           {/* Logo */}
           <div className="p-sm flex flex-col items-start rounded-sm">
-            <Link href="/" aria-label="GAK 홈으로 이동">
+            <Link href={ROOT_ROUTE} aria-label="GAK 홈으로 이동">
               <Image
                 src="/footer-logo.svg"
                 alt="GAK"
@@ -37,7 +43,7 @@ export function Footer() {
             <ul className="md:gap-md flex flex-wrap items-center gap-[16px]">
               <li>
                 <Link
-                  href="/terms"
+                  href={TERMS_ROUTE}
                   className="text-text-muted hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-xs leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   이용약관
@@ -45,7 +51,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/privacy"
+                  href={PRIVACY_ROUTE}
                   className="text-text-disabled hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-xs leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   개인정보 처리방침
@@ -53,7 +59,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/cookie-policy"
+                  href={COOKIE_POLICY_ROUTE}
                   className="text-text-muted hover:text-text-primary focus-visible:ring-primary rounded-sm p-[8px] text-xs leading-[1.4] font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   쿠키 정책

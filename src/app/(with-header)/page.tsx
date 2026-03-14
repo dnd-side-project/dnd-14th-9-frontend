@@ -13,12 +13,13 @@ import {
   toURLSearchParams,
 } from "@/features/session/utils/parseSessionListSearchParams";
 import { SITE_TITLE } from "@/lib/constants/seo";
+import { ROOT_ROUTE } from "@/lib/routes/route-paths";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
   title: "홈",
   description: "모집 중인 모각작 세션을 찾아보고 참여하세요.",
-  pathname: "/",
+  pathname: ROOT_ROUTE,
   openGraph: {
     title: SITE_TITLE,
   },
