@@ -2,13 +2,13 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 import { setAuthCookies } from "@/lib/auth/auth-cookies";
+import { redirectToLogin } from "@/lib/auth/login-redirect-utils";
+import { isLoginProvider } from "@/lib/auth/oauth-provider-policy";
+import { getCallbackTokens } from "@/lib/auth/oauth-route-utils";
 import {
   consumeRedirectAfterLoginCookie,
-  getCallbackTokens,
   getRedirectAfterLoginPath,
-  redirectToLogin,
-} from "@/lib/auth/auth-route-utils";
-import { isLoginProvider } from "@/lib/auth/oauth-provider-policy";
+} from "@/lib/auth/redirect-after-login-cookie";
 import { BACKEND_ERROR_CODES } from "@/lib/error/error-codes";
 
 interface CallbackRouteContext {

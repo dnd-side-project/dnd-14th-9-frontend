@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 import { LoginPage } from "@/features/auth/components/LoginPage";
-import { getLoginPageProps } from "@/lib/auth/auth-route-utils";
+import { getLoginPageProps } from "@/lib/auth/login-page-props";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
