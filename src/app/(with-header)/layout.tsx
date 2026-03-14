@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
 import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
 import { MAIN_SCROLL_ID } from "@/hooks/useBodyScrollLock";
-import { hasAuthCookies } from "@/lib/auth/hasAuthCookies";
+import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
 import { getQueryClient } from "@/lib/getQueryClient";
 
 const OnboardingModalWrapper = dynamic(() =>
@@ -28,8 +28,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const queryClient = getQueryClient();
   let isAuthenticated = false;
   let memberProfile = null;
+  const { hasAuthCookies } = await getServerAuthCookieState();
   // 인증 쿠키가 없으면 서버에서 me 조회를 건너뛰어 초기 문서 TTFB를 줄인다.
-  if (await hasAuthCookies()) {
+  if (hasAuthCookies) {
     try {
       const response = await queryClient.fetchQuery(memberQueries.me());
       memberProfile = response.result;

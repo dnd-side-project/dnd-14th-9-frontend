@@ -1,18 +1,13 @@
-import { cookies } from "next/headers";
-
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { Header } from "@/components/Header/Header";
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
 
 export default async function NotFound() {
-  const cookieStore = await cookies();
-  const isAuthenticated = Boolean(
-    cookieStore.get(ACCESS_TOKEN_COOKIE)?.value || cookieStore.get(REFRESH_TOKEN_COOKIE)?.value
-  );
+  const { hasAuthCookies } = await getServerAuthCookieState();
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header isAuthenticated={isAuthenticated} />
+      <Header isAuthenticated={hasAuthCookies} />
       <main className="gap-2xl mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center md:px-[250px]">
         <ErrorFallbackUI
           title="Page not found"
