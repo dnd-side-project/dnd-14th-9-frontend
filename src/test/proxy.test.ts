@@ -10,11 +10,17 @@ import { proxy } from "@/proxy";
 const mockFetch = jest.fn();
 global.fetch = mockFetch as unknown as typeof fetch;
 
+const KNOWN_PUBLIC_PAGE_PATHS = ["/", "/login", "/feedback"];
+const UNKNOWN_PAGE_PATH = "/does-not-exist";
 const PRIMARY_PROTECTED_PAGE_PATH = "/profile/settings";
-const SECONDARY_PROTECTED_PAGE_PATHS = [
+const ALL_PROTECTED_PAGE_PATHS = [
+  PRIMARY_PROTECTED_PAGE_PATH,
   "/session/create",
+  "/profile/report",
   "/profile/account",
   "/session/1/waiting",
+  "/session/1/result",
+  "/session/1/reports",
 ];
 const PROTECTED_PAGE_ACCESS_PATHS = [
   PRIMARY_PROTECTED_PAGE_PATH,
@@ -147,9 +153,7 @@ describe("Proxy Middleware", () => {
     });
 
     it("인증 없이 접근 가능한 경로들은 토큰 검증을 하지 않아야 함", async () => {
-      const publicPaths = ["/", "/login"];
-
-      for (const path of publicPaths) {
+      for (const path of KNOWN_PUBLIC_PAGE_PATHS) {
         const request = new NextRequest(`http://localhost:3000${path}`);
         const response = await proxy(request);
 
@@ -157,6 +161,19 @@ describe("Proxy Middleware", () => {
       }
 
       // fetch가 호출되지 않았는지 확인 (재발급 시도 없음)
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("/feedback 경로는 비로그인 상태에서도 통과해야 함", async () => {
+      const request = new NextRequest("http://localhost:3000/feedback");
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
+        false
+      );
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
@@ -331,9 +348,7 @@ describe("Proxy Middleware", () => {
     });
 
     it("다른 보호된 경로도 동일하게 리다이렉트해야 함", async () => {
-      const protectedPaths = [PRIMARY_PROTECTED_PAGE_PATH, ...SECONDARY_PROTECTED_PAGE_PATHS];
-
-      for (const path of protectedPaths) {
+      for (const path of ALL_PROTECTED_PAGE_PATHS) {
         jest.clearAllMocks();
 
         const request = new NextRequest(`http://localhost:3000${path}`);
@@ -342,6 +357,62 @@ describe("Proxy Middleware", () => {
         expectLoginRedirect(response, "auth_required");
         expectRedirectAfterLoginCookie(response, path);
       }
+    });
+  });
+
+  describe("존재하지 않는 페이지 경로", () => {
+    it("비로그인 상태에서는 리다이렉트 없이 그대로 통과해야 함", async () => {
+      const request = new NextRequest(`http://localhost:3000${UNKNOWN_PAGE_PATH}`);
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
+        false
+      );
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("로그인 상태에서도 리다이렉트 없이 그대로 통과해야 함", async () => {
+      const accessToken = createMockToken(10 * 60);
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest(`http://localhost:3000${UNKNOWN_PAGE_PATH}`, {
+        headers: {
+          cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}`,
+        },
+      });
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
+        false
+      );
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("redirectAfterLogin 쿠키", () => {
+    it("보호된 페이지 경로에만 설정되어야 함", async () => {
+      const protectedRequest = new NextRequest(
+        `http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`
+      );
+      const publicRequest = new NextRequest("http://localhost:3000/feedback");
+      const unknownRequest = new NextRequest(`http://localhost:3000${UNKNOWN_PAGE_PATH}`);
+
+      const protectedResponse = await proxy(protectedRequest);
+      const publicResponse = await proxy(publicRequest);
+      const unknownResponse = await proxy(unknownRequest);
+
+      expectRedirectAfterLoginCookie(protectedResponse, PRIMARY_PROTECTED_PAGE_PATH);
+      expect(
+        hasSetCookie(publicResponse, (cookie) => cookie.startsWith("redirectAfterLogin="))
+      ).toBe(false);
+      expect(
+        hasSetCookie(unknownResponse, (cookie) => cookie.startsWith("redirectAfterLogin="))
+      ).toBe(false);
     });
   });
 
