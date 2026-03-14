@@ -12,7 +12,7 @@ import {
   REDIRECT_AFTER_LOGIN_COOKIE,
   REFRESH_TOKEN_COOKIE,
 } from "@/lib/auth/cookie-constants";
-import { LOGIN_PROVIDERS } from "@/lib/auth/login-policy";
+import { LOGIN_PROVIDERS } from "@/lib/auth/oauth-provider-policy";
 
 // Next.js cookies() mock
 jest.mock("next/headers", () => ({

@@ -8,7 +8,7 @@ import {
   getRedirectAfterLoginPath,
   redirectToLogin,
 } from "@/lib/auth/auth-route-utils";
-import { isLoginProvider } from "@/lib/auth/login-policy";
+import { isLoginProvider } from "@/lib/auth/oauth-provider-policy";
 import { BACKEND_ERROR_CODES } from "@/lib/error/error-codes";
 
 interface CallbackRouteContext {

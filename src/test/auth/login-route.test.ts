@@ -6,7 +6,7 @@ import { NextRequest } from "next/server";
 
 import { GET } from "@/app/api/auth/login/route";
 import { REDIRECT_AFTER_LOGIN_COOKIE } from "@/lib/auth/cookie-constants";
-import { LOGIN_PROVIDERS } from "@/lib/auth/login-policy";
+import { LOGIN_PROVIDERS } from "@/lib/auth/oauth-provider-policy";
 
 function hasSetCookie(response: Response, matcher: (cookie: string) => boolean): boolean {
   return response.headers.getSetCookie().some(matcher);

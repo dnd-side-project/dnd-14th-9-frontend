@@ -6,7 +6,7 @@ import {
   resolveBackendOrigin,
   setRedirectAfterLoginCookie,
 } from "@/lib/auth/auth-route-utils";
-import { isLoginProvider } from "@/lib/auth/login-policy";
+import { isLoginProvider } from "@/lib/auth/oauth-provider-policy";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 
 export async function GET(request: NextRequest) {

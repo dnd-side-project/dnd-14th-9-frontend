@@ -7,7 +7,7 @@ import {
   REDIRECT_AFTER_LOGIN_MAX_AGE_SECONDS,
   REFRESH_TOKEN_COOKIE,
 } from "./cookie-constants";
-import { getLoginReasonMessage, normalizeInternalPath } from "./login-policy";
+import { getLoginReasonMessage, normalizeInternalPath } from "./login-page-policy";
 
 interface CookieReader {
   get: (name: string) => { value: string } | undefined;
