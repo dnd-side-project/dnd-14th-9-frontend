@@ -1,3 +1,9 @@
+import {
+  PROFILE_ROUTE_PREFIX,
+  SESSION_CREATE_ROUTE,
+  SESSION_MEMBER_ONLY_SUFFIXES,
+} from "./auth-route-groups";
+
 const KNOWN_PUBLIC_PAGE_ROUTE_PATTERNS = [
   /^\/$/,
   /^\/login$/,
@@ -9,13 +15,9 @@ const KNOWN_PUBLIC_PAGE_ROUTE_PATTERNS = [
 ];
 
 const PROTECTED_PAGE_ROUTE_PATTERNS = [
-  /^\/session\/create$/,
-  /^\/profile\/settings$/,
-  /^\/profile\/report$/,
-  /^\/profile\/account$/,
-  /^\/session\/\d+\/waiting$/,
-  /^\/session\/\d+\/result$/,
-  /^\/session\/\d+\/reports$/,
+  new RegExp(`^${SESSION_CREATE_ROUTE}$`),
+  new RegExp(`^${PROFILE_ROUTE_PREFIX}\\/(settings|report|account)$`),
+  ...SESSION_MEMBER_ONLY_SUFFIXES.map((suffix) => new RegExp(`^\\/session\\/\\d+\\/${suffix}$`)),
 ];
 
 export function isKnownPublicPageRoute(pathname: string): boolean {

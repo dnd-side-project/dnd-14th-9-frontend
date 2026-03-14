@@ -1,5 +1,10 @@
 import type { MetadataRoute } from "next";
 
+import {
+  PROFILE_ROUTE_PREFIX,
+  SESSION_CREATE_ROUTE,
+  SESSION_MEMBER_ONLY_SUFFIXES,
+} from "@/lib/auth/auth-route-groups";
 import { SITE_URL } from "@/lib/constants/seo";
 
 export default function robots(): MetadataRoute.Robots {
@@ -9,12 +14,10 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: [
         "/api/",
-        "/profile/",
-        "/session/create",
+        `${PROFILE_ROUTE_PREFIX}/`,
+        SESSION_CREATE_ROUTE,
         "/feedback",
-        "/session/*/waiting",
-        "/session/*/result",
-        "/session/*/reports",
+        ...SESSION_MEMBER_ONLY_SUFFIXES.map((suffix) => `/session/*/${suffix}`),
       ],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
