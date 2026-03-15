@@ -37,6 +37,7 @@ interface WaitingRoomContentProps {
 
 export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   const [isKicked, setIsKicked] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
   const [wasParticipant, setWasParticipant] = useState(false);
 
   const { showLeaveDialog, setShowLeaveDialog, isLeavingRef } = usePreventBackNavigation();
@@ -75,7 +76,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   }
 
   // SSE를 통한 강퇴 감지 (참여자였는데 멤버 목록에서 사라진 경우)
-  if (wasParticipant && sseWaitingData && myMemberId && !isKicked) {
+  if (wasParticipant && sseWaitingData && myMemberId && !isKicked && !isLeaving) {
     const isStillMember = sseWaitingData.members.some((m) => m.memberId === myMemberId);
     if (!isStillMember) {
       setIsKicked(true);
@@ -148,6 +149,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
           onShowDialog={() => setShowLeaveDialog(true)}
           onCloseDialog={() => setShowLeaveDialog(false)}
           isLeavingRef={isLeavingRef}
+          onLeavingChange={setIsLeaving}
         />
         <SessionInfoCard session={session} />
         <div className="gap-lg flex">
