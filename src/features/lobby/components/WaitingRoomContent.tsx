@@ -148,7 +148,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
           onShowDialog={() => setShowLeaveDialog(true)}
           onCloseDialog={() => setShowLeaveDialog(false)}
           isLeavingRef={isLeavingRef}
-          onLeaveStart={() => setIsLeaving(true)}
+          onLeavingChange={setIsLeaving}
         />
         <SessionInfoCard session={session} />
         <div className="gap-lg flex">
