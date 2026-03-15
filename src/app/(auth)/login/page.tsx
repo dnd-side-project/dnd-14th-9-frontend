@@ -1,13 +1,14 @@
 import { cookies } from "next/headers";
 
 import { LoginPage } from "@/features/auth/components/LoginPage";
-import { getLoginPageProps } from "@/lib/auth/auth-route-utils";
+import { getLoginPageProps } from "@/lib/auth/login-page-props";
+import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
   title: "로그인",
   description: "각에 로그인하여 모각작 세션에 참여하세요.",
-  pathname: "/login",
+  pathname: LOGIN_ROUTE,
 });
 
 interface LoginPageRouteProps {

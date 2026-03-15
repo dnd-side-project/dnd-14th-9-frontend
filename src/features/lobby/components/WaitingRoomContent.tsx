@@ -12,6 +12,7 @@ import { useSessionDetail, useWaitingRoom } from "@/features/session/hooks/useSe
 import { useSessionStatusSSE } from "@/features/session/hooks/useSessionStatusSSE";
 import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
+import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
 
 import { useWaitingMembersSSE } from "../hooks/useWaitingMembersSSE";
 
@@ -114,7 +115,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
     return (
       <div className="flex h-[calc(100vh-200px)] min-h-100 flex-col items-center justify-center gap-4">
         <p className="text-text-secondary text-lg">세션에 참여하려면 로그인이 필요합니다</p>
-        <ButtonLink href="/login" variant="solid" colorScheme="primary" size="medium">
+        <ButtonLink href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
           로그인하고 참여하기
         </ButtonLink>
       </div>

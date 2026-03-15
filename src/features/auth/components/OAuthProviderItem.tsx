@@ -1,6 +1,6 @@
 import { GuideBox } from "@/features/auth/components/GuideBox";
 import { SocialLoginButton } from "@/features/auth/components/SocialLoginButton";
-import type { LoginProvider } from "@/lib/auth/login-policy";
+import type { LoginProvider } from "@/lib/auth/oauth-provider-policy";
 
 interface OAuthProviderItemProps {
   provider: LoginProvider;

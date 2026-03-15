@@ -10,6 +10,25 @@ import { proxy } from "@/proxy";
 const mockFetch = jest.fn();
 global.fetch = mockFetch as unknown as typeof fetch;
 
+const KNOWN_PUBLIC_PAGE_PATHS = ["/", "/login", "/feedback"];
+const UNKNOWN_PAGE_PATH = "/does-not-exist";
+const PRIMARY_PROTECTED_PAGE_PATH = "/profile/settings";
+const ALL_PROTECTED_PAGE_PATHS = [
+  PRIMARY_PROTECTED_PAGE_PATH,
+  "/session/create",
+  "/profile/report",
+  "/profile/account",
+  "/session/1/waiting",
+  "/session/1/result",
+  "/session/1/reports",
+];
+const PROTECTED_PAGE_ACCESS_PATHS = [
+  PRIMARY_PROTECTED_PAGE_PATH,
+  "/profile/report",
+  "/session/create",
+  "/session/1/result",
+];
+
 describe("Proxy Middleware", () => {
   let consoleErrorSpy: jest.SpyInstance;
 
@@ -134,9 +153,7 @@ describe("Proxy Middleware", () => {
     });
 
     it("인증 없이 접근 가능한 경로들은 토큰 검증을 하지 않아야 함", async () => {
-      const publicPaths = ["/", "/login"];
-
-      for (const path of publicPaths) {
+      for (const path of KNOWN_PUBLIC_PAGE_PATHS) {
         const request = new NextRequest(`http://localhost:3000${path}`);
         const response = await proxy(request);
 
@@ -144,6 +161,19 @@ describe("Proxy Middleware", () => {
       }
 
       // fetch가 호출되지 않았는지 확인 (재발급 시도 없음)
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("/feedback 경로는 비로그인 상태에서도 통과해야 함", async () => {
+      const request = new NextRequest("http://localhost:3000/feedback");
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
+        false
+      );
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
@@ -305,22 +335,20 @@ describe("Proxy Middleware", () => {
   describe("보호된 라우트 - 토큰 없음", () => {
     it("accessToken과 refreshToken이 모두 없으면 로그인 라우트로 리다이렉트해야 함", async () => {
       // Given: 토큰 없는 요청
-      const request = new NextRequest("http://localhost:3000/dashboard");
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`);
 
       // When
       const response = await proxy(request);
 
       // Then: 로그인 라우트로 리다이렉트
       expectLoginRedirect(response, "auth_required");
-      expectRedirectAfterLoginCookie(response, "/dashboard");
+      expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
 
     it("다른 보호된 경로도 동일하게 리다이렉트해야 함", async () => {
-      const protectedPaths = ["/dashboard", "/profile", "/settings"];
-
-      for (const path of protectedPaths) {
+      for (const path of ALL_PROTECTED_PAGE_PATHS) {
         jest.clearAllMocks();
 
         const request = new NextRequest(`http://localhost:3000${path}`);
@@ -332,13 +360,69 @@ describe("Proxy Middleware", () => {
     });
   });
 
+  describe("존재하지 않는 페이지 경로", () => {
+    it("비로그인 상태에서는 리다이렉트 없이 그대로 통과해야 함", async () => {
+      const request = new NextRequest(`http://localhost:3000${UNKNOWN_PAGE_PATH}`);
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
+        false
+      );
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("로그인 상태에서도 리다이렉트 없이 그대로 통과해야 함", async () => {
+      const accessToken = createMockToken(10 * 60);
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest(`http://localhost:3000${UNKNOWN_PAGE_PATH}`, {
+        headers: {
+          cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}`,
+        },
+      });
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
+        false
+      );
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("redirectAfterLogin 쿠키", () => {
+    it("보호된 페이지 경로에만 설정되어야 함", async () => {
+      const protectedRequest = new NextRequest(
+        `http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`
+      );
+      const publicRequest = new NextRequest("http://localhost:3000/feedback");
+      const unknownRequest = new NextRequest(`http://localhost:3000${UNKNOWN_PAGE_PATH}`);
+
+      const protectedResponse = await proxy(protectedRequest);
+      const publicResponse = await proxy(publicRequest);
+      const unknownResponse = await proxy(unknownRequest);
+
+      expectRedirectAfterLoginCookie(protectedResponse, PRIMARY_PROTECTED_PAGE_PATH);
+      expect(
+        hasSetCookie(publicResponse, (cookie) => cookie.startsWith("redirectAfterLogin="))
+      ).toBe(false);
+      expect(
+        hasSetCookie(unknownResponse, (cookie) => cookie.startsWith("redirectAfterLogin="))
+      ).toBe(false);
+    });
+  });
+
   describe("토큰 만료 검증", () => {
     it("토큰이 5분 이상 남았으면 그대로 통과해야 함", async () => {
       // Given: 10분 후 만료되는 토큰
       const accessToken = createMockToken(10 * 60); // 10분
       const refreshToken = createMockToken(30 * 24 * 60 * 60); // 30일
 
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}`,
         },
@@ -357,7 +441,7 @@ describe("Proxy Middleware", () => {
       const accessToken = createBase64UrlMockToken(10 * 60);
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
 
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}`,
         },
@@ -376,7 +460,7 @@ describe("Proxy Middleware", () => {
       const accessToken = createMockToken(3 * 60); // 3분
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
 
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}`,
         },
@@ -415,7 +499,7 @@ describe("Proxy Middleware", () => {
       const accessToken = createMockToken(-60); // 1분 전 만료
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
 
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}`,
         },
@@ -440,7 +524,7 @@ describe("Proxy Middleware", () => {
       const invalidToken = "invalid.token.format";
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
 
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `accessToken=${invalidToken}; refreshToken=${refreshToken}`,
         },
@@ -462,7 +546,7 @@ describe("Proxy Middleware", () => {
     it("accessToken이 없고 refreshToken만 있으면 재발급을 시도해야 함", async () => {
       // Given: refreshToken만 있는 경우
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `refreshToken=${refreshToken}`,
         },
@@ -490,7 +574,7 @@ describe("Proxy Middleware", () => {
     it("재발급 성공 시 새 쿠키를 응답에 포함해야 함", async () => {
       // Given
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `refreshToken=${refreshToken}`,
         },
@@ -517,7 +601,7 @@ describe("Proxy Middleware", () => {
     it("보호된 라우트에서 재발급 응답 형식이 비정상이면 로그인 라우트(COMMON500)로 리다이렉트해야 함", async () => {
       // Given
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `refreshToken=${refreshToken}`,
         },
@@ -539,7 +623,7 @@ describe("Proxy Middleware", () => {
 
       // Then
       expectLoginRedirect(response, "COMMON500");
-      expectRedirectAfterLoginCookie(response, "/dashboard");
+      expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
@@ -547,7 +631,7 @@ describe("Proxy Middleware", () => {
     it("재발급 API가 실패하면 백엔드 에러 코드로 로그인 라우트에 리다이렉트해야 함", async () => {
       // Given: refreshToken만 있음
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `refreshToken=${refreshToken}`,
         },
@@ -570,7 +654,7 @@ describe("Proxy Middleware", () => {
 
       // Then: 로그인 라우트로 리다이렉트 + 세션 쿠키 정리
       expectLoginRedirect(response, "AUTH401_4");
-      expectRedirectAfterLoginCookie(response, "/dashboard");
+      expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
@@ -578,7 +662,7 @@ describe("Proxy Middleware", () => {
     it("재발급 API 호출 중 네트워크 에러가 발생하면 로그인 라우트로 리다이렉트해야 함", async () => {
       // Given
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `refreshToken=${refreshToken}`,
         },
@@ -592,7 +676,7 @@ describe("Proxy Middleware", () => {
 
       // Then: 네트워크 에러 시 로그인 라우트 유도
       expectLoginRedirect(response, "network_error");
-      expectRedirectAfterLoginCookie(response, "/dashboard");
+      expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
@@ -602,7 +686,7 @@ describe("Proxy Middleware", () => {
       delete process.env.BACKEND_API_BASE;
 
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `refreshToken=${refreshToken}`,
         },
@@ -613,7 +697,7 @@ describe("Proxy Middleware", () => {
 
       // Then
       expectLoginRedirect(response, "config_error");
-      expectRedirectAfterLoginCookie(response, "/dashboard");
+      expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
       expect(mockFetch).not.toHaveBeenCalled(); // API 호출 안함
@@ -625,7 +709,7 @@ describe("Proxy Middleware", () => {
       // Given: 만료 임박한 accessToken만 있고 refreshToken 없음
       const accessToken = createMockToken(2 * 60); // 2분
 
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `accessToken=${accessToken}`,
         },
@@ -636,7 +720,7 @@ describe("Proxy Middleware", () => {
 
       // Then: refreshToken 없으므로 재발급 불가 → 로그인 라우트
       expectLoginRedirect(response, "auth_required");
-      expectRedirectAfterLoginCookie(response, "/dashboard");
+      expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
       expect(mockFetch).not.toHaveBeenCalled();
@@ -649,7 +733,7 @@ describe("Proxy Middleware", () => {
       const accessToken = createMockToken(10 * 60); // 10분
       // refreshToken 없음
 
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `accessToken=${accessToken}`,
         },
@@ -669,7 +753,7 @@ describe("Proxy Middleware", () => {
     it("보호된 라우트에서 accessToken만 있고 refreshToken이 없을 때 경고 로그를 남겨야 함", async () => {
       // Given
       const accessToken = createMockToken(10 * 60);
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `accessToken=${accessToken}`,
         },
@@ -706,7 +790,7 @@ describe("Proxy Middleware", () => {
     it("보호된 라우트에서 accessToken이 유효한데 refreshToken만 있으면 통과해야 함", async () => {
       // Given: refreshToken만 있고 accessToken 없음
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `refreshToken=${refreshToken}`,
         },
@@ -733,7 +817,7 @@ describe("Proxy Middleware", () => {
       const accessToken = createMockToken(30 * 60); // 30분
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
 
-      const pages = ["/dashboard", "/profile", "/settings", "/posts/123"];
+      const pages = PROTECTED_PAGE_ACCESS_PATHS;
 
       for (const page of pages) {
         const request = new NextRequest(`http://localhost:3000${page}`, {
@@ -752,7 +836,7 @@ describe("Proxy Middleware", () => {
       const expiredToken = createMockToken(-60);
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
 
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `accessToken=${expiredToken}; refreshToken=${refreshToken}`,
         },
@@ -774,7 +858,7 @@ describe("Proxy Middleware", () => {
       const expiredToken = createMockToken(-60);
       const expiredRefreshToken = createMockToken(-60);
 
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
           cookie: `accessToken=${expiredToken}; refreshToken=${expiredRefreshToken}`,
         },
@@ -797,7 +881,7 @@ describe("Proxy Middleware", () => {
 
       // Then: 로그인 라우트로 리다이렉트
       expectLoginRedirect(response, "AUTH401_4");
-      expectRedirectAfterLoginCookie(response, "/dashboard");
+      expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
     });
   });
 

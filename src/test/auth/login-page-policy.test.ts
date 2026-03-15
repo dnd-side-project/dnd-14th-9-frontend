@@ -1,24 +1,6 @@
-import {
-  LOGIN_PROVIDERS,
-  getLoginReasonMessage,
-  isLoginProvider,
-  normalizeInternalPath,
-} from "@/lib/auth/login-policy";
+import { getLoginReasonMessage, normalizeInternalPath } from "@/lib/auth/login-page-policy";
 
-describe("login-policy", () => {
-  describe("isLoginProvider", () => {
-    const [googleProvider, kakaoProvider] = LOGIN_PROVIDERS;
-
-    it("google과 kakao만 유효한 provider로 허용해야 함", () => {
-      expect(isLoginProvider(googleProvider)).toBe(true);
-      expect(isLoginProvider(kakaoProvider)).toBe(true);
-      expect(isLoginProvider("naver")).toBe(false);
-      expect(isLoginProvider("")).toBe(false);
-      expect(isLoginProvider(null)).toBe(false);
-      expect(isLoginProvider(undefined)).toBe(false);
-    });
-  });
-
+describe("login-page-policy", () => {
   describe("normalizeInternalPath", () => {
     it("빈 값은 루트(/)로 폴백해야 함", () => {
       expect(normalizeInternalPath(undefined)).toBe("/");

@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import {
-  buildProviderAuthorizationUrl,
-  redirectToLogin,
-  resolveBackendOrigin,
-  setRedirectAfterLoginCookie,
-} from "@/lib/auth/auth-route-utils";
-import { isLoginProvider } from "@/lib/auth/login-policy";
+import { redirectToLogin } from "@/lib/auth/login-redirect-utils";
+import { isLoginProvider } from "@/lib/auth/oauth-provider-policy";
+import { buildProviderAuthorizationUrl, resolveBackendOrigin } from "@/lib/auth/oauth-route-utils";
+import { setRedirectAfterLoginCookie } from "@/lib/auth/redirect-after-login-cookie";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 
 export async function GET(request: NextRequest) {

@@ -2,24 +2,17 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
-import { buildLoginRedirectUrl, setRedirectAfterLoginCookie } from "@/lib/auth/auth-route-utils";
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 import {
   buildRefreshCookieHeader,
   mergeCookieHeaderWithAuthTokens,
 } from "@/lib/auth/cookie-header-utils";
+import { buildLoginRedirectUrl } from "@/lib/auth/login-redirect-utils";
+import { setRedirectAfterLoginCookie } from "@/lib/auth/redirect-after-login-cookie";
+import { isKnownPublicPageRoute, isProtectedPageRoute } from "@/lib/auth/route-access-policy";
 import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
-
-// 공개 페이지 라우트 (인증 불필요)
-const PUBLIC_PAGE_ROUTES = [
-  /^\/$/,
-  /^\/login$/,
-  /^\/session\/\d+$/,
-  /^\/terms$/,
-  /^\/privacy$/,
-  /^\/cookie-policy$/,
-];
+import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
 
 // 공개 API 라우트 (인증 불필요)
 const PUBLIC_API_ROUTE_PATTERNS = [
@@ -51,7 +44,8 @@ interface AuthFailureResponseOptions {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublicPageRoute = PUBLIC_PAGE_ROUTES.some((pattern) => pattern.test(pathname));
+  const isPublicPageRoute = isKnownPublicPageRoute(pathname);
+  const requiresHardAuth = isApiRoute(pathname) || isProtectedPageRoute(pathname);
 
   // well-known 경로는 인증 처리 없이 통과한다.
   if (pathname.startsWith("/.well-known")) {
@@ -60,6 +54,11 @@ export async function proxy(request: NextRequest) {
 
   // 공개 API 예외 경로는 인증 처리 없이 통과한다.
   if (isPublicApiRoute(pathname)) {
+    return NextResponse.next();
+  }
+
+  // 보호 경로가 아니고 알려진 공개 경로도 아니면 Next.js 404 처리로 넘긴다.
+  if (!isPublicPageRoute && !requiresHardAuth) {
     return NextResponse.next();
   }
 
@@ -145,7 +144,7 @@ function redirectToLoginRoute(
 ): NextResponse {
   const loginUrl = options?.reason
     ? buildLoginRedirectUrl(request, options.reason)
-    : new URL("/login", request.url);
+    : new URL(LOGIN_ROUTE, request.url);
   const response = NextResponse.redirect(loginUrl);
   if (shouldPersistRedirectAfterLogin(request.nextUrl.pathname)) {
     setRedirectAfterLoginCookie(response, `${request.nextUrl.pathname}${request.nextUrl.search}`);

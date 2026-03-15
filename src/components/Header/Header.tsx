@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
 import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
+import { LOGIN_ROUTE, ROOT_ROUTE } from "@/lib/routes/route-paths";
 
 interface HeaderProps {
   isAuthenticated: boolean;
@@ -17,7 +18,7 @@ export function Header({ isAuthenticated }: HeaderProps) {
     <header className="border-border-subtle bg-surface-default sticky top-0 z-50 w-full border-b">
       <div className="px-lg md:px-xl md:py-sm mx-auto flex h-full max-w-[1280px] items-center justify-between py-[15px] xl:px-[50px]">
         <Link
-          href="/"
+          href={ROOT_ROUTE}
           aria-label="홈으로 이동"
           className="focus-visible:ring-primary transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:outline-none"
         >
@@ -49,7 +50,7 @@ export function Header({ isAuthenticated }: HeaderProps) {
             </>
           ) : (
             <ButtonLink
-              href="/login"
+              href={LOGIN_ROUTE}
               aria-label="로그인"
               size="small"
               variant="outlined"

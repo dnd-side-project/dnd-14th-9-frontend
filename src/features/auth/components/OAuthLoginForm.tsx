@@ -7,7 +7,7 @@ import {
   getLastLoginProvider,
   saveLastLoginProvider,
 } from "@/features/auth/lib/last-login-provider";
-import { LOGIN_PROVIDERS, type LoginProvider } from "@/lib/auth/login-policy";
+import { LOGIN_PROVIDERS, type LoginProvider } from "@/lib/auth/oauth-provider-policy";
 
 interface OAuthLoginFormProps {
   nextPath: string;

@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 import { LoginModal } from "@/features/auth/components/LoginModal";
-import { getLoginPageProps } from "@/lib/auth/auth-route-utils";
+import { getLoginPageProps } from "@/lib/auth/login-page-props";
 
 interface LoginModalPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

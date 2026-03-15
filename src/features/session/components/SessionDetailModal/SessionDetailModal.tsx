@@ -11,6 +11,7 @@ import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
 import { useIsAuthenticated, useMe } from "@/features/member/hooks/useMemberHooks";
 import { useDialog } from "@/hooks/useDialog";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
+import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
 
 import { useSessionDetail, useWaitingRoom } from "../../hooks/useSessionHooks";
 import { useShareSession } from "../../hooks/useShareSession";
@@ -144,7 +145,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
           </Button>
         ) : (
           <ButtonLink
-            href="/login"
+            href={LOGIN_ROUTE}
             variant="solid"
             colorScheme="primary"
             size="medium"

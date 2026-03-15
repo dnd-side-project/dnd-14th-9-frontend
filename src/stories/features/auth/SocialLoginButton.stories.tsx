@@ -1,5 +1,5 @@
 import { SocialLoginButton } from "@/features/auth/components/SocialLoginButton";
-import { LOGIN_PROVIDERS } from "@/lib/auth/login-policy";
+import { LOGIN_PROVIDERS } from "@/lib/auth/oauth-provider-policy";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 

@@ -1,5 +1,5 @@
-import type { LoginProvider } from "@/lib/auth/login-policy";
-import { LOGIN_PROVIDERS } from "@/lib/auth/login-policy";
+import type { LoginProvider } from "@/lib/auth/oauth-provider-policy";
+import { LOGIN_PROVIDERS } from "@/lib/auth/oauth-provider-policy";
 
 const STORAGE_KEY = "lastLoginProvider";
 
