@@ -14,6 +14,7 @@ interface UseLeaveSessionHandlerOptions {
   isLeavingRef: React.MutableRefObject<boolean>;
   onCloseDialog: () => void;
   onBeforeNavigate?: () => void;
+  onLeaveFail?: () => void;
 }
 
 export function useLeaveSessionHandler({
@@ -21,6 +22,7 @@ export function useLeaveSessionHandler({
   isLeavingRef,
   onCloseDialog,
   onBeforeNavigate,
+  onLeaveFail,
 }: UseLeaveSessionHandlerOptions) {
   const [serverError, setServerError] = useState<string | null>(null);
   const leaveSessionMutation = useLeaveSession();
@@ -36,6 +38,7 @@ export function useLeaveSessionHandler({
       navigateWithHardReload("/");
     } catch (error: unknown) {
       isLeavingRef.current = false;
+      onLeaveFail?.();
       const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
       setServerError(message);
       toast.error(message);
