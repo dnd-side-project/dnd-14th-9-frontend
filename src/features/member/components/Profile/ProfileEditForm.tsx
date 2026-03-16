@@ -53,6 +53,22 @@ export function ProfileEditForm() {
     }
   }, [profile, reset]);
 
+  useEffect(() => {
+    if (!isDirty) return;
+
+    // 수정 중 브라우저를 이탈하면 기본 확인 다이얼로그를 노출합니다.
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isDirty]);
+
   const onSubmit = (values: ProfileEditFormValues) => {
     const { nickname, bio, interestCategories } = values;
 
