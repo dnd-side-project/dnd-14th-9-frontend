@@ -14,6 +14,8 @@ import { profileEditSchema, type ProfileEditFormValues } from "@/features/member
 import { CATEGORY_LABELS, ONBOARDING_CATEGORIES } from "@/lib/constants/category";
 import { toast } from "@/lib/toast";
 
+import { ProfileEditFormSkeleton } from "./ProfileEditFormSkeleton";
+
 export function ProfileEditForm() {
   const { data: meData } = useMeForEdit();
   const { mutate: updateMe, isPending } = useUpdateMe();
@@ -79,7 +81,7 @@ export function ProfileEditForm() {
   };
 
   if (!profile) {
-    return <div className="flex h-40 w-full items-center justify-center">Loading...</div>;
+    return <ProfileEditFormSkeleton />;
   }
 
   return (

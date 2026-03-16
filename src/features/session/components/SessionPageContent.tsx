@@ -27,6 +27,7 @@ import { clearTimerState, getTimerState } from "../hooks/useSessionTimer";
 import { SessionDetailSection } from "./SessionDetailSection";
 import { SessionGoalAndTodoCard } from "./SessionGoalAndTodoCard/SessionGoalAndTodoCard";
 import { SessionHeader } from "./SessionHeader";
+import { SessionPageContentSkeleton } from "./SessionPageContentSkeleton";
 import { SessionParticipantListCard } from "./SessionParticipantListCard";
 import { SessionTimerSection } from "./SessionTimerSection";
 
@@ -90,11 +91,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   });
 
   if (isLoading || (isAuthenticated && isWaitingRoomLoading)) {
-    return (
-      <div className="flex min-h-100 items-center justify-center">
-        <p className="text-text-secondary">세션 정보를 불러오는 중...</p>
-      </div>
-    );
+    return <SessionPageContentSkeleton />;
   }
 
   if (error instanceof ApiError && error.status === 404) {
