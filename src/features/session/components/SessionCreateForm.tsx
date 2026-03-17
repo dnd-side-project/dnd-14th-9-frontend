@@ -18,6 +18,7 @@ import { NumericStepper } from "@/components/NumericStepper/NumericStepper";
 import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useClickOutside } from "@/hooks/useClickOutside";
+import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { ApiError } from "@/lib/api/api-client";
 import { ONBOARDING_CATEGORIES, CATEGORY_LABELS, type Category } from "@/lib/constants/category";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
@@ -97,6 +98,34 @@ export function SessionCreateForm() {
       return next;
     });
   }, []);
+
+  const hasUnsavedChanges = useMemo(
+    () =>
+      roomName.trim().length > 0 ||
+      roomDescription.trim().length > 0 ||
+      notice.trim().length > 0 ||
+      selectedImage !== null ||
+      selectedCategory !== null ||
+      startDateTime !== null ||
+      duration !== SESSION_DURATION_MINUTES_DEFAULT ||
+      participants !== SESSION_PARTICIPANTS_DEFAULT ||
+      achievementRange !== 50 ||
+      focusRange !== 50,
+    [
+      roomName,
+      roomDescription,
+      notice,
+      selectedImage,
+      selectedCategory,
+      startDateTime,
+      duration,
+      participants,
+      achievementRange,
+      focusRange,
+    ]
+  );
+
+  useUnsavedChangesWarning(hasUnsavedChanges && !isPending);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -11,6 +11,7 @@ import { Textarea } from "@/components/Input/Textarea";
 import { TextInput } from "@/components/Input/TextInput";
 import { useMeForEdit, useUpdateMe } from "@/features/member/hooks/useMemberHooks";
 import { profileEditSchema, type ProfileEditFormValues } from "@/features/member/schemas";
+import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { CATEGORY_LABELS, ONBOARDING_CATEGORIES } from "@/lib/constants/category";
 import { toast } from "@/lib/toast";
 
@@ -53,21 +54,7 @@ export function ProfileEditForm() {
     }
   }, [profile, reset]);
 
-  useEffect(() => {
-    if (!isDirty) return;
-
-    // 수정 중 브라우저를 이탈하면 기본 확인 다이얼로그를 노출합니다.
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [isDirty]);
+  useUnsavedChangesWarning(isDirty && !isPending);
 
   const onSubmit = (values: ProfileEditFormValues) => {
     const { nickname, bio, interestCategories } = values;
