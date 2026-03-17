@@ -32,15 +32,15 @@ export function LogoutModal({ onClose }: LogoutModalProps) {
     dialogRef.current = node;
   }, []);
 
-  const restoreFocus = useCallback(() => {
+  const restoreFocus = () => {
     previousActiveElementRef.current?.focus();
     previousActiveElementRef.current = null;
-  }, []);
+  };
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     onClose();
     restoreFocus();
-  }, [onClose, restoreFocus]);
+  };
 
   const handleBackdropClick = (event: React.MouseEvent<HTMLDialogElement>) => {
     if (event.target !== dialogRef.current) return;
