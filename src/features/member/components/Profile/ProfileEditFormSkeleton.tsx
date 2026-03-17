@@ -1,6 +1,4 @@
-function SkeletonBlock({ className }: { className: string }) {
-  return <div className={`bg-surface-strong animate-pulse rounded-sm ${className}`} />;
-}
+import { SkeletonBlock } from "@/components/Skeleton/SkeletonBlock";
 
 function FieldSkeleton({
   labelWidth,
