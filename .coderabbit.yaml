@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
 # CodeRabbit 설정
 # 공식 문서: https://docs.coderabbit.ai/reference/configuration
 # 기술 스택: Next.js 16 + React 19 + TypeScript + Tailwind CSS
@@ -9,6 +11,9 @@
 # 리뷰 언어 설정 (ISO 코드)
 language: "ko-KR"
 
+# 리뷰/채팅 문체 가이드
+tone_instructions: "모든 리뷰와 채팅은 한국어로 작성하세요. 문체는 간결하고 단호한 실무형으로 유지하세요. 설명은 문제, 영향, 권장 수정 순서로 정리하세요. 코드 식별자, 에러 메시지, 명령어는 원문 그대로 유지하세요."
+
 # 얼리 액세스 기능 (실험적 기능 사용 여부)
 early_access: false
 
@@ -19,7 +24,7 @@ reviews:
   # 리뷰 톤 설정
   # - "chill": 부드럽고 친절한 톤 (팀 프로젝트 권장)
   # - "assertive": 단호하고 직접적인 톤
-  profile: "chill"
+  profile: "assertive"
 
   # PR 변경 요청 워크플로우 활성화
   # true: 심각한 문제 발견 시 "Request Changes" 상태로 전환
@@ -101,8 +106,11 @@ reviews:
   # 자동 리뷰 설정
   # ---------------------------------------------------------------------------
   auto_review:
-    # 자동 리뷰 비활성화 (Gemini Code Assist만 사용)
-    enabled: false
+    # Ready for review 상태의 PR에 자동 리뷰 활성화
+    enabled: true
+
+    # 추가 커밋 푸시 시 증분 리뷰 재실행
+    auto_incremental_review: true
 
     # 드래프트 PR 자동 리뷰 비활성화
     drafts: false
@@ -128,6 +136,15 @@ reviews:
     # LanguageTool (문법/철자 검사)
     languagetool:
       enabled: false # 한국어 지원 제한으로 비활성화
+
+# =============================================================================
+# 지식 베이스 설정
+# =============================================================================
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - ".gemini/styleguide.md"
 
 # =============================================================================
 # 채팅 설정 (PR 코멘트에서 @coderabbitai 멘션 시)

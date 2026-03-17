@@ -14,7 +14,7 @@ ignore_patterns:
 # 코드 리뷰 설정
 code_review:
   # 코드 리뷰 비활성화 여부
-  disable: false
+  disable: true
   # 리뷰 코멘트 심각도 임계값 (LOW, MEDIUM, HIGH, CRITICAL)
   comment_severity_threshold: MEDIUM
   # 최대 리뷰 코멘트 수 (-1: 무제한)
@@ -24,9 +24,9 @@ code_review:
 pull_request_opened:
   # 도움말 메시지 표시
   help: false
-  # PR 요약 자동 생성
-  summary: true
-  # 자동 코드 리뷰
-  code_review: true
+  # PR 요약 자동 생성 비활성화 (CodeRabbit로 전환)
+  summary: false
+  # 자동 코드 리뷰 비활성화 (CodeRabbit로 전환)
+  code_review: false
   # 드래프트 PR에도 적용
   include_drafts: false
