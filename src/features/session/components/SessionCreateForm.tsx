@@ -99,31 +99,17 @@ export function SessionCreateForm() {
     });
   }, []);
 
-  const hasUnsavedChanges = useMemo(
-    () =>
-      roomName.trim().length > 0 ||
-      roomDescription.trim().length > 0 ||
-      notice.trim().length > 0 ||
-      selectedImage !== null ||
-      selectedCategory !== null ||
-      startDateTime !== null ||
-      duration !== SESSION_DURATION_MINUTES_DEFAULT ||
-      participants !== SESSION_PARTICIPANTS_DEFAULT ||
-      achievementRange !== 50 ||
-      focusRange !== 50,
-    [
-      roomName,
-      roomDescription,
-      notice,
-      selectedImage,
-      selectedCategory,
-      startDateTime,
-      duration,
-      participants,
-      achievementRange,
-      focusRange,
-    ]
-  );
+  const hasUnsavedChanges =
+    roomName.trim().length > 0 ||
+    roomDescription.trim().length > 0 ||
+    notice.trim().length > 0 ||
+    selectedImage !== null ||
+    selectedCategory !== null ||
+    startDateTime !== null ||
+    duration !== SESSION_DURATION_MINUTES_DEFAULT ||
+    participants !== SESSION_PARTICIPANTS_DEFAULT ||
+    achievementRange !== 50 ||
+    focusRange !== 50;
 
   useUnsavedChangesWarning(hasUnsavedChanges && !isPending);
 

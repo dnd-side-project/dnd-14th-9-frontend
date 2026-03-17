@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -168,7 +168,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
     setDraftTodos((prev) => [...prev, { subtaskId: -Date.now(), content: "", isNew: true }]);
   };
 
-  const hasUnsavedChanges = useMemo(() => {
+  const hasUnsavedChanges = (() => {
     if (!isEditing) return false;
     if (draftGoal.trim() !== goal.trim()) return true;
     if (deletedTodoIds.length > 0) return true;
@@ -190,7 +190,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
     }
 
     return false;
-  }, [isEditing, draftGoal, goal, deletedTodoIds.length, draftTodos, todos]);
+  })();
 
   useUnsavedChangesWarning(hasUnsavedChanges && !isSaving);
 
