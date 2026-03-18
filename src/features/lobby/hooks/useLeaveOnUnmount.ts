@@ -43,18 +43,16 @@ export function useLeaveOnUnmount({
     const shouldSkipLeave = () =>
       isLeavingRef.current || isKickedRef.current || isSessionTransitionRef.current;
 
-    const handleBeforeUnload = () => {
+    const leaveOnExit = () => {
       if (shouldSkipLeave()) return;
       fetch(leaveUrl, { method: "DELETE", keepalive: true, credentials: "include" });
     };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("beforeunload", leaveOnExit);
 
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      if (!shouldSkipLeave()) {
-        fetch(leaveUrl, { method: "DELETE", keepalive: true, credentials: "include" });
-      }
+      window.removeEventListener("beforeunload", leaveOnExit);
+      leaveOnExit();
     };
   }, [enabled, sessionId, isLeavingRef]);
 
