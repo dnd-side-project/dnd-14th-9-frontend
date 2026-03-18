@@ -1,5 +1,3 @@
-import { memo } from "react";
-
 interface DeleteWarningSection {
   title: string;
   items: string[];
@@ -30,7 +28,7 @@ const DELETE_ACCOUNT_WARNING_SECTIONS: DeleteWarningSection[] = [
   },
 ];
 
-export const DeleteAccountWarnings = memo(function DeleteAccountWarnings() {
+export function DeleteAccountWarnings() {
   return (
     <div className="gap-xl flex flex-col">
       <h4 className="text-text-primary text-lg font-bold">회원 탈퇴 시 주의사항</h4>
@@ -46,4 +44,4 @@ export const DeleteAccountWarnings = memo(function DeleteAccountWarnings() {
       ))}
     </div>
   );
-});
+}
