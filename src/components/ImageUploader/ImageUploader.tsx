@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useRef, useCallback, useId, type InputHTMLAttributes } from "react";
+import { forwardRef, useRef, useId, type InputHTMLAttributes } from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -108,22 +108,19 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
 
     const isUploading = uploadProgress !== undefined && uploadProgress >= 0 && uploadProgress < 100;
 
-    const handleFileSelection = useCallback(
-      (file: File | null) => {
-        if (!file) {
-          onFileSelect?.(null);
-          return;
-        }
+    const handleFileSelection = (file: File | null) => {
+      if (!file) {
+        onFileSelect?.(null);
+        return;
+      }
 
-        if (file.size > maxFileSize) {
-          onFileSizeError?.(file, maxFileSize);
-          return;
-        }
+      if (file.size > maxFileSize) {
+        onFileSizeError?.(file, maxFileSize);
+        return;
+      }
 
-        onFileSelect?.(file);
-      },
-      [maxFileSize, onFileSelect, onFileSizeError]
-    );
+      onFileSelect?.(file);
+    };
 
     const { isDragging, dragFileName, mousePosition, dragHandlers } = useDragAndDrop({
       disabled: disabled || isUploading,
@@ -133,29 +130,23 @@ export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
 
     const state: UploadState = isUploading ? "uploading" : isDragging ? "dragging" : "default";
 
-    const handleClick = useCallback(() => {
+    const handleClick = () => {
       if (disabled || isUploading) return;
       internalInputRef.current?.click();
-    }, [disabled, isUploading]);
+    };
 
-    const handleFileChange = useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0] || null;
-        handleFileSelection(file);
-        e.target.value = "";
-      },
-      [handleFileSelection]
-    );
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0] || null;
+      handleFileSelection(file);
+      e.target.value = "";
+    };
 
-    const handleKeyDown = useCallback(
-      (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          handleClick();
-        }
-      },
-      [handleClick]
-    );
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleClick();
+      }
+    };
 
     return (
       <div className={cn("w-full", containerClassName)}>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { InfoIcon } from "@/components/Icon/InfoIcon";
@@ -28,12 +28,12 @@ const TOAST_STYLES: Record<ToastType, string> = {
 export function Toast({ id, type, message, duration = 3000, onClose }: ToastProps) {
   const [isClosing, setIsClosing] = useState(false);
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     setIsClosing(true);
     setTimeout(() => {
       onClose(id);
     }, 200); // 200ms duration for exit animation to complete
-  }, [id, onClose]);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -41,7 +41,7 @@ export function Toast({ id, type, message, duration = 3000, onClose }: ToastProp
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [duration, handleClose]);
+  }, [duration]);
 
   return (
     <div

@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useState, useCallback } from "react";
+import { forwardRef, useState } from "react";
 
 import { CalendarIcon } from "@/components/Icon/CalendarIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
@@ -144,42 +144,33 @@ const DatePickerSingle = forwardRef<HTMLDivElement, DatePickerSingleProps>(
       handleDateClick: baseHandleDateClick,
     } = useDatePickerSingle({ value, defaultValue, onChange });
 
-    const handleDateClick = useCallback(
-      (date: Date) => {
-        if (showTimePicker) {
-          const newDate = new Date(date);
-          newDate.setHours(hour, minute, 0, 0);
-          onChange?.(newDate);
-        } else {
-          baseHandleDateClick(date);
-        }
-      },
-      [showTimePicker, hour, minute, onChange, baseHandleDateClick]
-    );
+    const handleDateClick = (date: Date) => {
+      if (showTimePicker) {
+        const newDate = new Date(date);
+        newDate.setHours(hour, minute, 0, 0);
+        onChange?.(newDate);
+      } else {
+        baseHandleDateClick(date);
+      }
+    };
 
-    const handleHourChange = useCallback(
-      (newHour: number) => {
-        setHour(newHour);
-        if (selectedDate) {
-          const newDate = new Date(selectedDate);
-          newDate.setHours(newHour, minute, 0, 0);
-          onChange?.(newDate);
-        }
-      },
-      [selectedDate, minute, onChange]
-    );
+    const handleHourChange = (newHour: number) => {
+      setHour(newHour);
+      if (selectedDate) {
+        const newDate = new Date(selectedDate);
+        newDate.setHours(newHour, minute, 0, 0);
+        onChange?.(newDate);
+      }
+    };
 
-    const handleMinuteChange = useCallback(
-      (newMinute: number) => {
-        setMinute(newMinute);
-        if (selectedDate) {
-          const newDate = new Date(selectedDate);
-          newDate.setHours(hour, newMinute, 0, 0);
-          onChange?.(newDate);
-        }
-      },
-      [selectedDate, hour, onChange]
-    );
+    const handleMinuteChange = (newMinute: number) => {
+      setMinute(newMinute);
+      if (selectedDate) {
+        const newDate = new Date(selectedDate);
+        newDate.setHours(hour, newMinute, 0, 0);
+        onChange?.(newDate);
+      }
+    };
 
     return (
       <div

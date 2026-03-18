@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
 import { Filter } from "@/components/Filter/Filter";
 import { CheckIcon } from "@/components/Icon/CheckIcon";
@@ -28,10 +28,10 @@ export function StartTimeFilter({
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const closeFilter = useCallback(() => {
+  const closeFilter = () => {
     onOpenChange(false);
     triggerRef.current?.focus();
-  }, [onOpenChange]);
+  };
   useClickOutside(containerRef, closeFilter, isOpen);
 
   const hasTimeSlotSelection = selectedTimeSlots.length > 0;

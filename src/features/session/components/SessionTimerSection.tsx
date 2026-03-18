@@ -1,7 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-
 import dynamic from "next/dynamic";
 
 const MyTimer = dynamic(() => import("./MyTimer/MyTimer").then((mod) => mod.MyTimer), {
@@ -29,9 +27,8 @@ export function SessionTimerSection({
   totalCount,
   className,
 }: SessionTimerSectionProps) {
-  const sessionEndTime = useMemo(
-    () => new Date(new Date(startTime).getTime() + sessionDurationMinutes * 60 * 1000),
-    [startTime, sessionDurationMinutes]
+  const sessionEndTime = new Date(
+    new Date(startTime).getTime() + sessionDurationMinutes * 60 * 1000
   );
 
   return (

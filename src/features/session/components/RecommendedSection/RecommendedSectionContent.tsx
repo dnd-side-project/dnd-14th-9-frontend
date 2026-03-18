@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { useSearchParams } from "next/navigation";
 
@@ -39,12 +39,9 @@ export function RecommendedSectionContent() {
   const [searchPage, setSearchPage] = useState(1);
   const [searchTotalPage, setSearchTotalPage] = useState(1);
 
-  const handleSearchPageChange = useCallback(
-    (page: number) => {
-      setSearchPage(Math.max(1, Math.min(page, Math.max(searchTotalPage, 1))));
-    },
-    [searchTotalPage]
-  );
+  const handleSearchPageChange = (page: number) => {
+    setSearchPage(Math.max(1, Math.min(page, Math.max(searchTotalPage, 1))));
+  };
 
   const handleMetaChange = (meta: { totalPage: number }) => {
     setSearchTotalPage(meta.totalPage);

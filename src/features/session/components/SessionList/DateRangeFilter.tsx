@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
 import { DatePicker } from "@/components/DatePicker/DatePicker";
 import type { DateRange } from "@/components/DatePicker/DatePicker.types";
@@ -27,7 +27,7 @@ export function DateRangeFilter({
 }: DateRangeFilterProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const closeFilter = useCallback(() => onOpenChange(false), [onOpenChange]);
+  const closeFilter = () => onOpenChange(false);
   useClickOutside(containerRef, closeFilter, isOpen);
 
   return (

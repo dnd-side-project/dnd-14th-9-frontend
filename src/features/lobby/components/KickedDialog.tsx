@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { Portal } from "@/components/Portal/Portal";
@@ -15,12 +15,12 @@ export function KickedDialog({ onConfirm }: KickedDialogProps) {
 
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
-  const setDialogRef = useCallback((node: HTMLDialogElement | null) => {
+  const setDialogRef = (node: HTMLDialogElement | null) => {
     if (node && !node.open) {
       node.showModal();
     }
     dialogRef.current = node;
-  }, []);
+  };
 
   return (
     <Portal>

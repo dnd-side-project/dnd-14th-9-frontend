@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef } from "react";
 
 export interface UseDragAndDropOptions {
   /** 비활성화 상태 */
@@ -40,7 +40,7 @@ export function useDragAndDrop({
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const dragCounter = useRef(0);
 
-  const extractFileName = useCallback((e: React.DragEvent<HTMLElement>): string | null => {
+  const extractFileName = (e: React.DragEvent<HTMLElement>): string | null => {
     // files에서 파일명 추출 시도 (드롭 시 동작)
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       return e.dataTransfer.files[0].name;
@@ -63,88 +63,76 @@ export function useDragAndDrop({
     }
 
     return null;
-  }, []);
+  };
 
-  const resetDragState = useCallback(() => {
+  const resetDragState = () => {
     setIsDragging(false);
     setDragFileName(null);
     dragCounter.current = 0;
-  }, []);
+  };
 
-  const handleDragEnter = useCallback(
-    (e: React.DragEvent<HTMLElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (disabled) return;
+  const handleDragEnter = (e: React.DragEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (disabled) return;
 
-      dragCounter.current++;
-      if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-        setIsDragging(true);
-        const fileName = extractFileName(e);
-        if (fileName) {
-          setDragFileName(fileName);
-        }
+    dragCounter.current++;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+      const fileName = extractFileName(e);
+      if (fileName) {
+        setDragFileName(fileName);
       }
-    },
-    [disabled, extractFileName]
-  );
+    }
+  };
 
-  const handleDragLeave = useCallback(
-    (e: React.DragEvent<HTMLElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (disabled) return;
+  const handleDragLeave = (e: React.DragEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (disabled) return;
 
-      dragCounter.current--;
-      if (dragCounter.current === 0) {
-        setIsDragging(false);
-        setDragFileName(null);
+    dragCounter.current--;
+    if (dragCounter.current === 0) {
+      setIsDragging(false);
+      setDragFileName(null);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (containerRef?.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setMousePosition({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+    }
+
+    // 파일명이 아직 설정되지 않은 경우 추출 시도
+    if (!dragFileName || dragFileName === "파일") {
+      const fileName = extractFileName(e);
+      if (fileName && fileName !== "파일") {
+        setDragFileName(fileName);
+      } else if (!dragFileName && fileName) {
+        setDragFileName(fileName);
       }
-    },
-    [disabled]
-  );
+    }
+  };
 
-  const handleDragOver = useCallback(
-    (e: React.DragEvent<HTMLElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
+  const handleDrop = (e: React.DragEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    resetDragState();
 
-      if (containerRef?.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        setMousePosition({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-        });
-      }
+    if (disabled) return;
 
-      // 파일명이 아직 설정되지 않은 경우 추출 시도
-      if (!dragFileName || dragFileName === "파일") {
-        const fileName = extractFileName(e);
-        if (fileName && fileName !== "파일") {
-          setDragFileName(fileName);
-        } else if (!dragFileName && fileName) {
-          setDragFileName(fileName);
-        }
-      }
-    },
-    [containerRef, dragFileName, extractFileName]
-  );
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent<HTMLElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-      resetDragState();
-
-      if (disabled) return;
-
-      const files = e.dataTransfer.files;
-      if (files && files.length > 0) {
-        onFileDrop?.(files[0]);
-      }
-    },
-    [disabled, onFileDrop, resetDragState]
-  );
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      onFileDrop?.(files[0]);
+    }
+  };
 
   return {
     isDragging,

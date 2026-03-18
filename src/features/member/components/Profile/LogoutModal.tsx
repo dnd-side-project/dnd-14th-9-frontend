@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -23,14 +23,14 @@ export function LogoutModal({ onClose }: LogoutModalProps) {
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
-  const setDialogRef = useCallback((node: HTMLDialogElement | null) => {
+  const setDialogRef = (node: HTMLDialogElement | null) => {
     if (node && !node.open) {
       previousActiveElementRef.current =
         document.activeElement instanceof HTMLElement ? document.activeElement : null;
       node.showModal();
     }
     dialogRef.current = node;
-  }, []);
+  };
 
   const restoreFocus = () => {
     previousActiveElementRef.current?.focus();

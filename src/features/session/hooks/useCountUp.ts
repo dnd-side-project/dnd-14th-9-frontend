@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface CountUpResult {
   totalSeconds: number;
@@ -30,18 +30,18 @@ export function useCountUp(options: UseCountUpOptions = {}): CountUpResult {
   const [isRunning, setIsRunning] = useState(autoStart);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const start = useCallback(() => {
+  const start = () => {
     setIsRunning(true);
-  }, []);
+  };
 
-  const pause = useCallback(() => {
+  const pause = () => {
     setIsRunning(false);
-  }, []);
+  };
 
-  const reset = useCallback(() => {
+  const reset = () => {
     setTotalSeconds(startTime);
     setIsRunning(false);
-  }, [startTime]);
+  };
 
   useEffect(() => {
     if (isRunning) {

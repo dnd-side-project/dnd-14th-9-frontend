@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
-
 import { Button } from "@/components/Button/Button";
 import { ProgressRing } from "@/components/ProgressRing/ProgressRing";
 import { ApiError } from "@/lib/api/api-client";
@@ -27,7 +25,7 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
 
   const { mutate: toggleStatus, isPending } = useToggleMyStatus();
 
-  const handleToggle = useCallback(() => {
+  const handleToggle = () => {
     // 이중 호출 방지
     if (isPending) return;
 
@@ -64,7 +62,7 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
         },
       }
     );
-  }, [isPending, isRunning, sessionId, toggleStatus, start, pause]);
+  };
 
   return (
     <div className="gap-xl p-xl bg-surface-strong flex h-full rounded-2xl">

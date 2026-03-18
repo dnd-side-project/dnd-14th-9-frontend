@@ -1,7 +1,6 @@
 import {
   forwardRef,
   useState,
-  useCallback,
   useId,
   type InputHTMLAttributes,
   type FocusEvent,
@@ -128,38 +127,29 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       return "default";
     };
 
-    const handleFocus = useCallback(
-      (e: FocusEvent<HTMLInputElement>) => {
-        setIsFocused(true);
-        onFocus?.(e);
-      },
-      [onFocus]
-    );
+    const handleFocus = (e: FocusEvent<HTMLInputElement>) => {
+      setIsFocused(true);
+      onFocus?.(e);
+    };
 
-    const handleBlur = useCallback(
-      (e: FocusEvent<HTMLInputElement>) => {
-        setIsFocused(false);
-        onBlur?.(e);
-      },
-      [onBlur]
-    );
+    const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
+      setIsFocused(false);
+      onBlur?.(e);
+    };
 
-    const handleChange = useCallback(
-      (e: ChangeEvent<HTMLInputElement>) => {
-        if (!isControlled) {
-          setInternalValue(e.target.value);
-        }
-        onChange?.(e);
-      },
-      [isControlled, onChange]
-    );
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+      if (!isControlled) {
+        setInternalValue(e.target.value);
+      }
+      onChange?.(e);
+    };
 
-    const handleClear = useCallback(() => {
+    const handleClear = () => {
       if (!isControlled) {
         setInternalValue("");
       }
       onClear?.();
-    }, [isControlled, onClear]);
+    };
 
     const showClearButton = hasValue && isFocused && !disabled && !error;
 

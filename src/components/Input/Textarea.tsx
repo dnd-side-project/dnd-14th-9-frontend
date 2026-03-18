@@ -1,7 +1,6 @@
 import {
   forwardRef,
   useState,
-  useCallback,
   useId,
   type TextareaHTMLAttributes,
   type FocusEvent,
@@ -125,29 +124,20 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       return "default";
     };
 
-    const handleFocus = useCallback(
-      (e: FocusEvent<HTMLTextAreaElement>) => {
-        onFocus?.(e);
-      },
-      [onFocus]
-    );
+    const handleFocus = (e: FocusEvent<HTMLTextAreaElement>) => {
+      onFocus?.(e);
+    };
 
-    const handleBlur = useCallback(
-      (e: FocusEvent<HTMLTextAreaElement>) => {
-        onBlur?.(e);
-      },
-      [onBlur]
-    );
+    const handleBlur = (e: FocusEvent<HTMLTextAreaElement>) => {
+      onBlur?.(e);
+    };
 
-    const handleChange = useCallback(
-      (e: ChangeEvent<HTMLTextAreaElement>) => {
-        if (!isControlled) {
-          setInternalValue(e.target.value);
-        }
-        onChange?.(e);
-      },
-      [isControlled, onChange]
-    );
+    const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+      if (!isControlled) {
+        setInternalValue(e.target.value);
+      }
+      onChange?.(e);
+    };
 
     const showCount = showCharacterCount && maxLength !== undefined;
 

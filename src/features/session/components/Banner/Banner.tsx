@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { motion } from "motion/react";
 
@@ -25,14 +25,14 @@ export function Banner() {
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const clearAutoRoll = useCallback(() => {
+  const clearAutoRoll = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  }, []);
+  };
 
-  const startAutoRoll = useCallback(() => {
+  const startAutoRoll = () => {
     clearAutoRoll();
     intervalRef.current = setInterval(() => {
       setActiveIndex((prev) => {
@@ -41,7 +41,7 @@ export function Banner() {
         return next;
       });
     }, AUTO_ROLL_INTERVAL);
-  }, [clearAutoRoll]);
+  };
 
   useEffect(() => {
     if (isHovered) {
@@ -52,10 +52,10 @@ export function Banner() {
     return clearAutoRoll;
   }, [isHovered, startAutoRoll, clearAutoRoll]);
 
-  const goTo = useCallback((index: number) => {
+  const goTo = (index: number) => {
     setDirection(index === 1 ? "forward" : "backward");
     setActiveIndex(index);
-  }, []);
+  };
 
   const isDefault = activeIndex === 0;
 
