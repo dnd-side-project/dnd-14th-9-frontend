@@ -1,4 +1,4 @@
-import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { type ButtonHTMLAttributes } from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -45,38 +45,42 @@ const FILTER_VARIANTS = cva(
 export interface FilterProps
   extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof FILTER_VARIANTS> {
   isOpen?: boolean;
+  ref?: React.Ref<HTMLButtonElement>;
 }
 
-export const Filter = forwardRef<HTMLButtonElement, FilterProps>(
-  ({ className, size, radius, bordered, isOpen = false, children, ...props }, ref) => {
-    const iconSize = size === "medium" ? "small" : "medium";
+export function Filter({
+  className,
+  size,
+  radius,
+  bordered,
+  isOpen = false,
+  children,
+  ref,
+  ...props
+}: FilterProps) {
+  const iconSize = size === "medium" ? "small" : "medium";
 
-    return (
-      <button
-        ref={ref}
-        type="button"
-        className={cn(
-          FILTER_VARIANTS({ size, radius, bordered }),
-          isOpen
-            ? "bg-surface-strong border-border-default text-text-primary"
-            : "bg-surface-default",
-          className
-        )}
-        aria-expanded={isOpen}
-        {...props}
-      >
-        <div className="gap-xs flex items-center">
-          <span className="truncate">{children}</span>
-          <ChevronDownIcon
-            size={iconSize}
-            className={cn("shrink-0 transition-transform duration-200", isOpen && "rotate-180")}
-          />
-        </div>
-      </button>
-    );
-  }
-);
-
-Filter.displayName = "Filter";
+  return (
+    <button
+      ref={ref}
+      type="button"
+      className={cn(
+        FILTER_VARIANTS({ size, radius, bordered }),
+        isOpen ? "bg-surface-strong border-border-default text-text-primary" : "bg-surface-default",
+        className
+      )}
+      aria-expanded={isOpen}
+      {...props}
+    >
+      <div className="gap-xs flex items-center">
+        <span className="truncate">{children}</span>
+        <ChevronDownIcon
+          size={iconSize}
+          className={cn("shrink-0 transition-transform duration-200", isOpen && "rotate-180")}
+        />
+      </div>
+    </button>
+  );
+}
 
 export { FILTER_VARIANTS };

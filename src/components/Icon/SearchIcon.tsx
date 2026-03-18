@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const SearchSvg = (
@@ -28,8 +26,9 @@ const SearchSvg = (
 
 export type SearchIconProps = Omit<IconProps, "svg">;
 
-export const SearchIcon = forwardRef<HTMLSpanElement, SearchIconProps>((props, ref) => {
+export function SearchIcon({
+  ref,
+  ...props
+}: SearchIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={SearchSvg} {...props} />;
-});
-
-SearchIcon.displayName = "SearchIcon";
+}

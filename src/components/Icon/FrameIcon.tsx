@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 export type FrameIconProps = Omit<IconProps, "svg">;
@@ -36,8 +34,9 @@ const FrameSvg = (
   </svg>
 );
 
-export const FrameIcon = forwardRef<HTMLSpanElement, FrameIconProps>((props, ref) => {
+export function FrameIcon({
+  ref,
+  ...props
+}: FrameIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={FrameSvg} {...props} />;
-});
-
-FrameIcon.displayName = "FrameIcon";
+}

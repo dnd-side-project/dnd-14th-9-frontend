@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const KakaoSvg = (
@@ -21,8 +19,9 @@ const KakaoSvg = (
 
 export type KakaoIconProps = Omit<IconProps, "svg">;
 
-export const KakaoIcon = forwardRef<HTMLSpanElement, KakaoIconProps>((props, ref) => {
+export function KakaoIcon({
+  ref,
+  ...props
+}: KakaoIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={KakaoSvg} {...props} />;
-});
-
-KakaoIcon.displayName = "KakaoIcon";
+}

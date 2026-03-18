@@ -1,4 +1,4 @@
-import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { type ButtonHTMLAttributes } from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -34,23 +34,26 @@ const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
 export type CategoryFilterButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
   Omit<VariantProps<typeof CATEGORY_FILTER_BUTTON_VARIANTS>, "isSelected"> & {
     isSelected?: boolean;
+    ref?: React.Ref<HTMLButtonElement>;
   };
 
-export const CategoryFilterButton = forwardRef<HTMLButtonElement, CategoryFilterButtonProps>(
-  ({ className, isSelected = false, children, ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        className={cn(CATEGORY_FILTER_BUTTON_VARIANTS({ isSelected, className }))}
-        aria-pressed={isSelected}
-        {...props}
-      >
-        {children}
-      </button>
-    );
-  }
-);
-
-CategoryFilterButton.displayName = "CategoryFilterButton";
+export function CategoryFilterButton({
+  className,
+  isSelected = false,
+  children,
+  ref,
+  ...props
+}: CategoryFilterButtonProps) {
+  return (
+    <button
+      ref={ref}
+      className={cn(CATEGORY_FILTER_BUTTON_VARIANTS({ isSelected, className }))}
+      aria-pressed={isSelected}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
 
 export { CATEGORY_FILTER_BUTTON_VARIANTS };

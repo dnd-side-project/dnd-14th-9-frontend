@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const EditContainedSvg = (
@@ -19,10 +17,9 @@ const EditContainedSvg = (
 
 export type EditContainedIconProps = Omit<IconProps, "svg">;
 
-export const EditContainedIcon = forwardRef<HTMLSpanElement, EditContainedIconProps>(
-  (props, ref) => {
-    return <Icon ref={ref} svg={EditContainedSvg} {...props} />;
-  }
-);
-
-EditContainedIcon.displayName = "EditContainedIcon";
+export function EditContainedIcon({
+  ref,
+  ...props
+}: EditContainedIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
+  return <Icon ref={ref} svg={EditContainedSvg} {...props} />;
+}

@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const ARROW_RIGHT_SVG = (
@@ -19,8 +17,9 @@ const ARROW_RIGHT_SVG = (
 
 export type ArrowRightIconProps = Omit<IconProps, "svg">;
 
-export const ArrowRightIcon = forwardRef<HTMLSpanElement, ArrowRightIconProps>((props, ref) => {
+export function ArrowRightIcon({
+  ref,
+  ...props
+}: ArrowRightIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={ARROW_RIGHT_SVG} {...props} />;
-});
-
-ArrowRightIcon.displayName = "ArrowRightIcon";
+}

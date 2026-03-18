@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes } from "react";
+import { type HTMLAttributes } from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -47,33 +47,35 @@ export interface BadgeProps
   children: React.ReactNode;
   showIcon?: boolean;
   onIconClick?: () => void;
+  ref?: React.Ref<HTMLSpanElement>;
 }
 
-export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, status, radius, showIcon = false, onIconClick, children, ...props }, ref) => {
-    const canRenderIconButton = showIcon && typeof onIconClick === "function";
+export function Badge({
+  className,
+  status,
+  radius,
+  showIcon = false,
+  onIconClick,
+  children,
+  ref,
+  ...props
+}: BadgeProps) {
+  const canRenderIconButton = showIcon && typeof onIconClick === "function";
 
-    return (
-      <span
-        ref={ref}
-        className={cn(
-          BADGE_VARIANTS({ status, radius }),
-          canRenderIconButton && "gap-1",
-          className
-        )}
-        {...props}
-      >
-        {children}
-        {canRenderIconButton && (
-          <button type="button" onClick={onIconClick} className="inline-flex items-center">
-            <XIcon size="xsmall" />
-          </button>
-        )}
-      </span>
-    );
-  }
-);
-
-Badge.displayName = "Badge";
+  return (
+    <span
+      ref={ref}
+      className={cn(BADGE_VARIANTS({ status, radius }), canRenderIconButton && "gap-1", className)}
+      {...props}
+    >
+      {children}
+      {canRenderIconButton && (
+        <button type="button" onClick={onIconClick} className="inline-flex items-center">
+          <XIcon size="xsmall" />
+        </button>
+      )}
+    </span>
+  );
+}
 
 export { BADGE_VARIANTS };

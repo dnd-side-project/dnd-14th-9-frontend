@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const BarGraphSvg = (
@@ -19,8 +17,9 @@ const BarGraphSvg = (
 
 export type BarGraphIconProps = Omit<IconProps, "svg">;
 
-export const BarGraphIcon = forwardRef<HTMLSpanElement, BarGraphIconProps>((props, ref) => {
+export function BarGraphIcon({
+  ref,
+  ...props
+}: BarGraphIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={BarGraphSvg} {...props} />;
-});
-
-BarGraphIcon.displayName = "BarGraphIcon";
+}

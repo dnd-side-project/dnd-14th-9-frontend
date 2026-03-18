@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const PlusSvg = (
@@ -19,8 +17,6 @@ const PlusSvg = (
 
 export type PlusIconProps = Omit<IconProps, "svg">;
 
-export const PlusIcon = forwardRef<HTMLSpanElement, PlusIconProps>((props, ref) => {
+export function PlusIcon({ ref, ...props }: PlusIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={PlusSvg} {...props} />;
-});
-
-PlusIcon.displayName = "PlusIcon";
+}

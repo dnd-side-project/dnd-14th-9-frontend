@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const CalendarSvg = (
@@ -43,8 +41,9 @@ const CalendarSvg = (
 
 export type CalendarIconProps = Omit<IconProps, "svg">;
 
-export const CalendarIcon = forwardRef<HTMLSpanElement, CalendarIconProps>((props, ref) => {
+export function CalendarIcon({
+  ref,
+  ...props
+}: CalendarIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={CalendarSvg} {...props} />;
-});
-
-CalendarIcon.displayName = "CalendarIcon";
+}

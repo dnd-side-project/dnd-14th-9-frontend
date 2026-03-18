@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const ThumbUpSvg = (
@@ -19,8 +17,9 @@ const ThumbUpSvg = (
 
 export type ThumbUpIconProps = Omit<IconProps, "svg">;
 
-export const ThumbUpIcon = forwardRef<HTMLSpanElement, ThumbUpIconProps>((props, ref) => {
+export function ThumbUpIcon({
+  ref,
+  ...props
+}: ThumbUpIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={ThumbUpSvg} {...props} />;
-});
-
-ThumbUpIcon.displayName = "ThumbUpIcon";
+}

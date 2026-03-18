@@ -8,6 +8,7 @@ export interface DatePickerBaseProps {
   disabled?: boolean;
   /** Custom class name */
   className?: string;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
 export interface DatePickerRangeProps extends DatePickerBaseProps {

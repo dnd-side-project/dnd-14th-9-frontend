@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const HeartSvg = (
@@ -19,8 +17,9 @@ const HeartSvg = (
 
 export type HeartIconProps = Omit<IconProps, "svg">;
 
-export const HeartIcon = forwardRef<HTMLSpanElement, HeartIconProps>((props, ref) => {
+export function HeartIcon({
+  ref,
+  ...props
+}: HeartIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={HeartSvg} {...props} />;
-});
-
-HeartIcon.displayName = "HeartIcon";
+}

@@ -1,5 +1,4 @@
 import {
-  forwardRef,
   useState,
   useId,
   type TextareaHTMLAttributes,
@@ -80,114 +79,109 @@ export interface TextareaProps
   showCharacterCount?: boolean;
   containerClassName?: string;
   size?: keyof typeof SIZE_STYLES;
+  ref?: React.Ref<HTMLTextAreaElement>;
 }
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  (
-    {
-      className,
-      containerClassName,
-      label,
-      error = false,
-      errorMessage,
-      helperText,
-      helperTextType = "default",
-      disabled = false,
-      value,
-      defaultValue,
-      size = "medium",
-      showCharacterCount = false,
-      maxLength,
-      onFocus,
-      onBlur,
-      onChange,
-      id,
-      ...props
-    },
-    ref
-  ) => {
-    const generatedId = useId();
-    const textareaId = id ?? generatedId;
-    const errorMessageId = `${textareaId}-error`;
+export function Textarea({
+  className,
+  containerClassName,
+  label,
+  error = false,
+  errorMessage,
+  helperText,
+  helperTextType = "default",
+  disabled = false,
+  value,
+  defaultValue,
+  size = "medium",
+  showCharacterCount = false,
+  maxLength,
+  onFocus,
+  onBlur,
+  onChange,
+  id,
+  ref,
+  ...props
+}: TextareaProps) {
+  const generatedId = useId();
+  const textareaId = id ?? generatedId;
+  const errorMessageId = `${textareaId}-error`;
 
-    const [internalValue, setInternalValue] = useState(defaultValue ?? "");
+  const [internalValue, setInternalValue] = useState(defaultValue ?? "");
 
-    const isControlled = value !== undefined;
-    const currentValue = isControlled ? value : internalValue;
-    const characterCount = String(currentValue).length;
-    const hasValue = characterCount > 0;
+  const isControlled = value !== undefined;
+  const currentValue = isControlled ? value : internalValue;
+  const characterCount = String(currentValue).length;
+  const hasValue = characterCount > 0;
 
-    const getState = () => {
-      if (disabled) return "disabled";
-      if (error) return "error";
-      if (hasValue) return "filled";
-      return "default";
-    };
+  const getState = () => {
+    if (disabled) return "disabled";
+    if (error) return "error";
+    if (hasValue) return "filled";
+    return "default";
+  };
 
-    const handleFocus = (e: FocusEvent<HTMLTextAreaElement>) => {
-      onFocus?.(e);
-    };
+  const handleFocus = (e: FocusEvent<HTMLTextAreaElement>) => {
+    onFocus?.(e);
+  };
 
-    const handleBlur = (e: FocusEvent<HTMLTextAreaElement>) => {
-      onBlur?.(e);
-    };
+  const handleBlur = (e: FocusEvent<HTMLTextAreaElement>) => {
+    onBlur?.(e);
+  };
 
-    const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-      if (!isControlled) {
-        setInternalValue(e.target.value);
-      }
-      onChange?.(e);
-    };
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    if (!isControlled) {
+      setInternalValue(e.target.value);
+    }
+    onChange?.(e);
+  };
 
-    const showCount = showCharacterCount && maxLength !== undefined;
+  const showCount = showCharacterCount && maxLength !== undefined;
 
-    return (
-      <div className={cn("flex w-full max-w-90 flex-col gap-2", containerClassName)}>
-        {label && (
-          <label htmlFor={textareaId} className="text-text-secondary text-base">
-            {label}
-          </label>
-        )}
+  return (
+    <div className={cn("flex w-full max-w-90 flex-col gap-2", containerClassName)}>
+      {label && (
+        <label htmlFor={textareaId} className="text-text-secondary text-base">
+          {label}
+        </label>
+      )}
 
-        <textarea
-          ref={ref}
-          id={textareaId}
-          className={cn(textareaVariants({ state: getState() }), className)}
-          style={SIZE_STYLES[size]}
-          disabled={disabled}
-          value={currentValue}
-          maxLength={maxLength}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onChange={handleChange}
-          aria-invalid={error}
-          aria-describedby={error && errorMessage ? errorMessageId : undefined}
-          {...props}
-        />
+      <textarea
+        ref={ref}
+        id={textareaId}
+        className={cn(textareaVariants({ state: getState() }), className)}
+        style={SIZE_STYLES[size]}
+        disabled={disabled}
+        value={currentValue}
+        maxLength={maxLength}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onChange={handleChange}
+        aria-invalid={error}
+        aria-describedby={error && errorMessage ? errorMessageId : undefined}
+        {...props}
+      />
 
-        {showCount && (
-          <div className="flex w-full justify-end">
-            <span
-              className={cn(
-                "text-sm",
-                error ? "text-text-status-negative-default" : "text-text-muted"
-              )}
-              aria-live="polite"
-            >
-              {characterCount}/{maxLength}
-            </span>
-          </div>
-        )}
+      {showCount && (
+        <div className="flex w-full justify-end">
+          <span
+            className={cn(
+              "text-sm",
+              error ? "text-text-status-negative-default" : "text-text-muted"
+            )}
+            aria-live="polite"
+          >
+            {characterCount}/{maxLength}
+          </span>
+        </div>
+      )}
 
-        {/* Priority: errorMessage > helperText */}
-        {error && errorMessage ? (
-          <HelperText id={errorMessageId} text={errorMessage} type="negative" />
-        ) : helperText ? (
-          <HelperText text={helperText} type={helperTextType} />
-        ) : null}
-      </div>
-    );
-  }
-);
-
-Textarea.displayName = "Textarea";
+      {/* Priority: errorMessage > helperText */}
+      {error && errorMessage ? (
+        <HelperText id={errorMessageId} text={errorMessage} type="negative" />
+      ) : helperText ? (
+        <HelperText text={helperText} type={helperTextType} />
+      ) : null}
+    </div>
+  );
+}

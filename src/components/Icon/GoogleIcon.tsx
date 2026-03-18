@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const GoogleSvg = (
@@ -40,8 +38,9 @@ const GoogleSvg = (
 
 export type GoogleIconProps = Omit<IconProps, "svg">;
 
-export const GoogleIcon = forwardRef<HTMLSpanElement, GoogleIconProps>((props, ref) => {
+export function GoogleIcon({
+  ref,
+  ...props
+}: GoogleIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={GoogleSvg} {...props} />;
-});
-
-GoogleIcon.displayName = "GoogleIcon";
+}

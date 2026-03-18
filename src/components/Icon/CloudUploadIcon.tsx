@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const CloudUploadSvg = (
@@ -19,8 +17,9 @@ const CloudUploadSvg = (
 
 export type CloudUploadIconProps = Omit<IconProps, "svg">;
 
-export const CloudUploadIcon = forwardRef<HTMLSpanElement, CloudUploadIconProps>((props, ref) => {
+export function CloudUploadIcon({
+  ref,
+  ...props
+}: CloudUploadIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={CloudUploadSvg} {...props} />;
-});
-
-CloudUploadIcon.displayName = "CloudUploadIcon";
+}

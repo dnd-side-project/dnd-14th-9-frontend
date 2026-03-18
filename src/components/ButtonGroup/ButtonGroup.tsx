@@ -1,11 +1,13 @@
-import { forwardRef, type HTMLAttributes } from "react";
+import { type HTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils/utils";
 
-export type ButtonGroupProps = HTMLAttributes<HTMLDivElement>;
+export type ButtonGroupProps = HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
 
-export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
-  ({ className, children, ...props }, ref) => (
+export function ButtonGroup({ className, children, ref, ...props }: ButtonGroupProps) {
+  return (
     <div
       ref={ref}
       className={cn("inline-flex flex-row flex-wrap items-center gap-2", className)}
@@ -14,7 +16,5 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
     >
       {children}
     </div>
-  )
-);
-
-ButtonGroup.displayName = "ButtonGroup";
+  );
+}

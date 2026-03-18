@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const MinusSvg = (
@@ -19,8 +17,9 @@ const MinusSvg = (
 
 export type MinusIconProps = Omit<IconProps, "svg">;
 
-export const MinusIcon = forwardRef<HTMLSpanElement, MinusIconProps>((props, ref) => {
+export function MinusIcon({
+  ref,
+  ...props
+}: MinusIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={MinusSvg} {...props} />;
-});
-
-MinusIcon.displayName = "MinusIcon";
+}

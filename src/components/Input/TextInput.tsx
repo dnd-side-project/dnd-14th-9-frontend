@@ -1,5 +1,4 @@
 import {
-  forwardRef,
   useState,
   useId,
   type InputHTMLAttributes,
@@ -79,149 +78,142 @@ export interface TextInputProps
   containerClassName?: string;
   fullWidth?: boolean;
   showCharacterCount?: boolean;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
-export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  (
-    {
-      className,
-      containerClassName,
-      fullWidth = false,
-      label,
-      error = false,
-      errorMessage,
-      helperText,
-      helperTextType = "default",
-      disabled = false,
-      value,
-      defaultValue,
-      size = "md",
-      onClear,
-      onFocus,
-      onBlur,
-      onChange,
-      showCharacterCount = false,
-      maxLength,
-      id,
-      ...props
-    },
-    ref
-  ) => {
-    const generatedId = useId();
-    const inputId = id ?? generatedId;
-    const errorMessageId = `${inputId}-error`;
+export function TextInput({
+  className,
+  containerClassName,
+  fullWidth = false,
+  label,
+  error = false,
+  errorMessage,
+  helperText,
+  helperTextType = "default",
+  disabled = false,
+  value,
+  defaultValue,
+  size = "md",
+  onClear,
+  onFocus,
+  onBlur,
+  onChange,
+  showCharacterCount = false,
+  maxLength,
+  id,
+  ref,
+  ...props
+}: TextInputProps) {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+  const errorMessageId = `${inputId}-error`;
 
-    const [internalValue, setInternalValue] = useState(defaultValue ?? "");
-    const [isFocused, setIsFocused] = useState(false);
+  const [internalValue, setInternalValue] = useState(defaultValue ?? "");
+  const [isFocused, setIsFocused] = useState(false);
 
-    const isControlled = value !== undefined;
-    const currentValue = isControlled ? value : internalValue;
-    const characterCount = String(currentValue).length;
-    const hasValue = characterCount > 0;
-    const showCount = showCharacterCount && maxLength !== undefined;
+  const isControlled = value !== undefined;
+  const currentValue = isControlled ? value : internalValue;
+  const characterCount = String(currentValue).length;
+  const hasValue = characterCount > 0;
+  const showCount = showCharacterCount && maxLength !== undefined;
 
-    const getState = () => {
-      if (disabled) return "disabled";
-      if (error) return "error";
-      if (hasValue) return "filled";
-      return "default";
-    };
+  const getState = () => {
+    if (disabled) return "disabled";
+    if (error) return "error";
+    if (hasValue) return "filled";
+    return "default";
+  };
 
-    const handleFocus = (e: FocusEvent<HTMLInputElement>) => {
-      setIsFocused(true);
-      onFocus?.(e);
-    };
+  const handleFocus = (e: FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true);
+    onFocus?.(e);
+  };
 
-    const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
-      setIsFocused(false);
-      onBlur?.(e);
-    };
+  const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
+    setIsFocused(false);
+    onBlur?.(e);
+  };
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-      if (!isControlled) {
-        setInternalValue(e.target.value);
-      }
-      onChange?.(e);
-    };
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!isControlled) {
+      setInternalValue(e.target.value);
+    }
+    onChange?.(e);
+  };
 
-    const handleClear = () => {
-      if (!isControlled) {
-        setInternalValue("");
-      }
-      onClear?.();
-    };
+  const handleClear = () => {
+    if (!isControlled) {
+      setInternalValue("");
+    }
+    onClear?.();
+  };
 
-    const showClearButton = hasValue && isFocused && !disabled && !error;
+  const showClearButton = hasValue && isFocused && !disabled && !error;
 
-    return (
-      <div
-        className={cn("flex w-full flex-col gap-2", !fullWidth && "max-w-95", containerClassName)}
-      >
-        {label && (
-          <label htmlFor={inputId} className="text-text-secondary text-base">
-            {label}
-          </label>
-        )}
+  return (
+    <div className={cn("flex w-full flex-col gap-2", !fullWidth && "max-w-95", containerClassName)}>
+      {label && (
+        <label htmlFor={inputId} className="text-text-secondary text-base">
+          {label}
+        </label>
+      )}
 
-        <div className="relative">
-          <input
-            ref={ref}
-            id={inputId}
-            className={cn(
-              textInputVariants({ state: getState(), size }),
-              showClearButton && "pr-12",
-              className
-            )}
-            disabled={disabled}
-            value={currentValue}
-            maxLength={maxLength}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            aria-invalid={error}
-            aria-describedby={error && errorMessage ? errorMessageId : undefined}
-            {...(props as Omit<InputHTMLAttributes<HTMLInputElement>, "size">)}
-          />
-
-          {showClearButton && (
-            <button
-              type="button"
-              className="right-md absolute top-1/2 flex -translate-y-1/2 cursor-pointer items-center justify-center"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={handleClear}
-              tabIndex={-1}
-              aria-label="입력 초기화"
-            >
-              <ClearIcon size="small" />
-            </button>
+      <div className="relative">
+        <input
+          ref={ref}
+          id={inputId}
+          className={cn(
+            textInputVariants({ state: getState(), size }),
+            showClearButton && "pr-12",
+            className
           )}
-        </div>
+          disabled={disabled}
+          value={currentValue}
+          maxLength={maxLength}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onChange={handleChange}
+          aria-invalid={error}
+          aria-describedby={error && errorMessage ? errorMessageId : undefined}
+          {...(props as Omit<InputHTMLAttributes<HTMLInputElement>, "size">)}
+        />
 
-        {showCount && (
-          <div className="flex w-full justify-end">
-            <span
-              className={cn(
-                "text-sm",
-                error ? "text-text-status-negative-default" : "text-text-muted"
-              )}
-              aria-live="polite"
-            >
-              {characterCount}/{maxLength}
-            </span>
-          </div>
+        {showClearButton && (
+          <button
+            type="button"
+            className="right-md absolute top-1/2 flex -translate-y-1/2 cursor-pointer items-center justify-center"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={handleClear}
+            tabIndex={-1}
+            aria-label="입력 초기화"
+          >
+            <ClearIcon size="small" />
+          </button>
         )}
-
-        {/* Priority: errorMessage > helperText */}
-        {error && errorMessage ? (
-          <HelperText id={errorMessageId} text={errorMessage} type="negative" />
-        ) : helperText ? (
-          <HelperText text={helperText} type={helperTextType} />
-        ) : null}
       </div>
-    );
-  }
-);
 
-TextInput.displayName = "TextInput";
+      {showCount && (
+        <div className="flex w-full justify-end">
+          <span
+            className={cn(
+              "text-sm",
+              error ? "text-text-status-negative-default" : "text-text-muted"
+            )}
+            aria-live="polite"
+          >
+            {characterCount}/{maxLength}
+          </span>
+        </div>
+      )}
+
+      {/* Priority: errorMessage > helperText */}
+      {error && errorMessage ? (
+        <HelperText id={errorMessageId} text={errorMessage} type="negative" />
+      ) : helperText ? (
+        <HelperText text={helperText} type={helperTextType} />
+      ) : null}
+    </div>
+  );
+}
 
 export { textInputVariants };

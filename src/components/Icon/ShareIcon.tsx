@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const ShareSvg = (
@@ -24,18 +22,19 @@ const ShareSvg = (
 
 export type ShareIconProps = Omit<IconProps, "svg">;
 
-export const ShareIcon = forwardRef<HTMLSpanElement, ShareIconProps>(
-  ({ size = "medium", className, ...props }, ref) => {
-    return (
-      <Icon
-        ref={ref}
-        size={size}
-        svg={ShareSvg}
-        className={className ?? "text-text-muted"}
-        {...props}
-      />
-    );
-  }
-);
-
-ShareIcon.displayName = "ShareIcon";
+export function ShareIcon({
+  ref,
+  size = "medium",
+  className,
+  ...props
+}: ShareIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
+  return (
+    <Icon
+      ref={ref}
+      size={size}
+      svg={ShareSvg}
+      className={className ?? "text-text-muted"}
+      {...props}
+    />
+  );
+}

@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 export type EditProfileIconProps = Omit<IconProps, "svg">;
@@ -26,8 +24,9 @@ const EDIT_PROFILE_SVG = (
   </svg>
 );
 
-export const EditProfileIcon = forwardRef<HTMLSpanElement, EditProfileIconProps>((props, ref) => {
+export function EditProfileIcon({
+  ref,
+  ...props
+}: EditProfileIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={EDIT_PROFILE_SVG} {...props} />;
-});
-
-EditProfileIcon.displayName = "EditProfileIcon";
+}
