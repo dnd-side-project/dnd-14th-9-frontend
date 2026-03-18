@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { CalendarIcon } from "@/components/Icon/CalendarIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
 import { cn } from "@/lib/utils/utils";
@@ -135,11 +133,10 @@ function DatePickerSingle({
   showTimePicker,
   ref,
 }: DatePickerSingleProps) {
-  const [hour, setHour] = useState(() => (value ? value.getHours() : new Date().getHours()));
-  const [minute, setMinute] = useState(() => {
-    const mins = value ? value.getMinutes() : new Date().getMinutes();
-    return Math.floor(mins / 5) * 5;
-  });
+  const hour = value ? value.getHours() : new Date().getHours();
+  const minute = value
+    ? Math.floor(value.getMinutes() / 5) * 5
+    : Math.floor(new Date().getMinutes() / 5) * 5;
 
   const {
     displayYearMonth,
@@ -162,7 +159,6 @@ function DatePickerSingle({
   };
 
   const handleHourChange = (newHour: number) => {
-    setHour(newHour);
     if (selectedDate) {
       const newDate = new Date(selectedDate);
       newDate.setHours(newHour, minute, 0, 0);
@@ -171,7 +167,6 @@ function DatePickerSingle({
   };
 
   const handleMinuteChange = (newMinute: number) => {
-    setMinute(newMinute);
     if (selectedDate) {
       const newDate = new Date(selectedDate);
       newDate.setHours(hour, newMinute, 0, 0);

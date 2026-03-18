@@ -1,7 +1,11 @@
 import { useState } from "react";
 
 import { DatePicker } from "@/components/DatePicker/DatePicker";
-import type { DateRange, DatePickerRangeProps } from "@/components/DatePicker/DatePicker.types";
+import type {
+  DateRange,
+  DatePickerRangeProps,
+  DatePickerSingleProps,
+} from "@/components/DatePicker/DatePicker.types";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
@@ -150,6 +154,68 @@ export const SingleWithTimePicker: Story = {
     docs: {
       description: {
         story: "단일 날짜 + 시간 선택 모드입니다.",
+      },
+    },
+  },
+};
+
+export const ControlledTimePicker: StoryObj<DatePickerSingleProps> = {
+  render: function ControlledTimePickerStory() {
+    const [date, setDate] = useState<Date | null>(new Date());
+
+    const setToMorning = () => {
+      const d = new Date(date ?? new Date());
+      d.setHours(9, 0, 0, 0);
+      setDate(d);
+    };
+
+    const setToEvening = () => {
+      const d = new Date(date ?? new Date());
+      d.setHours(18, 30, 0, 0);
+      setDate(d);
+    };
+
+    const setToNow = () => {
+      setDate(new Date());
+    };
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={setToMorning}
+            className="rounded bg-white/10 px-3 py-1 text-sm text-white hover:bg-white/20"
+          >
+            오전 9:00
+          </button>
+          <button
+            type="button"
+            onClick={setToEvening}
+            className="rounded bg-white/10 px-3 py-1 text-sm text-white hover:bg-white/20"
+          >
+            오후 6:30
+          </button>
+          <button
+            type="button"
+            onClick={setToNow}
+            className="rounded bg-white/10 px-3 py-1 text-sm text-white hover:bg-white/20"
+          >
+            현재 시각
+          </button>
+        </div>
+        <DatePicker mode="single" showTimePicker value={date} onChange={setDate} />
+        <div className="text-text-secondary text-sm">
+          <p>선택된 날짜/시간: {date?.toLocaleString() ?? "선택 안됨"}</p>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "외부에서 value를 변경했을 때 시간 선택기 UI가 올바르게 갱신되는지 확인하는 스토리입니다. 버튼을 클릭하여 시간을 변경하면 TimePicker의 선택 상태가 동기화됩니다.",
       },
     },
   },
