@@ -53,12 +53,13 @@ export function RecommendedGrid({
     onMetaChange?.({ totalPage });
   }, [totalPage, onMetaChange]);
   const sessions = data.result.sessions;
-  const gridClassName = "gap-md grid min-h-[300px] grid-cols-4";
+  const gridClassName =
+    "grid min-h-[300px] grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-y-[48px]";
 
   if (sessions.length === 0) {
     return (
       <div className={gridClassName}>
-        <div className="text-text-muted col-span-4 flex items-center justify-center text-sm">
+        <div className="text-text-muted col-span-full flex items-center justify-center text-sm">
           {emptyMessage ?? "해당 카테고리에 모집 중인 세션이 없습니다"}
         </div>
       </div>
@@ -68,19 +69,21 @@ export function RecommendedGrid({
   return (
     <div className={gridClassName}>
       {sessions.map((session) => (
-        <Link key={session.sessionId} href={`/session/${session.sessionId}`} scroll={false}>
-          <Card
-            thumbnailSrc={session.imageUrl}
-            category={session.category}
-            createdAt={session.startTime}
-            title={session.title}
-            nickname={session.hostNickname}
-            currentParticipants={session.currentParticipants}
-            maxParticipants={session.maxParticipants}
-            durationMinutes={session.sessionDurationMinutes}
-            sessionDate={session.startTime}
-          />
-        </Link>
+        <div key={session.sessionId} className="mx-auto w-full max-w-69">
+          <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
+            <Card
+              thumbnailSrc={session.imageUrl}
+              category={session.category}
+              createdAt={session.startTime}
+              title={session.title}
+              nickname={session.hostNickname}
+              currentParticipants={session.currentParticipants}
+              maxParticipants={session.maxParticipants}
+              durationMinutes={session.sessionDurationMinutes}
+              sessionDate={session.startTime}
+            />
+          </Link>
+        </div>
       ))}
     </div>
   );

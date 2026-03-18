@@ -21,6 +21,7 @@ import { KickedDialog } from "./KickedDialog";
 import { LobbyHeader } from "./LobbyHeader";
 import { ParticipantListCard } from "./ParticipantListCard";
 import { SessionInfoCard } from "./SessionInfoCard";
+import { WaitingRoomContentSkeleton } from "./WaitingRoomContentSkeleton";
 
 import type { WaitingMember } from "../types";
 
@@ -89,11 +90,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   }
 
   if (isLoading || (isAuthenticated && isWaitingRoomLoading)) {
-    return (
-      <div className="flex min-h-100 items-center justify-center">
-        <p className="text-text-secondary">세션 정보를 불러오는 중...</p>
-      </div>
-    );
+    return <WaitingRoomContentSkeleton />;
   }
 
   if (error || !data?.result) {

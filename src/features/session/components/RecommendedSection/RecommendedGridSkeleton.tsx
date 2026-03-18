@@ -5,9 +5,11 @@ import { CardSkeleton } from "../Card/CardSkeleton";
  */
 export function RecommendedGridSkeleton() {
   return (
-    <div className="gap-md grid grid-cols-4">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-y-[48px]">
       {Array.from({ length: 4 }).map((_, i) => (
-        <CardSkeleton key={i} />
+        <div key={i} className="mx-auto w-full max-w-69">
+          <CardSkeleton />
+        </div>
       ))}
     </div>
   );

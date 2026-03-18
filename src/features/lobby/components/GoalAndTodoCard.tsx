@@ -16,6 +16,7 @@ import {
   useUpdateGoal,
   useUpdateTodo,
 } from "@/features/task/hooks/useTaskHooks";
+import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { toast } from "@/lib/toast";
@@ -166,6 +167,32 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
     if (draftTodos.length >= 5) return;
     setDraftTodos((prev) => [...prev, { subtaskId: -Date.now(), content: "", isNew: true }]);
   };
+
+  const hasUnsavedChanges = (() => {
+    if (!isEditing) return false;
+    if (draftGoal.trim() !== goal.trim()) return true;
+    if (deletedTodoIds.length > 0) return true;
+    if (draftTodos.length !== todos.length) return true;
+
+    const originalTodoMap = new Map(todos.map((todo) => [todo.subtaskId, todo.content.trim()]));
+
+    for (const draftTodo of draftTodos) {
+      const nextContent = draftTodo.content.trim();
+
+      if (draftTodo.isNew) {
+        if (nextContent.length > 0) return true;
+        continue;
+      }
+
+      const originalContent = originalTodoMap.get(draftTodo.subtaskId);
+      if (originalContent === undefined) return true;
+      if (originalContent !== nextContent) return true;
+    }
+
+    return false;
+  })();
+
+  useUnsavedChangesWarning(hasUnsavedChanges && !isSaving);
 
   const displayTodos = isEditing ? draftTodos : todos;
 

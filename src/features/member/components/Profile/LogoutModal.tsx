@@ -20,19 +20,32 @@ export function LogoutModal({ onClose }: LogoutModalProps) {
   const router = useRouter();
 
   const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
   const setDialogRef = useCallback((node: HTMLDialogElement | null) => {
     if (node && !node.open) {
+      previousActiveElementRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
       node.showModal();
     }
     dialogRef.current = node;
   }, []);
 
+  const restoreFocus = () => {
+    previousActiveElementRef.current?.focus();
+    previousActiveElementRef.current = null;
+  };
+
+  const handleClose = () => {
+    onClose();
+    restoreFocus();
+  };
+
   const handleBackdropClick = (event: React.MouseEvent<HTMLDialogElement>) => {
     if (event.target !== dialogRef.current) return;
     if (isLoggingOut) return;
-    onClose();
+    handleClose();
   };
 
   const handleLogout = () => {
@@ -41,6 +54,7 @@ export function LogoutModal({ onClose }: LogoutModalProps) {
     logout(undefined, {
       onSuccess: () => {
         onClose();
+        previousActiveElementRef.current = null;
         router.replace("/");
         router.refresh();
       },
@@ -56,7 +70,7 @@ export function LogoutModal({ onClose }: LogoutModalProps) {
         ref={setDialogRef}
         onCancel={(e) => {
           e.preventDefault();
-          if (!isLoggingOut) onClose();
+          if (!isLoggingOut) handleClose();
         }}
         onClick={handleBackdropClick}
         className="bg-surface-default p-3xl border-border-default fixed inset-0 m-auto flex w-full max-w-[440px] flex-col gap-16 rounded-lg border backdrop:bg-(--color-overlay-default)"
@@ -74,7 +88,7 @@ export function LogoutModal({ onClose }: LogoutModalProps) {
             colorScheme="tertiary"
             size="medium"
             className="flex-1"
-            onClick={onClose}
+            onClick={handleClose}
             disabled={isLoggingOut}
           >
             취소

@@ -11,8 +11,11 @@ import { Textarea } from "@/components/Input/Textarea";
 import { TextInput } from "@/components/Input/TextInput";
 import { useMeForEdit, useUpdateMe } from "@/features/member/hooks/useMemberHooks";
 import { profileEditSchema, type ProfileEditFormValues } from "@/features/member/schemas";
+import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { CATEGORY_LABELS, ONBOARDING_CATEGORIES } from "@/lib/constants/category";
 import { toast } from "@/lib/toast";
+
+import { ProfileEditFormSkeleton } from "./ProfileEditFormSkeleton";
 
 export function ProfileEditForm() {
   const { data: meData } = useMeForEdit();
@@ -51,6 +54,8 @@ export function ProfileEditForm() {
     }
   }, [profile, reset]);
 
+  useUnsavedChangesWarning(isDirty && !isPending);
+
   const onSubmit = (values: ProfileEditFormValues) => {
     const { nickname, bio, interestCategories } = values;
 
@@ -79,7 +84,7 @@ export function ProfileEditForm() {
   };
 
   if (!profile) {
-    return <div className="flex h-40 w-full items-center justify-center">Loading...</div>;
+    return <ProfileEditFormSkeleton />;
   }
 
   return (
