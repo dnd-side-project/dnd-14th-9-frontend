@@ -14,6 +14,7 @@ import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
 
+import { useLeaveOnUnmount } from "../hooks/useLeaveOnUnmount";
 import { useWaitingMembersSSE } from "../hooks/useWaitingMembersSSE";
 
 import { GoalAndTodoCard } from "./GoalAndTodoCard";
@@ -53,6 +54,13 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
 
   const myMemberId = meData?.result?.id;
 
+  const { isSessionTransitionRef } = useLeaveOnUnmount({
+    sessionId,
+    enabled: wasParticipant,
+    isLeavingRef,
+    isKicked,
+  });
+
   // 세션 상태 SSE - 대기 상태가 아니면 적절한 페이지로 이동
   // hard navigation을 사용하여 modal interceptor routing 우회
   useSessionStatusSSE({
@@ -60,8 +68,10 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
     enabled: true,
     onStatusChange: (eventData) => {
       if (eventData.status === "IN_PROGRESS") {
+        isSessionTransitionRef.current = true;
         window.location.replace(`/session/${sessionId}`);
       } else if (eventData.status === "COMPLETED") {
+        isSessionTransitionRef.current = true;
         window.location.replace(`/session/${sessionId}/result`);
       }
     },
