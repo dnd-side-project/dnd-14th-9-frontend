@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 interface UseLeaveOnUnmountOptions {
   sessionId: string;
   enabled: boolean;
-  isLeavingRef: React.MutableRefObject<boolean>;
+  isLeavingRef: React.RefObject<boolean>;
   isKicked: boolean;
 }
 
