@@ -67,12 +67,18 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
     sessionId,
     enabled: true,
     onStatusChange: (eventData) => {
-      if (eventData.status === "IN_PROGRESS") {
+      const { status } = eventData;
+      let targetUrl: string | null = null;
+
+      if (status === "IN_PROGRESS") {
+        targetUrl = `/session/${sessionId}`;
+      } else if (status === "COMPLETED") {
+        targetUrl = `/session/${sessionId}/result`;
+      }
+
+      if (targetUrl) {
         isSessionTransitionRef.current = true;
-        window.location.replace(`/session/${sessionId}`);
-      } else if (eventData.status === "COMPLETED") {
-        isSessionTransitionRef.current = true;
-        window.location.replace(`/session/${sessionId}/result`);
+        window.location.replace(targetUrl);
       }
     },
   });
