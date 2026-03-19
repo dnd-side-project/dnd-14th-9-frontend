@@ -133,11 +133,6 @@ function DatePickerSingle({
   showTimePicker,
   ref,
 }: DatePickerSingleProps) {
-  const hour = value ? value.getHours() : new Date().getHours();
-  const minute = value
-    ? Math.floor(value.getMinutes() / 5) * 5
-    : Math.floor(new Date().getMinutes() / 5) * 5;
-
   const {
     displayYearMonth,
     displayText,
@@ -148,11 +143,17 @@ function DatePickerSingle({
     handleDateClick: baseHandleDateClick,
   } = useDatePickerSingle({ value, defaultValue, onChange });
 
+  const timeSource = selectedDate ?? defaultValue;
+  const hour = timeSource ? timeSource.getHours() : new Date().getHours();
+  const minute = timeSource
+    ? Math.floor(timeSource.getMinutes() / 5) * 5
+    : Math.floor(new Date().getMinutes() / 5) * 5;
+
   const handleDateClick = (date: Date) => {
     if (showTimePicker) {
       const newDate = new Date(date);
       newDate.setHours(hour, minute, 0, 0);
-      onChange?.(newDate);
+      baseHandleDateClick(newDate);
     } else {
       baseHandleDateClick(date);
     }
@@ -162,7 +163,7 @@ function DatePickerSingle({
     if (selectedDate) {
       const newDate = new Date(selectedDate);
       newDate.setHours(newHour, minute, 0, 0);
-      onChange?.(newDate);
+      baseHandleDateClick(newDate);
     }
   };
 
@@ -170,7 +171,7 @@ function DatePickerSingle({
     if (selectedDate) {
       const newDate = new Date(selectedDate);
       newDate.setHours(hour, newMinute, 0, 0);
-      onChange?.(newDate);
+      baseHandleDateClick(newDate);
     }
   };
 
