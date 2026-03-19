@@ -267,7 +267,12 @@ function DatePickerSingle({
 
         {/* Time Picker Section */}
         {showTimePicker && (
-          <div className="border-divider-subtle flex flex-col border-l pl-4">
+          <div
+            className={cn(
+              "border-divider-subtle flex flex-col border-l pl-4",
+              !selectedDate && "pointer-events-none opacity-50"
+            )}
+          >
             <span className="text-text-secondary mb-4 text-lg font-semibold">시간</span>
             <TimePickerPanel
               hour={hour}
