@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 export type DefaultProfileIconProps = Omit<IconProps, "svg">;
@@ -26,10 +24,9 @@ const DEFAULT_PROFILE_SVG = (
   </svg>
 );
 
-export const DefaultProfileIcon = forwardRef<HTMLSpanElement, DefaultProfileIconProps>(
-  (props, ref) => {
-    return <Icon ref={ref} svg={DEFAULT_PROFILE_SVG} {...props} />;
-  }
-);
-
-DefaultProfileIcon.displayName = "DefaultProfileIcon";
+export function DefaultProfileIcon({
+  ref,
+  ...props
+}: DefaultProfileIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
+  return <Icon ref={ref} svg={DEFAULT_PROFILE_SVG} {...props} />;
+}

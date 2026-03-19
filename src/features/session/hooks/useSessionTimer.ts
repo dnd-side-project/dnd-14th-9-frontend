@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface TimerState {
   elapsedSeconds: number;
@@ -166,44 +166,41 @@ export function useSessionTimer({
   const lastTickRef = useRef<number>(0);
 
   // 시간 델타를 적용하는 공통 함수
-  const applyDelta = useCallback(
-    (delta: number, countFocus: boolean) => {
-      setState((prev) => {
-        if (!prev.isRunning) return prev;
+  const applyDelta = (delta: number, countFocus: boolean) => {
+    setState((prev) => {
+      if (!prev.isRunning) return prev;
 
-        const nextElapsed = Math.min(prev.elapsedSeconds + delta, maxSeconds);
-        const focusDelta = countFocus && prev.isFocusing ? delta : 0;
-        const nextFocused = Math.min(prev.focusedSeconds + focusDelta, nextElapsed);
+      const nextElapsed = Math.min(prev.elapsedSeconds + delta, maxSeconds);
+      const focusDelta = countFocus && prev.isFocusing ? delta : 0;
+      const nextFocused = Math.min(prev.focusedSeconds + focusDelta, nextElapsed);
 
-        const nextFocusRate =
-          maxSeconds > 0 ? Math.min(Math.round((nextElapsed / maxSeconds) * 100), 100) : 0;
-        const focusRateChanged = Math.abs(nextFocusRate - prev.focusRate) >= 1;
+      const nextFocusRate =
+        maxSeconds > 0 ? Math.min(Math.round((nextElapsed / maxSeconds) * 100), 100) : 0;
+      const focusRateChanged = Math.abs(nextFocusRate - prev.focusRate) >= 1;
 
-        if (nextElapsed >= maxSeconds) {
-          const next: TimerState = {
-            ...prev,
-            elapsedSeconds: maxSeconds,
-            focusedSeconds: nextFocused,
-            focusRate: nextFocusRate,
-            isRunning: false,
-            isFocusing: false,
-          };
-          saveTimerState(sessionId, next);
-          return next;
-        }
-
+      if (nextElapsed >= maxSeconds) {
         const next: TimerState = {
           ...prev,
-          elapsedSeconds: nextElapsed,
+          elapsedSeconds: maxSeconds,
           focusedSeconds: nextFocused,
-          focusRate: focusRateChanged ? nextFocusRate : prev.focusRate,
+          focusRate: nextFocusRate,
+          isRunning: false,
+          isFocusing: false,
         };
         saveTimerState(sessionId, next);
         return next;
-      });
-    },
-    [maxSeconds, sessionId]
-  );
+      }
+
+      const next: TimerState = {
+        ...prev,
+        elapsedSeconds: nextElapsed,
+        focusedSeconds: nextFocused,
+        focusRate: focusRateChanged ? nextFocusRate : prev.focusRate,
+      };
+      saveTimerState(sessionId, next);
+      return next;
+    });
+  };
 
   // 매 초 타이머 틱 - 시간 델타 기반으로 백그라운드 탭에서도 정확한 시간 계산
   useEffect(() => {
@@ -222,7 +219,7 @@ export function useSessionTimer({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [state.isRunning, maxSeconds, sessionId, applyDelta]);
+  }, [state.isRunning, maxSeconds, sessionId]);
 
   // 탭이 다시 보일 때 즉시 시간 보정
   useEffect(() => {
@@ -247,23 +244,23 @@ export function useSessionTimer({
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [state.isRunning, maxSeconds, sessionId, applyDelta]);
+  }, [state.isRunning, maxSeconds, sessionId]);
 
-  const start = useCallback(() => {
+  const start = () => {
     setState((prev) => {
       const next: TimerState = { ...prev, isRunning: true, isFocusing: true };
       saveTimerState(sessionId, next);
       return next;
     });
-  }, [sessionId]);
+  };
 
-  const pause = useCallback(() => {
+  const pause = () => {
     setState((prev) => {
       const next: TimerState = { ...prev, isRunning: false, isFocusing: false };
       saveTimerState(sessionId, next);
       return next;
     });
-  }, [sessionId]);
+  };
 
   const progress = maxSeconds > 0 ? Math.min((state.elapsedSeconds / maxSeconds) * 100, 100) : 0;
   const formatted = formatTime(state.elapsedSeconds);

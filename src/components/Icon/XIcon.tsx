@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const XSvg = (
@@ -19,18 +17,19 @@ const XSvg = (
 
 export type XIconProps = Omit<IconProps, "svg">;
 
-export const XIcon = forwardRef<HTMLSpanElement, XIconProps>(
-  ({ size = "xsmall", className, ...props }, ref) => {
-    return (
-      <Icon
-        ref={ref}
-        size={size}
-        svg={XSvg}
-        className={className ?? "text-text-brand-default"}
-        {...props}
-      />
-    );
-  }
-);
-
-XIcon.displayName = "XIcon";
+export function XIcon({
+  ref,
+  size = "xsmall",
+  className,
+  ...props
+}: XIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
+  return (
+    <Icon
+      ref={ref}
+      size={size}
+      svg={XSvg}
+      className={className ?? "text-text-brand-default"}
+      {...props}
+    />
+  );
+}

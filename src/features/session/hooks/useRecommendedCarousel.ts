@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 
 /**
  * useRecommendedCarousel - 추천 세션 캐러셀 슬라이드 관리
@@ -12,12 +12,9 @@ export function useRecommendedCarousel(totalPages: number) {
 
   const safeTotal = Math.max(totalPages, 1);
 
-  const handlePageChange = useCallback(
-    (page: number) => {
-      setCurrentPage(Math.max(1, Math.min(page, safeTotal)));
-    },
-    [safeTotal]
-  );
+  const handlePageChange = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, safeTotal)));
+  };
 
   return {
     currentPage,

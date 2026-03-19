@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const AlertSvg = (
@@ -19,18 +17,19 @@ const AlertSvg = (
 
 export type AlertIconProps = Omit<IconProps, "svg">;
 
-export const AlertIcon = forwardRef<HTMLSpanElement, AlertIconProps>(
-  ({ size = "xlarge", className, ...props }, ref) => {
-    return (
-      <Icon
-        ref={ref}
-        size={size}
-        svg={AlertSvg}
-        className={className ?? "text-text-primary"}
-        {...props}
-      />
-    );
-  }
-);
-
-AlertIcon.displayName = "AlertIcon";
+export function AlertIcon({
+  ref,
+  size = "xlarge",
+  className,
+  ...props
+}: AlertIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
+  return (
+    <Icon
+      ref={ref}
+      size={size}
+      svg={AlertSvg}
+      className={className ?? "text-text-primary"}
+      {...props}
+    />
+  );
+}

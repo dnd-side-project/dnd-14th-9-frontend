@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -62,14 +62,11 @@ export function SessionCreateForm() {
   const datePickerContainerRef = useRef<HTMLDivElement>(null);
 
   // 외부 클릭 시 DatePicker 닫기
-  const closeDatePicker = useCallback(() => setIsDatePickerOpen(false), []);
+  const closeDatePicker = () => setIsDatePickerOpen(false);
   useClickOutside(datePickerContainerRef, closeDatePicker, isDatePickerOpen);
 
   // 이미지 미리보기 URL 생성
-  const imagePreviewUrl = useMemo(() => {
-    if (!selectedImage) return null;
-    return URL.createObjectURL(selectedImage);
-  }, [selectedImage]);
+  const imagePreviewUrl = selectedImage ? URL.createObjectURL(selectedImage) : null;
 
   // 이미지 미리보기 URL 정리 (메모리 누수 방지)
   useEffect(() => {
@@ -80,9 +77,9 @@ export function SessionCreateForm() {
     };
   }, [imagePreviewUrl]);
 
-  const handleImageRemove = useCallback(() => {
+  const handleImageRemove = () => {
     setSelectedImage(null);
-  }, []);
+  };
 
   // validation / API 연동 상태
   const [formErrors, setFormErrors] = useState<SessionFormErrors>({});
@@ -90,14 +87,14 @@ export function SessionCreateForm() {
   const router = useRouter();
   const { mutate: createSession, isPending } = useCreateSession();
 
-  const clearFieldError = useCallback((field: keyof SessionFormErrors) => {
+  const clearFieldError = (field: keyof SessionFormErrors) => {
     setFormErrors((prev) => {
       if (!prev[field]) return prev;
       const next = { ...prev };
       delete next[field];
       return next;
     });
-  }, []);
+  };
 
   const hasUnsavedChanges =
     roomName.trim().length > 0 ||

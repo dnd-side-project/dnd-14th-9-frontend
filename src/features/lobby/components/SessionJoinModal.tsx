@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ButtonGroup } from "@/components/ButtonGroup/ButtonGroup";
@@ -39,12 +39,12 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
   const joinSessionMutation = useJoinSession();
 
   // callback ref: dialog 요소가 DOM에 마운트되면 showModal 호출
-  const setDialogRef = useCallback((node: HTMLDialogElement | null) => {
+  const setDialogRef = (node: HTMLDialogElement | null) => {
     if (node && !node.open) {
       node.showModal();
     }
     dialogRef.current = node;
-  }, []);
+  };
 
   const handleBackdropClick = (event: React.MouseEvent<HTMLDialogElement>) => {
     if (event.target !== dialogRef.current) return;

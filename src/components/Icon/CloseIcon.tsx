@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const CloseSvg = (
@@ -19,18 +17,19 @@ const CloseSvg = (
 
 export type CloseIconProps = Omit<IconProps, "svg">;
 
-export const CloseIcon = forwardRef<HTMLSpanElement, CloseIconProps>(
-  ({ size = "medium", className, ...props }, ref) => {
-    return (
-      <Icon
-        ref={ref}
-        size={size}
-        svg={CloseSvg}
-        className={className ?? "text-text-muted"}
-        {...props}
-      />
-    );
-  }
-);
-
-CloseIcon.displayName = "CloseIcon";
+export function CloseIcon({
+  ref,
+  size = "medium",
+  className,
+  ...props
+}: CloseIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
+  return (
+    <Icon
+      ref={ref}
+      size={size}
+      svg={CloseSvg}
+      className={className ?? "text-text-muted"}
+      {...props}
+    />
+  );
+}

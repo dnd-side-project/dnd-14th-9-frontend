@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useState } from "react";
+import { useState } from "react";
 
 import Image from "next/image";
 
@@ -48,6 +48,7 @@ export interface ThumbnailProps
   src: string | null | undefined;
   alt: string;
   fallbackSrc?: string;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
 interface ThumbnailImageProps {
@@ -84,32 +85,37 @@ const ThumbnailImage = ({ src, alt, fallbackSrc, onLoadingChange }: ThumbnailIma
   );
 };
 
-export const Thumbnail = forwardRef<HTMLDivElement, ThumbnailProps>(
-  ({ className, radius, border, src, alt, fallbackSrc = DEFAULT_PLACEHOLDER, ...props }, ref) => {
-    const [isLoading, setIsLoading] = useState(true);
-    const imageSrc = src || fallbackSrc;
+export function Thumbnail({
+  className,
+  radius,
+  border,
+  src,
+  alt,
+  fallbackSrc = DEFAULT_PLACEHOLDER,
+  ref,
+  ...props
+}: ThumbnailProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const imageSrc = src || fallbackSrc;
 
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          THUMBNAIL_VARIANTS({ radius, border, className }),
-          isLoading && "animate-pulse"
-        )}
-        {...props}
-      >
-        <ThumbnailImage
-          key={imageSrc}
-          src={imageSrc}
-          alt={alt}
-          fallbackSrc={fallbackSrc}
-          onLoadingChange={setIsLoading}
-        />
-      </div>
-    );
-  }
-);
-
-Thumbnail.displayName = "Thumbnail";
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        THUMBNAIL_VARIANTS({ radius, border, className }),
+        isLoading && "animate-pulse"
+      )}
+      {...props}
+    >
+      <ThumbnailImage
+        key={imageSrc}
+        src={imageSrc}
+        alt={alt}
+        fallbackSrc={fallbackSrc}
+        onLoadingChange={setIsLoading}
+      />
+    </div>
+  );
+}
 
 export { THUMBNAIL_VARIANTS };

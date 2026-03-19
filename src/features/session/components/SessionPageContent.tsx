@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
-
 import { notFound } from "next/navigation";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
@@ -50,7 +48,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const sessionDurationMinutes = sessionData?.result?.sessionDurationMinutes;
 
   // 세션 완료 시 결과 제출 및 페이지 이동
-  const handleSessionComplete = useCallback(async () => {
+  const handleSessionComplete = async () => {
     const maxSeconds = (sessionDurationMinutes ?? 0) * 60;
     const timerState = getTimerState(sessionId, maxSeconds);
 
@@ -75,7 +73,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     // 타이머 상태 정리 후 이동
     clearTimerState(sessionId);
     window.location.replace(`/session/${sessionId}/result`);
-  }, [sessionId, sessionDurationMinutes, submitResultMutation]);
+  };
 
   // 세션 상태 SSE - 진행 중 상태가 아니면 적절한 페이지로 이동
   useSessionStatusSSE({

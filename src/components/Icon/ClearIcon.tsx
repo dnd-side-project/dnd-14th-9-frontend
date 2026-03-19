@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const ClearSvg = (
@@ -23,8 +21,9 @@ const ClearSvg = (
 
 export type ClearIconProps = Omit<IconProps, "svg">;
 
-export const ClearIcon = forwardRef<HTMLSpanElement, ClearIconProps>((props, ref) => {
+export function ClearIcon({
+  ref,
+  ...props
+}: ClearIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={ClearSvg} {...props} />;
-});
-
-ClearIcon.displayName = "ClearIcon";
+}

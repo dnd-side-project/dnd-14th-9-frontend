@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { SSEClient } from "./client";
 
@@ -50,21 +50,21 @@ export function useSSE<T>({
     onErrorRef.current = onError;
   }, [onError]);
 
-  const connect = useCallback(() => {
+  const connect = () => {
     if (!clientRef.current) return;
 
     setError(null);
     clientRef.current.connect(url);
-  }, [url]);
+  };
 
-  const disconnect = useCallback(() => {
+  const disconnect = () => {
     clientRef.current?.disconnect();
-  }, []);
+  };
 
-  const reconnect = useCallback(() => {
+  const reconnect = () => {
     disconnect();
     connect();
-  }, [disconnect, connect]);
+  };
 
   useEffect(() => {
     if (!enabled) return;

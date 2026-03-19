@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 interface CountdownResult {
   hours: number;
@@ -11,9 +11,9 @@ interface CountdownResult {
 }
 
 export function useCountdown(targetTime: Date): CountdownResult {
-  const calculateRemaining = useCallback(() => {
+  const calculateRemaining = () => {
     return Math.max(0, Math.floor((targetTime.getTime() - Date.now()) / 1000));
-  }, [targetTime]);
+  };
 
   const [totalSeconds, setTotalSeconds] = useState(calculateRemaining);
 
@@ -27,7 +27,7 @@ export function useCountdown(targetTime: Date): CountdownResult {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [calculateRemaining]);
+  }, [targetTime]);
 
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);

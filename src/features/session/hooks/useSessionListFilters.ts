@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
-
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { SORT_OPTIONS } from "../components/SessionList/sessionListFilter.types";
@@ -57,18 +55,15 @@ export function useSessionListFilters() {
     sort: parsedParams.sort,
   };
 
-  const updateFilters = useCallback(
-    (
-      updates: SessionSearchParamUpdates,
-      options: UpdateFiltersOptions = DEFAULT_UPDATE_OPTIONS
-    ) => {
-      const href = buildUpdatedSessionSearchHref(searchParams, updates, {
-        resetPage: options.resetPage,
-      });
-      router.push(href, { scroll: false });
-    },
-    [router, searchParams]
-  );
+  const updateFilters = (
+    updates: SessionSearchParamUpdates,
+    options: UpdateFiltersOptions = DEFAULT_UPDATE_OPTIONS
+  ) => {
+    const href = buildUpdatedSessionSearchHref(searchParams, updates, {
+      resetPage: options.resetPage,
+    });
+    router.push(href, { scroll: false });
+  };
 
   const setDateRange = (startDate: Date | null, endDate: Date | null) => {
     updateFilters({
@@ -114,19 +109,16 @@ export function useSessionListFilters() {
     updateFilters({ sort: nextSort });
   };
 
-  const setPage = useCallback(
-    (page: number) => {
-      updateFilters(
-        {
-          page: page === 1 ? null : String(page),
-        },
-        { resetPage: false }
-      );
-    },
-    [updateFilters]
-  );
+  const setPage = (page: number) => {
+    updateFilters(
+      {
+        page: page === 1 ? null : String(page),
+      },
+      { resetPage: false }
+    );
+  };
 
-  const resetFilters = useCallback(() => {
+  const resetFilters = () => {
     updateFilters({
       startDate: null,
       endDate: null,
@@ -134,7 +126,7 @@ export function useSessionListFilters() {
       durationRange: null,
       participants: null,
     });
-  }, [updateFilters]);
+  };
 
   return {
     values,

@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const ThumbsDownSvg = (
@@ -19,8 +17,9 @@ const ThumbsDownSvg = (
 
 export type ThumbsDownIconProps = Omit<IconProps, "svg">;
 
-export const ThumbsDownIcon = forwardRef<HTMLSpanElement, ThumbsDownIconProps>((props, ref) => {
+export function ThumbsDownIcon({
+  ref,
+  ...props
+}: ThumbsDownIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={ThumbsDownSvg} {...props} />;
-});
-
-ThumbsDownIcon.displayName = "ThumbsDownIcon";
+}

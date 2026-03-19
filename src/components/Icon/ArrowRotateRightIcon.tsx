@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const ArrowRotateRightSvg = (
@@ -19,10 +17,9 @@ const ArrowRotateRightSvg = (
 
 export type ArrowRotateRightIconProps = Omit<IconProps, "svg">;
 
-export const ArrowRotateRightIcon = forwardRef<HTMLSpanElement, ArrowRotateRightIconProps>(
-  (props, ref) => {
-    return <Icon ref={ref} svg={ArrowRotateRightSvg} {...props} />;
-  }
-);
-
-ArrowRotateRightIcon.displayName = "ArrowRotateRightIcon";
+export function ArrowRotateRightIcon({
+  ref,
+  ...props
+}: ArrowRotateRightIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
+  return <Icon ref={ref} svg={ArrowRotateRightSvg} {...props} />;
+}

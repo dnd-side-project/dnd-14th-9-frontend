@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 export type LogoutIconProps = Omit<IconProps, "svg">;
@@ -19,8 +17,9 @@ const LogoutSvg = (
   </svg>
 );
 
-export const LogoutIcon = forwardRef<HTMLSpanElement, LogoutIconProps>((props, ref) => {
+export function LogoutIcon({
+  ref,
+  ...props
+}: LogoutIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={LogoutSvg} {...props} />;
-});
-
-LogoutIcon.displayName = "LogoutIcon";
+}

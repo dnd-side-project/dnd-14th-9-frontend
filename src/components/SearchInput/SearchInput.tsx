@@ -1,4 +1,4 @@
-import { forwardRef, type InputHTMLAttributes } from "react";
+import { type InputHTMLAttributes } from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -50,34 +50,31 @@ export interface SearchInputProps
     Omit<InputHTMLAttributes<HTMLInputElement>, "type">,
     VariantProps<typeof searchInputContainerVariants> {
   onSearchClick?: () => void;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
-export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ className, onSearchClick, ...props }, ref) => {
-    return (
-      <div className={cn(searchInputContainerVariants(), className)}>
-        <input
-          ref={ref}
-          type="text"
-          className={searchInputVariants()}
-          placeholder={props.placeholder ?? " "}
-          {...props}
+export function SearchInput({ className, onSearchClick, ref, ...props }: SearchInputProps) {
+  return (
+    <div className={cn(searchInputContainerVariants(), className)}>
+      <input
+        ref={ref}
+        type="text"
+        className={searchInputVariants()}
+        placeholder={props.placeholder ?? " "}
+        {...props}
+      />
+      <button
+        type="button"
+        onClick={onSearchClick}
+        className="p-xs flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors hover:bg-gray-800"
+      >
+        <SearchIcon
+          size="small"
+          className="group-focus-within:text-text-primary text-gray-300 transition-colors"
         />
-        <button
-          type="button"
-          onClick={onSearchClick}
-          className="p-xs flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors hover:bg-gray-800"
-        >
-          <SearchIcon
-            size="small"
-            className="group-focus-within:text-text-primary text-gray-300 transition-colors"
-          />
-        </button>
-      </div>
-    );
-  }
-);
-
-SearchInput.displayName = "SearchInput";
+      </button>
+    </div>
+  );
+}
 
 export { searchInputContainerVariants, searchInputVariants };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
 import { cn } from "@/lib/utils/utils";
 
@@ -25,24 +25,21 @@ export function TimePickerPanel({
   const hourListRef = useRef<HTMLDivElement>(null);
   const minuteListRef = useRef<HTMLDivElement>(null);
 
-  const scrollToSelected = useCallback(
-    (ref: React.RefObject<HTMLDivElement | null>, index: number) => {
-      if (ref.current) {
-        const itemHeight = 36;
-        ref.current.scrollTop = index * itemHeight;
-      }
-    },
-    []
-  );
+  const scrollToSelected = (ref: React.RefObject<HTMLDivElement | null>, index: number) => {
+    if (ref.current) {
+      const itemHeight = 36;
+      ref.current.scrollTop = index * itemHeight;
+    }
+  };
 
   useEffect(() => {
     scrollToSelected(hourListRef, hour);
-  }, [hour, scrollToSelected]);
+  }, [hour]);
 
   useEffect(() => {
     const minuteIndex = Math.floor(minute / 5);
     scrollToSelected(minuteListRef, minuteIndex);
-  }, [minute, scrollToSelected]);
+  }, [minute]);
 
   return (
     <div className={cn("flex gap-2", className)}>

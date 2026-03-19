@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 export type ProfileCircleIconProps = Omit<IconProps, "svg">;
@@ -23,10 +21,9 @@ const ProfileCircleSvg = (
   </svg>
 );
 
-export const ProfileCircleIcon = forwardRef<HTMLSpanElement, ProfileCircleIconProps>(
-  (props, ref) => {
-    return <Icon ref={ref} svg={ProfileCircleSvg} {...props} />;
-  }
-);
-
-ProfileCircleIcon.displayName = "ProfileCircleIcon";
+export function ProfileCircleIcon({
+  ref,
+  ...props
+}: ProfileCircleIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
+  return <Icon ref={ref} svg={ProfileCircleSvg} {...props} />;
+}

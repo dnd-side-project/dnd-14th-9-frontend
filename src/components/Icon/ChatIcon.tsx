@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const ChatSvg = (
@@ -19,8 +17,6 @@ const ChatSvg = (
 
 export type ChatIconProps = Omit<IconProps, "svg">;
 
-export const ChatIcon = forwardRef<HTMLSpanElement, ChatIconProps>((props, ref) => {
+export function ChatIcon({ ref, ...props }: ChatIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={ChatSvg} {...props} />;
-});
-
-ChatIcon.displayName = "ChatIcon";
+}

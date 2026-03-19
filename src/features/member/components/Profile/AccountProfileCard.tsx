@@ -1,5 +1,3 @@
-import { memo } from "react";
-
 import { Avatar } from "@/components/Avatar/Avatar";
 import { Badge } from "@/components/Badge/Badge";
 import type { MemberProfileView } from "@/features/member/types";
@@ -23,7 +21,7 @@ function AccountProfileCardSkeleton() {
   );
 }
 
-export const AccountProfileCard = memo(function AccountProfileCard({
+export function AccountProfileCard({
   profile,
   isLoading,
 }: {
@@ -58,4 +56,4 @@ export const AccountProfileCard = memo(function AccountProfileCard({
       ) : null}
     </div>
   );
-});
+}

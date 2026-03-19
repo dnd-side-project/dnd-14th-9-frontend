@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const ClockSvg = (
@@ -29,8 +27,9 @@ const ClockSvg = (
 
 export type ClockIconProps = Omit<IconProps, "svg">;
 
-export const ClockIcon = forwardRef<HTMLSpanElement, ClockIconProps>((props, ref) => {
+export function ClockIcon({
+  ref,
+  ...props
+}: ClockIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={ClockSvg} {...props} />;
-});
-
-ClockIcon.displayName = "ClockIcon";
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
@@ -24,12 +24,12 @@ export function KickConfirmDialog({
 
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
-  const setDialogRef = useCallback((node: HTMLDialogElement | null) => {
+  const setDialogRef = (node: HTMLDialogElement | null) => {
     if (node && !node.open) {
       node.showModal();
     }
     dialogRef.current = node;
-  }, []);
+  };
 
   const handleBackdropClick = (event: React.MouseEvent<HTMLDialogElement>) => {
     if (event.target !== dialogRef.current) return;

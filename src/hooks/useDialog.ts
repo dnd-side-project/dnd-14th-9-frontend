@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -22,14 +22,14 @@ export function useDialog(fallbackPath: string = "/") {
 
   useBodyScrollLock();
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     if (window.history.length > 1) {
       router.back();
       return;
     }
 
     router.replace(fallbackPath);
-  }, [router, fallbackPath]);
+  };
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -46,13 +46,10 @@ export function useDialog(fallbackPath: string = "/") {
     };
   }, []);
 
-  const handleBackdropClick = useCallback(
-    (event: React.MouseEvent<HTMLDialogElement>) => {
-      if (event.target !== dialogRef.current) return;
-      handleClose();
-    },
-    [handleClose]
-  );
+  const handleBackdropClick = (event: React.MouseEvent<HTMLDialogElement>) => {
+    if (event.target !== dialogRef.current) return;
+    handleClose();
+  };
 
   return { dialogRef, handleClose, handleBackdropClick };
 }

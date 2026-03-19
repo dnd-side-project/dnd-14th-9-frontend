@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState } from "react";
 
 import {
   formatDateRangeDisplay,
@@ -51,14 +51,12 @@ export function useDatePicker({
   const selectedRange = value ?? internalRange;
   const displayYearMonth = formatYearMonth(currentMonth);
 
-  const displayText = useMemo(() => {
-    if (selectedRange.startDate && selectedRange.endDate) {
-      return formatDateRangeDisplay(selectedRange.startDate, selectedRange.endDate);
-    }
-    return formatDateWithDay(new Date());
-  }, [selectedRange.startDate, selectedRange.endDate]);
+  const displayText =
+    selectedRange.startDate && selectedRange.endDate
+      ? formatDateRangeDisplay(selectedRange.startDate, selectedRange.endDate)
+      : formatDateWithDay(new Date());
 
-  const calendarDays = useMemo((): CalendarDay[] => {
+  const calendarDays = ((): CalendarDay[] => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
 
@@ -139,44 +137,41 @@ export function useDatePicker({
     }
 
     return days;
-  }, [currentMonth, selectedRange]);
+  })();
 
-  const goToPrevMonth = useCallback(() => {
+  const goToPrevMonth = () => {
     setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
-  }, []);
+  };
 
-  const goToNextMonth = useCallback(() => {
+  const goToNextMonth = () => {
     setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
-  }, []);
+  };
 
-  const handleDateClick = useCallback(
-    (date: Date) => {
-      let newRange: DateRange;
+  const handleDateClick = (date: Date) => {
+    let newRange: DateRange;
 
-      if (selectionPhase === "start") {
-        newRange = { startDate: date, endDate: null };
-        setSelectionPhase("end");
-      } else {
-        if (selectedRange.startDate) {
-          // 클릭한 날짜가 startDate 이후면 그대로, 이전이면 swap
-          if (date >= selectedRange.startDate) {
-            newRange = { startDate: selectedRange.startDate, endDate: date };
-          } else {
-            newRange = { startDate: date, endDate: selectedRange.startDate };
-          }
+    if (selectionPhase === "start") {
+      newRange = { startDate: date, endDate: null };
+      setSelectionPhase("end");
+    } else {
+      if (selectedRange.startDate) {
+        // 클릭한 날짜가 startDate 이후면 그대로, 이전이면 swap
+        if (date >= selectedRange.startDate) {
+          newRange = { startDate: selectedRange.startDate, endDate: date };
         } else {
-          newRange = { startDate: date, endDate: null };
+          newRange = { startDate: date, endDate: selectedRange.startDate };
         }
-        setSelectionPhase("start");
+      } else {
+        newRange = { startDate: date, endDate: null };
       }
+      setSelectionPhase("start");
+    }
 
-      if (!value) {
-        setInternalRange(newRange);
-      }
-      onChange?.(newRange);
-    },
-    [selectionPhase, selectedRange.startDate, value, onChange]
-  );
+    if (!value) {
+      setInternalRange(newRange);
+    }
+    onChange?.(newRange);
+  };
 
   return {
     currentMonth,
@@ -201,14 +196,11 @@ export function useDatePickerSingle({
   const selectedDate = value !== undefined ? value : internalDate;
   const displayYearMonth = formatYearMonth(currentMonth);
 
-  const displayText = useMemo(() => {
-    if (selectedDate) {
-      return formatDateWithDay(selectedDate);
-    }
-    return formatDateWithDay(new Date());
-  }, [selectedDate]);
+  const displayText = selectedDate
+    ? formatDateWithDay(selectedDate)
+    : formatDateWithDay(new Date());
 
-  const calendarDays = useMemo((): CalendarDay[] => {
+  const calendarDays = ((): CalendarDay[] => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
 
@@ -277,25 +269,22 @@ export function useDatePickerSingle({
     }
 
     return days;
-  }, [currentMonth, selectedDate]);
+  })();
 
-  const goToPrevMonth = useCallback(() => {
+  const goToPrevMonth = () => {
     setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
-  }, []);
+  };
 
-  const goToNextMonth = useCallback(() => {
+  const goToNextMonth = () => {
     setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
-  }, []);
+  };
 
-  const handleDateClick = useCallback(
-    (date: Date) => {
-      if (value === undefined) {
-        setInternalDate(date);
-      }
-      onChange?.(date);
-    },
-    [value, onChange]
-  );
+  const handleDateClick = (date: Date) => {
+    if (value === undefined) {
+      setInternalDate(date);
+    }
+    onChange?.(date);
+  };
 
   return {
     currentMonth,

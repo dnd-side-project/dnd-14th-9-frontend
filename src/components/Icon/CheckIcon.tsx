@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const CheckSvg = (
@@ -19,8 +17,9 @@ const CheckSvg = (
 
 export type CheckIconProps = Omit<IconProps, "svg">;
 
-export const CheckIcon = forwardRef<HTMLSpanElement, CheckIconProps>((props, ref) => {
+export function CheckIcon({
+  ref,
+  ...props
+}: CheckIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={CheckSvg} {...props} />;
-});
-
-CheckIcon.displayName = "CheckIcon";
+}

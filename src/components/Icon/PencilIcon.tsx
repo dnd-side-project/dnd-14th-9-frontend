@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const PencilSvg = (
@@ -19,8 +17,9 @@ const PencilSvg = (
 
 export type PencilIconProps = Omit<IconProps, "svg">;
 
-export const PencilIcon = forwardRef<HTMLSpanElement, PencilIconProps>((props, ref) => {
+export function PencilIcon({
+  ref,
+  ...props
+}: PencilIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={PencilSvg} {...props} />;
-});
-
-PencilIcon.displayName = "PencilIcon";
+}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { UseDropdownProps, UseDropdownReturn } from "./Dropdown.types";
 
@@ -19,7 +19,7 @@ export function useDropdown({
   const isControlled = value !== undefined;
   const selectedValue = isControlled ? value : internalValue;
 
-  const toggle = useCallback(() => {
+  const toggle = () => {
     if (disabled) return;
     setIsOpen((prev) => {
       if (!prev) {
@@ -28,19 +28,16 @@ export function useDropdown({
       }
       return !prev;
     });
-  }, [disabled]);
+  };
 
-  const selectOption = useCallback(
-    (optionValue: string) => {
-      if (!isControlled) {
-        setInternalValue(optionValue);
-      }
-      onChange?.(optionValue);
-      setIsOpen(false);
-      setFocusedIndex(-1);
-    },
-    [isControlled, onChange]
-  );
+  const selectOption = (optionValue: string) => {
+    if (!isControlled) {
+      setInternalValue(optionValue);
+    }
+    onChange?.(optionValue);
+    setIsOpen(false);
+    setFocusedIndex(-1);
+  };
 
   // Click outside & Escape key handling
   useEffect(() => {

@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
-
 import { useRouter } from "next/navigation";
 
 import { getApiErrorMessage } from "@/lib/error/api-error-utils";
@@ -13,7 +11,7 @@ export function useDeleteAccountFlow() {
   const router = useRouter();
   const { mutate: deleteMe, isPending: isDeleting } = useDeleteMe();
 
-  const deleteAccount = useCallback(() => {
+  const deleteAccount = () => {
     if (isDeleting) return;
 
     deleteMe(undefined, {
@@ -25,7 +23,7 @@ export function useDeleteAccountFlow() {
         toast.error(getApiErrorMessage(error));
       },
     });
-  }, [deleteMe, isDeleting, router]);
+  };
 
   return { deleteAccount, isDeleting };
 }

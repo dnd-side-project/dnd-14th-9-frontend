@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
 import { Filter } from "@/components/Filter/Filter";
 import { useClickOutside } from "@/hooks/useClickOutside";
@@ -22,10 +22,10 @@ export function DurationFilter({ isOpen, value, onOpenChange, onSelect }: Durati
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const closeFilter = useCallback(() => {
+  const closeFilter = () => {
     onOpenChange(false);
     triggerRef.current?.focus();
-  }, [onOpenChange]);
+  };
   useClickOutside(containerRef, closeFilter, isOpen);
 
   const hasSelection = Boolean(value);

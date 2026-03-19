@@ -1,4 +1,4 @@
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { type ButtonHTMLAttributes, type ReactNode } from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -112,46 +112,41 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
   ButtonVariantProps & {
     leftIcon?: ReactNode;
     rightIcon?: ReactNode;
+    ref?: React.Ref<HTMLButtonElement>;
   };
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      className,
-      variant,
-      colorScheme,
-      size,
-      iconOnly,
-      leftIcon,
-      rightIcon,
-      children,
-      disabled,
-      ...props
-    },
-    ref
-  ) => {
-    return (
-      <button
-        ref={ref}
-        className={cn(buttonVariants({ variant, colorScheme, size, iconOnly, className }))}
-        disabled={disabled}
-        aria-disabled={disabled}
-        {...props}
-      >
-        {iconOnly ? (
-          (leftIcon ?? rightIcon)
-        ) : (
-          <>
-            {leftIcon}
-            {children}
-            {rightIcon}
-          </>
-        )}
-      </button>
-    );
-  }
-);
-
-Button.displayName = "Button";
+export function Button({
+  className,
+  variant,
+  colorScheme,
+  size,
+  iconOnly,
+  leftIcon,
+  rightIcon,
+  children,
+  disabled,
+  ref,
+  ...props
+}: ButtonProps) {
+  return (
+    <button
+      ref={ref}
+      className={cn(buttonVariants({ variant, colorScheme, size, iconOnly, className }))}
+      disabled={disabled}
+      aria-disabled={disabled}
+      {...props}
+    >
+      {iconOnly ? (
+        (leftIcon ?? rightIcon)
+      ) : (
+        <>
+          {leftIcon}
+          {children}
+          {rightIcon}
+        </>
+      )}
+    </button>
+  );
+}
 
 export { buttonVariants };

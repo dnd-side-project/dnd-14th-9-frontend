@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import { Icon, type IconProps } from "./Icon";
 
 const CHEVRON_RIGHT_SVG = (
@@ -16,8 +14,9 @@ const CHEVRON_RIGHT_SVG = (
 
 export type ChevronRightIconProps = Omit<IconProps, "svg">;
 
-export const ChevronRightIcon = forwardRef<HTMLSpanElement, ChevronRightIconProps>((props, ref) => {
+export function ChevronRightIcon({
+  ref,
+  ...props
+}: ChevronRightIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
   return <Icon ref={ref} svg={CHEVRON_RIGHT_SVG} {...props} />;
-});
-
-ChevronRightIcon.displayName = "ChevronRightIcon";
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useRef, useCallback, useId, type InputHTMLAttributes } from "react";
+import { useRef, useId, type InputHTMLAttributes } from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -80,167 +80,153 @@ export interface ImageUploaderProps
   containerClassName?: string;
   /** 업로드 취소 시 콜백 */
   onCancel?: () => void;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
-export const ImageUploader = forwardRef<HTMLInputElement, ImageUploaderProps>(
-  (
-    {
-      className,
-      containerClassName,
-      onFileSelect,
-      uploadProgress,
-      accept = "image/*",
-      maxFileSize = DEFAULT_MAX_FILE_SIZE,
-      onFileSizeError,
-      disabled = false,
-      hintText = "최대 5MB 파일만 허용 가능",
-      uploadingText = "업로드 중...",
-      onCancel,
-      id,
-      ...props
-    },
-    ref
-  ) => {
-    const generatedId = useId();
-    const inputId = id ?? generatedId;
-    const internalInputRef = useRef<HTMLInputElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
+export function ImageUploader({
+  className,
+  containerClassName,
+  onFileSelect,
+  uploadProgress,
+  accept = "image/*",
+  maxFileSize = DEFAULT_MAX_FILE_SIZE,
+  onFileSizeError,
+  disabled = false,
+  hintText = "최대 5MB 파일만 허용 가능",
+  uploadingText = "업로드 중...",
+  onCancel,
+  id,
+  ref,
+  ...props
+}: ImageUploaderProps) {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+  const internalInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-    const isUploading = uploadProgress !== undefined && uploadProgress >= 0 && uploadProgress < 100;
+  const isUploading = uploadProgress !== undefined && uploadProgress >= 0 && uploadProgress < 100;
 
-    const handleFileSelection = useCallback(
-      (file: File | null) => {
-        if (!file) {
-          onFileSelect?.(null);
-          return;
-        }
+  const handleFileSelection = (file: File | null) => {
+    if (!file) {
+      onFileSelect?.(null);
+      return;
+    }
 
-        if (file.size > maxFileSize) {
-          onFileSizeError?.(file, maxFileSize);
-          return;
-        }
+    if (file.size > maxFileSize) {
+      onFileSizeError?.(file, maxFileSize);
+      return;
+    }
 
-        onFileSelect?.(file);
-      },
-      [maxFileSize, onFileSelect, onFileSizeError]
-    );
+    onFileSelect?.(file);
+  };
 
-    const { isDragging, dragFileName, mousePosition, dragHandlers } = useDragAndDrop({
-      disabled: disabled || isUploading,
-      onFileDrop: handleFileSelection,
-      containerRef,
-    });
+  const { isDragging, dragFileName, mousePosition, dragHandlers } = useDragAndDrop({
+    disabled: disabled || isUploading,
+    onFileDrop: handleFileSelection,
+    containerRef,
+  });
 
-    const state: UploadState = isUploading ? "uploading" : isDragging ? "dragging" : "default";
+  const state: UploadState = isUploading ? "uploading" : isDragging ? "dragging" : "default";
 
-    const handleClick = useCallback(() => {
-      if (disabled || isUploading) return;
-      internalInputRef.current?.click();
-    }, [disabled, isUploading]);
+  const handleClick = () => {
+    if (disabled || isUploading) return;
+    internalInputRef.current?.click();
+  };
 
-    const handleFileChange = useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0] || null;
-        handleFileSelection(file);
-        e.target.value = "";
-      },
-      [handleFileSelection]
-    );
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    handleFileSelection(file);
+    e.target.value = "";
+  };
 
-    const handleKeyDown = useCallback(
-      (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          handleClick();
-        }
-      },
-      [handleClick]
-    );
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
-    return (
-      <div className={cn("w-full", containerClassName)}>
-        <div
-          ref={containerRef}
-          className={cn(imageUploaderVariants({ state, disabled, className }))}
-          onDragEnter={dragHandlers.onDragEnter}
-          onDragLeave={dragHandlers.onDragLeave}
-          onDragOver={dragHandlers.onDragOver}
-          onDrop={dragHandlers.onDrop}
-          onClick={handleClick}
-          onKeyDown={handleKeyDown}
-          role="button"
-          tabIndex={disabled || isUploading ? -1 : 0}
-          aria-label="이미지 업로드 영역"
-          aria-disabled={disabled || isUploading}
-        >
-          {/* 숨겨진 파일 input */}
-          <input
-            ref={(node) => {
-              internalInputRef.current = node;
-              if (typeof ref === "function") {
-                ref(node);
-              } else if (ref) {
-                ref.current = node;
-              }
+  return (
+    <div className={cn("w-full", containerClassName)}>
+      <div
+        ref={containerRef}
+        className={cn(imageUploaderVariants({ state, disabled, className }))}
+        onDragEnter={dragHandlers.onDragEnter}
+        onDragLeave={dragHandlers.onDragLeave}
+        onDragOver={dragHandlers.onDragOver}
+        onDrop={dragHandlers.onDrop}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={disabled || isUploading ? -1 : 0}
+        aria-label="이미지 업로드 영역"
+        aria-disabled={disabled || isUploading}
+      >
+        {/* 숨겨진 파일 input */}
+        <input
+          ref={(node) => {
+            internalInputRef.current = node;
+            if (typeof ref === "function") {
+              ref(node);
+            } else if (ref) {
+              ref.current = node;
+            }
+          }}
+          type="file"
+          id={inputId}
+          accept={accept}
+          disabled={disabled || isUploading}
+          onChange={handleFileChange}
+          className="sr-only"
+          aria-describedby={`${inputId}-hint`}
+          {...props}
+        />
+
+        {/* 드래그 중 파일명 툴팁 - OS 프리뷰 위에 표시되도록 위쪽에 배치 */}
+        {isDragging && dragFileName && (
+          <div
+            className="pointer-events-none absolute z-50 flex items-center gap-1.5 rounded bg-green-600 px-2 py-1 shadow-lg"
+            style={{
+              left: mousePosition.x + 16,
+              top: mousePosition.y - 36,
             }}
-            type="file"
-            id={inputId}
-            accept={accept}
-            disabled={disabled || isUploading}
-            onChange={handleFileChange}
-            className="sr-only"
-            aria-describedby={`${inputId}-hint`}
-            {...props}
-          />
+          >
+            <FileIcon size="xsmall" className="text-white" />
+            <span className="text-xs font-medium text-gray-800">{dragFileName}</span>
+          </div>
+        )}
 
-          {/* 드래그 중 파일명 툴팁 - OS 프리뷰 위에 표시되도록 위쪽에 배치 */}
-          {isDragging && dragFileName && (
-            <div
-              className="pointer-events-none absolute z-50 flex items-center gap-1.5 rounded bg-green-600 px-2 py-1 shadow-lg"
-              style={{
-                left: mousePosition.x + 16,
-                top: mousePosition.y - 36,
+        {/* 상태별 콘텐츠 렌더링 */}
+        {isUploading ? (
+          <div className="flex flex-col items-center gap-3">
+            <ProgressRing progress={uploadProgress!} />
+            <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
+              {uploadingText}
+            </span>
+            <Button
+              variant="outlined"
+              colorScheme="secondary"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onCancel?.();
               }}
             >
-              <FileIcon size="xsmall" className="text-white" />
-              <span className="text-xs font-medium text-gray-800">{dragFileName}</span>
-            </div>
-          )}
-
-          {/* 상태별 콘텐츠 렌더링 */}
-          {isUploading ? (
-            <div className="flex flex-col items-center gap-3">
-              <ProgressRing progress={uploadProgress!} />
-              <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
-                {uploadingText}
-              </span>
-              <Button
-                variant="outlined"
-                colorScheme="secondary"
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCancel?.();
-                }}
-              >
-                취소하기
-              </Button>
-            </div>
-          ) : (
-            <>
-              <CloudUploadIcon size="xlarge" className="text-green-600" />
-              <span className="text-sm text-gray-50">커버 사진을 등록해주세요</span>
-              <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
-                {hintText}
-              </span>
-            </>
-          )}
-        </div>
+              취소하기
+            </Button>
+          </div>
+        ) : (
+          <>
+            <CloudUploadIcon size="xlarge" className="text-green-600" />
+            <span className="text-sm text-gray-50">커버 사진을 등록해주세요</span>
+            <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
+              {hintText}
+            </span>
+          </>
+        )}
       </div>
-    );
-  }
-);
-
-ImageUploader.displayName = "ImageUploader";
+    </div>
+  );
+}
 
 export { imageUploaderVariants };
