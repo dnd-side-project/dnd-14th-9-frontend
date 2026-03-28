@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ButtonGroup } from "@/components/ButtonGroup/ButtonGroup";
@@ -38,18 +38,13 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
 
   const joinSessionMutation = useJoinSession();
 
-  // callback ref: dialog 요소가 DOM에 마운트되면 showModal 호출
-  const setDialogRef = (node: HTMLDialogElement | null) => {
-    if (node && !node.open) {
+  const setDialogRef = useCallback((node: HTMLDialogElement | null) => {
+    if (node) {
+      if (node.open) node.close();
       node.showModal();
     }
     dialogRef.current = node;
-  };
-
-  const handleBackdropClick = (event: React.MouseEvent<HTMLDialogElement>) => {
-    if (event.target !== dialogRef.current) return;
-    onClose();
-  };
+  }, []);
 
   const handleTodoChange = (index: number, content: string) => {
     setTodos((prev) => prev.map((todo, i) => (i === index ? { ...todo, content } : todo)));
@@ -102,9 +97,13 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
     <Portal>
       <dialog
         ref={setDialogRef}
-        onCancel={onClose}
-        onClick={handleBackdropClick}
-        className="bg-surface-default gap-lg px-xl pt-xl pb-2xl fixed inset-0 m-auto flex w-full max-w-160 flex-col rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default)"
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }}
+        className="bg-surface-default gap-lg px-xl pt-xl pb-2xl fixed inset-0 m-auto flex w-full max-w-160 flex-col rounded-lg border border-gray-900 not-[&:modal]:hidden backdrop:bg-(--color-overlay-default)"
       >
         {/* 헤더 */}
         <div className="flex flex-col gap-1">
