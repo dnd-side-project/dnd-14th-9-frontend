@@ -26,7 +26,7 @@ interface SessionDetailModalProps {
 
 export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
   const { dialogRef, handleClose, handleBackdropClick } = useDialog("/");
-  const { data, isLoading, error: sessionError } = useSessionDetail(sessionId);
+  const { data, error: sessionError } = useSessionDetail(sessionId);
   const { shareSession } = useShareSession();
   const isAuthenticated = useIsAuthenticated();
   const [showJoinModal, setShowJoinModal] = useState(false);
