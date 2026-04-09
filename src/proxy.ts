@@ -42,6 +42,8 @@ interface AuthFailureResponseOptions {
   status?: number;
 }
 
+type RefreshFailureReason = "http_error" | "invalid_response" | "timeout" | "network_error";
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublicPageRoute = isKnownPublicPageRoute(pathname);
@@ -169,6 +171,43 @@ function shouldPersistRedirectAfterLogin(pathname: string): boolean {
   return !isApiRoute(pathname);
 }
 
+function getRouteType(pathname: string): "public" | "protected" | "api" {
+  if (isApiRoute(pathname)) {
+    return "api";
+  }
+
+  if (isProtectedPageRoute(pathname)) {
+    return "protected";
+  }
+
+  return "public";
+}
+
+function logRefreshFailure(
+  request: NextRequest,
+  details: {
+    reason: RefreshFailureReason;
+    status: number;
+    cookieClear: boolean;
+    error?: unknown;
+  }
+) {
+  const context = {
+    reason: details.reason,
+    status: details.status,
+    path: request.nextUrl.pathname,
+    routeType: getRouteType(request.nextUrl.pathname),
+    cookieClear: details.cookieClear,
+  };
+
+  if (details.error) {
+    console.error("Proxy: Token refresh failed", context, details.error);
+    return;
+  }
+
+  console.error("Proxy: Token refresh failed", context);
+}
+
 /**
  * JWT payload는 base64url 인코딩(-, _)과 padding 생략을 사용한다.
  * atob 디코딩 전 표준 base64(+ , /) 및 padding으로 정규화한다.
@@ -251,13 +290,13 @@ async function tryRefreshToken(
     }
 
     if (!reissueResponse.ok) {
-      console.error("Proxy: Token refresh failed:", reissueResponse.status);
+      logRefreshFailure(request, {
+        reason: "http_error",
+        status: reissueResponse.status,
+        cookieClear: !allowPassThroughOnFailure,
+      });
       if (allowPassThroughOnFailure) {
-        const response = NextResponse.next();
-        if (reissueResponse.status === 401 || reissueResponse.status === 403) {
-          clearAuthCookies(response.cookies);
-        }
-        return response;
+        return NextResponse.next();
       }
 
       const errorCode = await getErrorCodeFromResponse(reissueResponse);
@@ -279,7 +318,11 @@ async function tryRefreshToken(
 
     // API 응답 검증 (필수 버그 픽스)
     if (!tokens) {
-      console.error("Proxy: Invalid refresh response format");
+      logRefreshFailure(request, {
+        reason: "invalid_response",
+        status: 500,
+        cookieClear: !allowPassThroughOnFailure,
+      });
       if (allowPassThroughOnFailure) {
         return NextResponse.next();
       }
@@ -318,7 +361,12 @@ async function tryRefreshToken(
     return response;
   } catch (error) {
     const isTimeout = error instanceof Error && error.name === "AbortError";
-    console.error(`Proxy: Token refresh ${isTimeout ? "timeout" : "network error"}`, error);
+    logRefreshFailure(request, {
+      reason: isTimeout ? "timeout" : "network_error",
+      status: isTimeout ? 504 : 500,
+      cookieClear: !allowPassThroughOnFailure,
+      error,
+    });
 
     if (allowPassThroughOnFailure) {
       return NextResponse.next();
