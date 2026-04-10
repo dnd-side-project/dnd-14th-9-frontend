@@ -43,6 +43,7 @@ interface AuthFailureResponseOptions {
 }
 
 type RefreshFailureReason = "http_error" | "invalid_response" | "timeout" | "network_error";
+type RouteType = "public" | "protected" | "api";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -171,16 +172,17 @@ function shouldPersistRedirectAfterLogin(pathname: string): boolean {
   return !isApiRoute(pathname);
 }
 
-function getRouteType(pathname: string): "public" | "protected" | "api" {
-  if (isApiRoute(pathname)) {
-    return "api";
-  }
+const ROUTE_TYPE_CONFIG: Array<{
+  type: Exclude<RouteType, "public">;
+  check: (pathname: string) => boolean;
+}> = [
+  { type: "api", check: isApiRoute },
+  { type: "protected", check: isProtectedPageRoute },
+];
 
-  if (isProtectedPageRoute(pathname)) {
-    return "protected";
-  }
-
-  return "public";
+function getRouteType(pathname: string): RouteType {
+  const matched = ROUTE_TYPE_CONFIG.find((route) => route.check(pathname));
+  return matched?.type ?? "public";
 }
 
 function logRefreshFailure(
@@ -320,7 +322,7 @@ async function tryRefreshToken(
     if (!tokens) {
       logRefreshFailure(request, {
         reason: "invalid_response",
-        status: 500,
+        status: reissueResponse.status,
         cookieClear: !allowPassThroughOnFailure,
       });
       if (allowPassThroughOnFailure) {
