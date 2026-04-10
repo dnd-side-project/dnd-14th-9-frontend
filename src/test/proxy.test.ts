@@ -31,6 +31,8 @@ const PROTECTED_PAGE_ACCESS_PATHS = [
 
 describe("Proxy Middleware", () => {
   let consoleErrorSpy: jest.SpyInstance;
+  type RefreshFailureReason = "http_error" | "invalid_response" | "timeout" | "network_error";
+  type RouteType = "public" | "protected" | "api";
 
   function createRefreshSuccessResponse(
     accessToken: string = "new_access",
@@ -38,6 +40,7 @@ describe("Proxy Middleware", () => {
   ) {
     return {
       ok: true,
+      status: 200,
       json: jest.fn().mockResolvedValue({
         result: {
           accessToken,
@@ -140,6 +143,19 @@ describe("Proxy Middleware", () => {
     });
   }
 
+  function expectRefreshFailureLog(
+    details: Partial<{
+      reason: RefreshFailureReason;
+      routeType: RouteType;
+      status: number;
+      cookieClear: boolean;
+    }>
+  ) {
+    expect(consoleErrorSpy.mock.calls).toEqual(
+      expect.arrayContaining([["Proxy: Token refresh failed", expect.objectContaining(details)]])
+    );
+  }
+
   describe("공개 라우트", () => {
     it("홈(/) 경로는 인증 없이 통과해야 함", async () => {
       // Given
@@ -204,26 +220,35 @@ describe("Proxy Middleware", () => {
       expect(hasSetCookie(response, (cookie) => cookie.includes("refreshToken="))).toBe(true);
     });
 
-    it("공개 라우트에서 재발급이 401/403이면 리다이렉트 없이 인증 쿠키를 정리해야 함", async () => {
-      const refreshToken = createMockToken(30 * 24 * 60 * 60);
-      const request = new NextRequest("http://localhost:3000/login", {
-        headers: {
-          cookie: `refreshToken=${refreshToken}`,
-        },
-      });
+    it.each([401, 403])(
+      "공개 라우트에서 재발급이 %i이면 리다이렉트와 쿠키 정리 없이 통과해야 함",
+      async (status) => {
+        const refreshToken = createMockToken(30 * 24 * 60 * 60);
+        const request = new NextRequest("http://localhost:3000/login", {
+          headers: {
+            cookie: `refreshToken=${refreshToken}`,
+          },
+        });
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-      });
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+          status,
+        });
 
-      const response = await proxy(request);
+        const response = await proxy(request);
 
-      expect(response.status).toBe(200);
-      expect(response.headers.get("location")).toBeNull();
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
-    });
+        expect(response.status).toBe(200);
+        expect(response.headers.get("location")).toBeNull();
+        expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+        expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
+        expectRefreshFailureLog({
+          reason: "http_error",
+          routeType: "public",
+          status,
+          cookieClear: false,
+        });
+      }
+    );
 
     it("공개 라우트에서 재발급이 5xx로 실패하면 리다이렉트 없이 통과해야 함", async () => {
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
@@ -256,6 +281,7 @@ describe("Proxy Middleware", () => {
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
+        status: 200,
         json: jest.fn().mockResolvedValue({
           result: {
             accessToken: "new_access",
@@ -270,6 +296,12 @@ describe("Proxy Middleware", () => {
       expect(response.headers.get("location")).toBeNull();
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
+      expectRefreshFailureLog({
+        reason: "invalid_response",
+        routeType: "public",
+        status: 200,
+        cookieClear: false,
+      });
     });
 
     it("공개 라우트에서 재발급 네트워크 에러가 나도 리다이렉트 없이 통과해야 함", async () => {
@@ -610,6 +642,7 @@ describe("Proxy Middleware", () => {
       // Mock: accessToken 타입이 문자열이 아님
       mockFetch.mockResolvedValueOnce({
         ok: true,
+        status: 200,
         json: jest.fn().mockResolvedValue({
           result: {
             accessToken: 12345,
@@ -624,6 +657,12 @@ describe("Proxy Middleware", () => {
       // Then
       expectLoginRedirect(response, "COMMON500");
       expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
+      expectRefreshFailureLog({
+        reason: "invalid_response",
+        routeType: "protected",
+        status: 200,
+        cookieClear: true,
+      });
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
@@ -657,6 +696,12 @@ describe("Proxy Middleware", () => {
       expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
+      expectRefreshFailureLog({
+        reason: "http_error",
+        routeType: "protected",
+        status: 401,
+        cookieClear: true,
+      });
     });
 
     it("재발급 API 호출 중 네트워크 에러가 발생하면 로그인 라우트로 리다이렉트해야 함", async () => {
@@ -992,6 +1037,12 @@ describe("Proxy Middleware", () => {
 
       // Then: 인증 에러 JSON
       await expectApiAuthError(response, { code: "AUTH401_4" });
+      expectRefreshFailureLog({
+        reason: "http_error",
+        routeType: "api",
+        status: 401,
+        cookieClear: true,
+      });
     });
 
     it("/api/* 에서 재발급 네트워크 에러가 나면 500 JSON 에러를 반환해야 함", async () => {
