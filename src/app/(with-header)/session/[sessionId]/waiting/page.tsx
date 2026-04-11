@@ -5,7 +5,7 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { WaitingRoomContent } from "@/features/lobby/components/WaitingRoomContent";
 import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
 import { isInProgressStatus } from "@/features/session/types";
-import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
+import { resolveServerAuthState } from "@/lib/auth/resolve-server-auth-state";
 import { getQueryClient } from "@/lib/getQueryClient";
 
 export const metadata = { title: "대기실" };
@@ -17,7 +17,7 @@ interface WaitingRoomPageProps {
 export default async function WaitingRoomPage({ params }: WaitingRoomPageProps) {
   const { sessionId } = await params;
   const queryClient = getQueryClient();
-  const { hasAuthCookies } = await getServerAuthCookieState();
+  const authState = await resolveServerAuthState(queryClient);
 
   const sessionData = await queryClient.fetchQuery(sessionQueries.detail(sessionId));
 
@@ -26,7 +26,7 @@ export default async function WaitingRoomPage({ params }: WaitingRoomPageProps) 
     redirect(`/session/${sessionId}`);
   }
 
-  if (hasAuthCookies) {
+  if (authState.status === "authenticated") {
     await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
   }
 

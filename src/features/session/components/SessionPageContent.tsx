@@ -4,8 +4,9 @@ import { notFound } from "next/navigation";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
-import { useIsAuthenticated, useMe } from "@/features/member/hooks/useMemberHooks";
+import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
@@ -36,10 +37,11 @@ interface SessionPageContentProps {
 export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const { showLeaveDialog, setShowLeaveDialog, isLeavingRef } = usePreventBackNavigation();
 
-  const isAuthenticated = useIsAuthenticated();
+  const authState = useAuthState();
+  const isAuthenticated = authState.status === "authenticated";
   const { data: sessionData, isLoading, error, refetch } = useSessionDetail(sessionId);
   const { data: inProgressData } = useInProgressData({ sessionId });
-  const { data: meData } = useMe();
+  const { data: meData } = useMe({ enabled: isAuthenticated });
   const { data: waitingRoomData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
     enabled: isAuthenticated,
   });
@@ -88,7 +90,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     },
   });
 
-  if (isLoading || (isAuthenticated && isWaitingRoomLoading)) {
+  if (isLoading || authState.status === "recovering" || (isAuthenticated && isWaitingRoomLoading)) {
     return <SessionPageContentSkeleton />;
   }
 

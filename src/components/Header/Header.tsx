@@ -1,19 +1,30 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
+import { SkeletonBlock } from "@/components/Skeleton/SkeletonBlock";
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
 import { LOGIN_ROUTE, ROOT_ROUTE } from "@/lib/routes/route-paths";
 
-interface HeaderProps {
-  isAuthenticated: boolean;
+/**
+ * Header - GNB (Global Navigation Bar)
+ * 공용 auth state 기준으로 우측 액션 영역을 렌더링합니다.
+ */
+function HeaderAuthLoading() {
+  return (
+    <div role="status" aria-label="인증 상태 확인 중" className="gap-sm flex items-center">
+      <SkeletonBlock className="h-9 w-24 rounded-md" />
+      <SkeletonBlock className="h-8 w-8 rounded-full" />
+    </div>
+  );
 }
 
-/**
- * Header - GNB (Global Navigation Bar) 서버 컴포넌트
- * 상위 레이아웃에서 주입된 인증 상태에 따라 UI를 렌더링합니다.
- */
-export function Header({ isAuthenticated }: HeaderProps) {
+export function Header() {
+  const authState = useAuthState();
+
   return (
     <header className="border-border-subtle bg-surface-default sticky top-0 z-50 w-full border-b">
       <div className="px-lg md:px-xl md:py-sm mx-auto flex h-full max-w-[1280px] items-center justify-between py-[15px] xl:px-[50px]">
@@ -33,7 +44,7 @@ export function Header({ isAuthenticated }: HeaderProps) {
         </Link>
 
         <div className="gap-sm flex items-center justify-end">
-          {isAuthenticated ? (
+          {authState.status === "authenticated" ? (
             <>
               <ButtonLink
                 href="/session/create"
@@ -48,6 +59,8 @@ export function Header({ isAuthenticated }: HeaderProps) {
               </ButtonLink>
               <ProfileDropdown />
             </>
+          ) : authState.status === "recovering" ? (
+            <HeaderAuthLoading />
           ) : (
             <ButtonLink
               href={LOGIN_ROUTE}

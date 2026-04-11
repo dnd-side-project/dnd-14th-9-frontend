@@ -85,11 +85,6 @@ export function useMe(options?: UseMeOptions) {
   });
 }
 
-export function useIsAuthenticated() {
-  const { data, isError } = useMe();
-  return !isError && Boolean(data?.result);
-}
-
 export const useDeleteMe = memberCore.useDelete!;
 
 export async function prefetchMe() {

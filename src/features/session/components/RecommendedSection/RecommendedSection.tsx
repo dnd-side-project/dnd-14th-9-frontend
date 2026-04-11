@@ -1,6 +1,6 @@
 "use client";
 
-import { useIsAuthenticated } from "@/features/member/hooks/useMemberHooks";
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
 
 import { RecommendedSectionContent } from "./RecommendedSectionContent";
 
@@ -19,9 +19,9 @@ import { RecommendedSectionContent } from "./RecommendedSectionContent";
  *   - 관심 카테고리가 아닌 경우: EmptyRecommendedSessionPlaceholder 노출
  */
 export function RecommendedSection() {
-  const isAuthenticated = useIsAuthenticated();
+  const authState = useAuthState();
 
-  if (!isAuthenticated) {
+  if (authState.status !== "authenticated") {
     return null;
   }
 

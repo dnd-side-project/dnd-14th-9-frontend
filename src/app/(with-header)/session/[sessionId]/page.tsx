@@ -8,7 +8,7 @@ import { sessionApi } from "@/features/session/api";
 import { SessionPageContent } from "@/features/session/components/SessionPageContent";
 import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
 import { isWaitingStatus } from "@/features/session/types";
-import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
+import { resolveServerAuthState } from "@/lib/auth/resolve-server-auth-state";
 import { getQueryClient } from "@/lib/getQueryClient";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: SessionPageProps): Promise<Me
 export default async function SessionPage({ params }: SessionPageProps) {
   const { sessionId } = await params;
   const queryClient = getQueryClient();
-  const { hasAuthCookies } = await getServerAuthCookieState();
+  const authState = await resolveServerAuthState(queryClient);
 
   const sessionData = await queryClient.fetchQuery(sessionQueries.detail(sessionId));
 
@@ -49,7 +49,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
     redirect(`/session/${sessionId}/waiting`);
   }
 
-  if (hasAuthCookies) {
+  if (authState.status === "authenticated") {
     await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
   }
 

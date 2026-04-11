@@ -1,13 +1,10 @@
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { Header } from "@/components/Header/Header";
-import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
 
 export default async function NotFound() {
-  const { hasAuthCookies } = await getServerAuthCookieState();
-
   return (
     <div className="flex min-h-screen flex-col">
-      <Header isAuthenticated={hasAuthCookies} />
+      <Header />
       <main className="gap-2xl mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center md:px-[250px]">
         <ErrorFallbackUI
           title="Page not found"

@@ -23,7 +23,7 @@ export default function Error({
 
   return (
     <div className="bg-surface-default flex min-h-screen flex-col">
-      <Header isAuthenticated={false} />
+      <Header />
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center gap-8 px-4 py-20 md:px-[250px]">
         <ErrorFallbackUI
           title="Not found"

@@ -6,8 +6,9 @@ import dynamic from "next/dynamic";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
-import { useIsAuthenticated, useMe } from "@/features/member/hooks/useMemberHooks";
+import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useSessionDetail, useWaitingRoom } from "@/features/session/hooks/useSessionHooks";
 import { useSessionStatusSSE } from "@/features/session/hooks/useSessionStatusSSE";
 import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
@@ -44,11 +45,14 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
 
   const { showLeaveDialog, setShowLeaveDialog, isLeavingRef } = usePreventBackNavigation();
 
-  const isAuthenticated = useIsAuthenticated();
+  const authState = useAuthState();
+  const isAuthenticated = authState.status === "authenticated";
   const { data, isLoading, error, refetch } = useSessionDetail(sessionId);
-  const { data: meData } = useMe();
+  const { data: meData } = useMe({ enabled: isAuthenticated });
   // 초기 데이터: REST API로 조회
-  const { data: initialWaitingData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId);
+  const { data: initialWaitingData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
+    enabled: isAuthenticated,
+  });
   // 실시간 업데이트: SSE로 수신
   const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
 
@@ -105,7 +109,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
     return <KickedDialog onConfirm={() => navigateWithHardReload("/")} />;
   }
 
-  if (isLoading || (isAuthenticated && isWaitingRoomLoading)) {
+  if (isLoading || authState.status === "recovering" || (isAuthenticated && isWaitingRoomLoading)) {
     return <WaitingRoomContentSkeleton />;
   }
 
