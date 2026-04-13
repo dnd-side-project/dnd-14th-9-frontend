@@ -48,7 +48,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   const authState = useAuthState();
   const isAuthenticated = authState.status === "authenticated";
   const { data, isLoading, error, refetch } = useSessionDetail(sessionId);
-  const { data: meData } = useMe({ enabled: isAuthenticated });
+  const { data: meData, isLoading: isMeLoading } = useMe({ enabled: isAuthenticated });
   // 초기 데이터: REST API로 조회
   const { data: initialWaitingData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
     enabled: isAuthenticated,
@@ -56,7 +56,8 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   // 실시간 업데이트: SSE로 수신
   const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
 
-  const myMemberId = meData?.result?.id;
+  const isAuthDataLoading = isAuthenticated && (isWaitingRoomLoading || isMeLoading);
+  const myMemberId = isAuthDataLoading ? undefined : meData?.result?.id;
 
   const { isSessionTransitionRef } = useLeaveOnUnmount({
     sessionId,
@@ -88,8 +89,10 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   });
 
   // 참여 여부 확인 (useEffect보다 먼저 계산)
-  const isParticipant =
-    initialWaitingData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false;
+  const isParticipant = isAuthDataLoading
+    ? false
+    : (initialWaitingData?.result?.members?.some((member) => member.memberId === myMemberId) ??
+      false);
 
   // 한번 참여자로 확인되면 wasParticipant를 true로 유지 (나가기 시 flash 방지)
   if (isParticipant && !wasParticipant) {
@@ -109,7 +112,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
     return <KickedDialog onConfirm={() => navigateWithHardReload("/")} />;
   }
 
-  if (isLoading || authState.status === "recovering" || (isAuthenticated && isWaitingRoomLoading)) {
+  if (isLoading || authState.status === "recovering" || isAuthDataLoading) {
     return <WaitingRoomContentSkeleton />;
   }
 
