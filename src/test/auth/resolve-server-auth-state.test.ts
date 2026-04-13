@@ -1,88 +1,73 @@
-import { cookies } from "next/headers";
+import { QueryClient } from "@tanstack/react-query";
 
-import type { MemberProfileView } from "@/features/member/types";
-import { resolveServerAuthStateWithQueryClient } from "@/lib/auth/resolve-server-auth-state";
+import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
+import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
 
-jest.mock("next/headers", () => ({
-  cookies: jest.fn(),
+jest.mock("@/lib/auth/auth-cookie-state", () => ({
+  getServerAuthCookieState: jest.fn(),
 }));
 
-describe("resolveServerAuthState", () => {
-  let mockCookieStore: {
-    get: jest.Mock;
-  };
-
-  const mockQueryClient = {
-    fetchQuery: jest.fn(),
-    removeQueries: jest.fn(),
-  };
-
-  const memberProfile: MemberProfileView = {
-    id: 1,
-    nickname: "경환",
-    profileImageUrl: null,
-    email: "test@gak.today",
-    bio: null,
-    socialProvider: "google",
-    totalParticipationTime: 0,
-    focusedTime: 0,
-    focusRate: 0,
-    totalTodoCount: 0,
-    completedTodoCount: 0,
-    todoCompletionRate: 0,
-    participationSessionCount: 0,
-    firstLogin: false,
-  };
+describe("RootLayout auth prefetch flow", () => {
+  const mockedGetServerAuthCookieState = jest.mocked(getServerAuthCookieState);
 
   beforeEach(() => {
-    mockCookieStore = {
-      get: jest.fn(),
-    };
-
-    (cookies as jest.Mock).mockResolvedValue(mockCookieStore);
-    mockQueryClient.fetchQuery.mockReset();
-    mockQueryClient.removeQueries.mockReset();
+    jest.clearAllMocks();
   });
 
-  it("인증 쿠키가 없으면 guest 상태를 반환해야 한다", async () => {
-    mockCookieStore.get.mockReturnValue(undefined);
+  async function runPrefetchFlow(queryClient: QueryClient) {
+    const { hasAuthCookies } = await getServerAuthCookieState();
 
-    await expect(resolveServerAuthStateWithQueryClient(mockQueryClient)).resolves.toEqual({
-      status: "guest",
+    if (hasAuthCookies) {
+      try {
+        await queryClient.prefetchQuery(memberQueries.me());
+      } catch {
+        queryClient.removeQueries({ queryKey: memberKeys.me(), exact: true });
+      }
+    }
+  }
+
+  it("인증 쿠키가 없으면 me prefetch를 생략해야 한다", async () => {
+    mockedGetServerAuthCookieState.mockResolvedValue({
+      hasAccessToken: false,
+      hasRefreshToken: false,
       hasAuthCookies: false,
-      profile: null,
     });
+    const queryClient = new QueryClient();
+    const prefetchSpy = jest.spyOn(queryClient, "prefetchQuery");
 
-    expect(mockQueryClient.fetchQuery).not.toHaveBeenCalled();
+    await runPrefetchFlow(queryClient);
+
+    expect(prefetchSpy).not.toHaveBeenCalled();
   });
 
-  it("인증 쿠키가 있고 me 조회가 성공하면 authenticated 상태를 반환해야 한다", async () => {
-    mockCookieStore.get.mockImplementation((name: string) =>
-      name === "accessToken" || name === "refreshToken" ? { value: `${name}-value` } : undefined
-    );
-    mockQueryClient.fetchQuery.mockResolvedValueOnce({ result: memberProfile });
-
-    await expect(resolveServerAuthStateWithQueryClient(mockQueryClient)).resolves.toEqual({
-      status: "authenticated",
+  it("인증 쿠키가 있으면 me prefetch를 수행해야 한다", async () => {
+    mockedGetServerAuthCookieState.mockResolvedValue({
+      hasAccessToken: true,
+      hasRefreshToken: true,
       hasAuthCookies: true,
-      profile: memberProfile,
     });
+    const queryClient = new QueryClient();
+    const prefetchSpy = jest.spyOn(queryClient, "prefetchQuery").mockResolvedValue(undefined);
+
+    await runPrefetchFlow(queryClient);
+
+    expect(prefetchSpy).toHaveBeenCalledWith(memberQueries.me());
   });
 
-  it("인증 쿠키가 있지만 me 조회가 실패하면 recovering 상태를 반환해야 한다", async () => {
-    mockCookieStore.get.mockImplementation((name: string) =>
-      name === "accessToken" || name === "refreshToken" ? { value: `${name}-value` } : undefined
-    );
-    mockQueryClient.fetchQuery.mockRejectedValueOnce(new Error("Unauthorized"));
-
-    await expect(resolveServerAuthStateWithQueryClient(mockQueryClient)).resolves.toEqual({
-      status: "recovering",
+  it("me prefetch가 실패하면 member 캐시를 정리해야 한다", async () => {
+    mockedGetServerAuthCookieState.mockResolvedValue({
+      hasAccessToken: true,
+      hasRefreshToken: true,
       hasAuthCookies: true,
-      profile: null,
-      reason: "me_fetch_failed",
     });
-    expect(mockQueryClient.removeQueries).toHaveBeenCalledWith({
-      queryKey: ["member", "data"],
+    const queryClient = new QueryClient();
+    jest.spyOn(queryClient, "prefetchQuery").mockRejectedValue(new Error("Unauthorized"));
+    const removeSpy = jest.spyOn(queryClient, "removeQueries");
+
+    await runPrefetchFlow(queryClient);
+
+    expect(removeSpy).toHaveBeenCalledWith({
+      queryKey: memberKeys.me(),
       exact: true,
     });
   });

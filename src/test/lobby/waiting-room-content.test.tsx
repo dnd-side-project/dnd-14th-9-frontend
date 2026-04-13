@@ -59,7 +59,6 @@ describe("WaitingRoomContent", () => {
 
     mockUseAuthState.mockReturnValue({
       status: "authenticated",
-      hasAuthCookies: true,
       profile: {
         id: 7,
       },

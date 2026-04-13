@@ -78,7 +78,6 @@ describe("SessionPageContent", () => {
 
     mockUseAuthState.mockReturnValue({
       status: "authenticated",
-      hasAuthCookies: true,
       profile: {
         id: 7,
       },
@@ -131,5 +130,57 @@ describe("SessionPageContent", () => {
 
     expect(screen.getByTestId("session-page-skeleton")).toBeInTheDocument();
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
+  });
+
+  it("recovering 상태에서는 스켈레톤을 노출해야 한다", () => {
+    mockUseAuthState.mockReturnValue({
+      status: "recovering",
+    });
+    mockUseMe.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    });
+
+    render(<SessionPageContent sessionId="1" />);
+
+    expect(screen.getByTestId("session-page-skeleton")).toBeInTheDocument();
+  });
+
+  it("authenticated + 참여자이면 메인 콘텐츠를 렌더링해야 한다", () => {
+    mockUseMe.mockReturnValue({
+      data: {
+        result: {
+          id: 7,
+        },
+      },
+      isLoading: false,
+    });
+
+    render(<SessionPageContent sessionId="1" />);
+
+    expect(screen.getByTestId("session-header")).toBeInTheDocument();
+    expect(screen.getByTestId("session-detail-section")).toBeInTheDocument();
+    expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
+  });
+
+  it("guest 상태이면 로그인 유도 UI를 노출해야 한다", () => {
+    mockUseAuthState.mockReturnValue({
+      status: "guest",
+    });
+    mockUseMe.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    });
+    mockUseWaitingRoom.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    });
+
+    render(<SessionPageContent sessionId="1" />);
+
+    expect(screen.getByRole("link", { name: "로그인하고 참여하기" })).toHaveAttribute(
+      "href",
+      "/login"
+    );
   });
 });

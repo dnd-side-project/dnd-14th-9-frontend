@@ -3,9 +3,10 @@ import { redirect } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { WaitingRoomContent } from "@/features/lobby/components/WaitingRoomContent";
+import { memberKeys } from "@/features/member/hooks/useMemberHooks";
+import type { GetMeResponse } from "@/features/member/types";
 import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
 import { isInProgressStatus } from "@/features/session/types";
-import { resolveServerAuthState } from "@/lib/auth/resolve-server-auth-state";
 import { getQueryClient } from "@/lib/getQueryClient";
 
 export const metadata = { title: "대기실" };
@@ -17,7 +18,6 @@ interface WaitingRoomPageProps {
 export default async function WaitingRoomPage({ params }: WaitingRoomPageProps) {
   const { sessionId } = await params;
   const queryClient = getQueryClient();
-  const authState = await resolveServerAuthState();
 
   const sessionData = await queryClient.fetchQuery(sessionQueries.detail(sessionId));
 
@@ -26,7 +26,8 @@ export default async function WaitingRoomPage({ params }: WaitingRoomPageProps) 
     redirect(`/session/${sessionId}`);
   }
 
-  if (authState.status === "authenticated") {
+  const meData = queryClient.getQueryData<GetMeResponse>(memberKeys.me());
+  if (meData?.result) {
     await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
   }
 
