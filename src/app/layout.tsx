@@ -26,7 +26,7 @@ export default async function RootLayout({
 
   if (hasAuthCookies) {
     try {
-      await queryClient.prefetchQuery(memberQueries.me());
+      await queryClient.fetchQuery(memberQueries.me());
     } catch {
       queryClient.removeQueries({ queryKey: memberKeys.me(), exact: true });
     }

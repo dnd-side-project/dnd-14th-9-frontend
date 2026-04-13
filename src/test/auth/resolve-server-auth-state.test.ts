@@ -19,7 +19,7 @@ describe("RootLayout auth prefetch flow", () => {
 
     if (hasAuthCookies) {
       try {
-        await queryClient.prefetchQuery(memberQueries.me());
+        await queryClient.fetchQuery(memberQueries.me());
       } catch {
         queryClient.removeQueries({ queryKey: memberKeys.me(), exact: true });
       }
@@ -33,11 +33,11 @@ describe("RootLayout auth prefetch flow", () => {
       hasAuthCookies: false,
     });
     const queryClient = new QueryClient();
-    const prefetchSpy = jest.spyOn(queryClient, "prefetchQuery");
+    const fetchSpy = jest.spyOn(queryClient, "fetchQuery");
 
     await runPrefetchFlow(queryClient);
 
-    expect(prefetchSpy).not.toHaveBeenCalled();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
   it("인증 쿠키가 있으면 me prefetch를 수행해야 한다", async () => {
@@ -47,11 +47,16 @@ describe("RootLayout auth prefetch flow", () => {
       hasAuthCookies: true,
     });
     const queryClient = new QueryClient();
-    const prefetchSpy = jest.spyOn(queryClient, "prefetchQuery").mockResolvedValue(undefined);
+    const fetchSpy = jest.spyOn(queryClient, "fetchQuery").mockResolvedValue({
+      id: 1,
+      result: {
+        id: 1,
+      },
+    } as never);
 
     await runPrefetchFlow(queryClient);
 
-    expect(prefetchSpy).toHaveBeenCalledWith(memberQueries.me());
+    expect(fetchSpy).toHaveBeenCalledWith(memberQueries.me());
   });
 
   it("me prefetch가 실패하면 member 캐시를 정리해야 한다", async () => {
@@ -61,7 +66,7 @@ describe("RootLayout auth prefetch flow", () => {
       hasAuthCookies: true,
     });
     const queryClient = new QueryClient();
-    jest.spyOn(queryClient, "prefetchQuery").mockRejectedValue(new Error("Unauthorized"));
+    jest.spyOn(queryClient, "fetchQuery").mockRejectedValue(new Error("Unauthorized"));
     const removeSpy = jest.spyOn(queryClient, "removeQueries");
 
     await runPrefetchFlow(queryClient);
