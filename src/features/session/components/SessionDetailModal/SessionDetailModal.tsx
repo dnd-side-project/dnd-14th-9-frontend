@@ -146,7 +146,6 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
             size="medium"
             className="w-full"
             onClick={() => setShowJoinModal(true)}
-            disabled={false}
           >
             참여하기
           </Button>
