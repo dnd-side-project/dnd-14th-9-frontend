@@ -17,7 +17,7 @@ interface WaitingRoomPageProps {
 export default async function WaitingRoomPage({ params }: WaitingRoomPageProps) {
   const { sessionId } = await params;
   const queryClient = getQueryClient();
-  const authState = await resolveServerAuthState(queryClient);
+  const authState = await resolveServerAuthState();
 
   const sessionData = await queryClient.fetchQuery(sessionQueries.detail(sessionId));
 

@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: SessionPageProps): Promise<Me
 export default async function SessionPage({ params }: SessionPageProps) {
   const { sessionId } = await params;
   const queryClient = getQueryClient();
-  const authState = await resolveServerAuthState(queryClient);
+  const authState = await resolveServerAuthState();
 
   const sessionData = await queryClient.fetchQuery(sessionQueries.detail(sessionId));
 

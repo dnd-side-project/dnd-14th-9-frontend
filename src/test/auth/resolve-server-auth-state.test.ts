@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 import type { MemberProfileView } from "@/features/member/types";
-import { resolveServerAuthState } from "@/lib/auth/resolve-server-auth-state";
+import { resolveServerAuthStateWithQueryClient } from "@/lib/auth/resolve-server-auth-state";
 
 jest.mock("next/headers", () => ({
   cookies: jest.fn(),
@@ -47,7 +47,7 @@ describe("resolveServerAuthState", () => {
   it("인증 쿠키가 없으면 guest 상태를 반환해야 한다", async () => {
     mockCookieStore.get.mockReturnValue(undefined);
 
-    await expect(resolveServerAuthState(mockQueryClient)).resolves.toEqual({
+    await expect(resolveServerAuthStateWithQueryClient(mockQueryClient)).resolves.toEqual({
       status: "guest",
       hasAuthCookies: false,
       profile: null,
@@ -62,7 +62,7 @@ describe("resolveServerAuthState", () => {
     );
     mockQueryClient.fetchQuery.mockResolvedValueOnce({ result: memberProfile });
 
-    await expect(resolveServerAuthState(mockQueryClient)).resolves.toEqual({
+    await expect(resolveServerAuthStateWithQueryClient(mockQueryClient)).resolves.toEqual({
       status: "authenticated",
       hasAuthCookies: true,
       profile: memberProfile,
@@ -75,7 +75,7 @@ describe("resolveServerAuthState", () => {
     );
     mockQueryClient.fetchQuery.mockRejectedValueOnce(new Error("Unauthorized"));
 
-    await expect(resolveServerAuthState(mockQueryClient)).resolves.toEqual({
+    await expect(resolveServerAuthStateWithQueryClient(mockQueryClient)).resolves.toEqual({
       status: "recovering",
       hasAuthCookies: true,
       profile: null,

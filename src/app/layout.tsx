@@ -21,7 +21,7 @@ export default async function RootLayout({
   modal: React.ReactNode;
 }>) {
   const queryClient = getQueryClient();
-  const authState = await resolveServerAuthState(queryClient);
+  const authState = await resolveServerAuthState();
 
   return (
     <html lang="ko" className="dark">

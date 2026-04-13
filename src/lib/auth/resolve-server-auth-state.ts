@@ -15,7 +15,9 @@ import type { QueryClient } from "@tanstack/react-query";
 
 type AuthResolverQueryClient = Pick<QueryClient, "fetchQuery" | "removeQueries">;
 
-async function resolveWithQueryClient(queryClient: AuthResolverQueryClient): Promise<AuthState> {
+export async function resolveServerAuthStateWithQueryClient(
+  queryClient: AuthResolverQueryClient
+): Promise<AuthState> {
   const { hasAuthCookies } = await getServerAuthCookieState();
 
   if (!hasAuthCookies) {
@@ -32,15 +34,9 @@ async function resolveWithQueryClient(queryClient: AuthResolverQueryClient): Pro
 }
 
 const resolveCachedServerAuthState = cache(async (): Promise<AuthState> => {
-  return resolveWithQueryClient(getQueryClient());
+  return resolveServerAuthStateWithQueryClient(getQueryClient());
 });
 
-export async function resolveServerAuthState(
-  queryClient?: AuthResolverQueryClient
-): Promise<AuthState> {
-  if (queryClient) {
-    return resolveWithQueryClient(queryClient);
-  }
-
+export async function resolveServerAuthState(): Promise<AuthState> {
   return resolveCachedServerAuthState();
 }
