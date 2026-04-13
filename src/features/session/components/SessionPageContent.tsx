@@ -41,11 +41,12 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const isAuthenticated = authState.status === "authenticated";
   const { data: sessionData, isLoading, error, refetch } = useSessionDetail(sessionId);
   const { data: inProgressData } = useInProgressData({ sessionId });
-  const { data: meData } = useMe({ enabled: isAuthenticated });
+  const { data: meData, isLoading: isMeLoading } = useMe({ enabled: isAuthenticated });
   const { data: waitingRoomData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
     enabled: isAuthenticated,
   });
   const submitResultMutation = useSubmitSessionResult();
+  const isAuthDataLoading = isAuthenticated && (isWaitingRoomLoading || isMeLoading);
 
   const sessionDurationMinutes = sessionData?.result?.sessionDurationMinutes;
 
@@ -90,7 +91,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     },
   });
 
-  if (isLoading || authState.status === "recovering" || (isAuthenticated && isWaitingRoomLoading)) {
+  if (isLoading || authState.status === "recovering" || isAuthDataLoading) {
     return <SessionPageContentSkeleton />;
   }
 
@@ -126,9 +127,10 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   }
 
   // 참여 여부 확인
-  const myMemberId = meData?.result?.id;
-  const isParticipant =
-    waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false;
+  const myMemberId = isAuthDataLoading ? undefined : meData?.result?.id;
+  const isParticipant = isAuthDataLoading
+    ? false
+    : (waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false);
 
   // 미참여자 → SessionJoinModal 표시
   if (!isParticipant) {
