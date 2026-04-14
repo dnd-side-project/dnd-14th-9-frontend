@@ -1,8 +1,7 @@
 import { dehydrate } from "@tanstack/react-query";
 
 import { ToastViewport } from "@/components/Toast/ToastViewport";
-import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
-import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
+import { prepareAuthMeQuery } from "@/lib/auth/prepare-auth-me-query";
 import { getQueryClient } from "@/lib/getQueryClient";
 import GoogleAnalytics from "@/lib/GoogleAnalytics";
 import { rootMetadata } from "@/lib/seo/metadata";
@@ -22,15 +21,7 @@ export default async function RootLayout({
   modal: React.ReactNode;
 }>) {
   const queryClient = getQueryClient();
-  const { hasAuthCookies } = await getServerAuthCookieState();
-
-  if (hasAuthCookies) {
-    try {
-      await queryClient.fetchQuery(memberQueries.me());
-    } catch {
-      queryClient.removeQueries({ queryKey: memberKeys.me(), exact: true });
-    }
-  }
+  const { hasAuthCookies } = await prepareAuthMeQuery(queryClient);
 
   return (
     <html lang="ko" className="dark">

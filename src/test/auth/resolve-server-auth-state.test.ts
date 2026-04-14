@@ -2,6 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
 import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
+import { prepareAuthMeQuery } from "@/lib/auth/prepare-auth-me-query";
 
 jest.mock("@/lib/auth/auth-cookie-state", () => ({
   getServerAuthCookieState: jest.fn(),
@@ -14,18 +15,6 @@ describe("RootLayout auth prefetch flow", () => {
     jest.clearAllMocks();
   });
 
-  async function runPrefetchFlow(queryClient: QueryClient) {
-    const { hasAuthCookies } = await getServerAuthCookieState();
-
-    if (hasAuthCookies) {
-      try {
-        await queryClient.fetchQuery(memberQueries.me());
-      } catch {
-        queryClient.removeQueries({ queryKey: memberKeys.me(), exact: true });
-      }
-    }
-  }
-
   it("인증 쿠키가 없으면 me prefetch를 생략해야 한다", async () => {
     mockedGetServerAuthCookieState.mockResolvedValue({
       hasAccessToken: false,
@@ -35,7 +24,7 @@ describe("RootLayout auth prefetch flow", () => {
     const queryClient = new QueryClient();
     const fetchSpy = jest.spyOn(queryClient, "fetchQuery");
 
-    await runPrefetchFlow(queryClient);
+    await prepareAuthMeQuery(queryClient);
 
     expect(fetchSpy).not.toHaveBeenCalled();
   });
@@ -54,7 +43,7 @@ describe("RootLayout auth prefetch flow", () => {
       },
     } as never);
 
-    await runPrefetchFlow(queryClient);
+    await prepareAuthMeQuery(queryClient);
 
     expect(fetchSpy).toHaveBeenCalledWith(memberQueries.me());
   });
@@ -69,7 +58,7 @@ describe("RootLayout auth prefetch flow", () => {
     jest.spyOn(queryClient, "fetchQuery").mockRejectedValue(new Error("Unauthorized"));
     const removeSpy = jest.spyOn(queryClient, "removeQueries");
 
-    await runPrefetchFlow(queryClient);
+    await prepareAuthMeQuery(queryClient);
 
     expect(removeSpy).toHaveBeenCalledWith({
       queryKey: memberKeys.me(),
