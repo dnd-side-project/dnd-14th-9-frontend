@@ -1,7 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 import {
   createAuthenticatedAuthState,
@@ -14,23 +12,21 @@ export function useAuthState() {
   const hasAuthCookies = useAuthHint();
   const { data, isLoading, isFetching, isError } = useMe({ enabled: hasAuthCookies });
 
-  return useMemo(() => {
-    if (!hasAuthCookies) {
-      return GUEST_AUTH_STATE;
-    }
+  if (!hasAuthCookies) {
+    return GUEST_AUTH_STATE;
+  }
 
-    if (data?.result) {
-      return createAuthenticatedAuthState(data.result);
-    }
+  if (data?.result) {
+    return createAuthenticatedAuthState(data.result);
+  }
 
-    if (isLoading || isFetching) {
-      return createRecoveringAuthState();
-    }
-
-    if (isError) {
-      return GUEST_AUTH_STATE;
-    }
-
+  if (isLoading || isFetching) {
     return createRecoveringAuthState();
-  }, [data, hasAuthCookies, isError, isFetching, isLoading]);
+  }
+
+  if (isError) {
+    return GUEST_AUTH_STATE;
+  }
+
+  return GUEST_AUTH_STATE;
 }
