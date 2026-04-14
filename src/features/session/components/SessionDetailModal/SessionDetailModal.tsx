@@ -135,9 +135,13 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
           >
             닫기
           </Button>
-        ) : isRecovering || isCheckingParticipation ? (
+        ) : isRecovering ? (
           <Button variant="solid" colorScheme="primary" size="medium" className="w-full" disabled>
             로그인 상태 확인 중...
+          </Button>
+        ) : isCheckingParticipation ? (
+          <Button variant="solid" colorScheme="primary" size="medium" className="w-full" disabled>
+            참여 여부 확인 중...
           </Button>
         ) : isAuthenticated ? (
           <Button
