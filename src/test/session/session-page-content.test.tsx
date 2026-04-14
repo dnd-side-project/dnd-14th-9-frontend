@@ -144,6 +144,10 @@ describe("SessionPageContent", () => {
     render(<SessionPageContent sessionId="1" />);
 
     expect(screen.getByTestId("session-page-skeleton")).toBeInTheDocument();
+    expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("session-header")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("session-detail-section")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("session-timer-section")).not.toBeInTheDocument();
   });
 
   it("authenticated + 참여자이면 메인 콘텐츠를 렌더링해야 한다", () => {

@@ -53,6 +53,22 @@ jest.mock("@/features/lobby/components/SessionJoinModal", () => ({
   SessionJoinModal: () => <div data-testid="session-join-modal" />,
 }));
 
+jest.mock("@/features/lobby/components/LobbyHeader", () => ({
+  LobbyHeader: () => <div data-testid="lobby-header" />,
+}));
+
+jest.mock("@/features/lobby/components/SessionInfoCard", () => ({
+  SessionInfoCard: () => <div data-testid="session-info-card" />,
+}));
+
+jest.mock("@/features/lobby/components/GoalAndTodoCard", () => ({
+  GoalAndTodoCard: () => <div data-testid="goal-todo-card" />,
+}));
+
+jest.mock("@/features/lobby/components/ParticipantListCard", () => ({
+  ParticipantListCard: () => <div data-testid="participant-list-card" />,
+}));
+
 describe("WaitingRoomContent", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -87,6 +103,61 @@ describe("WaitingRoomContent", () => {
     });
 
     mockUseWaitingMembersSSE.mockReturnValue({ data: null });
+  });
+
+  it("recovering 상태면 스켈레톤을 표시해야 한다", () => {
+    mockUseAuthState.mockReturnValue({
+      status: "recovering",
+    });
+    mockUseMe.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    });
+
+    render(<WaitingRoomContent sessionId="1" />);
+
+    expect(screen.getByTestId("waiting-room-skeleton")).toBeInTheDocument();
+    expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
+  });
+
+  it("waitingRoom 데이터 로딩 중이면 스켈레톤을 표시해야 한다", () => {
+    mockUseMe.mockReturnValue({
+      data: {
+        result: {
+          id: 7,
+        },
+      },
+      isLoading: false,
+    });
+    mockUseWaitingRoom.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    });
+
+    render(<WaitingRoomContent sessionId="1" />);
+
+    expect(screen.getByTestId("waiting-room-skeleton")).toBeInTheDocument();
+    expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
+  });
+
+  it("인증 완료 + 데이터 로딩 완료면 정상 UI를 렌더링해야 한다", () => {
+    mockUseMe.mockReturnValue({
+      data: {
+        result: {
+          id: 7,
+        },
+      },
+      isLoading: false,
+    });
+
+    render(<WaitingRoomContent sessionId="1" />);
+
+    expect(screen.queryByTestId("waiting-room-skeleton")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
+    expect(screen.getByTestId("lobby-header")).toBeInTheDocument();
+    expect(screen.getByTestId("session-info-card")).toBeInTheDocument();
+    expect(screen.getByTestId("goal-todo-card")).toBeInTheDocument();
+    expect(screen.getByTestId("participant-list-card")).toBeInTheDocument();
   });
 
   it("me 정보가 아직 로딩 중이면 참여 여부를 판단하지 않고 스켈레톤을 유지해야 한다", () => {
