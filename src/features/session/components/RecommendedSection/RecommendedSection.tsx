@@ -3,6 +3,7 @@
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
 
 import { RecommendedSectionContent } from "./RecommendedSectionContent";
+import { RecommendedSectionSkeleton } from "./RecommendedSectionSkeleton";
 
 /**
  * RecommendedSection - 맞춤 추천 세션
@@ -20,6 +21,10 @@ import { RecommendedSectionContent } from "./RecommendedSectionContent";
  */
 export function RecommendedSection() {
   const authState = useAuthState();
+
+  if (authState.status === "recovering") {
+    return <RecommendedSectionSkeleton />;
+  }
 
   if (authState.status !== "authenticated") {
     return null;
