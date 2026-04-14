@@ -34,7 +34,3 @@ export function useAuthState() {
     return createRecoveringAuthState();
   }, [data, hasAuthCookies, isError, isFetching, isLoading]);
 }
-
-export function useIsAuthenticated() {
-  return useAuthState().status === "authenticated";
-}
