@@ -20,7 +20,7 @@ interface FeedbackBannerProps {
 
 export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
   return (
-    <section className="border-sm border-alpha-white-16 relative flex h-[264px] w-full items-center overflow-hidden rounded-sm bg-linear-to-b from-cyan-800 from-0% to-cyan-500 to-100%">
+    <section className="border-sm border-alpha-white-16 gap-3xl relative flex h-[264px] w-full items-center overflow-hidden rounded-sm bg-linear-to-b from-cyan-800 from-0% to-cyan-500 to-100%">
       {/* Content Container */}
       <div className="gap-2xl p-4xl relative z-10 flex flex-1 flex-col">
         <div className="gap-2xs text-text-primary flex w-[384px] flex-col">
@@ -51,7 +51,7 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
       </div>
 
       {/* Image Container */}
-      <div className="relative h-full w-[54%] shrink-0 overflow-hidden" aria-hidden="true">
+      <div className="relative h-full w-[640px] shrink-0 overflow-hidden" aria-hidden="true">
         <Image
           src="/images/banner/feedback-banner-artwork-desktop.svg"
           alt=""
