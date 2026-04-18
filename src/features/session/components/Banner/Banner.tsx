@@ -105,6 +105,8 @@ export function Banner() {
         >
           <FeedbackBanner isHovered={!isDefault && isHovered} />
         </motion.div>
+
+        {/* <FeedbackBanner isHovered={!isDefault && isHovered} /> */}
       </div>
 
       {/* 인디케이터 */}
