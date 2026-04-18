@@ -54,14 +54,12 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
           alt=""
           fill
           className={`object-contain transition-opacity duration-700 md:hidden ${isHovered ? "opacity-0" : "opacity-100"}`}
-          priority
         />
         <Image
           src="/images/banner/feedback-banner-artwork-mobile-hover.svg"
           alt=""
           fill
           className={`object-contain transition-opacity duration-700 md:hidden ${isHovered ? "opacity-100" : "opacity-0"}`}
-          priority
         />
         {/* Tablet */}
         <Image
@@ -69,14 +67,12 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
           alt=""
           fill
           className={`hidden object-contain transition-opacity duration-700 min-[1200px]:!hidden md:block ${isHovered ? "opacity-0" : "opacity-100"}`}
-          priority
         />
         <Image
           src="/images/banner/feedback-banner-artwork-tablet-hover.svg"
           alt=""
           fill
           className={`hidden object-contain transition-opacity duration-700 min-[1200px]:!hidden md:block ${isHovered ? "opacity-100" : "opacity-0"}`}
-          priority
         />
         {/* Desktop */}
         <Image
@@ -84,14 +80,12 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
           alt=""
           fill
           className={`hidden object-contain transition-opacity duration-700 min-[1200px]:block ${isHovered ? "opacity-0" : "opacity-100"}`}
-          priority
         />
         <Image
           src="/images/banner/feedback-banner-artwork-desktop-hover.svg"
           alt=""
           fill
           className={`hidden object-contain transition-opacity duration-700 min-[1200px]:block ${isHovered ? "opacity-100" : "opacity-0"}`}
-          priority
         />
       </div>
     </section>
