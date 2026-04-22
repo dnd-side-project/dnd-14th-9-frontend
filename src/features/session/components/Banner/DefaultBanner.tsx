@@ -132,7 +132,7 @@ function useViewport(): Viewport {
   useEffect(() => {
     const update = () => {
       if (window.innerWidth < 768) setViewport("mobile");
-      else if (window.innerWidth < 1200) setViewport("tablet");
+      else if (window.innerWidth < 1280) setViewport("tablet");
       else setViewport("desktop");
     };
     update();
@@ -153,7 +153,7 @@ export function DefaultBanner({ isHovered }: DefaultBannerProps) {
   const cardStyles = CARD_STYLES[viewport][state];
 
   return (
-    <section className="border-sm border-alpha-white-16 relative flex h-[264px] w-full flex-col items-start justify-between overflow-hidden rounded-sm bg-linear-to-b from-gray-950 to-gray-900 min-[1200px]:flex-row min-[1200px]:items-center min-[1200px]:justify-start">
+    <section className="border-sm border-alpha-white-16 relative flex h-[264px] w-full flex-col items-start justify-between overflow-hidden rounded-sm bg-linear-to-b from-gray-950 to-gray-900 xl:flex-row xl:items-center xl:justify-start">
       {/* Background: 라인 패턴 레이어 */}
       <div className="absolute inset-0 overflow-hidden">
         {/* 가로 라인 패턴 (90도 회전) */}
@@ -190,7 +190,7 @@ export function DefaultBanner({ isHovered }: DefaultBannerProps) {
       </div>
 
       {/* Content Container */}
-      <div className="px-2xl py-xl gap-md md:px-3xl md:py-2xl md:gap-lg min-[1200px]:p-4xl min-[1200px]:gap-2xl relative z-10 flex w-full shrink-0 flex-col items-start min-[1200px]:h-full min-[1200px]:w-auto min-[1200px]:min-w-px min-[1200px]:flex-1">
+      <div className="px-2xl py-xl gap-md md:px-3xl md:py-2xl md:gap-lg xl:p-4xl xl:gap-2xl relative z-10 flex w-full shrink-0 flex-col items-start xl:h-full xl:w-auto xl:min-w-px xl:flex-1">
         <div className="gap-2xs text-text-primary flex flex-col">
           <h2 className="text-[18px] leading-[1.4] font-bold md:text-2xl">
             지금 각 잡고, 바로 시작!
@@ -214,7 +214,7 @@ export function DefaultBanner({ isHovered }: DefaultBannerProps) {
       </div>
 
       {/* Image Container: 3개 UI 카드 */}
-      <div className="absolute right-0 bottom-0 left-0 h-[132px] overflow-clip min-[1200px]:relative min-[1200px]:inset-auto min-[1200px]:!h-full min-[1200px]:w-[640px] min-[1200px]:shrink-0 min-[1200px]:self-stretch md:h-[152px]">
+      <div className="absolute right-0 bottom-0 left-0 h-[132px] overflow-clip md:h-[152px] xl:relative xl:inset-auto xl:!h-full xl:w-[640px] xl:shrink-0 xl:self-stretch">
         {/* Goals Section 카드 */}
         <div
           className="absolute flex items-center justify-center transition-all duration-500 ease-out"

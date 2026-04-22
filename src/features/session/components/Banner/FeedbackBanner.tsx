@@ -13,10 +13,10 @@ interface FeedbackBannerProps {
 
 export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
   return (
-    <section className="border-sm border-alpha-white-16 min-[1200px]:gap-3xl relative flex h-[264px] w-full flex-col items-start justify-between overflow-clip rounded-sm border-solid bg-linear-to-b from-cyan-800 to-cyan-500 min-[1200px]:flex-row min-[1200px]:items-center min-[1200px]:justify-start">
+    <section className="border-sm border-alpha-white-16 xl:gap-3xl relative flex h-[264px] w-full flex-col items-start justify-between overflow-clip rounded-sm border-solid bg-linear-to-b from-cyan-800 to-cyan-500 xl:flex-row xl:items-center xl:justify-start">
       {/* Content Container */}
-      <div className="px-2xl py-xl gap-md md:px-3xl md:py-2xl md:gap-lg min-[1200px]:p-4xl min-[1200px]:gap-2xl relative flex w-full shrink-0 flex-col items-start min-[1200px]:h-full min-[1200px]:w-auto min-[1200px]:min-w-px min-[1200px]:flex-1">
-        <div className="gap-2xs text-text-primary flex w-full shrink-0 flex-col min-[1200px]:w-[384px]">
+      <div className="px-2xl py-xl gap-md md:px-3xl md:py-2xl md:gap-lg xl:p-4xl xl:gap-2xl relative flex w-full shrink-0 flex-col items-start xl:h-full xl:w-auto xl:min-w-px xl:flex-1">
+        <div className="gap-2xs text-text-primary flex w-full shrink-0 flex-col xl:w-[384px]">
           <h2 className="text-[18px] leading-[1.4] font-bold md:text-2xl">
             GAK을 사용해보고 느낀 점을 알려주세요
           </h2>
@@ -45,7 +45,7 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
 
       {/* Image Container */}
       <div
-        className="absolute right-0 bottom-0 left-0 h-[132px] overflow-clip min-[1200px]:relative min-[1200px]:inset-auto min-[1200px]:!h-full min-[1200px]:w-[640px] min-[1200px]:shrink-0 min-[1200px]:self-stretch md:h-[152px]"
+        className="absolute right-0 bottom-0 left-0 h-[132px] overflow-clip md:h-[152px] xl:relative xl:inset-auto xl:!h-full xl:w-[640px] xl:shrink-0 xl:self-stretch"
         aria-hidden="true"
       >
         {/* Mobile */}
@@ -66,26 +66,26 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
           src="/images/banner/feedback-banner-artwork-tablet.svg"
           alt=""
           fill
-          className={`hidden object-contain transition-opacity duration-700 min-[1200px]:!hidden md:block ${isHovered ? "opacity-0" : "opacity-100"}`}
+          className={`hidden object-contain transition-opacity duration-700 md:block xl:!hidden ${isHovered ? "opacity-0" : "opacity-100"}`}
         />
         <Image
           src="/images/banner/feedback-banner-artwork-tablet-hover.svg"
           alt=""
           fill
-          className={`hidden object-contain transition-opacity duration-700 min-[1200px]:!hidden md:block ${isHovered ? "opacity-100" : "opacity-0"}`}
+          className={`hidden object-contain transition-opacity duration-700 md:block xl:!hidden ${isHovered ? "opacity-100" : "opacity-0"}`}
         />
         {/* Desktop */}
         <Image
           src="/images/banner/feedback-banner-artwork-desktop.svg"
           alt=""
           fill
-          className={`hidden object-contain transition-opacity duration-700 min-[1200px]:block ${isHovered ? "opacity-0" : "opacity-100"}`}
+          className={`hidden object-contain transition-opacity duration-700 xl:block ${isHovered ? "opacity-0" : "opacity-100"}`}
         />
         <Image
           src="/images/banner/feedback-banner-artwork-desktop-hover.svg"
           alt=""
           fill
-          className={`hidden object-contain transition-opacity duration-700 min-[1200px]:block ${isHovered ? "opacity-100" : "opacity-0"}`}
+          className={`hidden object-contain transition-opacity duration-700 xl:block ${isHovered ? "opacity-100" : "opacity-0"}`}
         />
       </div>
     </section>
