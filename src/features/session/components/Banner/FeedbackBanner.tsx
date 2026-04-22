@@ -45,7 +45,7 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
 
       {/* Image Container */}
       <div
-        className="pointer-events-none absolute right-0 bottom-0 left-0 h-[132px] overflow-clip md:h-[152px] xl:relative xl:inset-auto xl:!h-full xl:w-[640px] xl:shrink-0 xl:self-stretch"
+        className="pointer-events-none absolute right-0 bottom-0 h-[132px] overflow-clip md:relative md:inset-auto md:h-[152px] md:w-[660px] md:shrink-0 xl:!h-full xl:w-[640px] xl:self-stretch"
         aria-hidden="true"
       >
         {/* Mobile */}
