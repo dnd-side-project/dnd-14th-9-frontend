@@ -4,11 +4,12 @@ import { redirect } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import { memberKeys } from "@/features/member/hooks/useMemberHooks";
+import type { GetMeResponse } from "@/features/member/types";
 import { sessionApi } from "@/features/session/api";
 import { SessionPageContent } from "@/features/session/components/SessionPageContent";
 import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
 import { isWaitingStatus } from "@/features/session/types";
-import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
 import { getQueryClient } from "@/lib/getQueryClient";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
@@ -40,7 +41,6 @@ export async function generateMetadata({ params }: SessionPageProps): Promise<Me
 export default async function SessionPage({ params }: SessionPageProps) {
   const { sessionId } = await params;
   const queryClient = getQueryClient();
-  const { hasAuthCookies } = await getServerAuthCookieState();
 
   const sessionData = await queryClient.fetchQuery(sessionQueries.detail(sessionId));
 
@@ -49,7 +49,8 @@ export default async function SessionPage({ params }: SessionPageProps) {
     redirect(`/session/${sessionId}/waiting`);
   }
 
-  if (hasAuthCookies) {
+  const meData = queryClient.getQueryData<GetMeResponse>(memberKeys.me());
+  if (meData?.result) {
     await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
   }
 

@@ -1,19 +1,7 @@
-import dynamic from "next/dynamic";
-
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
-import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
+import { OnboardingModalGate } from "@/features/member/components/Onboarding/OnboardingModalGate";
 import { MAIN_SCROLL_ID } from "@/hooks/useBodyScrollLock";
-import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
-import { getQueryClient } from "@/lib/getQueryClient";
-
-const OnboardingModalWrapper = dynamic(() =>
-  import("@/features/member/components/Onboarding/OnboardingModalWrapper").then(
-    (mod) => mod.OnboardingModalWrapper
-  )
-);
 
 /**
  * WithHeader Layout
@@ -25,25 +13,10 @@ const OnboardingModalWrapper = dynamic(() =>
  * - OnboardingModal: firstLogin 시 자동 표시
  */
 export default async function Layout({ children }: { children: React.ReactNode }) {
-  const queryClient = getQueryClient();
-  let isAuthenticated = false;
-  let memberProfile = null;
-  const { hasAuthCookies } = await getServerAuthCookieState();
-  // 인증 쿠키가 없으면 서버에서 me 조회를 건너뛰어 초기 문서 TTFB를 줄인다.
-  if (hasAuthCookies) {
-    try {
-      const response = await queryClient.fetchQuery(memberQueries.me());
-      memberProfile = response.result;
-      isAuthenticated = true;
-    } catch {
-      queryClient.removeQueries({ queryKey: memberKeys.me(), exact: true });
-    }
-  }
-
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
+    <>
       <div className="flex h-screen flex-col">
-        <Header isAuthenticated={isAuthenticated} />
+        <Header />
         <div id={MAIN_SCROLL_ID} className="flex-1 overflow-y-auto">
           <div className="flex min-h-full flex-col">
             <main className="mx-auto w-full max-w-7xl flex-1">{children}</main>
@@ -51,12 +24,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
           </div>
         </div>
       </div>
-      {memberProfile?.firstLogin ? (
-        <OnboardingModalWrapper
-          defaultNickname={memberProfile.nickname}
-          defaultProfileImageUrl={memberProfile.profileImageUrl}
-        />
-      ) : null}
-    </HydrationBoundary>
+      <OnboardingModalGate />
+    </>
   );
 }

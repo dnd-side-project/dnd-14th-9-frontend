@@ -1,19 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { ButtonLink } from "@/components/Button/ButtonLink";
-import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
-import { LOGIN_ROUTE, ROOT_ROUTE } from "@/lib/routes/route-paths";
+import { ROOT_ROUTE } from "@/lib/routes/route-paths";
 
-interface HeaderProps {
-  isAuthenticated: boolean;
-}
+import { HeaderAuthActions } from "./HeaderAuthActions";
 
-/**
- * Header - GNB (Global Navigation Bar) 서버 컴포넌트
- * 상위 레이아웃에서 주입된 인증 상태에 따라 UI를 렌더링합니다.
- */
-export function Header({ isAuthenticated }: HeaderProps) {
+export function Header() {
   return (
     <header className="border-border-subtle bg-surface-default sticky top-0 z-50 w-full border-b">
       <div className="px-lg md:px-xl md:py-sm mx-auto flex h-full max-w-[1280px] items-center justify-between py-[15px] xl:px-[50px]">
@@ -33,33 +25,7 @@ export function Header({ isAuthenticated }: HeaderProps) {
         </Link>
 
         <div className="gap-sm flex items-center justify-end">
-          {isAuthenticated ? (
-            <>
-              <ButtonLink
-                href="/session/create"
-                aria-label="세션 만들기"
-                size="small"
-                variant="solid"
-                colorScheme="primary"
-                className="px-xs py-2xs md:px-sm md:py-xs"
-                hardNavigate
-              >
-                세션 만들기
-              </ButtonLink>
-              <ProfileDropdown />
-            </>
-          ) : (
-            <ButtonLink
-              href={LOGIN_ROUTE}
-              aria-label="로그인"
-              size="small"
-              variant="outlined"
-              colorScheme="secondary"
-              className="px-xs py-2xs md:px-sm md:py-xs"
-            >
-              회원가입 / 로그인
-            </ButtonLink>
-          )}
+          <HeaderAuthActions />
         </div>
       </div>
     </header>

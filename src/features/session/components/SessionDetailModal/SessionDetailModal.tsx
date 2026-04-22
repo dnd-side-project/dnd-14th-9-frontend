@@ -7,8 +7,9 @@ import { ButtonLink } from "@/components/Button/ButtonLink";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { ShareIcon } from "@/components/Icon/ShareIcon";
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
-import { useIsAuthenticated, useMe } from "@/features/member/hooks/useMemberHooks";
+import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useDialog } from "@/hooks/useDialog";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
@@ -28,7 +29,9 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
   const { dialogRef, handleClose, handleBackdropClick } = useDialog("/");
   const { data, error: sessionError } = useSessionDetail(sessionId);
   const { shareSession } = useShareSession();
-  const isAuthenticated = useIsAuthenticated();
+  const authState = useAuthState();
+  const isAuthenticated = authState.status === "authenticated";
+  const isRecovering = authState.status === "recovering";
   const [showJoinModal, setShowJoinModal] = useState(false);
 
   // 현재 사용자 정보 (인증된 경우만)
@@ -132,6 +135,14 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
           >
             닫기
           </Button>
+        ) : isRecovering ? (
+          <Button variant="solid" colorScheme="primary" size="medium" className="w-full" disabled>
+            로그인 상태 확인 중...
+          </Button>
+        ) : isCheckingParticipation ? (
+          <Button variant="solid" colorScheme="primary" size="medium" className="w-full" disabled>
+            참여 여부 확인 중...
+          </Button>
         ) : isAuthenticated ? (
           <Button
             variant="solid"
@@ -139,9 +150,8 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
             size="medium"
             className="w-full"
             onClick={() => setShowJoinModal(true)}
-            disabled={isCheckingParticipation}
           >
-            {isCheckingParticipation ? "확인 중..." : "참여하기"}
+            참여하기
           </Button>
         ) : (
           <ButtonLink
