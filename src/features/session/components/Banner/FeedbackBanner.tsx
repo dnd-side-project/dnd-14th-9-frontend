@@ -15,7 +15,7 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
   return (
     <section className="border-sm border-alpha-white-16 xl:gap-3xl relative flex h-[264px] w-full flex-col items-start justify-between overflow-clip rounded-sm border-solid bg-linear-to-b from-cyan-800 to-cyan-500 xl:flex-row xl:items-center xl:justify-start">
       {/* Content Container */}
-      <div className="px-2xl py-xl gap-md md:px-3xl md:py-2xl md:gap-lg xl:p-4xl xl:gap-2xl relative flex w-full shrink-0 flex-col items-start xl:h-full xl:w-auto xl:min-w-px xl:flex-1">
+      <div className="px-2xl py-xl gap-md md:px-3xl md:py-2xl md:gap-lg xl:p-4xl xl:gap-2xl relative z-10 flex w-full shrink-0 flex-col items-start xl:h-full xl:w-auto xl:min-w-px xl:flex-1">
         <div className="gap-2xs text-text-primary flex w-full shrink-0 flex-col xl:w-[384px]">
           <h2 className="text-[18px] leading-[1.4] font-bold md:text-2xl">
             GAK을 사용해보고 느낀 점을 알려주세요
@@ -45,7 +45,7 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
 
       {/* Image Container */}
       <div
-        className="absolute right-0 bottom-0 left-0 h-[132px] overflow-clip md:h-[152px] xl:relative xl:inset-auto xl:!h-full xl:w-[640px] xl:shrink-0 xl:self-stretch"
+        className="pointer-events-none absolute right-0 bottom-0 left-0 h-[132px] overflow-clip md:h-[152px] xl:relative xl:inset-auto xl:!h-full xl:w-[640px] xl:shrink-0 xl:self-stretch"
         aria-hidden="true"
       >
         {/* Mobile */}
