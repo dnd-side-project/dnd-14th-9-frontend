@@ -45,20 +45,24 @@ export function Card({
   const renderStatusBadge = () => {
     if (isPastTime(sessionDate)) {
       return (
-        <Badge radius="max" status="inProgress" className="text-[10px] px-2 md:text-xs md:px-3">
+        <Badge radius="max" status="inProgress" className="px-2 text-[10px] md:px-3 md:text-xs">
           진행중
         </Badge>
       );
     }
     if (statusText) {
       return (
-        <Badge radius="max" status={statusBadgeStatus ?? "recruiting"} className="text-[10px] px-2 md:text-xs md:px-3">
+        <Badge
+          radius="max"
+          status={statusBadgeStatus ?? "recruiting"}
+          className="px-2 text-[10px] md:px-3 md:text-xs"
+        >
           {statusText}
         </Badge>
       );
     }
     if (createdAt) {
-      return <RelativeTimeBadge date={createdAt} className="text-[10px] px-2 md:text-xs md:px-3" />;
+      return <RelativeTimeBadge date={createdAt} className="px-2 text-[10px] md:px-3 md:text-xs" />;
     }
     return null;
   };
