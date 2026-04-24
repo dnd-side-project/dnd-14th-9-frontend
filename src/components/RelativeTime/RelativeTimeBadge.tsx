@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/Badge/Badge";
 import { formatRelativeTime } from "@/lib/utils/date";
+import { cn } from "@/lib/utils/utils";
 
 interface RelativeTimeBadgeProps {
   date: Date | string;
+  className?: string;
 }
 
 /**
@@ -15,7 +17,7 @@ interface RelativeTimeBadgeProps {
  * SSR/Hydration 시 mismatch를 방지하기 위해
  * 클라이언트에서만 상대 시간을 계산하여 Badge로 표시합니다.
  */
-export function RelativeTimeBadge({ date }: RelativeTimeBadgeProps) {
+export function RelativeTimeBadge({ date, className }: RelativeTimeBadgeProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export function RelativeTimeBadge({ date }: RelativeTimeBadgeProps) {
   if (!mounted) {
     // 서버/hydration 시에는 빈 뱃지 렌더링 (레이아웃 shift 최소화)
     return (
-      <Badge radius="max" status="recruiting" className="invisible">
+      <Badge radius="max" status="recruiting" className={cn("invisible", className)}>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       </Badge>
     );
@@ -38,7 +40,7 @@ export function RelativeTimeBadge({ date }: RelativeTimeBadgeProps) {
   const badgeStatus = isClosing ? "closing" : "recruiting";
 
   return (
-    <Badge radius="max" status={badgeStatus}>
+    <Badge radius="max" status={badgeStatus} className={className}>
       {displayText}
     </Badge>
   );
