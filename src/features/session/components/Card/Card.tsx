@@ -42,50 +42,56 @@ export function Card({
   durationMinutes,
   sessionDate,
 }: CardProps) {
-  // 세션 시작 시간이 이미 지났으면 inProgress 뱃지 우선 표시
-  // statusText가 명시적으로 제공되면 직접 Badge 사용
-  // 그 외에 createdAt이 있으면 RelativeTimeBadge 사용 (hydration 안전)
   const renderStatusBadge = () => {
     if (isPastTime(sessionDate)) {
       return (
-        <Badge radius="max" status="inProgress">
+        <Badge radius="max" status="inProgress" className="text-[10px] px-2 md:text-xs md:px-3">
           진행중
         </Badge>
       );
     }
     if (statusText) {
       return (
-        <Badge radius="max" status={statusBadgeStatus ?? "recruiting"}>
+        <Badge radius="max" status={statusBadgeStatus ?? "recruiting"} className="text-[10px] px-2 md:text-xs md:px-3">
           {statusText}
         </Badge>
       );
     }
     if (createdAt) {
-      return <RelativeTimeBadge date={createdAt} />;
+      return <RelativeTimeBadge date={createdAt} className="text-[10px] px-2 md:text-xs md:px-3" />;
     }
     return null;
   };
 
   return (
-    <div className={cn("flex w-full max-w-69 flex-col gap-4", className)}>
+    <div className={cn("flex w-full flex-col gap-3 md:gap-4", className)}>
       <Thumbnail src={thumbnailSrc} alt={title} radius="xs" border="sm" />
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <Badge radius="xs" className="border-0">
-            {category}
-          </Badge>
-          {renderStatusBadge()}
+      {/* Root Frame */}
+      <div className="flex flex-col gap-3 py-1 md:gap-4 md:py-2">
+        {/* Container */}
+        <div className="flex flex-col gap-2">
+          {/* Badge Container */}
+          <div className="flex items-center gap-2">
+            <Badge radius="xs" className="border-0 text-[10px] md:text-xs">
+              {category}
+            </Badge>
+            {renderStatusBadge()}
+          </div>
+
+          {/* Text Container */}
+          <div className="flex flex-col gap-1">
+            <h3 className="text-text-primary truncate text-[15px] font-bold md:text-lg">{title}</h3>
+
+            {description ? (
+              <p className="text-text-muted truncate text-xs">{description}</p>
+            ) : nickname ? (
+              <span className="text-text-muted text-xs font-semibold">{nickname}</span>
+            ) : null}
+          </div>
         </div>
 
-        <h3 className="text-text-primary truncate text-lg font-bold">{title}</h3>
-
-        {description ? (
-          <p className="text-text-muted truncate text-xs">{description}</p>
-        ) : nickname ? (
-          <span className="text-text-muted text-xs font-semibold">{nickname}</span>
-        ) : null}
-
+        {/* Meta Container */}
         <CardMeta
           currentParticipants={currentParticipants}
           maxParticipants={maxParticipants}
