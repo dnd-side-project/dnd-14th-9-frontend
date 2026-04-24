@@ -89,7 +89,7 @@ export function SessionList() {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-y-[48px]">
           {sessions.map((session) => (
-            <div key={session.sessionId} className="relative mx-auto w-full max-w-69">
+            <div key={session.sessionId} className="relative mx-auto w-full md:max-w-69">
               <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
                 <Card
                   thumbnailSrc={session.imageUrl}
