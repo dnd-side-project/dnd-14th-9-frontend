@@ -10,9 +10,7 @@ const BADGE_VARIANTS = cva(
     "inline-flex",
     "items-center",
     "justify-center",
-    "px-3",
     "py-1",
-    "text-xs",
     "font-semibold",
     "border",
     "whitespace-nowrap",
@@ -34,10 +32,22 @@ const BADGE_VARIANTS = cva(
         max: "rounded-max",
         xs: "rounded-xs",
       },
+      size: {
+        md: ["px-3", "text-xs"],
+        sm: ["px-2", "text-[10px]"],
+      },
     },
+    compoundVariants: [
+      {
+        radius: "xs",
+        size: "md",
+        class: "px-2",
+      },
+    ],
     defaultVariants: {
       status: "recruiting",
       radius: "max",
+      size: "md",
     },
   }
 );
