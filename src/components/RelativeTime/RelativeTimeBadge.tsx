@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { formatRelativeTime } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
 
@@ -28,9 +28,9 @@ export function RelativeTimeBadge({ date, className }: RelativeTimeBadgeProps) {
   if (!mounted) {
     // 서버/hydration 시에는 빈 뱃지 렌더링 (레이아웃 shift 최소화)
     return (
-      <Badge radius="max" status="recruiting" className={cn("invisible", className)}>
+      <ChipBadge radius="max" status="recruiting" className={cn("invisible", className)}>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </Badge>
+      </ChipBadge>
     );
   }
 
@@ -40,8 +40,8 @@ export function RelativeTimeBadge({ date, className }: RelativeTimeBadgeProps) {
   const badgeStatus = isClosing ? "closing" : "recruiting";
 
   return (
-    <Badge radius="max" status={badgeStatus} className={className}>
+    <ChipBadge radius="max" status={badgeStatus} className={className}>
       {displayText}
-    </Badge>
+    </ChipBadge>
   );
 }

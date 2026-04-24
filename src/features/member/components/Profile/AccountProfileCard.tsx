@@ -1,5 +1,5 @@
 import { Avatar } from "@/components/Avatar/Avatar";
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import type { MemberProfileView } from "@/features/member/types";
 import { cn } from "@/lib/utils/utils";
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { Button } from "@/components/Button/Button";
 import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";

@@ -1,4 +1,4 @@
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { getCategoryLabel } from "@/lib/constants/category";
 import type { Category } from "@/lib/constants/category";
 

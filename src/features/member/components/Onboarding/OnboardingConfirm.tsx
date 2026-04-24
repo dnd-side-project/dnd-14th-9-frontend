@@ -1,5 +1,5 @@
 import { Avatar } from "@/components/Avatar/Avatar";
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { Button } from "@/components/Button/Button";
 import { CATEGORY_LABELS, type Category } from "@/lib/constants/category";
 import { cn } from "@/lib/utils/utils";

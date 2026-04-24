@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { XIcon } from "@/components/Icon/XIcon";
 import { cn } from "@/lib/utils/utils";
 
-const BADGE_VARIANTS = cva(
+const CHIP_BADGE_VARIANTS = cva(
   [
     "inline-flex",
     "items-center",
@@ -52,15 +52,15 @@ const BADGE_VARIANTS = cva(
   }
 );
 
-export interface BadgeProps
-  extends HTMLAttributes<HTMLSpanElement>, VariantProps<typeof BADGE_VARIANTS> {
+export interface ChipBadgeProps
+  extends HTMLAttributes<HTMLSpanElement>, VariantProps<typeof CHIP_BADGE_VARIANTS> {
   children: React.ReactNode;
   showIcon?: boolean;
   onIconClick?: () => void;
   ref?: React.Ref<HTMLSpanElement>;
 }
 
-export function Badge({
+export function ChipBadge({
   className,
   status,
   radius,
@@ -69,13 +69,13 @@ export function Badge({
   children,
   ref,
   ...props
-}: BadgeProps) {
+}: ChipBadgeProps) {
   const canRenderIconButton = showIcon && typeof onIconClick === "function";
 
   return (
     <span
       ref={ref}
-      className={cn(BADGE_VARIANTS({ status, radius }), canRenderIconButton && "gap-1", className)}
+      className={cn(CHIP_BADGE_VARIANTS({ status, radius }), canRenderIconButton && "gap-1", className)}
       {...props}
     >
       {children}
@@ -88,4 +88,4 @@ export function Badge({
   );
 }
 
-export { BADGE_VARIANTS };
+export { CHIP_BADGE_VARIANTS };

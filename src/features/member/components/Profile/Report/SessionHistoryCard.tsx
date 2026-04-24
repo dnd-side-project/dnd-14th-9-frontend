@@ -1,4 +1,4 @@
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { CalendarIcon } from "@/components/Icon/CalendarIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
 import { ClockIcon } from "@/components/Icon/ClockIcon";

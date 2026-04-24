@@ -1,4 +1,4 @@
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { Thumbnail } from "@/components/Thumbnail/Thumbnail";
 
 import { CardMeta } from "./Card/CardMeta";

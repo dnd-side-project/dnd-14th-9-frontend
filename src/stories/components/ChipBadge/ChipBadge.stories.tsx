@@ -1,10 +1,10 @@
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
-  title: "Components/Badge",
-  component: Badge,
+  title: "Components/ChipBadge",
+  component: ChipBadge,
   tags: ["autodocs"],
   parameters: {
     layout: "centered",
@@ -40,7 +40,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof Badge>;
+} satisfies Meta<typeof ChipBadge>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -109,10 +109,10 @@ export const AllStatuses: Story = {
   },
   render: () => (
     <div className="flex flex-wrap gap-4">
-      <Badge status="recruiting">모집중</Badge>
-      <Badge status="closing">마감 임박</Badge>
-      <Badge status="inProgress">진행중</Badge>
-      <Badge status="closed">마감</Badge>
+      <ChipBadge status="recruiting">모집중</ChipBadge>
+      <ChipBadge status="closing">마감 임박</ChipBadge>
+      <ChipBadge status="inProgress">진행중</ChipBadge>
+      <ChipBadge status="closed">마감</ChipBadge>
     </div>
   ),
   parameters: {
@@ -130,8 +130,8 @@ export const AllRadii: Story = {
   },
   render: () => (
     <div className="flex flex-wrap gap-4">
-      <Badge radius="max">Pill (max)</Badge>
-      <Badge radius="xs">Rounded (xs)</Badge>
+      <ChipBadge radius="max">Pill (max)</ChipBadge>
+      <ChipBadge radius="xs">Rounded (xs)</ChipBadge>
     </div>
   ),
   parameters: {

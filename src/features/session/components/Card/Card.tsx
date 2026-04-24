@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { RelativeTimeBadge } from "@/components/RelativeTime/RelativeTimeBadge";
 import { Thumbnail } from "@/components/Thumbnail/Thumbnail";
 import { isPastTime } from "@/lib/utils/date";
@@ -45,20 +45,20 @@ export function Card({
   const renderStatusBadge = () => {
     if (isPastTime(sessionDate)) {
       return (
-        <Badge radius="max" status="inProgress" className="px-2 text-[10px] md:px-3 md:text-xs">
+        <ChipBadge radius="max" status="inProgress" className="px-2 text-[10px] md:px-3 md:text-xs">
           진행중
-        </Badge>
+        </ChipBadge>
       );
     }
     if (statusText) {
       return (
-        <Badge
+        <ChipBadge
           radius="max"
           status={statusBadgeStatus ?? "recruiting"}
           className="px-2 text-[10px] md:px-3 md:text-xs"
         >
           {statusText}
-        </Badge>
+        </ChipBadge>
       );
     }
     if (createdAt) {
@@ -77,9 +77,9 @@ export function Card({
         <div className="flex flex-col gap-2">
           {/* Badge Container */}
           <div className="flex items-center gap-2">
-            <Badge radius="xs" className="border-0 text-[10px] md:text-xs">
+            <ChipBadge radius="xs" className="border-0 text-[10px] md:text-xs">
               {category}
-            </Badge>
+            </ChipBadge>
             {renderStatusBadge()}
           </div>
 

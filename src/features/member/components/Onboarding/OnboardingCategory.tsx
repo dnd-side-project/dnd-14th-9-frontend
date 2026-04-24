@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
 import { CheckIcon } from "@/components/Icon/CheckIcon";

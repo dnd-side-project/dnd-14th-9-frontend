@@ -1,4 +1,4 @@
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { ChipGroup } from "@/components/ChipGroup/ChipGroup";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
