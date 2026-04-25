@@ -28,15 +28,15 @@ export function CardMeta({
       )}
     >
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <UsersIcon size="xsmall" className="size-3 md:size-4" />
+        <UsersIcon className="size-3 md:size-4" />
         <span>{formatParticipantCount(currentParticipants, maxParticipants)}</span>
       </span>
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <ClockIcon size="xsmall" className="size-3 md:size-4" />
+        <ClockIcon className="size-3 md:size-4" />
         <span>{formatSessionDuration(durationMinutes)}</span>
       </span>
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <CalendarIcon size="xsmall" className="size-3 md:size-4" />
+        <CalendarIcon className="size-3 md:size-4" />
         <span>{formatSessionDateTime(sessionDate)}</span>
       </span>
     </div>

@@ -64,6 +64,7 @@ export function ChipBadge({
   className,
   status,
   radius,
+  size,
   showIcon = false,
   onIconClick,
   children,
@@ -75,7 +76,11 @@ export function ChipBadge({
   return (
     <span
       ref={ref}
-      className={cn(CHIP_BADGE_VARIANTS({ status, radius }), canRenderIconButton && "gap-1", className)}
+      className={cn(
+        CHIP_BADGE_VARIANTS({ status, radius, size }),
+        canRenderIconButton && "gap-1",
+        className
+      )}
       {...props}
     >
       {children}

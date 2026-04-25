@@ -6,7 +6,7 @@ interface CardSkeletonProps {
 
 export function CardSkeleton({ className }: CardSkeletonProps) {
   return (
-    <div className={cn("flex w-full max-w-69 animate-pulse flex-col gap-4", className)}>
+    <div className={cn("flex w-full animate-pulse flex-col gap-3 md:gap-4", className)}>
       {/* Thumbnail */}
       <div className="bg-surface-strong aspect-276/146 w-full rounded-lg" />
 

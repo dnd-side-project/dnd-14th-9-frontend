@@ -44,13 +44,13 @@ export function AccountProfileCard({
           />
           <div className="gap-xs flex flex-col justify-center">
             <p className="text-text-primary text-lg font-bold">{profile.nickname}</p>
-            <Badge
+            <ChipBadge
               status="closed"
               radius="xs"
               className="bg-alpha-white-8 text-text-secondary px-xs py-2xs border-none text-xs font-semibold"
             >
               {profile.email}
-            </Badge>
+            </ChipBadge>
           </div>
         </div>
       ) : null}

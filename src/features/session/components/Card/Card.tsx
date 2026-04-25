@@ -8,6 +8,20 @@ import { cn } from "@/lib/utils/utils";
 
 import { CardMeta } from "./CardMeta";
 
+const STATUS_BADGE_CLASS_NAME = "px-2 text-[10px] md:px-3 md:text-xs";
+
+function renderSubtitle({ description, nickname }: { description?: string; nickname?: string }) {
+  if (description) {
+    return <p className="text-text-muted truncate text-xs">{description}</p>;
+  }
+
+  if (nickname) {
+    return <span className="text-text-muted text-xs font-semibold">{nickname}</span>;
+  }
+
+  return null;
+}
+
 export interface CardProps {
   className?: string;
   thumbnailSrc: string | null | undefined;
@@ -45,7 +59,7 @@ export function Card({
   const renderStatusBadge = () => {
     if (isPastTime(sessionDate)) {
       return (
-        <ChipBadge radius="max" status="inProgress" className="px-2 text-[10px] md:px-3 md:text-xs">
+        <ChipBadge radius="max" status="inProgress" className={STATUS_BADGE_CLASS_NAME}>
           진행중
         </ChipBadge>
       );
@@ -55,14 +69,14 @@ export function Card({
         <ChipBadge
           radius="max"
           status={statusBadgeStatus ?? "recruiting"}
-          className="px-2 text-[10px] md:px-3 md:text-xs"
+          className={STATUS_BADGE_CLASS_NAME}
         >
           {statusText}
         </ChipBadge>
       );
     }
     if (createdAt) {
-      return <RelativeTimeBadge date={createdAt} className="px-2 text-[10px] md:px-3 md:text-xs" />;
+      return <RelativeTimeBadge date={createdAt} className={STATUS_BADGE_CLASS_NAME} />;
     }
     return null;
   };
@@ -87,11 +101,7 @@ export function Card({
           <div className="flex flex-col gap-1">
             <h3 className="text-text-primary truncate text-[15px] font-bold md:text-lg">{title}</h3>
 
-            {description ? (
-              <p className="text-text-muted truncate text-xs">{description}</p>
-            ) : nickname ? (
-              <span className="text-text-muted text-xs font-semibold">{nickname}</span>
-            ) : null}
+            {renderSubtitle({ description, nickname })}
           </div>
         </div>
 

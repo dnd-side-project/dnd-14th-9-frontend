@@ -48,9 +48,9 @@ export default function SessionHistoryCard({
         <div className="gap-xs flex flex-col">
           <p className="text-text-primary text-base font-semibold">{session.title}</p>
           <div className="gap-sm flex items-center">
-            <Badge radius="xs" className="border-0">
+            <ChipBadge radius="xs" className="border-0">
               {getCategoryLabel(session.category as CategoryFilter)}
-            </Badge>
+            </ChipBadge>
             <div className="gap-xs flex">
               <MetadataItem icon={<UsersIcon className="h-[12px] w-[12px]" />}>
                 {formatParticipantCount(session.currentCount, session.maxCapacity)}

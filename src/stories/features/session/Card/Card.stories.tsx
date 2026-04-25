@@ -1,4 +1,5 @@
 import { Card } from "@/features/session/components/Card/Card";
+import { CardSkeleton } from "@/features/session/components/Card/CardSkeleton";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
@@ -224,6 +225,38 @@ export const CardList: Story = {
     docs: {
       description: {
         story: "여러 카드를 목록으로 표시합니다.",
+      },
+    },
+  },
+};
+
+export const SkeletonWidthPolicy: Story = {
+  args: {
+    thumbnailSrc: null,
+    category: "개발",
+    title: "Skeleton",
+    currentParticipants: 0,
+    maxParticipants: 0,
+    durationMinutes: 0,
+    sessionDate: SESSION_DATE,
+  },
+  render: () => (
+    <div className="flex flex-col gap-8">
+      <div className="w-[180px] border border-dashed border-white/20 p-2">
+        <CardSkeleton />
+      </div>
+      <div className="w-[276px] border border-dashed border-white/20 p-2">
+        <CardSkeleton />
+      </div>
+      <div className="w-full border border-dashed border-white/20 p-2">
+        <CardSkeleton className="max-w-full" />
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: "CardSkeleton이 자체 max-width 없이 부모 컨테이너 폭을 따르는지 비교합니다.",
       },
     },
   },

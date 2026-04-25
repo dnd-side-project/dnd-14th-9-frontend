@@ -19,7 +19,7 @@ export function InterestBadges({ profile }: { profile: MemberProfileView }) {
       {badges.map(({ rank, label }) => (
         <div key={rank} className="gap-xs flex items-center">
           <p className="text-text-primary text-xs font-semibold">{rank}</p>
-          <Badge>{label}</Badge>
+          <ChipBadge>{label}</ChipBadge>
         </div>
       ))}
     </div>

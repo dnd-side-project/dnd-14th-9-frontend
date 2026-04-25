@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { CATEGORY_LABELS, ONBOARDING_CATEGORIES, type Category } from "@/lib/constants/category";
 import { cn } from "@/lib/utils/utils";
@@ -90,18 +90,18 @@ export function OnboardingCategory({
                   )}
                 </div>
                 {selected ? (
-                  <Badge
+                  <ChipBadge
                     status="inProgress"
                     radius="max"
                     showIcon
                     onIconClick={() => removeCategoryByIndex(index)}
                   >
                     {CATEGORY_LABELS[selected]}
-                  </Badge>
+                  </ChipBadge>
                 ) : (
-                  <Badge status="recruiting" radius="max">
+                  <ChipBadge status="recruiting" radius="max">
                     카테고리를 선택해 주세요
-                  </Badge>
+                  </ChipBadge>
                 )}
               </div>
             );

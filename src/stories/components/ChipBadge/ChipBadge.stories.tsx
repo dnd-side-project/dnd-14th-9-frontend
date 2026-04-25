@@ -28,6 +28,11 @@ const meta = {
       options: ["max", "xs"],
       description: "Badge의 모서리 둥글기",
     },
+    size: {
+      control: "select",
+      options: ["md", "sm"],
+      description: "Badge의 크기",
+    },
     children: {
       control: "text",
       description: "Badge에 표시될 텍스트",
@@ -138,6 +143,25 @@ export const AllRadii: Story = {
     docs: {
       description: {
         story: "모든 radius 옵션을 비교합니다.",
+      },
+    },
+  },
+};
+
+export const AllSizes: Story = {
+  args: {
+    children: "Badge",
+  },
+  render: () => (
+    <div className="flex flex-wrap items-center gap-4">
+      <ChipBadge size="md">MD</ChipBadge>
+      <ChipBadge size="sm">SM</ChipBadge>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: "모든 size 옵션을 비교합니다.",
       },
     },
   },

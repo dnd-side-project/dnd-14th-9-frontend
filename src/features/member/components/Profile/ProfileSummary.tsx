@@ -85,13 +85,13 @@ export function ProfileSummary() {
           <div className="gap-2xs flex min-w-0 flex-1 flex-col items-start">
             <div className="gap-xs flex items-center">
               <h2 className="text-text-primary text-lg font-bold">{profile.nickname}</h2>
-              <Badge
+              <ChipBadge
                 status="closed"
                 radius="xs"
                 className="bg-alpha-white-8 text-text-secondary px-xs py-2xs border-none text-xs font-semibold"
               >
                 {profile.email}
-              </Badge>
+              </ChipBadge>
             </div>
             <p className="text-text-tertiary text-base font-normal">
               {profile.bio || "아직 한 줄 소개가 없습니다."}

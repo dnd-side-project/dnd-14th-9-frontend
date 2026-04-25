@@ -1,6 +1,6 @@
 import { Avatar } from "@/components/Avatar/Avatar";
-import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { Button } from "@/components/Button/Button";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { CATEGORY_LABELS, type Category } from "@/lib/constants/category";
 import { cn } from "@/lib/utils/utils";
 
@@ -72,9 +72,9 @@ export function OnboardingConfirm({
                   </span>
                 )}
               </div>
-              <Badge status="inProgress" radius="max">
+              <ChipBadge status="inProgress" radius="max">
                 {CATEGORY_LABELS[category]}
-              </Badge>
+              </ChipBadge>
             </div>
           ))}
         </div>
