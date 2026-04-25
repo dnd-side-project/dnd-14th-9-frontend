@@ -29,6 +29,11 @@ const BADGE_VARIANTS = cva(
         closing: ["bg-[#FF174429]", "text-text-status-negative-default", "border-red-800"],
         inProgress: ["bg-[#27EA6729]", "text-text-brand-default", "border-[#178A42]"],
         closed: ["bg-alpha-white-16", "text-text-disabled", "border-border-subtle"],
+        positive: [
+          "bg-[rgba(0,184,219,0.16)]",
+          "text-text-status-positive-default",
+          "border-[#00b8db]",
+        ],
       },
       radius: {
         max: "rounded-max",
