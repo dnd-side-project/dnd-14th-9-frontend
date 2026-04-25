@@ -38,7 +38,7 @@ export function SessionDetailSection({
       {/* 오른쪽: 정보 영역 (70%) */}
       <div className="gap-sm flex flex-7 flex-col">
         {/* 카테고리 Badge */}
-        <Badge radius="xs" className="w-fit border-0">
+        <Badge radius="xs" className="w-fit">
           {category}
         </Badge>
 
