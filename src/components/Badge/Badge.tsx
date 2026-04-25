@@ -35,6 +35,12 @@ const BADGE_VARIANTS = cva(
         xs: "rounded-xs",
       },
     },
+    compoundVariants: [
+      {
+        radius: "xs",
+        class: "border-0",
+      },
+    ],
     defaultVariants: {
       status: "recruiting",
       radius: "max",
