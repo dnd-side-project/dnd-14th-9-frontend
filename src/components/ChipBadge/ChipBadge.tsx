@@ -24,7 +24,7 @@ const CHIP_BADGE_VARIANTS = cva(
           "dark:text-gray-200",
           "border-alpha-white-16",
         ],
-        closing: ["bg-[#FF174429]", "text-text-status-negative-default", "border-red-800"],
+        closing: ["bg-[#FF174429]", "text-text-status-negative-default", "border-[#66091b]"],
         inProgress: ["bg-[#27EA6729]", "text-text-brand-default", "border-[#178A42]"],
         closed: ["bg-alpha-white-16", "text-text-disabled", "border-border-subtle"],
       },
