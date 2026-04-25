@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import dynamic from "next/dynamic";
 
@@ -53,11 +53,24 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   const { data: initialWaitingData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
     enabled: isAuthenticated,
   });
-  // 실시간 업데이트: SSE로 수신
-  const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
-
   const isAuthDataLoading = isAuthenticated && (isWaitingRoomLoading || isMeLoading);
   const myMemberId = isAuthDataLoading ? undefined : meData?.result?.id;
+
+  // SSE KICKED 이벤트 콜백
+  const handleKicked = useCallback(
+    (memberIds: number[]) => {
+      if (myMemberId && memberIds.includes(myMemberId)) {
+        setIsKicked(true);
+      }
+    },
+    [myMemberId]
+  );
+  // 실시간 업데이트: SSE로 수신
+  const { data: sseWaitingData } = useWaitingMembersSSE({
+    sessionId,
+    enabled: true,
+    onKicked: handleKicked,
+  });
 
   const { isSessionTransitionRef } = useLeaveOnUnmount({
     sessionId,
