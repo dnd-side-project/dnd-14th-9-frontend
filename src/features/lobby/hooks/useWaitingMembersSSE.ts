@@ -1,19 +1,22 @@
 "use client";
 
-import type { SSEError } from "@/lib/sse/types";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import type { SSEConnectionStatus, SSEError } from "@/lib/sse/types";
 import { useSSE } from "@/lib/sse/useSSE";
 
-import type { WaitingMembersEventData } from "../types";
+import type { WaitingMembersEventData, WaitingMembersSSEPayload } from "../types";
 
 interface UseWaitingMembersSSEOptions {
   sessionId: string;
   enabled?: boolean;
   onError?: (error: SSEError) => void;
+  onKicked?: (memberIds: number[]) => void;
 }
 
 interface UseWaitingMembersSSEReturn {
   data: WaitingMembersEventData | null;
-  status: import("@/lib/sse/types").SSEConnectionStatus;
+  status: SSEConnectionStatus;
   error: SSEError | null;
   reconnect: () => void;
   disconnect: () => void;
@@ -23,11 +26,35 @@ export function useWaitingMembersSSE({
   sessionId,
   enabled = true,
   onError,
+  onKicked,
 }: UseWaitingMembersSSEOptions): UseWaitingMembersSSEReturn {
-  return useSSE<WaitingMembersEventData>({
+  const [roomData, setRoomData] = useState<WaitingMembersEventData | null>(null);
+  const onKickedRef = useRef(onKicked);
+  useEffect(() => {
+    onKickedRef.current = onKicked;
+  }, [onKicked]);
+
+  const handleData = useCallback((payload: WaitingMembersSSEPayload) => {
+    if (payload.eventType === "ROOM_UPDATE") {
+      setRoomData(payload.data);
+    } else if (payload.eventType === "KICKED") {
+      onKickedRef.current?.(payload.data.memberIds);
+    }
+  }, []);
+
+  const { status, error, reconnect, disconnect } = useSSE<WaitingMembersSSEPayload>({
     url: `/api/sse/waiting/${sessionId}`,
     eventName: "waiting-members-updated",
     enabled: enabled && !!sessionId,
+    onData: handleData,
     onError,
   });
+
+  return {
+    data: roomData,
+    status,
+    error,
+    reconnect,
+    disconnect,
+  };
 }
