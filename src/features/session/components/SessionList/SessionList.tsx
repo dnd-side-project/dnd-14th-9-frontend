@@ -67,9 +67,11 @@ export function SessionList() {
   return (
     <section className="gap-lg flex flex-col">
       <div className="flex flex-col gap-[10px]">
-        <h2 className="text-text-primary text-2xl font-bold">지금 모집 중인 세션</h2>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-text-disabled text-base">현재 모집 중인 세션에 바로 참여해 보세요</p>
+        <h2 className="text-text-primary text-[18px] font-bold md:text-2xl">지금 모집 중인 세션</h2>
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <p className="text-text-disabled text-[13px] md:text-base">
+            현재 모집 중인 세션에 바로 참여해 보세요
+          </p>
           <SessionListFilterBar
             values={values}
             onSetDateRange={setDateRange}
@@ -89,7 +91,7 @@ export function SessionList() {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-y-[48px]">
           {sessions.map((session) => (
-            <div key={session.sessionId} className="relative mx-auto w-full max-w-69">
+            <div key={session.sessionId} className="relative mx-auto w-full xl:max-w-69">
               <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
                 <Card
                   thumbnailSrc={session.imageUrl}

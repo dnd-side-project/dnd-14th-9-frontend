@@ -68,8 +68,10 @@ export function RecommendedSectionContent() {
       <section className="gap-xl flex flex-col">
         <div className="flex items-center justify-between">
           <div className="gap-xs flex flex-col">
-            <h2 className="text-text-primary text-2xl font-bold">지금 바로 참여할 수 있는 세션</h2>
-            <p className="text-text-disabled text-base">
+            <h2 className="text-text-primary text-[18px] font-bold md:text-2xl">
+              지금 바로 참여할 수 있는 세션
+            </h2>
+            <p className="text-text-disabled text-[13px] md:text-base">
               입력한 검색어와 연관된 세션 중 바로 참여 가능한 방을 우선 보여드려요
             </p>
           </div>
@@ -117,10 +119,10 @@ export function RecommendedSectionContent() {
   const renderHeader = (action?: ReactNode) => (
     <div className="flex items-center justify-between">
       <div className="gap-xs flex flex-col">
-        <h2 className="text-text-primary text-2xl font-bold">
+        <h2 className="text-text-primary text-[18px] font-bold md:text-2xl">
           <span className="text-text-brand-default">{nickname}</span> 님을 위한 추천 세션
         </h2>
-        <p className="text-text-disabled text-base">
+        <p className="text-text-disabled text-[13px] md:text-base">
           설정한 관심 카테고리를 기준으로 세션을 추천해 드려요
         </p>
       </div>
