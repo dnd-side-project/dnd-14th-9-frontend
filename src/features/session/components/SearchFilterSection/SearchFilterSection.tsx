@@ -79,7 +79,7 @@ export function SearchFilterSection() {
       <div className="gap-xs flex items-start md:flex-wrap md:justify-center">
         <div
           className={cn(
-            "gap-xs flex min-w-0 flex-1 flex-wrap items-center",
+            "gap-xs flex min-w-0 flex-1 items-center",
             isCategoryExpanded
               ? "flex-wrap"
               : "h-[44px] flex-nowrap overflow-x-auto overflow-y-clip md:h-auto md:flex-wrap md:overflow-visible"
@@ -103,7 +103,8 @@ export function SearchFilterSection() {
         <button
           className="bg-surface-strong border-alpha-white-16 border-sm p-xs rounded-max flex shrink-0 items-center justify-center md:hidden"
           onClick={() => setIsCategoryExpanded((prev) => !prev)}
-          aria-label="카테고리 펼치기"
+          aria-expanded={isCategoryExpanded}
+          aria-label={isCategoryExpanded ? "카테고리 접기" : "카테고리 펼치기"}
         >
           <ChevronDownIcon
             className={cn("transition-transform", isCategoryExpanded ? "rotate-180" : "")}
