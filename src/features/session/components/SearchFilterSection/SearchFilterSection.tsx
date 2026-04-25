@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef } from "react";
+import { useState, useRef } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
+import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
 import { SearchInput } from "@/components/SearchInput/SearchInput";
 import { CATEGORIES, getCategoryLabel } from "@/lib/constants/category";
+import { cn } from "@/lib/utils";
 
 import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
 import { buildUpdatedSessionSearchHref } from "../../utils/updateSessionSearchParams";
@@ -33,6 +35,7 @@ export function SearchFilterSection() {
   const searchParams = useSearchParams();
   const parsedParams = parseSessionListSearchParams(searchParams);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isCategoryExpanded, setIsCategoryExpanded] = useState(false);
 
   const currentCategory = parsedParams.category ?? "ALL";
   const currentQuery = parsedParams.keyword ?? "";
@@ -69,22 +72,43 @@ export function SearchFilterSection() {
           defaultValue={currentQuery}
           placeholder="관심 분야의 세션을 검색해 보세요"
           onSearchClick={handleSearchClick}
+          className="h-11 md:h-14"
         />
       </form>
 
-      <div className="gap-xs flex flex-wrap justify-center">
-        {CATEGORY_FILTERS.map(({ value, label }) => {
-          const isSelected = currentCategory === value;
-          return (
-            <CategoryFilterButton
-              key={value}
-              isSelected={isSelected}
-              onClick={() => handleCategoryChange(value)}
-            >
-              {label}
-            </CategoryFilterButton>
-          );
-        })}
+      <div className="gap-xs flex items-start md:flex-wrap md:justify-center">
+        <div
+          className={cn(
+            "gap-xs flex min-w-0 flex-1 flex-wrap items-center",
+            isCategoryExpanded
+              ? "flex-wrap"
+              : "h-[44px] flex-nowrap overflow-x-auto overflow-y-clip md:h-auto md:flex-wrap md:overflow-visible"
+          )}
+        >
+          {CATEGORY_FILTERS.map(({ value, label }) => {
+            const isSelected = currentCategory === value;
+            return (
+              <CategoryFilterButton
+                key={value}
+                isSelected={isSelected}
+                onClick={() => handleCategoryChange(value)}
+                className="text-xs md:text-sm"
+              >
+                {label}
+              </CategoryFilterButton>
+            );
+          })}
+        </div>
+
+        <button
+          className="bg-surface-strong border-alpha-white-16 border-sm p-xs rounded-max flex shrink-0 items-center justify-center md:hidden"
+          onClick={() => setIsCategoryExpanded((prev) => !prev)}
+          aria-label="카테고리 펼치기"
+        >
+          <ChevronDownIcon
+            className={cn("transition-transform", isCategoryExpanded ? "rotate-180" : "")}
+          />
+        </button>
       </div>
     </section>
   );
