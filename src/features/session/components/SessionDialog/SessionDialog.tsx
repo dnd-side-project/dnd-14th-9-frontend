@@ -69,10 +69,10 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
       ref={dialogRef}
       onCancel={handleClose}
       onClick={handleBackdropClick}
-      className="fixed inset-0 m-auto w-full max-w-90 rounded-lg bg-transparent p-0 backdrop:bg-(--color-overlay-default) max-md:m-0 max-md:max-h-none max-md:max-w-none max-md:overflow-y-auto max-md:rounded-none max-md:backdrop:bg-transparent md:max-w-[440px]"
+      className="bg-transparent p-0 backdrop:bg-(--color-overlay-default) max-md:m-0 max-md:h-dvh max-md:max-h-[100dvh] max-md:w-screen max-md:max-w-[100vw] max-md:overflow-y-auto max-md:rounded-none max-md:backdrop:bg-transparent md:m-auto md:w-[440px]"
     >
       {/* 모바일: 풀페이지 wrapper (GNB + 내용을 하나의 배경으로 통합) */}
-      <div className="bg-surface-default flex flex-col max-md:min-h-screen md:rounded-2xl">
+      <div className="bg-surface-default flex flex-col max-md:min-h-full md:rounded-2xl">
         {/* Mobile-only GNB */}
         <div className="border-border-subtle sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b px-5 md:hidden">
           <span className="text-text-primary text-sm font-semibold">GAK</span>
