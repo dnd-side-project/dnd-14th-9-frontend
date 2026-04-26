@@ -21,11 +21,11 @@ import { CardSkeleton } from "../Card/CardSkeleton";
 
 import { getSessionStatusDisplay } from "./utils";
 
-interface SessionDetailModalProps {
+interface SessionDialogProps {
   sessionId: string;
 }
 
-export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
+export function SessionDialog({ sessionId }: SessionDialogProps) {
   const { dialogRef, handleClose, handleBackdropClick } = useDialog("/");
   const { data, error: sessionError } = useSessionDetail(sessionId);
   const { shareSession } = useShareSession();
@@ -69,11 +69,25 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
       ref={dialogRef}
       onCancel={handleClose}
       onClick={handleBackdropClick}
-      className="fixed inset-0 m-auto w-full max-w-90 rounded-lg bg-transparent p-0 backdrop:bg-(--color-overlay-default) md:max-w-100 lg:max-w-110"
+      className="fixed inset-0 m-auto w-full max-w-90 rounded-lg bg-transparent p-0 backdrop:bg-(--color-overlay-default) max-md:inset-0 max-md:m-0 max-md:h-full max-md:max-w-none max-md:rounded-none max-md:backdrop:bg-transparent md:max-w-[440px]"
     >
-      <div className="gap-2xl p-3xl bg-surface-default relative flex flex-col rounded-2xl">
-        {/* 공유 · 닫기 버튼 */}
-        <div className="top-lg right-lg absolute flex items-center gap-1">
+      {/* Mobile-only GNB */}
+      <div className="border-border-subtle bg-surface-default sticky top-0 flex h-14 shrink-0 items-center justify-between border-b px-5 md:hidden">
+        <span className="text-text-primary text-sm font-semibold">GAK</span>
+        <div className="flex items-center gap-2">
+          {isAuthenticated ? (
+            <div className="h-6 w-6 rounded-full bg-gray-300" />
+          ) : (
+            <ButtonLink href={LOGIN_ROUTE} variant="outlined" size="small" className="text-xs">
+              로그인
+            </ButtonLink>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-surface-default relative flex flex-col gap-8 px-6 py-5 md:gap-10 md:rounded-2xl md:p-10">
+        {/* Tablet+: 공유·닫기 버튼 절대 위치 */}
+        <div className="top-lg right-lg hidden items-center gap-1 md:absolute md:flex">
           <button
             type="button"
             onClick={() => shareSession(Number(sessionId))}
@@ -92,12 +106,25 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
           </button>
         </div>
 
-        {/* 제목 영역 */}
-        <div className="gap-xs flex flex-col">
-          <h2 className="text-text-primary text-2xl leading-[140%] font-bold">세션 참여하기</h2>
-          <p className="text-text-secondary font-regular text-base leading-[140%]">
-            원하는 세션에서 함께 몰입해 보세요!
-          </p>
+        {/* 제목 + Mobile X버튼 인라인 */}
+        <div className="flex items-start gap-[10px]">
+          <div className="gap-xs flex flex-1 flex-col">
+            <h2 className="text-text-primary text-lg leading-[1.4] font-bold md:text-2xl md:leading-[140%]">
+              세션 참여하기
+            </h2>
+            <p className="text-text-secondary font-regular text-[13px] leading-[1.4] md:text-base md:leading-[140%]">
+              원하는 세션에서 함께 몰입해 보세요!
+            </p>
+          </div>
+          {/* Mobile-only X버튼 */}
+          <button
+            type="button"
+            onClick={handleClose}
+            className="text-text-muted hover:text-text-primary p-2 md:hidden"
+            aria-label="닫기"
+          >
+            <CloseIcon />
+          </button>
         </div>
 
         {/* 카드 영역 */}
@@ -108,7 +135,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
           </div>
         ) : session ? (
           <Card
-            className="max-w-full"
+            className="max-w-full gap-3 md:gap-4"
             thumbnailSrc={session.imageUrl}
             category={session.category}
             statusText={statusDisplay?.text}
