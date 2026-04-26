@@ -32,7 +32,7 @@ const BADGE_VARIANTS = cva(
         positive: [
           "bg-[rgba(0,184,219,0.16)]",
           "text-text-status-positive-default",
-          "border-[#00b8db]",
+          "border-border-success-default",
         ],
       },
       radius: {
