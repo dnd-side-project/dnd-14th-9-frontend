@@ -67,7 +67,7 @@ export function SessionList() {
   return (
     <section className="gap-lg flex flex-col">
       <div className="flex flex-col gap-[10px]">
-        <h2 className="text-text-primary text-[18px] font-bold md:text-2xl">지금 모집 중인 세션</h2>
+        <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <p className="text-text-disabled text-[13px] md:text-base">
             현재 모집 중인 세션에 바로 참여해 보세요

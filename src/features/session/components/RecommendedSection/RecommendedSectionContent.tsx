@@ -68,7 +68,7 @@ export function RecommendedSectionContent() {
       <section className="gap-xl flex flex-col">
         <div className="flex items-center justify-between">
           <div className="gap-xs flex flex-col">
-            <h2 className="text-text-primary text-[18px] font-bold md:text-2xl">
+            <h2 className="text-text-primary text-lg font-bold md:text-2xl">
               지금 바로 참여할 수 있는 세션
             </h2>
             <p className="text-text-disabled text-[13px] md:text-base">
@@ -119,7 +119,7 @@ export function RecommendedSectionContent() {
   const renderHeader = (action?: ReactNode) => (
     <div className="flex items-center justify-between">
       <div className="gap-xs flex flex-col">
-        <h2 className="text-text-primary text-[18px] font-bold md:text-2xl">
+        <h2 className="text-text-primary text-lg font-bold md:text-2xl">
           <span className="text-text-brand-default">{nickname}</span> 님을 위한 추천 세션
         </h2>
         <p className="text-text-disabled text-[13px] md:text-base">
