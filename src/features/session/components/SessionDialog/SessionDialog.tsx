@@ -69,128 +69,131 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
       ref={dialogRef}
       onCancel={handleClose}
       onClick={handleBackdropClick}
-      className="fixed inset-0 m-auto w-full max-w-90 rounded-lg bg-transparent p-0 backdrop:bg-(--color-overlay-default) max-md:inset-0 max-md:m-0 max-md:h-full max-md:max-w-none max-md:rounded-none max-md:backdrop:bg-transparent md:max-w-[440px]"
+      className="fixed inset-0 m-auto w-full max-w-90 rounded-lg bg-transparent p-0 backdrop:bg-(--color-overlay-default) max-md:m-0 max-md:max-h-none max-md:max-w-none max-md:overflow-y-auto max-md:rounded-none max-md:backdrop:bg-transparent md:max-w-[440px]"
     >
-      {/* Mobile-only GNB */}
-      <div className="border-border-subtle bg-surface-default sticky top-0 flex h-14 shrink-0 items-center justify-between border-b px-5 md:hidden">
-        <span className="text-text-primary text-sm font-semibold">GAK</span>
-        <div className="flex items-center gap-2">
-          {isAuthenticated ? (
-            <div className="h-6 w-6 rounded-full bg-gray-300" />
+      {/* 모바일: 풀페이지 wrapper (GNB + 내용을 하나의 배경으로 통합) */}
+      <div className="bg-surface-default flex flex-col max-md:min-h-screen md:rounded-2xl">
+        {/* Mobile-only GNB */}
+        <div className="border-border-subtle sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b px-5 md:hidden">
+          <span className="text-text-primary text-sm font-semibold">GAK</span>
+          <div className="flex items-center gap-2">
+            {isAuthenticated ? (
+              <div className="h-6 w-6 rounded-full bg-gray-300" />
+            ) : (
+              <ButtonLink href={LOGIN_ROUTE} variant="outlined" size="small" className="text-xs">
+                로그인
+              </ButtonLink>
+            )}
+          </div>
+        </div>
+
+        <div className="relative flex flex-col gap-5 px-6 py-5 md:gap-10 md:p-10">
+          {/* Tablet+: 공유·닫기 버튼 절대 위치 */}
+          <div className="top-lg right-lg hidden items-center gap-1 md:absolute md:flex">
+            <button
+              type="button"
+              onClick={() => shareSession(Number(sessionId))}
+              className="text-text-muted hover:text-text-primary focus-visible:ring-text-muted p-xs flex cursor-pointer items-center rounded-sm focus-visible:ring-2"
+              aria-label="세션 링크 복사"
+            >
+              <ShareIcon />
+            </button>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="text-text-muted hover:text-text-primary focus-visible:ring-text-muted p-xs flex cursor-pointer items-center rounded-sm focus-visible:ring-2"
+              aria-label="닫기"
+            >
+              <CloseIcon />
+            </button>
+          </div>
+
+          {/* 제목 + Mobile X버튼 인라인 */}
+          <div className="flex items-start gap-[10px]">
+            <div className="gap-xs flex flex-1 flex-col">
+              <h2 className="text-text-primary text-lg leading-[1.4] font-bold md:text-2xl md:leading-[140%]">
+                세션 참여하기
+              </h2>
+              <p className="text-text-secondary font-regular text-[13px] leading-[1.4] md:text-base md:leading-[140%]">
+                원하는 세션에서 함께 몰입해 보세요!
+              </p>
+            </div>
+            {/* Mobile-only X버튼 */}
+            <button
+              type="button"
+              onClick={handleClose}
+              className="text-text-muted hover:text-text-primary p-2 md:hidden"
+              aria-label="닫기"
+            >
+              <CloseIcon />
+            </button>
+          </div>
+
+          {/* 카드 영역 */}
+          {sessionError ? (
+            <div className="flex animate-[fadeIn_0.2s_ease-out] flex-col items-center gap-3 rounded-lg border border-gray-800 py-10">
+              <AlertIcon className="text-text-muted h-8 w-8" />
+              <p className="text-text-secondary text-sm">세션 정보를 불러오지 못했어요</p>
+            </div>
+          ) : session ? (
+            <Card
+              className="max-w-full gap-3 md:gap-4"
+              thumbnailSrc={session.imageUrl}
+              category={session.category}
+              statusText={statusDisplay?.text}
+              statusBadgeStatus={statusDisplay?.badgeStatus}
+              title={session.title}
+              description={session.summary}
+              currentParticipants={session.currentParticipants}
+              maxParticipants={session.maxParticipants}
+              durationMinutes={session.sessionDurationMinutes}
+              sessionDate={session.startTime}
+            />
           ) : (
-            <ButtonLink href={LOGIN_ROUTE} variant="outlined" size="small" className="text-xs">
-              로그인
+            <CardSkeleton className="max-w-full" />
+          )}
+
+          {/* 버튼 영역 */}
+          {sessionError ? (
+            <Button
+              variant="solid"
+              colorScheme="secondary"
+              size="medium"
+              className="w-full"
+              onClick={handleClose}
+            >
+              닫기
+            </Button>
+          ) : isRecovering ? (
+            <Button variant="solid" colorScheme="primary" size="medium" className="w-full" disabled>
+              로그인 상태 확인 중...
+            </Button>
+          ) : isCheckingParticipation ? (
+            <Button variant="solid" colorScheme="primary" size="medium" className="w-full" disabled>
+              참여 여부 확인 중...
+            </Button>
+          ) : isAuthenticated ? (
+            <Button
+              variant="solid"
+              colorScheme="primary"
+              size="medium"
+              className="w-full"
+              onClick={() => setShowJoinModal(true)}
+            >
+              참여하기
+            </Button>
+          ) : (
+            <ButtonLink
+              href={LOGIN_ROUTE}
+              variant="solid"
+              colorScheme="primary"
+              size="medium"
+              className="w-full"
+            >
+              로그인하고 참여하기
             </ButtonLink>
           )}
         </div>
-      </div>
-
-      <div className="bg-surface-default relative flex flex-col gap-8 px-6 py-5 md:gap-10 md:rounded-2xl md:p-10">
-        {/* Tablet+: 공유·닫기 버튼 절대 위치 */}
-        <div className="top-lg right-lg hidden items-center gap-1 md:absolute md:flex">
-          <button
-            type="button"
-            onClick={() => shareSession(Number(sessionId))}
-            className="text-text-muted hover:text-text-primary focus-visible:ring-text-muted p-xs flex cursor-pointer items-center rounded-sm focus-visible:ring-2"
-            aria-label="세션 링크 복사"
-          >
-            <ShareIcon />
-          </button>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="text-text-muted hover:text-text-primary focus-visible:ring-text-muted p-xs flex cursor-pointer items-center rounded-sm focus-visible:ring-2"
-            aria-label="닫기"
-          >
-            <CloseIcon />
-          </button>
-        </div>
-
-        {/* 제목 + Mobile X버튼 인라인 */}
-        <div className="flex items-start gap-[10px]">
-          <div className="gap-xs flex flex-1 flex-col">
-            <h2 className="text-text-primary text-lg leading-[1.4] font-bold md:text-2xl md:leading-[140%]">
-              세션 참여하기
-            </h2>
-            <p className="text-text-secondary font-regular text-[13px] leading-[1.4] md:text-base md:leading-[140%]">
-              원하는 세션에서 함께 몰입해 보세요!
-            </p>
-          </div>
-          {/* Mobile-only X버튼 */}
-          <button
-            type="button"
-            onClick={handleClose}
-            className="text-text-muted hover:text-text-primary p-2 md:hidden"
-            aria-label="닫기"
-          >
-            <CloseIcon />
-          </button>
-        </div>
-
-        {/* 카드 영역 */}
-        {sessionError ? (
-          <div className="flex animate-[fadeIn_0.2s_ease-out] flex-col items-center gap-3 rounded-lg border border-gray-800 py-10">
-            <AlertIcon className="text-text-muted h-8 w-8" />
-            <p className="text-text-secondary text-sm">세션 정보를 불러오지 못했어요</p>
-          </div>
-        ) : session ? (
-          <Card
-            className="max-w-full gap-3 md:gap-4"
-            thumbnailSrc={session.imageUrl}
-            category={session.category}
-            statusText={statusDisplay?.text}
-            statusBadgeStatus={statusDisplay?.badgeStatus}
-            title={session.title}
-            description={session.summary}
-            currentParticipants={session.currentParticipants}
-            maxParticipants={session.maxParticipants}
-            durationMinutes={session.sessionDurationMinutes}
-            sessionDate={session.startTime}
-          />
-        ) : (
-          <CardSkeleton className="max-w-full" />
-        )}
-
-        {/* 버튼 영역 */}
-        {sessionError ? (
-          <Button
-            variant="solid"
-            colorScheme="secondary"
-            size="medium"
-            className="w-full"
-            onClick={handleClose}
-          >
-            닫기
-          </Button>
-        ) : isRecovering ? (
-          <Button variant="solid" colorScheme="primary" size="medium" className="w-full" disabled>
-            로그인 상태 확인 중...
-          </Button>
-        ) : isCheckingParticipation ? (
-          <Button variant="solid" colorScheme="primary" size="medium" className="w-full" disabled>
-            참여 여부 확인 중...
-          </Button>
-        ) : isAuthenticated ? (
-          <Button
-            variant="solid"
-            colorScheme="primary"
-            size="medium"
-            className="w-full"
-            onClick={() => setShowJoinModal(true)}
-          >
-            참여하기
-          </Button>
-        ) : (
-          <ButtonLink
-            href={LOGIN_ROUTE}
-            variant="solid"
-            colorScheme="primary"
-            size="medium"
-            className="w-full"
-          >
-            로그인하고 참여하기
-          </ButtonLink>
-        )}
       </div>
 
       {showJoinModal && (
