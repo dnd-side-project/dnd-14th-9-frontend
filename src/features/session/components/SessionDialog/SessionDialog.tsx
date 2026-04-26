@@ -70,18 +70,18 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
       ref={dialogRef}
       onCancel={handleClose}
       onClick={handleBackdropClick}
-      className="bg-transparent p-0 backdrop:bg-(--color-overlay-default) max-sm:m-0 max-sm:h-dvh max-sm:max-h-[100dvh] max-sm:w-screen max-sm:max-w-[100vw] max-sm:overflow-y-auto max-sm:rounded-none max-sm:backdrop:bg-transparent sm:m-auto sm:w-[440px]"
+      className="bg-transparent p-0 backdrop:bg-(--color-overlay-default) max-md:m-0 max-md:h-dvh max-md:max-h-[100dvh] max-md:w-screen max-md:max-w-[100vw] max-md:overflow-y-auto max-md:rounded-none max-md:backdrop:bg-transparent md:m-auto md:w-[440px]"
     >
       {/* 모바일: 풀페이지 wrapper (GNB + 내용을 하나의 배경으로 통합) */}
-      <div className="bg-surface-default flex flex-col max-sm:min-h-full sm:rounded-2xl">
+      <div className="bg-surface-default flex flex-col max-md:min-h-full md:rounded-2xl">
         {/* Mobile-only GNB */}
-        <div className="sm:hidden">
+        <div className="md:hidden">
           <Header />
         </div>
 
-        <div className="relative flex flex-col gap-5 px-6 py-5 sm:gap-10 sm:p-10">
+        <div className="relative flex flex-col gap-5 px-6 py-5 md:gap-10 md:p-10">
           {/* Tablet+: 공유·닫기 버튼 절대 위치 */}
-          <div className="top-lg right-lg hidden items-center gap-1 sm:absolute sm:flex">
+          <div className="top-lg right-lg hidden items-center gap-1 md:absolute md:flex">
             <button
               type="button"
               onClick={() => shareSession(Number(sessionId))}
@@ -103,10 +103,10 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
           {/* 제목 + Mobile X버튼 인라인 */}
           <div className="flex items-start gap-[10px]">
             <div className="gap-xs flex flex-1 flex-col">
-              <h2 className="text-text-primary text-lg leading-[1.4] font-bold sm:text-2xl sm:leading-[140%]">
+              <h2 className="text-text-primary text-lg leading-[1.4] font-bold md:text-2xl md:leading-[140%]">
                 세션 참여하기
               </h2>
-              <p className="text-text-secondary font-regular text-[13px] leading-[1.4] sm:text-base sm:leading-[140%]">
+              <p className="text-text-secondary font-regular text-[13px] leading-[1.4] md:text-base md:leading-[140%]">
                 원하는 세션에서 함께 몰입해 보세요!
               </p>
             </div>
@@ -114,7 +114,7 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
             <button
               type="button"
               onClick={handleClose}
-              className="text-text-muted hover:text-text-primary p-2 sm:hidden"
+              className="text-text-muted hover:text-text-primary p-2 md:hidden"
               aria-label="닫기"
             >
               <CloseIcon />
@@ -129,7 +129,7 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
             </div>
           ) : session ? (
             <Card
-              className="max-w-full gap-3 sm:gap-4"
+              className="max-w-full gap-3 md:gap-4"
               thumbnailSrc={session.imageUrl}
               category={session.category}
               statusText={statusDisplay?.text}
