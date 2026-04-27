@@ -20,7 +20,7 @@ const meta = {
   argTypes: {
     status: {
       control: "select",
-      options: ["recruiting", "closing", "inProgress", "closed"],
+      options: ["recruiting", "closing", "inProgress", "closed", "positive"],
       description: "Badge의 상태",
     },
     radius: {
@@ -73,6 +73,20 @@ export const Closed: Story = {
   },
 };
 
+export const Positive: Story = {
+  args: {
+    status: "positive",
+    children: "긍정 상태",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Figma cyan state — 긍정적 상태를 나타내는 배지 (예: 모집 시작 임박 등)",
+      },
+    },
+  },
+};
+
 export const RadiusMax: Story = {
   args: {
     status: "recruiting",
@@ -113,6 +127,7 @@ export const AllStatuses: Story = {
       <Badge status="closing">마감 임박</Badge>
       <Badge status="inProgress">진행중</Badge>
       <Badge status="closed">마감</Badge>
+      <Badge status="positive">긍정 상태</Badge>
     </div>
   ),
   parameters: {
