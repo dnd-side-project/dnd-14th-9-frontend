@@ -1,4 +1,10 @@
-import { type ButtonHTMLAttributes, type ReactNode, type ComponentProps } from "react";
+import {
+  type ButtonHTMLAttributes,
+  type ComponentProps,
+  type MouseEventHandler,
+  type ReactNode,
+  type Ref,
+} from "react";
 
 import Link from "next/link";
 
@@ -116,19 +122,45 @@ type BaseButtonProps = Omit<VariantProps<typeof buttonVariants>, "variant" | "co
     rightIcon?: ReactNode;
   };
 
-export type ButtonProps<T extends boolean | undefined = undefined> = Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  "ref"
-> &
-  Omit<ComponentProps<typeof Link>, "href" | "onClick" | "ref"> &
+type LinkProps = ComponentProps<typeof Link>;
+type LinkOnlyProps = Omit<LinkProps, "href" | "onClick" | "ref" | "type">;
+
+export type NativeButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "ref" | "href"> &
   BaseButtonProps & {
-    hardNavigate?: T;
-    href?: T extends true ? string : ComponentProps<typeof Link>["href"];
-    ref?: React.Ref<HTMLButtonElement | HTMLAnchorElement>;
-    onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+    href?: never;
+    hardNavigate?: never;
+    locale?: never;
+    passHref?: never;
+    prefetch?: never;
+    replace?: never;
+    scroll?: never;
+    shallow?: never;
+    ref?: Ref<HTMLButtonElement>;
   };
 
-export function Button<T extends boolean | undefined = undefined>({
+export type SoftNavigateButtonProps = LinkOnlyProps &
+  BaseButtonProps & {
+    href: LinkProps["href"];
+    hardNavigate?: false;
+    disabled?: never;
+    type?: never;
+    ref?: Ref<HTMLAnchorElement>;
+    onClick?: MouseEventHandler<HTMLAnchorElement>;
+  };
+
+export type HardNavigateButtonProps = LinkOnlyProps &
+  BaseButtonProps & {
+    href: string;
+    hardNavigate: true;
+    disabled?: never;
+    type?: never;
+    ref?: Ref<HTMLAnchorElement>;
+    onClick?: MouseEventHandler<HTMLAnchorElement>;
+  };
+
+export type ButtonProps = NativeButtonProps | SoftNavigateButtonProps | HardNavigateButtonProps;
+
+export function Button({
   className,
   variant,
   colorScheme,
@@ -138,7 +170,7 @@ export function Button<T extends boolean | undefined = undefined>({
   rightIcon,
   children,
   ...props
-}: ButtonProps<T>) {
+}: ButtonProps) {
   const content = iconOnly ? (
     (leftIcon ?? rightIcon)
   ) : (
@@ -151,13 +183,13 @@ export function Button<T extends boolean | undefined = undefined>({
 
   const classNames = cn(buttonVariants({ variant, colorScheme, size, iconOnly, className }));
 
-  if (props.href) {
+  if (props.href !== undefined) {
     const { href, hardNavigate, onClick, ref, ...linkProps } = props;
 
-    if (hardNavigate) {
+    if (hardNavigate === true) {
       return (
         <Link
-          ref={ref as React.Ref<HTMLAnchorElement>}
+          ref={ref}
           className={classNames}
           {...linkProps}
           href={href}
@@ -176,19 +208,13 @@ export function Button<T extends boolean | undefined = undefined>({
     }
 
     return (
-      <Link
-        ref={ref as React.Ref<HTMLAnchorElement>}
-        className={classNames}
-        {...linkProps}
-        href={href}
-        onClick={onClick}
-      >
+      <Link ref={ref} className={classNames} {...linkProps} href={href} onClick={onClick}>
         {content}
       </Link>
     );
   }
 
-  const { disabled, ref, ...buttonProps } = props as React.ComponentProps<"button">;
+  const { disabled, ref, ...buttonProps } = props;
   return (
     <button
       ref={ref}

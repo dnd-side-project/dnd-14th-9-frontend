@@ -3,14 +3,24 @@
 import { Button } from "@/components/Button/Button";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 
-interface ErrorFallbackUIProps {
+type ErrorFallbackUIBaseProps = {
   title: string;
   description: string;
   buttonLabel: string;
-  onRetry?: () => void;
-  href?: string;
   className?: string; // 컨테이너에 전달할 추가 클래스 (예: 상단 패딩용)
-}
+};
+
+type ErrorFallbackUIRetryProps = ErrorFallbackUIBaseProps & {
+  onRetry: () => void;
+  href?: never;
+};
+
+type ErrorFallbackUILinkProps = ErrorFallbackUIBaseProps & {
+  href: string;
+  onRetry?: never;
+};
+
+export type ErrorFallbackUIProps = ErrorFallbackUIRetryProps | ErrorFallbackUILinkProps;
 
 export function ErrorFallbackUI({
   title,
@@ -37,9 +47,15 @@ export function ErrorFallbackUI({
         {description}
       </div>
 
-      <Button onClick={onRetry} href={href} variant="solid" colorScheme="tertiary" size="large">
-        {buttonLabel}
-      </Button>
+      {href !== undefined ? (
+        <Button href={href} variant="solid" colorScheme="tertiary" size="large">
+          {buttonLabel}
+        </Button>
+      ) : (
+        <Button onClick={onRetry} variant="solid" colorScheme="tertiary" size="large">
+          {buttonLabel}
+        </Button>
+      )}
     </div>
   );
 }
