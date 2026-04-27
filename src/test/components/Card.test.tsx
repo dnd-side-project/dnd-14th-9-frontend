@@ -70,7 +70,7 @@ describe("Card", () => {
     expect(screen.getByTestId("relative-time-badge")).toHaveTextContent("상대시간");
   });
 
-  it("prefers description over nickname for subtitle text", () => {
+  it("prefers description over nickname when showDescription is true", () => {
     renderCard({
       description: "설명",
       nickname: "닉네임",
@@ -86,5 +86,32 @@ describe("Card", () => {
     });
 
     expect(screen.getByText("닉네임")).toBeInTheDocument();
+  });
+
+  it("hides description and shows nickname when showDescription is false", () => {
+    renderCard({
+      description: "설명",
+      nickname: "닉네임",
+      showDescription: false,
+    });
+
+    expect(screen.queryByText("설명")).not.toBeInTheDocument();
+    expect(screen.getByText("닉네임")).toBeInTheDocument();
+  });
+
+  it("renders with size=sm without errors", () => {
+    renderCard({ size: "sm" });
+    // Thumbnail mock이 alt를 텍스트로 렌더링하므로 h3 요소로 범위를 좁힘
+    expect(screen.getByRole("heading", { name: "세션 제목" })).toBeInTheDocument();
+  });
+
+  it("renders with layout=horizontal without errors", () => {
+    renderCard({ layout: "horizontal" });
+    expect(screen.getByRole("heading", { name: "세션 제목" })).toBeInTheDocument();
+  });
+
+  it("renders with layout=horizontal and size=sm without errors", () => {
+    renderCard({ layout: "horizontal", size: "sm" });
+    expect(screen.getByRole("heading", { name: "세션 제목" })).toBeInTheDocument();
   });
 });
