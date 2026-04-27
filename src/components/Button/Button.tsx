@@ -1,7 +1,10 @@
-import { type ButtonHTMLAttributes, type ReactNode } from "react";
+import { type ButtonHTMLAttributes, type ReactNode, type ComponentProps } from "react";
+
+import Link from "next/link";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
+import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 import { cn } from "@/lib/utils/utils";
 
 const buttonVariants = cva(
@@ -107,15 +110,25 @@ type GhostButtonProps = {
 
 export type ButtonVariantProps = SolidButtonProps | OutlinedButtonProps | GhostButtonProps;
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
-  Omit<VariantProps<typeof buttonVariants>, "variant" | "colorScheme"> &
+type BaseButtonProps = Omit<VariantProps<typeof buttonVariants>, "variant" | "colorScheme"> &
   ButtonVariantProps & {
     leftIcon?: ReactNode;
     rightIcon?: ReactNode;
-    ref?: React.Ref<HTMLButtonElement>;
   };
 
-export function Button({
+export type ButtonProps<T extends boolean | undefined = undefined> = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "ref"
+> &
+  Omit<ComponentProps<typeof Link>, "href" | "onClick" | "ref"> &
+  BaseButtonProps & {
+    hardNavigate?: T;
+    href?: T extends true ? string : ComponentProps<typeof Link>["href"];
+    ref?: React.Ref<HTMLButtonElement | HTMLAnchorElement>;
+    onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+  };
+
+export function Button<T extends boolean | undefined = undefined>({
   className,
   variant,
   colorScheme,
@@ -124,27 +137,67 @@ export function Button({
   leftIcon,
   rightIcon,
   children,
-  disabled,
-  ref,
   ...props
-}: ButtonProps) {
+}: ButtonProps<T>) {
+  const content = iconOnly ? (
+    (leftIcon ?? rightIcon)
+  ) : (
+    <>
+      {leftIcon}
+      {children}
+      {rightIcon}
+    </>
+  );
+
+  const classNames = cn(buttonVariants({ variant, colorScheme, size, iconOnly, className }));
+
+  if (props.href) {
+    const { href, hardNavigate, onClick, ref, ...linkProps } = props;
+
+    if (hardNavigate) {
+      return (
+        <Link
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          className={classNames}
+          {...linkProps}
+          href={href}
+          onClick={(e) => {
+            onClick?.(e);
+            if (e.defaultPrevented) {
+              return;
+            }
+            e.preventDefault();
+            navigateWithHardReload(e.currentTarget.href);
+          }}
+        >
+          {content}
+        </Link>
+      );
+    }
+
+    return (
+      <Link
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        className={classNames}
+        {...linkProps}
+        href={href}
+        onClick={onClick}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  const { disabled, ref, ...buttonProps } = props as React.ComponentProps<"button">;
   return (
     <button
       ref={ref}
-      className={cn(buttonVariants({ variant, colorScheme, size, iconOnly, className }))}
+      className={classNames}
       disabled={disabled}
       aria-disabled={disabled}
-      {...props}
+      {...buttonProps}
     >
-      {iconOnly ? (
-        (leftIcon ?? rightIcon)
-      ) : (
-        <>
-          {leftIcon}
-          {children}
-          {rightIcon}
-        </>
-      )}
+      {content}
     </button>
   );
 }
