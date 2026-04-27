@@ -162,7 +162,7 @@ describe("useWaitingMembersSSE", () => {
   });
 
   describe("이벤트 수신", () => {
-    it("waiting-members-updated 이벤트 수신 시 data가 업데이트되어야 합니다", async () => {
+    it("waiting-members-updated 이벤트(ROOM_UPDATE) 수신 시 data가 업데이트되어야 합니다", async () => {
       const { result } = renderHook(() =>
         useWaitingMembersSSE({
           sessionId: "test-session",
@@ -186,10 +186,70 @@ describe("useWaitingMembersSSE", () => {
       };
 
       act(() => {
-        simulateSSEEvent("waiting-members-updated", mockData);
+        simulateSSEEvent("waiting-members-updated", { eventType: "ROOM_UPDATE", data: mockData });
       });
 
       expect(result.current.data).toEqual(mockData);
+    });
+
+    it("members 필드가 누락된 비정상 ROOM_UPDATE는 무시되어야 합니다", () => {
+      const { result } = renderHook(() =>
+        useWaitingMembersSSE({
+          sessionId: "test-session",
+          enabled: true,
+        })
+      );
+
+      act(() => {
+        simulateSSEEvent("waiting-members-updated", {
+          eventType: "ROOM_UPDATE",
+          data: { participantCount: 0 },
+        });
+      });
+
+      expect(result.current.data).toBeNull();
+    });
+
+    it("KICKED 이벤트 수신 시 onKicked 콜백이 memberIds로 호출되어야 합니다", () => {
+      const onKicked = jest.fn();
+
+      renderHook(() =>
+        useWaitingMembersSSE({
+          sessionId: "test-session",
+          enabled: true,
+          onKicked,
+        })
+      );
+
+      act(() => {
+        simulateSSEEvent("waiting-members-updated", {
+          eventType: "KICKED",
+          data: { memberIds: [1, 2, 3] },
+        });
+      });
+
+      expect(onKicked).toHaveBeenCalledWith([1, 2, 3]);
+    });
+
+    it("memberIds가 누락된 비정상 KICKED 이벤트는 onKicked가 호출되지 않아야 합니다", () => {
+      const onKicked = jest.fn();
+
+      renderHook(() =>
+        useWaitingMembersSSE({
+          sessionId: "test-session",
+          enabled: true,
+          onKicked,
+        })
+      );
+
+      act(() => {
+        simulateSSEEvent("waiting-members-updated", {
+          eventType: "KICKED",
+          data: {},
+        });
+      });
+
+      expect(onKicked).not.toHaveBeenCalled();
     });
 
     it("error 이벤트 수신 시 error가 업데이트되어야 합니다", () => {
