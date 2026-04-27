@@ -11,6 +11,8 @@ export interface CardMetaProps {
   maxParticipants: number;
   durationMinutes: number;
   sessionDate: Date | string;
+  /** Figma size 변형 — md: 16px 아이콘 / 11px 텍스트, sm: 12px 아이콘 / 10px 텍스트 */
+  size?: "md" | "sm";
 }
 
 export function CardMeta({
@@ -19,24 +21,29 @@ export function CardMeta({
   maxParticipants,
   durationMinutes,
   sessionDate,
+  size = "md",
 }: CardMetaProps) {
+  const iconClassName = size === "sm" ? "size-3" : "size-4";
+  const textClassName = size === "sm" ? "text-[10px]" : "text-[11px]";
+
   return (
     <div
       className={cn(
-        "text-text-disabled flex flex-wrap items-center gap-x-2 gap-y-2 text-[10px] leading-none md:text-[11px]",
+        "text-text-disabled flex flex-wrap items-center gap-x-2 gap-y-2 leading-none",
+        textClassName,
         className
       )}
     >
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <UsersIcon className="size-3 md:size-4" />
+        <UsersIcon className={iconClassName} />
         <span>{formatParticipantCount(currentParticipants, maxParticipants)}</span>
       </span>
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <ClockIcon className="size-3 md:size-4" />
+        <ClockIcon className={iconClassName} />
         <span>{formatSessionDuration(durationMinutes)}</span>
       </span>
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <CalendarIcon className="size-3 md:size-4" />
+        <CalendarIcon className={iconClassName} />
         <span>{formatSessionDateTime(sessionDate)}</span>
       </span>
     </div>
