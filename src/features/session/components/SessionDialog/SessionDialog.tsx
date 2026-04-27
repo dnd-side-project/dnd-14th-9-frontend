@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ButtonLink } from "@/components/Button/ButtonLink";
+import { ButtonGroup } from "@/components/ButtonGroup/ButtonGroup";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { ShareIcon } from "@/components/Icon/ShareIcon";
@@ -141,43 +142,43 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
 
           {/* 버튼 영역 */}
           {sessionError ? (
-            <Button
-              variant="solid"
-              colorScheme="secondary"
-              size="medium"
-              className="w-full"
-              onClick={handleClose}
-            >
-              닫기
-            </Button>
+            <ButtonGroup layout="single" horizontal={false} className="w-full [&>*]:w-full">
+              <Button variant="solid" colorScheme="secondary" size="medium" onClick={handleClose}>
+                닫기
+              </Button>
+            </ButtonGroup>
           ) : isRecovering ? (
-            <Button variant="solid" colorScheme="primary" size="medium" className="w-full" disabled>
-              로그인 상태 확인 중...
-            </Button>
+            <ButtonGroup layout="single" horizontal={false} className="w-full [&>*]:w-full">
+              <Button variant="solid" colorScheme="primary" size="medium" disabled>
+                로그인 상태 확인 중...
+              </Button>
+            </ButtonGroup>
           ) : isCheckingParticipation ? (
-            <Button variant="solid" colorScheme="primary" size="medium" className="w-full" disabled>
-              참여 여부 확인 중...
-            </Button>
+            <ButtonGroup layout="single" horizontal={false} className="w-full [&>*]:w-full">
+              <Button variant="solid" colorScheme="primary" size="medium" disabled>
+                참여 여부 확인 중...
+              </Button>
+            </ButtonGroup>
           ) : isAuthenticated ? (
-            <Button
-              variant="solid"
-              colorScheme="primary"
-              size="medium"
-              className="w-full"
-              onClick={() => setShowJoinModal(true)}
-            >
-              참여하기
-            </Button>
+            <ButtonGroup layout="single" horizontal={false} className="w-full [&>*]:w-full">
+              <Button
+                variant="solid"
+                colorScheme="primary"
+                size="medium"
+                onClick={() => setShowJoinModal(true)}
+              >
+                참여하기
+              </Button>
+            </ButtonGroup>
           ) : (
-            <ButtonLink
-              href={LOGIN_ROUTE}
-              variant="solid"
-              colorScheme="primary"
-              size="medium"
-              className="w-full"
-            >
-              로그인하고 참여하기
-            </ButtonLink>
+            <ButtonGroup layout="dual" horizontal={false} className="w-full [&>*]:w-full">
+              <Button variant="solid" colorScheme="tertiary" size="medium" onClick={handleClose}>
+                건너뛰기
+              </Button>
+              <ButtonLink href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
+                로그인하고 참여하기
+              </ButtonLink>
+            </ButtonGroup>
           )}
         </div>
       </div>
