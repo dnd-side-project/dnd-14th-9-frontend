@@ -43,6 +43,11 @@ const CHIP_BADGE_VARIANTS = cva(
         size: "md",
         class: "px-2",
       },
+      {
+        radius: "xs",
+        size: "sm",
+        class: "px-2",
+      },
     ],
     defaultVariants: {
       status: "recruiting",
