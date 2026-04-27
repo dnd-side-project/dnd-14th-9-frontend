@@ -39,6 +39,20 @@ const meta = {
       control: "text",
       description: "작성자 닉네임",
     },
+    layout: {
+      control: "select",
+      options: ["vertical", "horizontal"],
+      description: "레이아웃 방향",
+    },
+    size: {
+      control: "select",
+      options: ["md", "sm"],
+      description: "카드 사이즈",
+    },
+    showDescription: {
+      control: "boolean",
+      description: "description 표시 여부",
+    },
     currentParticipants: {
       control: "number",
       description: "현재 참가자 수",
@@ -58,7 +72,7 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "316px" }}>
+      <div className="dark" style={{ padding: "20px", background: "#0b0f0e" }}>
         <Story />
       </div>
     ),
@@ -74,23 +88,134 @@ const FIVE_HOURS_AGO = new Date(NOW.getTime() - 5 * 60 * 60 * 1000);
 const THIRTY_MINUTES_AGO = new Date(NOW.getTime() - 30 * 60 * 1000);
 const SESSION_DATE = new Date(NOW.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-export const Default: Story = {
+const BASE_ARGS = {
+  thumbnailSrc: "https://picsum.photos/320/170",
+  category: "개발",
+  createdAt: THREE_DAYS_AGO,
+  title: "React 스터디 모집합니다",
+  nickname: "김개발",
+  description: "세션 한 줄 소개",
+  currentParticipants: 3,
+  maxParticipants: 6,
+  durationMinutes: 90,
+  sessionDate: SESSION_DATE,
+};
+
+// --- Vertical MD (기본) ---
+export const VerticalMd: Story = {
   args: {
-    thumbnailSrc: "https://picsum.photos/276/146",
-    category: "개발",
-    createdAt: THREE_DAYS_AGO,
-    title: "React 스터디 모집합니다",
-    nickname: "김개발",
-    currentParticipants: 3,
-    maxParticipants: 6,
-    durationMinutes: 90,
-    sessionDate: SESSION_DATE,
+    ...BASE_ARGS,
+    layout: "vertical",
+    size: "md",
+  },
+  parameters: {
+    docs: {
+      description: { story: "Figma: layout=vertical, size=md (320px)" },
+    },
   },
 };
 
+// --- Vertical SM ---
+export const VerticalSm: Story = {
+  args: {
+    ...BASE_ARGS,
+    layout: "vertical",
+    size: "sm",
+  },
+  parameters: {
+    docs: {
+      description: { story: "Figma: layout=vertical, size=sm (226px)" },
+    },
+  },
+};
+
+// --- Horizontal MD ---
+export const HorizontalMd: Story = {
+  args: {
+    ...BASE_ARGS,
+    layout: "horizontal",
+    size: "md",
+  },
+  decorators: [
+    (Story) => (
+      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "528px" }}>
+        <Story />
+      </div>
+    ),
+  ],
+  parameters: {
+    docs: {
+      description: { story: "Figma: layout=horizontal, size=md (528px)" },
+    },
+  },
+};
+
+// --- Horizontal SM ---
+export const HorizontalSm: Story = {
+  args: {
+    ...BASE_ARGS,
+    layout: "horizontal",
+    size: "sm",
+  },
+  decorators: [
+    (Story) => (
+      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "444px" }}>
+        <Story />
+      </div>
+    ),
+  ],
+  parameters: {
+    docs: {
+      description: { story: "Figma: layout=horizontal, size=sm (444px)" },
+    },
+  },
+};
+
+// --- Horizontal MD — 마감임박 배지 ---
+export const HorizontalMdClosing: Story = {
+  args: {
+    ...BASE_ARGS,
+    layout: "horizontal",
+    size: "md",
+    createdAt: THIRTY_MINUTES_AGO,
+    statusText: "마감임박",
+    statusBadgeStatus: "closing",
+  },
+  decorators: [
+    (Story) => (
+      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "528px" }}>
+        <Story />
+      </div>
+    ),
+  ],
+  parameters: {
+    docs: {
+      description: { story: "Figma Usage 예시: horizontal md + 마감임박 배지" },
+    },
+  },
+};
+
+// --- showDescription=false ---
+export const HideDescription: Story = {
+  args: {
+    ...BASE_ARGS,
+    layout: "vertical",
+    size: "md",
+    showDescription: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Figma Usage: showDescription=false — description 숨기고 nickname만 표시",
+      },
+    },
+  },
+};
+
+// --- 기타 기존 케이스 ---
 export const Urgent: Story = {
   args: {
-    thumbnailSrc: "https://picsum.photos/276/146?1",
+    thumbnailSrc: "https://picsum.photos/320/170?1",
     category: "디자인",
     createdAt: THIRTY_MINUTES_AGO,
     title: "Figma 협업 스터디",
@@ -99,40 +224,18 @@ export const Urgent: Story = {
     maxParticipants: 6,
     durationMinutes: 60,
     sessionDate: SESSION_DATE,
+    size: "md",
   },
   parameters: {
     docs: {
-      description: {
-        story: "1시간 미만일 때 '마감임박'으로 표시됩니다.",
-      },
-    },
-  },
-};
-
-export const RecentlyCreated: Story = {
-  args: {
-    thumbnailSrc: "https://picsum.photos/276/146?2",
-    category: "언어",
-    createdAt: FIVE_HOURS_AGO,
-    title: "영어 회화 스터디",
-    nickname: "이영어",
-    currentParticipants: 2,
-    maxParticipants: 4,
-    durationMinutes: 120,
-    sessionDate: SESSION_DATE,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "1시간~24시간 사이일 때 'n시간 전'으로 표시됩니다.",
-      },
+      description: { story: "1시간 미만일 때 '마감임박'으로 표시됩니다." },
     },
   },
 };
 
 export const LongTitle: Story = {
   args: {
-    thumbnailSrc: "https://picsum.photos/276/146?3",
+    thumbnailSrc: "https://picsum.photos/320/170?3",
     category: "개발",
     createdAt: THREE_DAYS_AGO,
     title: "주니어 개발자를 위한 알고리즘 스터디 모집합니다 함께 성장해요",
@@ -141,12 +244,11 @@ export const LongTitle: Story = {
     maxParticipants: 8,
     durationMinutes: 180,
     sessionDate: SESSION_DATE,
+    size: "md",
   },
   parameters: {
     docs: {
-      description: {
-        story: "긴 제목은 말줄임표(...)로 표시됩니다.",
-      },
+      description: { story: "긴 제목은 말줄임표(...)로 표시됩니다." },
     },
   },
 };
@@ -162,32 +264,22 @@ export const NoThumbnail: Story = {
     maxParticipants: 5,
     durationMinutes: 60,
     sessionDate: SESSION_DATE,
+    size: "md",
   },
   parameters: {
     docs: {
-      description: {
-        story: "썸네일이 없을 때 placeholder가 표시됩니다.",
-      },
+      description: { story: "썸네일이 없을 때 placeholder가 표시됩니다." },
     },
   },
 };
 
 export const CardList: Story = {
-  args: {
-    thumbnailSrc: "https://picsum.photos/276/146",
-    category: "개발",
-    createdAt: THREE_DAYS_AGO,
-    title: "React 스터디",
-    nickname: "김개발",
-    currentParticipants: 3,
-    maxParticipants: 6,
-    durationMinutes: 90,
-    sessionDate: SESSION_DATE,
-  },
+  args: BASE_ARGS,
   render: () => (
     <div className="flex flex-col gap-6">
       <Card
-        thumbnailSrc="https://picsum.photos/276/146?10"
+        size="md"
+        thumbnailSrc="https://picsum.photos/320/170?10"
         category="개발"
         createdAt={THREE_DAYS_AGO}
         title="React 스터디 모집합니다"
@@ -198,7 +290,8 @@ export const CardList: Story = {
         sessionDate={SESSION_DATE}
       />
       <Card
-        thumbnailSrc="https://picsum.photos/276/146?11"
+        size="md"
+        thumbnailSrc="https://picsum.photos/320/170?11"
         category="디자인"
         createdAt={FIVE_HOURS_AGO}
         title="Figma 협업 스터디"
@@ -209,7 +302,8 @@ export const CardList: Story = {
         sessionDate={SESSION_DATE}
       />
       <Card
-        thumbnailSrc="https://picsum.photos/276/146?12"
+        size="md"
+        thumbnailSrc="https://picsum.photos/320/170?12"
         category="언어"
         createdAt={THIRTY_MINUTES_AGO}
         title="영어 회화 스터디"
@@ -223,30 +317,20 @@ export const CardList: Story = {
   ),
   parameters: {
     docs: {
-      description: {
-        story: "여러 카드를 목록으로 표시합니다.",
-      },
+      description: { story: "여러 카드를 목록으로 표시합니다." },
     },
   },
 };
 
 export const SkeletonWidthPolicy: Story = {
-  args: {
-    thumbnailSrc: null,
-    category: "개발",
-    title: "Skeleton",
-    currentParticipants: 0,
-    maxParticipants: 0,
-    durationMinutes: 0,
-    sessionDate: SESSION_DATE,
-  },
+  args: BASE_ARGS,
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="w-[180px] border border-dashed border-white/20 p-2">
         <CardSkeleton />
       </div>
-      <div className="w-[276px] border border-dashed border-white/20 p-2">
-        <CardSkeleton />
+      <div className="w-[226px] border border-dashed border-white/20 p-2">
+        <CardSkeleton size="sm" />
       </div>
       <div className="w-full border border-dashed border-white/20 p-2">
         <CardSkeleton className="max-w-full" />
@@ -256,7 +340,7 @@ export const SkeletonWidthPolicy: Story = {
   parameters: {
     docs: {
       description: {
-        story: "CardSkeleton이 자체 max-width 없이 부모 컨테이너 폭을 따르는지 비교합니다.",
+        story: "CardSkeleton의 layout/size 변형과 부모 컨테이너 폭 정책을 비교합니다.",
       },
     },
   },
