@@ -36,8 +36,11 @@ export function useWaitingMembersSSE({
 
   const handleData = useCallback((payload: WaitingMembersSSEPayload) => {
     if (payload.eventType === "ROOM_UPDATE") {
+      // members 필드가 누락된 비정상 payload는 무시 (런타임 가드)
+      if (!payload.data || !Array.isArray(payload.data.members)) return;
       setRoomData(payload.data);
     } else if (payload.eventType === "KICKED") {
+      if (!Array.isArray(payload.data?.memberIds)) return;
       onKickedRef.current?.(payload.data.memberIds);
     }
   }, []);

@@ -113,7 +113,15 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   }
 
   // SSE를 통한 강퇴 감지 (참여자였는데 멤버 목록에서 사라진 경우)
-  if (wasParticipant && sseWaitingData && myMemberId && !isKicked && !isLeaving) {
+  // members가 누락된 비정상 payload는 강퇴 추론에서 제외
+  if (
+    wasParticipant &&
+    sseWaitingData &&
+    Array.isArray(sseWaitingData.members) &&
+    myMemberId &&
+    !isKicked &&
+    !isLeaving
+  ) {
     const isStillMember = sseWaitingData.members.some((m) => m.memberId === myMemberId);
     if (!isStillMember) {
       setIsKicked(true);
