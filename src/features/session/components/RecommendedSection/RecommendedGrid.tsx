@@ -72,6 +72,7 @@ export function RecommendedGrid({
         <div key={session.sessionId} className="mx-auto w-full md:max-w-69">
           <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
             <Card
+              size="md"
               thumbnailSrc={session.imageUrl}
               category={session.category}
               createdAt={session.startTime}

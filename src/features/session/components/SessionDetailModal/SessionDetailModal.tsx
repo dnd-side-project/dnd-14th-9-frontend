@@ -108,6 +108,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
           </div>
         ) : session ? (
           <Card
+            size="md"
             className="max-w-full"
             thumbnailSrc={session.imageUrl}
             category={session.category}
