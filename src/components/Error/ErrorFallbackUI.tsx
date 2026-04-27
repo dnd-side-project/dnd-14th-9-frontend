@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/Button/Button";
-import { ButtonLink } from "@/components/Button/ButtonLink";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 
 interface ErrorFallbackUIProps {
@@ -38,15 +37,9 @@ export function ErrorFallbackUI({
         {description}
       </div>
 
-      {href ? (
-        <ButtonLink href={href} variant="solid" colorScheme="tertiary" size="large">
-          {buttonLabel}
-        </ButtonLink>
-      ) : (
-        <Button onClick={onRetry} variant="solid" colorScheme="tertiary" size="large">
-          {buttonLabel}
-        </Button>
-      )}
+      <Button onClick={onRetry} href={href} variant="solid" colorScheme="tertiary" size="large">
+        {buttonLabel}
+      </Button>
     </div>
   );
 }

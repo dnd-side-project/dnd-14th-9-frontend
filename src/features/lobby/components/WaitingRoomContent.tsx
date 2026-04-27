@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import dynamic from "next/dynamic";
 
-import { ButtonLink } from "@/components/Button/ButtonLink";
+import { Button } from "@/components/Button/Button";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
@@ -136,9 +136,9 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
     return (
       <div className="flex h-[calc(100vh-200px)] min-h-100 flex-col items-center justify-center gap-4">
         <p className="text-text-secondary text-lg">세션에 참여하려면 로그인이 필요합니다</p>
-        <ButtonLink href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
+        <Button href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
           로그인하고 참여하기
-        </ButtonLink>
+        </Button>
       </div>
     );
   }

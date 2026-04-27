@@ -4,7 +4,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 
 import Image from "next/image";
 
-import { ButtonLink } from "@/components/Button/ButtonLink";
+import { Button } from "@/components/Button/Button";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
 
 type Viewport = "mobile" | "tablet" | "desktop";
@@ -200,17 +200,22 @@ export function DefaultBanner({ isHovered }: DefaultBannerProps) {
           </p>
         </div>
 
-        <ButtonLink
+        <Button
           href="/session/create"
           variant="solid"
           colorScheme="tertiary"
           size="medium"
           className="gap-xs py-xs pl-sm pr-xs md:py-sm md:pl-lg md:pr-md h-8 w-fit rounded-sm text-[12px] leading-[1.4] font-semibold md:h-11 md:rounded-md md:text-[14px]"
-          rightIcon={<PlusIcon size="xsmall" className="md:h-5 md:w-5" />}
+          rightIcon={
+            <>
+              <PlusIcon size="xsmall" className="md:hidden" />
+              <PlusIcon size="small" className="hidden md:inline-block" />
+            </>
+          }
           hardNavigate
         >
           세션 만들기
-        </ButtonLink>
+        </Button>
       </div>
 
       {/* Image Container: 3개 UI 카드 */}
