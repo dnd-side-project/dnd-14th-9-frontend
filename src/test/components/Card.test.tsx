@@ -3,7 +3,11 @@ import { render, screen } from "@testing-library/react";
 import { Card, type CardProps } from "@/features/session/components/Card/Card";
 
 jest.mock("@/components/Thumbnail/Thumbnail", () => ({
-  Thumbnail: ({ alt }: { alt: string }) => <div data-testid="thumbnail">{alt}</div>,
+  Thumbnail: ({ alt, className }: { alt: string; className?: string }) => (
+    <div className={className} data-testid="thumbnail">
+      {alt}
+    </div>
+  ),
 }));
 
 jest.mock("@/components/RelativeTime/RelativeTimeBadge", () => ({
@@ -103,6 +107,49 @@ describe("Card", () => {
     renderCard({ size: "sm" });
     // Thumbnail mock이 alt를 텍스트로 렌더링하므로 h3 요소로 범위를 좁힘
     expect(screen.getByRole("heading", { name: "세션 제목" })).toBeInTheDocument();
+  });
+
+  it("uses fixed md density classes for default md size", () => {
+    renderCard({
+      statusText: "모집중",
+      description: "설명",
+    });
+
+    expect(screen.getByText("모집중")).toHaveClass("px-3", "text-xs");
+    expect(screen.getByText("보드게임")).not.toHaveClass("text-[10px]", "md:text-xs");
+    expect(screen.getByRole("heading", { name: "세션 제목" })).toHaveClass("text-lg");
+    expect(screen.getByText("설명")).toHaveClass("text-xs");
+  });
+
+  it("uses mobile compact and desktop md density classes for responsive size", () => {
+    renderCard({
+      size: "responsive",
+      statusText: "모집중",
+      description: "설명",
+    });
+
+    expect(screen.getByText("모집중")).toHaveClass("px-2", "text-[10px]", "md:px-3", "md:text-xs");
+    expect(screen.getByText("보드게임")).toHaveClass("text-[10px]", "md:text-xs");
+    expect(screen.getByRole("heading", { name: "세션 제목" })).toHaveClass(
+      "text-[15px]",
+      "md:text-lg"
+    );
+    expect(screen.getByText("설명")).toHaveClass("text-[11px]", "md:text-xs");
+  });
+
+  it("uses responsive thumbnail density for horizontal responsive size", () => {
+    renderCard({
+      layout: "horizontal",
+      size: "responsive",
+    });
+
+    expect(screen.getByTestId("thumbnail")).toHaveClass(
+      "self-stretch",
+      "w-auto",
+      "md:h-[180px]",
+      "md:w-[290px]",
+      "md:self-auto"
+    );
   });
 
   it("renders with layout=horizontal without errors", () => {

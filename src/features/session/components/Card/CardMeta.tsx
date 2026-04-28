@@ -12,7 +12,7 @@ export interface CardMetaProps {
   durationMinutes: number;
   sessionDate: Date | string;
   /** Figma size 변형과 카드 density를 동기화합니다. */
-  size?: "md" | "sm";
+  size?: "md" | "sm" | "responsive";
 }
 
 export function CardMeta({
@@ -23,8 +23,16 @@ export function CardMeta({
   sessionDate,
   size = "md",
 }: CardMetaProps) {
-  const iconClassName = size === "sm" ? "size-3" : "size-4";
-  const textClassName = size === "sm" ? "text-[10px]" : "text-[11px]";
+  const iconClassName = cn(
+    size === "sm" && "size-3",
+    size === "md" && "size-4",
+    size === "responsive" && "size-3 md:size-4"
+  );
+  const textClassName = cn(
+    size === "sm" && "text-[10px]",
+    size === "md" && "text-[11px]",
+    size === "responsive" && "text-[10px] md:text-[11px]"
+  );
 
   return (
     <div

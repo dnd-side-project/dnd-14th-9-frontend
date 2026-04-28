@@ -46,8 +46,8 @@ const meta = {
     },
     size: {
       control: "select",
-      options: ["md", "sm"],
-      description: "카드 사이즈",
+      options: ["md", "sm", "responsive"],
+      description: "카드 사이즈 또는 반응형 density",
     },
     showDescription: {
       control: "boolean",
@@ -125,6 +125,33 @@ export const VerticalSm: Story = {
   parameters: {
     docs: {
       description: { story: "Figma: layout=vertical, size=sm (226px)" },
+    },
+  },
+};
+
+// --- Vertical Responsive ---
+export const VerticalResponsive: Story = {
+  args: {
+    ...BASE_ARGS,
+    layout: "vertical",
+    size: "responsive",
+  },
+  decorators: [
+    (Story) => (
+      <div
+        className="dark"
+        style={{ padding: "20px", background: "#0b0f0e", width: "100%", maxWidth: "276px" }}
+      >
+        <Story />
+      </div>
+    ),
+  ],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Usage: 모바일은 compact density, md 이상은 md density로 전환되는 명시적 반응형 variant",
+      },
     },
   },
 };
@@ -332,6 +359,9 @@ export const SkeletonWidthPolicy: Story = {
       <div className="w-[226px] border border-dashed border-white/20 p-2">
         <CardSkeleton size="sm" />
       </div>
+      <div className="w-full border border-dashed border-white/20 p-2 md:max-w-69">
+        <CardSkeleton size="responsive" />
+      </div>
       <div className="w-full border border-dashed border-white/20 p-2">
         <CardSkeleton className="max-w-full" />
       </div>
@@ -340,7 +370,7 @@ export const SkeletonWidthPolicy: Story = {
   parameters: {
     docs: {
       description: {
-        story: "CardSkeleton의 layout/size 변형과 부모 컨테이너 폭 정책을 비교합니다.",
+        story: "CardSkeleton의 layout/size/responsive 변형과 부모 컨테이너 폭 정책을 비교합니다.",
       },
     },
   },

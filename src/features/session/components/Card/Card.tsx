@@ -29,8 +29,8 @@ export interface CardProps {
   sessionDate: Date | string;
   /** Figma layout 변형 (default: "vertical") */
   layout?: "vertical" | "horizontal";
-  /** Figma size 변형 (default: "md") */
-  size?: "md" | "sm";
+  /** Figma size 변형 또는 명시적 반응형 density (default: "md") */
+  size?: "md" | "sm" | "responsive";
 }
 
 export function Card({
@@ -54,12 +54,18 @@ export function Card({
   const isHorizontal = layout === "horizontal";
   const isSm = size === "sm";
 
-  const statusBadgeClassName = isSm ? "px-2 text-[10px]" : "px-3 text-xs";
-
   const renderStatusBadge = () => {
     if (isPastTime(sessionDate)) {
       return (
-        <ChipBadge radius="max" status="inProgress" className={statusBadgeClassName}>
+        <ChipBadge
+          radius="max"
+          status="inProgress"
+          className={cn(
+            size === "sm" && "px-2 text-[10px]",
+            size === "md" && "px-3 text-xs",
+            size === "responsive" && "px-2 text-[10px] md:px-3 md:text-xs"
+          )}
+        >
           진행중
         </ChipBadge>
       );
@@ -69,33 +75,60 @@ export function Card({
         <ChipBadge
           radius="max"
           status={statusBadgeStatus ?? "recruiting"}
-          className={statusBadgeClassName}
+          className={cn(
+            size === "sm" && "px-2 text-[10px]",
+            size === "md" && "px-3 text-xs",
+            size === "responsive" && "px-2 text-[10px] md:px-3 md:text-xs"
+          )}
         >
           {statusText}
         </ChipBadge>
       );
     }
     if (createdAt) {
-      return <RelativeTimeBadge date={createdAt} className={statusBadgeClassName} />;
+      return (
+        <RelativeTimeBadge
+          date={createdAt}
+          className={cn(
+            size === "sm" && "px-2 text-[10px]",
+            size === "md" && "px-3 text-xs",
+            size === "responsive" && "px-2 text-[10px] md:px-3 md:text-xs"
+          )}
+        />
+      );
     }
     return null;
   };
 
-  /**
-   * 타이틀 아래 서브텍스트
-   * - description이 있고 showDescription=true이면 description 표시
-   * - 그 외 nickname이 있으면 nickname 표시
-   */
+  // 카드 사용 맥락에 따라 방 소개를 숨길 수 있어야 하며, 작성자명은 최종 fallback으로 유지합니다.
   const renderSubtitle = () => {
     if (showDescription && description) {
       return (
-        <p className={cn("text-text-disabled truncate", isSm ? "text-[11px]" : "text-xs")}>
+        <p
+          className={cn(
+            "text-text-disabled truncate",
+            size === "sm" && "text-[11px]",
+            size === "md" && "text-xs",
+            size === "responsive" && "text-[11px] md:text-xs"
+          )}
+        >
           {description}
         </p>
       );
     }
     if (nickname) {
-      return <span className="text-text-muted text-xs font-semibold">{nickname}</span>;
+      return (
+        <span
+          className={cn(
+            "text-text-muted font-semibold",
+            size === "sm" && "text-[11px]",
+            size === "md" && "text-xs",
+            size === "responsive" && "text-[11px] md:text-xs"
+          )}
+        >
+          {nickname}
+        </span>
+      );
     }
     return null;
   };
@@ -104,22 +137,31 @@ export function Card({
   const thumbnailClassName = isHorizontal
     ? isSm
       ? "self-stretch aspect-auto w-auto shrink-0"
-      : "h-[180px] w-[290px] shrink-0 aspect-auto"
+      : size === "md"
+        ? "h-[180px] w-[290px] shrink-0 aspect-auto"
+        : "self-stretch aspect-auto w-auto shrink-0 md:h-[180px] md:w-[290px] md:self-auto"
     : "aspect-[320/170] w-full";
 
   // 루트 컨테이너
   const rootClassName = cn(
     "flex w-full",
     isHorizontal
-      ? cn("flex-row items-start", isSm ? "gap-3" : "gap-4")
-      : cn("flex-col", isSm ? "gap-3" : "gap-4"),
+      ? cn(
+          "flex-row items-start",
+          size === "sm" && "gap-3",
+          size === "md" && "gap-4",
+          size === "responsive" && "gap-3 md:gap-4"
+        )
+      : cn("flex-col", size === "md" ? "gap-4" : size === "sm" ? "gap-3" : "gap-3 md:gap-4"),
     className
   );
 
   // 콘텐츠 영역(Root Frame)
   const contentClassName = cn(
     "flex flex-col items-start",
-    isSm ? "gap-3 py-1" : "gap-4 py-2",
+    size === "sm" && "gap-3 py-1",
+    size === "md" && "gap-4 py-2",
+    size === "responsive" && "gap-3 py-1 md:gap-4 md:py-2",
     isHorizontal ? "flex-1 min-w-0" : "w-full"
   );
 
@@ -139,7 +181,11 @@ export function Card({
         <div className="flex w-full flex-col gap-2">
           {/* Badge Container */}
           <div className="flex items-center gap-2">
-            <ChipBadge radius="xs" size={isSm ? "sm" : "md"} className="border-0">
+            <ChipBadge
+              radius="xs"
+              size={isSm ? "sm" : "md"}
+              className={cn("border-0", size === "responsive" && "text-[10px] md:text-xs")}
+            >
               {category}
             </ChipBadge>
             {renderStatusBadge()}
@@ -150,7 +196,9 @@ export function Card({
             <h3
               className={cn(
                 "text-text-primary truncate font-bold",
-                isSm ? "text-[15px]" : "text-lg"
+                size === "sm" && "text-[15px]",
+                size === "md" && "text-lg",
+                size === "responsive" && "text-[15px] md:text-lg"
               )}
             >
               {title}
