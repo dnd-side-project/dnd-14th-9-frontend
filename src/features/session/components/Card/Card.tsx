@@ -16,7 +16,7 @@ export interface CardProps {
   /** 직접 상태 뱃지 텍스트를 지정 (createdAt 기반 상대시간 대신 사용) */
   statusText?: string;
   /** 상태 뱃지 스타일 (statusText 사용 시 함께 지정) */
-  statusBadgeStatus?: "recruiting" | "closing" | "inProgress" | "closed";
+  statusBadgeStatus?: NonNullable<BadgeProps["status"]>;
   title: string;
   nickname?: string;
   /** 제목 아래 설명 텍스트 */

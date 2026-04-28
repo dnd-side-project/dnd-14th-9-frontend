@@ -27,6 +27,11 @@ const CHIP_BADGE_VARIANTS = cva(
         closing: ["bg-[#FF174429]", "text-text-status-negative-default", "border-[#66091b]"],
         inProgress: ["bg-[#27EA6729]", "text-text-brand-default", "border-[#178A42]"],
         closed: ["bg-alpha-white-16", "text-text-disabled", "border-border-subtle"],
+        positive: [
+          "bg-[rgba(0,184,219,0.16)]",
+          "text-text-status-positive-default",
+          "border-border-success-default",
+        ],
       },
       radius: {
         max: "rounded-max",
