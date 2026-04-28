@@ -22,7 +22,7 @@ export function CardSkeleton({ className, layout = "vertical", size = "md" }: Ca
     "flex w-full animate-pulse",
     isHorizontal
       ? cn("flex-row items-start", isSm ? "gap-3" : "gap-4")
-      : cn("flex-col", isSm ? "gap-3 max-w-[226px]" : "gap-4 max-w-[320px]"),
+      : cn("flex-col", isSm ? "gap-3" : "gap-4"),
     className
   );
 

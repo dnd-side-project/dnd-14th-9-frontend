@@ -11,7 +11,7 @@ export interface CardMetaProps {
   maxParticipants: number;
   durationMinutes: number;
   sessionDate: Date | string;
-  /** Figma size 변형 — md: 16px 아이콘 / 11px 텍스트, sm: 12px 아이콘 / 10px 텍스트 */
+  /** Figma size 변형과 카드 density를 동기화합니다. */
   size?: "md" | "sm";
 }
 

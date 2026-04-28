@@ -1,6 +1,6 @@
 "use client";
 
-import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
+import { ChipBadge, type ChipBadgeProps } from "@/components/ChipBadge/ChipBadge";
 import { RelativeTimeBadge } from "@/components/RelativeTime/RelativeTimeBadge";
 import { Thumbnail } from "@/components/Thumbnail/Thumbnail";
 import { isPastTime } from "@/lib/utils/date";
@@ -16,7 +16,7 @@ export interface CardProps {
   /** 직접 상태 뱃지 텍스트를 지정 (createdAt 기반 상대시간 대신 사용) */
   statusText?: string;
   /** 상태 뱃지 스타일 (statusText 사용 시 함께 지정) */
-  statusBadgeStatus?: NonNullable<BadgeProps["status"]>;
+  statusBadgeStatus?: NonNullable<ChipBadgeProps["status"]>;
   title: string;
   nickname?: string;
   /** 제목 아래 설명 텍스트 */
@@ -112,7 +112,7 @@ export function Card({
     "flex w-full",
     isHorizontal
       ? cn("flex-row items-start", isSm ? "gap-3" : "gap-4")
-      : cn("flex-col", isSm ? "gap-3 max-w-[226px]" : "gap-4 max-w-[320px]"),
+      : cn("flex-col", isSm ? "gap-3" : "gap-4"),
     className
   );
 
