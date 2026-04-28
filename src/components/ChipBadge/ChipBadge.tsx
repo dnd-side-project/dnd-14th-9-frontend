@@ -95,7 +95,12 @@ export function ChipBadge({
     >
       {children}
       {canRenderIconButton && (
-        <button type="button" onClick={onIconClick} className="inline-flex items-center">
+        <button
+          type="button"
+          onClick={onIconClick}
+          aria-label="배지 닫기"
+          className="inline-flex items-center"
+        >
           <XIcon size="xsmall" />
         </button>
       )}
