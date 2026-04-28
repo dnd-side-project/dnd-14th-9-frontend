@@ -29,6 +29,14 @@ export function useWaitingMembersSSE({
   onKicked,
 }: UseWaitingMembersSSEOptions): UseWaitingMembersSSEReturn {
   const [roomData, setRoomData] = useState<WaitingMembersEventData | null>(null);
+  // sessionId 변경 시 이전 방 데이터가 stale 상태로 노출되지 않도록 렌더 중 초기화
+  // (effect 안에서 setState 시 cascading render 유발하므로 prev prop 비교 패턴 사용)
+  const [prevSessionId, setPrevSessionId] = useState(sessionId);
+  if (prevSessionId !== sessionId) {
+    setPrevSessionId(sessionId);
+    setRoomData(null);
+  }
+
   const onKickedRef = useRef(onKicked);
   useEffect(() => {
     onKickedRef.current = onKicked;

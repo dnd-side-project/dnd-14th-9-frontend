@@ -49,7 +49,10 @@ export function useLeaveOnUnmount({
 
     return () => {
       if (shouldSkipLeave()) return;
-      fetch(leaveUrl, { method: "DELETE", keepalive: true, credentials: "include" });
+      // 이탈 경로 실패는 의도적으로 무시 (좀비 멤버는 서버 SSE disconnect/타임아웃으로 정리)
+      fetch(leaveUrl, { method: "DELETE", keepalive: true, credentials: "include" }).catch(
+        () => {}
+      );
     };
   }, [enabled, sessionId, isLeavingRef]);
 
