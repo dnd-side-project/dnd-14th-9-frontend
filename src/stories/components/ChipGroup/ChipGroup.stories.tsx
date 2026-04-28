@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "여러 개의 Chip(Badge)을 가로로 정렬하고 레이아웃을 관리하는 컨테이너 컴포넌트입니다. 4개를 초과하면 자동으로 줄바꿈됩니다.",
+          "여러 개의 ChipBadge를 가로로 정렬하고 레이아웃을 관리하는 컨테이너 컴포넌트입니다. 4개를 초과하면 자동으로 줄바꿈됩니다.",
       },
     },
     backgrounds: {
@@ -65,7 +65,7 @@ export const AllStatuses: Story = {
   parameters: {
     docs: {
       description: {
-        story: "4개의 Badge를 모두 포함한 ChipGroup입니다.",
+        story: "4개의 ChipBadge를 모두 포함한 ChipGroup입니다.",
       },
     },
   },
@@ -112,7 +112,7 @@ export const DifferentSizes: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Chip의 크기/스타일은 하위 Badge 컴포넌트에서 직접 제어합니다.",
+        story: "Chip의 크기/스타일은 하위 ChipBadge 컴포넌트에서 직접 제어합니다.",
       },
     },
   },
