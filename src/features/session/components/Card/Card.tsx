@@ -21,7 +21,7 @@ export interface CardProps {
   nickname?: string;
   /** 제목 아래 설명 텍스트 */
   description?: string;
-  /** description 표시 여부 (default: true) */
+  /** description 표시 여부. false여도 nickname은 표시됩니다. (default: true) */
   showDescription?: boolean;
   currentParticipants: number;
   maxParticipants: number;
@@ -100,37 +100,41 @@ export function Card({
     return null;
   };
 
-  // 카드 사용 맥락에 따라 방 소개를 숨길 수 있어야 하며, 작성자명은 최종 fallback으로 유지합니다.
   const renderSubtitle = () => {
-    if (showDescription && description) {
-      return (
-        <p
-          className={cn(
-            "text-text-disabled truncate",
-            size === "sm" && "text-[11px]",
-            size === "md" && "text-xs",
-            size === "responsive" && "text-[11px] md:text-xs"
-          )}
-        >
-          {description}
-        </p>
-      );
+    const shouldShowDescription = showDescription && description;
+
+    if (!nickname && !shouldShowDescription) {
+      return null;
     }
-    if (nickname) {
-      return (
-        <span
-          className={cn(
-            "text-text-muted font-semibold",
-            size === "sm" && "text-[11px]",
-            size === "md" && "text-xs",
-            size === "responsive" && "text-[11px] md:text-xs"
-          )}
-        >
-          {nickname}
-        </span>
-      );
-    }
-    return null;
+
+    return (
+      <>
+        {nickname && (
+          <span
+            className={cn(
+              "text-text-muted font-semibold",
+              size === "sm" && "text-xs",
+              size === "md" && "text-xs",
+              size === "responsive" && "text-xs"
+            )}
+          >
+            {nickname}
+          </span>
+        )}
+        {shouldShowDescription && (
+          <p
+            className={cn(
+              "text-text-disabled truncate",
+              size === "sm" && "text-[11px]",
+              size === "md" && "text-xs",
+              size === "responsive" && "text-[11px] md:text-xs"
+            )}
+          >
+            {description}
+          </p>
+        )}
+      </>
+    );
   };
 
   const thumbnailClassName = isHorizontal

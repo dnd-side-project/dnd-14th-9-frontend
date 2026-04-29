@@ -80,14 +80,18 @@ describe("Card", () => {
     expect(screen.getByTestId("relative-time-badge")).toHaveTextContent("상대시간");
   });
 
-  it("prefers description over nickname when showDescription is true", () => {
+  it("shows nickname before description when both exist", () => {
     renderCard({
       description: "설명",
       nickname: "닉네임",
     });
 
-    expect(screen.getByText("설명")).toBeInTheDocument();
-    expect(screen.queryByText("닉네임")).not.toBeInTheDocument();
+    const nickname = screen.getByText("닉네임");
+    const description = screen.getByText("설명");
+
+    expect(nickname).toBeInTheDocument();
+    expect(description).toBeInTheDocument();
+    expect(nickname.compareDocumentPosition(description)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
   it("shows nickname as subtitle when description is missing", () => {
@@ -119,11 +123,13 @@ describe("Card", () => {
     renderCard({
       statusText: "모집중",
       description: "설명",
+      nickname: "닉네임",
     });
 
     expect(screen.getByText("모집중")).toHaveClass("px-3", "text-xs");
     expect(screen.getByText("보드게임")).not.toHaveClass("text-[10px]", "md:text-xs");
     expect(screen.getByRole("heading", { name: "세션 제목" })).toHaveClass("text-lg");
+    expect(screen.getByText("닉네임")).toHaveClass("text-xs");
     expect(screen.getByText("설명")).toHaveClass("text-xs");
     expect(screen.getByTestId("card-meta")).toHaveAttribute("data-size", "md");
   });
@@ -133,6 +139,7 @@ describe("Card", () => {
       size: "responsive",
       statusText: "모집중",
       description: "설명",
+      nickname: "닉네임",
     });
 
     expect(screen.getByText("모집중")).toHaveClass("px-2", "text-[10px]", "md:px-3", "md:text-xs");
@@ -141,6 +148,7 @@ describe("Card", () => {
       "text-[15px]",
       "md:text-lg"
     );
+    expect(screen.getByText("닉네임")).toHaveClass("text-xs");
     expect(screen.getByText("설명")).toHaveClass("text-[11px]", "md:text-xs");
     expect(screen.getByTestId("card-meta")).toHaveAttribute("data-size", "responsive");
   });

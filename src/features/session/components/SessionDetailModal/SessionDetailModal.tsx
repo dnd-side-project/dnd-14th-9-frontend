@@ -115,6 +115,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
             statusText={statusDisplay?.text}
             statusBadgeStatus={statusDisplay?.badgeStatus}
             title={session.title}
+            nickname={session.hostNickname}
             description={session.summary}
             currentParticipants={session.currentParticipants}
             maxParticipants={session.maxParticipants}
