@@ -101,6 +101,14 @@ const BASE_ARGS = {
   sessionDate: SESSION_DATE,
 };
 
+function CardStoryFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="dark" style={{ padding: "20px", background: "#0b0f0e" }}>
+      {children}
+    </div>
+  );
+}
+
 // --- Vertical MD (기본) ---
 export const VerticalMd: Story = {
   args: {
@@ -110,9 +118,11 @@ export const VerticalMd: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "320px" }}>
-        <Story />
-      </div>
+      <CardStoryFrame>
+        <div style={{ width: "320px" }}>
+          <Story />
+        </div>
+      </CardStoryFrame>
     ),
   ],
   parameters: {
@@ -131,9 +141,11 @@ export const VerticalSm: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "226px" }}>
-        <Story />
-      </div>
+      <CardStoryFrame>
+        <div style={{ width: "226px" }}>
+          <Story />
+        </div>
+      </CardStoryFrame>
     ),
   ],
   parameters: {
@@ -152,9 +164,11 @@ export const VerticalResponsive: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="dark w-full md:max-w-69" style={{ padding: "20px", background: "#0b0f0e" }}>
-        <Story />
-      </div>
+      <CardStoryFrame>
+        <div className="w-full md:max-w-69">
+          <Story />
+        </div>
+      </CardStoryFrame>
     ),
   ],
   parameters: {
@@ -176,9 +190,11 @@ export const HorizontalMd: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "528px" }}>
-        <Story />
-      </div>
+      <CardStoryFrame>
+        <div style={{ width: "528px" }}>
+          <Story />
+        </div>
+      </CardStoryFrame>
     ),
   ],
   parameters: {
@@ -197,9 +213,11 @@ export const HorizontalSm: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "444px" }}>
-        <Story />
-      </div>
+      <CardStoryFrame>
+        <div style={{ width: "444px" }}>
+          <Story />
+        </div>
+      </CardStoryFrame>
     ),
   ],
   parameters: {
@@ -220,9 +238,11 @@ export const HorizontalMdClosing: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "528px" }}>
-        <Story />
-      </div>
+      <CardStoryFrame>
+        <div style={{ width: "528px" }}>
+          <Story />
+        </div>
+      </CardStoryFrame>
     ),
   ],
   parameters: {
