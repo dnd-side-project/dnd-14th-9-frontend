@@ -133,7 +133,6 @@ export function Card({
     return null;
   };
 
-  // Thumbnail 크기: layout × size 조합으로 결정
   const thumbnailClassName = isHorizontal
     ? isSm
       ? "self-stretch aspect-auto w-auto shrink-0"
@@ -142,7 +141,6 @@ export function Card({
         : "self-stretch aspect-auto w-auto shrink-0 md:h-[180px] md:w-[290px] md:self-auto"
     : "aspect-[320/170] w-full";
 
-  // 루트 컨테이너
   const rootClassName = cn(
     "flex w-full",
     isHorizontal
@@ -156,7 +154,6 @@ export function Card({
     className
   );
 
-  // 콘텐츠 영역(Root Frame)
   const contentClassName = cn(
     "flex flex-col items-start",
     size === "sm" && "gap-3 py-1",
@@ -175,11 +172,8 @@ export function Card({
         className={thumbnailClassName}
       />
 
-      {/* Root Frame */}
       <div className={contentClassName}>
-        {/* Container */}
         <div className="flex w-full flex-col gap-2">
-          {/* Badge Container */}
           <div className="flex items-center gap-2">
             <ChipBadge
               radius="xs"
@@ -191,7 +185,6 @@ export function Card({
             {renderStatusBadge()}
           </div>
 
-          {/* Text Container */}
           <div className="flex flex-col gap-1">
             <h3
               className={cn(
@@ -207,7 +200,6 @@ export function Card({
           </div>
         </div>
 
-        {/* Meta Container */}
         <CardMeta
           currentParticipants={currentParticipants}
           maxParticipants={maxParticipants}

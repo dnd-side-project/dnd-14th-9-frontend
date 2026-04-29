@@ -18,6 +18,12 @@ jest.mock("@/components/RelativeTime/RelativeTimeBadge", () => ({
   ),
 }));
 
+jest.mock("@/features/session/components/Card/CardMeta", () => ({
+  CardMeta: ({ size = "md" }: { size?: "md" | "sm" | "responsive" }) => (
+    <div data-size={size} data-testid="card-meta" />
+  ),
+}));
+
 const BASE_CARD_PROPS = {
   thumbnailSrc: "/thumbnail.png",
   category: "보드게임",
@@ -119,6 +125,7 @@ describe("Card", () => {
     expect(screen.getByText("보드게임")).not.toHaveClass("text-[10px]", "md:text-xs");
     expect(screen.getByRole("heading", { name: "세션 제목" })).toHaveClass("text-lg");
     expect(screen.getByText("설명")).toHaveClass("text-xs");
+    expect(screen.getByTestId("card-meta")).toHaveAttribute("data-size", "md");
   });
 
   it("uses mobile compact and desktop md density classes for responsive size", () => {
@@ -135,6 +142,7 @@ describe("Card", () => {
       "md:text-lg"
     );
     expect(screen.getByText("설명")).toHaveClass("text-[11px]", "md:text-xs");
+    expect(screen.getByTestId("card-meta")).toHaveAttribute("data-size", "responsive");
   });
 
   it("uses responsive thumbnail density for horizontal responsive size", () => {

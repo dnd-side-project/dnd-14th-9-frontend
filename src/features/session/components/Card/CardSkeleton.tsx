@@ -14,10 +14,10 @@ export function CardSkeleton({ className, layout = "vertical", size = "md" }: Ca
 
   const thumbnailClassName = isHorizontal
     ? isSm
-      ? "self-stretch aspect-auto w-auto shrink-0 min-w-[120px]"
+      ? "self-stretch aspect-auto w-auto shrink-0"
       : size === "md"
-        ? "h-[180px] w-[290px] shrink-0"
-        : "self-stretch aspect-auto w-auto min-w-[120px] shrink-0 md:h-[180px] md:w-[290px] md:min-w-0 md:self-auto"
+        ? "h-[180px] w-[290px] shrink-0 aspect-auto"
+        : "self-stretch aspect-auto w-auto shrink-0 md:h-[180px] md:w-[290px] md:self-auto"
     : "aspect-[320/170] w-full";
 
   const rootClassName = cn(
@@ -43,18 +43,15 @@ export function CardSkeleton({ className, layout = "vertical", size = "md" }: Ca
 
   return (
     <div className={rootClassName}>
-      {/* Thumbnail placeholder */}
       <div className={cn("bg-surface-strong rounded-xs", thumbnailClassName)} />
 
       <div className={contentClassName}>
         <div className="flex flex-col gap-2">
-          {/* Badge 행 */}
           <div className="flex items-center gap-2">
             <div className="bg-surface-strong h-5 w-14 rounded-xs" />
             <div className="bg-surface-strong h-5 w-16 rounded-full" />
           </div>
 
-          {/* Title + subtitle */}
           <div className="flex flex-col gap-1">
             <div
               className={cn(
@@ -68,7 +65,6 @@ export function CardSkeleton({ className, layout = "vertical", size = "md" }: Ca
           </div>
         </div>
 
-        {/* CardMeta */}
         <div className="flex items-center gap-2">
           <div
             className={cn(

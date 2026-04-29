@@ -81,17 +81,17 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+type CardSkeletonStory = StoryObj<typeof CardSkeleton>;
 
-const NOW = new Date();
-const THREE_DAYS_AGO = new Date(NOW.getTime() - 3 * 24 * 60 * 60 * 1000);
-const FIVE_HOURS_AGO = new Date(NOW.getTime() - 5 * 60 * 60 * 1000);
-const THIRTY_MINUTES_AGO = new Date(NOW.getTime() - 30 * 60 * 1000);
-const SESSION_DATE = new Date(NOW.getTime() + 7 * 24 * 60 * 60 * 1000);
+const DEFAULT_CREATED_AT = new Date("2026-04-21T09:00:00Z");
+const SECONDARY_CREATED_AT = new Date("2026-04-24T04:00:00Z");
+const RECENT_CREATED_AT = new Date("2026-04-24T08:30:00Z");
+const SESSION_DATE = new Date("2026-05-01T09:00:00Z");
 
 const BASE_ARGS = {
   thumbnailSrc: "https://picsum.photos/320/170",
   category: "개발",
-  createdAt: THREE_DAYS_AGO,
+  createdAt: DEFAULT_CREATED_AT,
   title: "React 스터디 모집합니다",
   nickname: "김개발",
   description: "세션 한 줄 소개",
@@ -108,6 +108,13 @@ export const VerticalMd: Story = {
     layout: "vertical",
     size: "md",
   },
+  decorators: [
+    (Story) => (
+      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "320px" }}>
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
     docs: {
       description: { story: "Figma: layout=vertical, size=md (320px)" },
@@ -122,6 +129,13 @@ export const VerticalSm: Story = {
     layout: "vertical",
     size: "sm",
   },
+  decorators: [
+    (Story) => (
+      <div className="dark" style={{ padding: "20px", background: "#0b0f0e", width: "226px" }}>
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
     docs: {
       description: { story: "Figma: layout=vertical, size=sm (226px)" },
@@ -138,10 +152,7 @@ export const VerticalResponsive: Story = {
   },
   decorators: [
     (Story) => (
-      <div
-        className="dark"
-        style={{ padding: "20px", background: "#0b0f0e", width: "100%", maxWidth: "276px" }}
-      >
+      <div className="dark w-full md:max-w-69" style={{ padding: "20px", background: "#0b0f0e" }}>
         <Story />
       </div>
     ),
@@ -204,7 +215,6 @@ export const HorizontalMdClosing: Story = {
     ...BASE_ARGS,
     layout: "horizontal",
     size: "md",
-    createdAt: THIRTY_MINUTES_AGO,
     statusText: "마감임박",
     statusBadgeStatus: "closing",
   },
@@ -244,9 +254,10 @@ export const Urgent: Story = {
   args: {
     thumbnailSrc: "https://picsum.photos/320/170?1",
     category: "디자인",
-    createdAt: THIRTY_MINUTES_AGO,
     title: "Figma 협업 스터디",
     nickname: "박디자인",
+    statusText: "마감임박",
+    statusBadgeStatus: "closing",
     currentParticipants: 5,
     maxParticipants: 6,
     durationMinutes: 60,
@@ -255,7 +266,7 @@ export const Urgent: Story = {
   },
   parameters: {
     docs: {
-      description: { story: "1시간 미만일 때 '마감임박'으로 표시됩니다." },
+      description: { story: "마감임박 상태 배지를 직접 표시합니다." },
     },
   },
 };
@@ -264,7 +275,7 @@ export const LongTitle: Story = {
   args: {
     thumbnailSrc: "https://picsum.photos/320/170?3",
     category: "개발",
-    createdAt: THREE_DAYS_AGO,
+    createdAt: DEFAULT_CREATED_AT,
     title: "주니어 개발자를 위한 알고리즘 스터디 모집합니다 함께 성장해요",
     nickname: "알고리즘마스터",
     currentParticipants: 4,
@@ -284,7 +295,7 @@ export const NoThumbnail: Story = {
   args: {
     thumbnailSrc: null,
     category: "취미",
-    createdAt: THREE_DAYS_AGO,
+    createdAt: DEFAULT_CREATED_AT,
     title: "독서 모임",
     nickname: "책벌레",
     currentParticipants: 2,
@@ -301,26 +312,18 @@ export const NoThumbnail: Story = {
 };
 
 export const CardList: Story = {
-  args: BASE_ARGS,
-  render: () => (
+  args: {
+    ...BASE_ARGS,
+    size: "md",
+  },
+  render: (args) => (
     <div className="flex flex-col gap-6">
-      <Card
-        size="md"
-        thumbnailSrc="https://picsum.photos/320/170?10"
-        category="개발"
-        createdAt={THREE_DAYS_AGO}
-        title="React 스터디 모집합니다"
-        nickname="김개발"
-        currentParticipants={3}
-        maxParticipants={6}
-        durationMinutes={90}
-        sessionDate={SESSION_DATE}
-      />
+      <Card {...args} />
       <Card
         size="md"
         thumbnailSrc="https://picsum.photos/320/170?11"
         category="디자인"
-        createdAt={FIVE_HOURS_AGO}
+        createdAt={SECONDARY_CREATED_AT}
         title="Figma 협업 스터디"
         nickname="박디자인"
         currentParticipants={5}
@@ -332,7 +335,7 @@ export const CardList: Story = {
         size="md"
         thumbnailSrc="https://picsum.photos/320/170?12"
         category="언어"
-        createdAt={THIRTY_MINUTES_AGO}
+        createdAt={RECENT_CREATED_AT}
         title="영어 회화 스터디"
         nickname="이영어"
         currentParticipants={2}
@@ -349,12 +352,15 @@ export const CardList: Story = {
   },
 };
 
-export const SkeletonWidthPolicy: Story = {
-  args: BASE_ARGS,
-  render: () => (
+export const SkeletonWidthPolicy: CardSkeletonStory = {
+  args: {
+    layout: "vertical",
+    size: "md",
+  },
+  render: ({ layout, size }) => (
     <div className="flex flex-col gap-8">
       <div className="w-[180px] border border-dashed border-white/20 p-2">
-        <CardSkeleton />
+        <CardSkeleton layout={layout} size={size} />
       </div>
       <div className="w-[226px] border border-dashed border-white/20 p-2">
         <CardSkeleton size="sm" />
