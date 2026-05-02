@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -35,7 +35,45 @@ export function SearchFilterSection() {
   const searchParams = useSearchParams();
   const parsedParams = parseSessionListSearchParams(searchParams);
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [isCategoryExpanded, setIsCategoryExpanded] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 1);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    updateScrollState();
+    const el = scrollRef.current;
+    el?.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+    return () => {
+      el?.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [updateScrollState]);
+
+  // 접힐 때 스크롤 위치 초기화
+  useEffect(() => {
+    if (!isCategoryExpanded && scrollRef.current) {
+      scrollRef.current.scrollLeft = 0;
+      updateScrollState();
+    }
+  }, [isCategoryExpanded, updateScrollState]);
+
+  const scrollMaskImage =
+    !isCategoryExpanded && (canScrollLeft || canScrollRight)
+      ? canScrollLeft && canScrollRight
+        ? "linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)"
+        : canScrollLeft
+          ? "linear-gradient(to right, transparent, black 40px)"
+          : "linear-gradient(to right, black calc(100% - 40px), transparent)"
+      : undefined;
 
   const currentCategory = parsedParams.category ?? "ALL";
   const currentQuery = parsedParams.keyword ?? "";
@@ -64,7 +102,7 @@ export function SearchFilterSection() {
   };
 
   return (
-    <section className="gap-xl flex flex-col items-center">
+    <section className="md:gap-xl gap-md flex w-full flex-col items-start md:items-center">
       <form onSubmit={handleSearch} className="flex w-full justify-center">
         <SearchInput
           ref={inputRef}
@@ -78,37 +116,48 @@ export function SearchFilterSection() {
 
       <div
         className={cn(
-          "md:gap-xs flex w-full items-start md:justify-center",
-          isCategoryExpanded ? "gap-sm" : "gap-xs"
+          "flex w-full md:justify-center",
+          isCategoryExpanded ? "gap-sm items-start" : "gap-xs items-center"
         )}
       >
+        {/* 높이 애니메이션 wrapper — mobile only */}
         <div
           className={cn(
-            "gap-xs md:gap-sm flex min-w-0 flex-1 items-center md:flex-none md:justify-center",
+            "min-w-0 flex-1 transition-[max-height] duration-200 ease-in-out",
             isCategoryExpanded
-              ? "flex-wrap"
-              : "min-h-[41px] flex-nowrap overflow-x-auto md:min-h-0 md:flex-wrap md:overflow-visible"
+              ? "max-md:max-h-[139px] max-md:overflow-hidden"
+              : "max-md:max-h-[41px] max-md:overflow-hidden"
           )}
         >
-          {CATEGORY_FILTERS.map(({ value, label }) => {
-            const isSelected = currentCategory === value;
-            return (
-              <CategoryFilterButton
-                key={value}
-                isSelected={isSelected}
-                onClick={() => handleCategoryChange(value)}
-                className="text-xs md:text-sm"
-              >
-                {label}
-              </CategoryFilterButton>
-            );
-          })}
+          <div
+            ref={scrollRef}
+            style={{ maskImage: scrollMaskImage }}
+            className={cn(
+              "gap-xs md:gap-sm flex w-full flex-wrap items-center md:justify-center",
+              "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+              !isCategoryExpanded && "max-md:flex-nowrap max-md:overflow-x-auto"
+            )}
+          >
+            {CATEGORY_FILTERS.map(({ value, label }) => {
+              const isSelected = currentCategory === value;
+              return (
+                <CategoryFilterButton
+                  key={value}
+                  isSelected={isSelected}
+                  onClick={() => handleCategoryChange(value)}
+                  className="text-xs md:text-sm"
+                >
+                  {label}
+                </CategoryFilterButton>
+              );
+            })}
+          </div>
         </div>
 
         <button
           type="button"
           className={cn(
-            "border-alpha-white-16 border-sm p-xs rounded-max flex shrink-0 items-center justify-center md:hidden",
+            "border-alpha-white-16 border-sm p-xs hover:bg-surface-strong flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors md:hidden",
             isCategoryExpanded ? "bg-surface-strong" : "bg-surface-default"
           )}
           onClick={() => setIsCategoryExpanded((prev) => !prev)}
@@ -116,7 +165,10 @@ export function SearchFilterSection() {
           aria-label={isCategoryExpanded ? "카테고리 접기" : "카테고리 펼치기"}
         >
           <ChevronDownIcon
-            className={cn("transition-transform", isCategoryExpanded ? "rotate-180" : "")}
+            className={cn(
+              "transition-transform duration-300",
+              isCategoryExpanded ? "rotate-180" : ""
+            )}
           />
         </button>
       </div>

@@ -89,7 +89,7 @@ export function SessionListFilterBar({
       )}
       <div className="gap-md relative z-20 flex flex-col">
         <div className="flex items-center justify-end">
-          <div className="flex items-center gap-[15px] overflow-x-auto md:overflow-x-visible">
+          <div className="scrollbar-hide flex items-center gap-[15px] overflow-x-auto md:overflow-x-visible">
             <DateRangeFilter
               isOpen={isDatePickerOpen}
               label={dateFilterLabel}
