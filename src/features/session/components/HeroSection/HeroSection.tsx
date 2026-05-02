@@ -10,7 +10,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ isSearchMode }: HeroSectionProps) {
   return (
-    <section className="flex flex-col gap-10 md:gap-[48px]">
+    <section className="flex flex-col items-center gap-10 md:gap-[48px]">
       <Suspense fallback={<SearchFilterSectionSkeleton />}>
         <SearchFilterSection />
       </Suspense>
