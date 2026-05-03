@@ -22,7 +22,7 @@ describe("Header", () => {
     mockedUseAuthState.mockReturnValue({ status: "guest" });
     render(<Header />);
 
-    expect(screen.getByRole("link", { name: "로그인" })).toHaveAttribute("href", "/login");
+    expect(screen.getAllByRole("link", { name: "로그인" })[0]).toHaveAttribute("href", "/login");
     expect(screen.queryByTestId("profile-dropdown")).not.toBeInTheDocument();
   });
 
@@ -48,7 +48,7 @@ describe("Header", () => {
     });
     render(<Header />);
 
-    expect(screen.getByRole("link", { name: "세션 만들기" })).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: "세션 만들기" })[0]).toHaveAttribute(
       "href",
       "/session/create"
     );

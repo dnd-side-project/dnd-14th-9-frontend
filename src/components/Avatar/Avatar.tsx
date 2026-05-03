@@ -10,7 +10,7 @@ import { type IconProps } from "@/components/Icon/Icon";
 import { cn } from "@/lib/utils/utils";
 
 const AVATAR_VARIANTS = cva(
-  "relative inline-flex items-center justify-center overflow-hidden rounded-full bg-surface-subtle border border-border-subtle box-border",
+  "relative inline-flex items-center justify-center overflow-hidden rounded-full bg-surface-subtle ring-1 ring-inset ring-border-strong box-border",
   {
     variants: {
       size: {
