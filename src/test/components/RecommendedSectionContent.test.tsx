@@ -58,18 +58,20 @@ jest.mock("@/features/session/components/RecommendedSection/RecommendedGrid", ()
   },
 }));
 
-jest.mock("@/components/Pagination/PaginationFraction", () => ({
-  PaginationFraction: ({
+jest.mock("@/components/Pagination/Pagination", () => ({
+  Pagination: ({
     currentPage,
     totalPage,
     onPageChange,
+    type,
   }: {
     currentPage: number;
     totalPage: number;
     onPageChange: (page: number) => void;
+    type: "fraction" | "list";
   }) => (
     <button type="button" onClick={() => onPageChange(currentPage + 1)}>
-      fraction {currentPage}/{totalPage}
+      {type} {currentPage}/{totalPage}
     </button>
   ),
 }));
@@ -180,7 +182,7 @@ describe("RecommendedSectionContent", () => {
       expect.objectContaining({ page: 1 })
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /fraction/i }));
+    fireEvent.click(screen.getAllByRole("button", { name: /fraction/i })[0]);
 
     await waitFor(() => {
       expect(mockUseSuspenseSessionList).toHaveBeenLastCalledWith(

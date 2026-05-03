@@ -11,8 +11,8 @@ jest.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams("page=1&filter=all"),
 }));
 
-jest.mock("@/components/Pagination/PaginationList", () => ({
-  PaginationList: ({ onPageChange }: { onPageChange: (page: number) => void }) => (
+jest.mock("@/components/Pagination/Pagination", () => ({
+  Pagination: ({ onPageChange }: { onPageChange: (page: number) => void }) => (
     <button type="button" onClick={() => onPageChange(2)}>
       pagination-trigger
     </button>
