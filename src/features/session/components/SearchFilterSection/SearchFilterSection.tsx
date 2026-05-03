@@ -37,6 +37,9 @@ export function SearchFilterSection() {
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isCategoryExpanded, setIsCategoryExpanded] = useState(false);
+  // 닫기 애니메이션(200ms) 동안 flex-wrap 유지 — 즉시 flex-nowrap 전환 시 콘텐츠가
+  // 먼저 1행으로 리플로우되어 max-height 트랜지션이 시각적으로 사라지는 문제 방지
+  const [displayExpanded, setDisplayExpanded] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
@@ -58,11 +61,15 @@ export function SearchFilterSection() {
     };
   }, [updateScrollState]);
 
-  // 접힐 때 스크롤 위치 초기화
+  // 열릴 때: flex-wrap 즉시 적용 / 닫힐 때: 애니메이션 후 flex-nowrap 전환 + 스크롤 초기화
   useEffect(() => {
-    if (!isCategoryExpanded && scrollRef.current) {
-      scrollRef.current.scrollLeft = 0;
-      updateScrollState();
+    if (!isCategoryExpanded) {
+      if (scrollRef.current) scrollRef.current.scrollLeft = 0;
+      const timer = setTimeout(() => {
+        setDisplayExpanded(false);
+        updateScrollState();
+      }, 200);
+      return () => clearTimeout(timer);
     }
   }, [isCategoryExpanded, updateScrollState]);
 
@@ -135,7 +142,7 @@ export function SearchFilterSection() {
             className={cn(
               "gap-xs md:gap-sm flex w-full flex-wrap items-center md:justify-center",
               "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-              !isCategoryExpanded && "max-md:flex-nowrap max-md:overflow-x-auto"
+              !displayExpanded && "max-md:flex-nowrap max-md:overflow-x-auto"
             )}
           >
             {CATEGORY_FILTERS.map(({ value, label }) => {
@@ -160,7 +167,11 @@ export function SearchFilterSection() {
             "border-alpha-white-16 border-sm p-xs hover:bg-surface-strong flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors md:hidden",
             isCategoryExpanded ? "bg-surface-strong" : "bg-surface-default"
           )}
-          onClick={() => setIsCategoryExpanded((prev) => !prev)}
+          onClick={() => {
+            const next = !isCategoryExpanded;
+            setIsCategoryExpanded(next);
+            if (next) setDisplayExpanded(true);
+          }}
           aria-expanded={isCategoryExpanded}
           aria-label={isCategoryExpanded ? "카테고리 접기" : "카테고리 펼치기"}
         >
