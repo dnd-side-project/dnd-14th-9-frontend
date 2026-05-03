@@ -12,7 +12,7 @@ interface MainSectionProps {
 
 export function MainSection({ listParams }: MainSectionProps) {
   return (
-    <section className="flex flex-col gap-20">
+    <section className="flex flex-col gap-20 xl:gap-40">
       <Suspense fallback={<RecommendedSectionSkeleton />}>
         <RecommendedSection />
       </Suspense>

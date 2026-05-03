@@ -88,61 +88,74 @@ export function SessionListFilterBar({
         <div className="bg-overlay-default fixed inset-0 z-10 w-full" />
       )}
       <div className="gap-md relative z-20 flex flex-col">
-        <div className="flex items-center justify-end">
-          <div className="scrollbar-hide flex items-center gap-[15px] overflow-x-auto md:overflow-x-visible">
-            <DateRangeFilter
-              isOpen={isDatePickerOpen}
-              label={dateFilterLabel}
-              value={selectedDateRange}
-              hasSelection={hasDateSelection}
-              onOpenChange={handleDateOpenChange}
-              onChange={handleDateRangeChange}
-            />
+        {/* Tablet/Mobile: filter 4개 + sort 같은 row (justify-between) */}
+        <div className="flex items-center justify-between xl:contents">
+          <div className="flex items-center justify-end xl:contents">
+            <div className="scrollbar-hide flex items-center gap-[15px] overflow-x-auto">
+              <DateRangeFilter
+                isOpen={isDatePickerOpen}
+                label={dateFilterLabel}
+                value={selectedDateRange}
+                hasSelection={hasDateSelection}
+                onOpenChange={handleDateOpenChange}
+                onChange={handleDateRangeChange}
+              />
 
-            <StartTimeFilter
-              isOpen={isTimeSlotOpen}
-              selectedTimeSlots={values.timeSlots}
-              onOpenChange={handleTimeSlotOpenChange}
-              onToggleTimeSlot={onToggleTimeSlot}
-            />
+              <StartTimeFilter
+                isOpen={isTimeSlotOpen}
+                selectedTimeSlots={values.timeSlots}
+                onOpenChange={handleTimeSlotOpenChange}
+                onToggleTimeSlot={onToggleTimeSlot}
+              />
 
-            <DurationFilter
-              isOpen={isDurationOpen}
-              value={values.durationRange}
-              onOpenChange={handleDurationOpenChange}
-              onSelect={onSetDurationRange}
-            />
+              <DurationFilter
+                isOpen={isDurationOpen}
+                value={values.durationRange}
+                onOpenChange={handleDurationOpenChange}
+                onSelect={onSetDurationRange}
+              />
 
-            <ParticipantsFilter
-              isOpen={isParticipantsOpen}
-              participants={values.participants}
-              onOpenChange={handleParticipantsOpenChange}
-              onChange={onSetParticipants}
-            />
+              <ParticipantsFilter
+                isOpen={isParticipantsOpen}
+                participants={values.participants}
+                onOpenChange={handleParticipantsOpenChange}
+                onChange={onSetParticipants}
+              />
+            </div>
+            <div
+              className={`flex items-center overflow-hidden transition-all duration-300 ease-in-out ${
+                hasAnyFilter ? "ml-xs max-w-[40px] opacity-100" : "ml-0 max-w-0 opacity-0"
+              }`}
+            >
+              <Button
+                size="small"
+                variant="ghost"
+                colorScheme="secondary"
+                iconOnly
+                leftIcon={<ArrowRotateRightIcon />}
+                className="text-text-tertiary hover:text-text-primary active:bg-surface-strong active:text-text-primary h-[32px] w-[32px] shrink-0 p-[8px]!"
+                onClick={onResetFilters}
+              />
+            </div>
           </div>
-          <div
-            className={`flex items-center overflow-hidden transition-all duration-300 ease-in-out ${
-              hasAnyFilter ? "ml-xs max-w-[40px] opacity-100" : "ml-0 max-w-0 opacity-0"
-            }`}
-          >
-            <Button
-              size="small"
-              variant="ghost"
-              colorScheme="secondary"
-              iconOnly
-              leftIcon={<ArrowRotateRightIcon />}
-              className="text-text-tertiary hover:text-text-primary active:bg-surface-strong active:text-text-primary h-[32px] w-[32px] shrink-0 p-[8px]!"
-              onClick={onResetFilters}
-            />
-          </div>
+
+          {/* Tablet/Mobile에서만 같은 row에 Sort 표시 */}
+          <SortFilter
+            isOpen={isSortOpen}
+            value={values.sort}
+            onOpenChange={handleSortOpenChange}
+            onSelect={onSetSort}
+            className="shrink-0 xl:hidden"
+          />
         </div>
 
+        {/* Desktop(xl): sort 별도 row */}
         <SortFilter
           isOpen={isSortOpen}
           value={values.sort}
           onOpenChange={handleSortOpenChange}
           onSelect={onSetSort}
-          className="self-end"
+          className="hidden self-end xl:flex"
         />
       </div>
     </>
