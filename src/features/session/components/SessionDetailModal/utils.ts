@@ -1,9 +1,9 @@
-import type { BadgeProps } from "@/components/Badge/Badge";
+import type { ChipBadgeProps } from "@/components/ChipBadge/ChipBadge";
 import type { SessionDetailStatus } from "@/features/session/types";
 
 type SessionStatusDisplay = {
   text: string;
-  badgeStatus: NonNullable<BadgeProps["status"]>;
+  badgeStatus: NonNullable<ChipBadgeProps["status"]>;
 };
 
 /**

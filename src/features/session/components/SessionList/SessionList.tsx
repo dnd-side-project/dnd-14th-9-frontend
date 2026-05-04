@@ -94,6 +94,7 @@ export function SessionList() {
             <div key={session.sessionId} className="relative mx-auto w-full xl:max-w-69">
               <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
                 <Card
+                  size="responsive"
                   thumbnailSrc={session.imageUrl}
                   category={session.category}
                   createdAt={session.startTime}
