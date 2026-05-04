@@ -1,6 +1,6 @@
 "use client";
 
-import { ButtonLink } from "@/components/Button/ButtonLink";
+import { Button } from "@/components/Button/Button";
 import { SkeletonBlock } from "@/components/Skeleton/SkeletonBlock";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
@@ -21,7 +21,7 @@ export function HeaderAuthActions() {
   if (authState.status === "authenticated") {
     return (
       <>
-        <ButtonLink
+        <Button
           href="/session/create"
           aria-label="세션 만들기"
           size="small"
@@ -31,7 +31,7 @@ export function HeaderAuthActions() {
           hardNavigate
         >
           세션 만들기
-        </ButtonLink>
+        </Button>
         <ProfileDropdown />
       </>
     );
@@ -42,7 +42,7 @@ export function HeaderAuthActions() {
   }
 
   return (
-    <ButtonLink
+    <Button
       href={LOGIN_ROUTE}
       aria-label="로그인"
       size="small"
@@ -51,6 +51,6 @@ export function HeaderAuthActions() {
       className="px-xs py-2xs md:px-sm md:py-xs"
     >
       회원가입 / 로그인
-    </ButtonLink>
+    </Button>
   );
 }

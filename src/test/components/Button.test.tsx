@@ -2,14 +2,14 @@ import type { MouseEvent } from "react";
 
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import { ButtonLink } from "@/components/Button/ButtonLink";
+import { Button } from "@/components/Button/Button";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
 jest.mock("@/lib/navigation/hardNavigate", () => ({
   navigateWithHardReload: jest.fn(),
 }));
 
-describe("ButtonLink", () => {
+describe("Button (href support)", () => {
   const hardReloadMock = jest.mocked(navigateWithHardReload);
 
   beforeEach(() => {
@@ -22,9 +22,7 @@ describe("ButtonLink", () => {
 
   it("soft navigation에서 UrlObject href를 정상 렌더링한다", () => {
     render(
-      <ButtonLink href={{ pathname: "/session", query: { page: "2" }, hash: "top" }}>
-        세션 보기
-      </ButtonLink>
+      <Button href={{ pathname: "/session", query: { page: "2" }, hash: "top" }}>세션 보기</Button>
     );
 
     expect(screen.getByRole("link", { name: "세션 보기" })).toHaveAttribute(
@@ -35,9 +33,9 @@ describe("ButtonLink", () => {
 
   it("hardNavigate일 때 브라우저가 계산한 href로 full reload를 수행한다", () => {
     render(
-      <ButtonLink href="/login?from=header#cta" hardNavigate>
+      <Button href="/login?from=header#cta" hardNavigate>
         로그인
-      </ButtonLink>
+      </Button>
     );
 
     fireEvent.click(screen.getByRole("link", { name: "로그인" }));
@@ -46,14 +44,14 @@ describe("ButtonLink", () => {
   });
 
   it("hardNavigate에서 onClick이 기본 동작을 막으면 reload하지 않는다", () => {
-    const handleClick = jest.fn((e: MouseEvent<HTMLAnchorElement>) => {
+    const handleClick = jest.fn((e: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
       e.preventDefault();
     });
 
     render(
-      <ButtonLink href="/login" hardNavigate onClick={handleClick}>
+      <Button href="/login" hardNavigate onClick={handleClick}>
         로그인
-      </ButtonLink>
+      </Button>
     );
 
     fireEvent.click(screen.getByRole("link", { name: "로그인" }));

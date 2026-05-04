@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
-import { ButtonLink } from "@/components/Button/ButtonLink";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { ShareIcon } from "@/components/Icon/ShareIcon";
@@ -154,7 +153,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
             참여하기
           </Button>
         ) : (
-          <ButtonLink
+          <Button
             href={LOGIN_ROUTE}
             variant="solid"
             colorScheme="primary"
@@ -162,7 +161,7 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
             className="w-full"
           >
             로그인하고 참여하기
-          </ButtonLink>
+          </Button>
         )}
       </div>
 

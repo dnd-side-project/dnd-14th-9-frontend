@@ -6,13 +6,20 @@ import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/Button/Button";
 import { cn } from "@/lib/utils/utils";
 
-interface NavigationAction {
+type NavigationAction = {
   label: string;
   href: string;
-  variant: "outlined" | "solid";
-  colorScheme: "primary" | "secondary";
   replace?: boolean;
-}
+} & (
+  | {
+      variant: "solid";
+      colorScheme: "primary" | "secondary" | "tertiary";
+    }
+  | {
+      variant: "outlined";
+      colorScheme: "primary" | "secondary";
+    }
+);
 
 interface ResultNavigationButtonsProps {
   actions: NavigationAction[];
@@ -25,15 +32,27 @@ export function ResultNavigationButtons({ actions }: ResultNavigationButtonsProp
     <section className="mt-2xl mb-3xl gap-md flex justify-center">
       {actions.map((action) =>
         action.replace ? (
-          <Button
-            key={action.label}
-            variant={action.variant}
-            colorScheme={action.colorScheme}
-            size="large"
-            onClick={() => router.replace(action.href)}
-          >
-            {action.label}
-          </Button>
+          action.variant === "solid" ? (
+            <Button
+              key={action.label}
+              variant="solid"
+              colorScheme={action.colorScheme}
+              size="large"
+              onClick={() => router.replace(action.href)}
+            >
+              {action.label}
+            </Button>
+          ) : (
+            <Button
+              key={action.label}
+              variant="outlined"
+              colorScheme={action.colorScheme}
+              size="large"
+              onClick={() => router.replace(action.href)}
+            >
+              {action.label}
+            </Button>
+          )
         ) : (
           <Link
             key={action.label}

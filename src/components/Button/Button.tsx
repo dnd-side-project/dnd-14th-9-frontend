@@ -1,7 +1,16 @@
-import { type ButtonHTMLAttributes, type ReactNode } from "react";
+import {
+  type ButtonHTMLAttributes,
+  type ComponentProps,
+  type MouseEventHandler,
+  type ReactNode,
+  type Ref,
+} from "react";
+
+import Link from "next/link";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
+import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 import { cn } from "@/lib/utils/utils";
 
 const buttonVariants = cva(
@@ -107,13 +116,49 @@ type GhostButtonProps = {
 
 export type ButtonVariantProps = SolidButtonProps | OutlinedButtonProps | GhostButtonProps;
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
-  Omit<VariantProps<typeof buttonVariants>, "variant" | "colorScheme"> &
+type BaseButtonProps = Omit<VariantProps<typeof buttonVariants>, "variant" | "colorScheme"> &
   ButtonVariantProps & {
     leftIcon?: ReactNode;
     rightIcon?: ReactNode;
-    ref?: React.Ref<HTMLButtonElement>;
   };
+
+type LinkProps = ComponentProps<typeof Link>;
+type LinkOnlyProps = Omit<LinkProps, "href" | "onClick" | "ref" | "type">;
+
+export type NativeButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "ref" | "href"> &
+  BaseButtonProps & {
+    href?: never;
+    hardNavigate?: never;
+    locale?: never;
+    passHref?: never;
+    prefetch?: never;
+    replace?: never;
+    scroll?: never;
+    shallow?: never;
+    ref?: Ref<HTMLButtonElement>;
+  };
+
+export type SoftNavigateButtonProps = LinkOnlyProps &
+  BaseButtonProps & {
+    href: LinkProps["href"];
+    hardNavigate?: false;
+    disabled?: never;
+    type?: never;
+    ref?: Ref<HTMLAnchorElement>;
+    onClick?: MouseEventHandler<HTMLAnchorElement>;
+  };
+
+export type HardNavigateButtonProps = LinkOnlyProps &
+  BaseButtonProps & {
+    href: string;
+    hardNavigate: true;
+    disabled?: never;
+    type?: never;
+    ref?: Ref<HTMLAnchorElement>;
+    onClick?: MouseEventHandler<HTMLAnchorElement>;
+  };
+
+export type ButtonProps = NativeButtonProps | SoftNavigateButtonProps | HardNavigateButtonProps;
 
 export function Button({
   className,
@@ -124,27 +169,61 @@ export function Button({
   leftIcon,
   rightIcon,
   children,
-  disabled,
-  ref,
   ...props
 }: ButtonProps) {
+  const content = iconOnly ? (
+    (leftIcon ?? rightIcon)
+  ) : (
+    <>
+      {leftIcon}
+      {children}
+      {rightIcon}
+    </>
+  );
+
+  const classNames = cn(buttonVariants({ variant, colorScheme, size, iconOnly, className }));
+
+  if (props.href !== undefined) {
+    const { href, hardNavigate, onClick, ref, ...linkProps } = props;
+
+    if (hardNavigate === true) {
+      return (
+        <Link
+          ref={ref}
+          className={classNames}
+          {...linkProps}
+          href={href}
+          onClick={(e) => {
+            onClick?.(e);
+            if (e.defaultPrevented) {
+              return;
+            }
+            e.preventDefault();
+            navigateWithHardReload(e.currentTarget.href);
+          }}
+        >
+          {content}
+        </Link>
+      );
+    }
+
+    return (
+      <Link ref={ref} className={classNames} {...linkProps} href={href} onClick={onClick}>
+        {content}
+      </Link>
+    );
+  }
+
+  const { disabled, ref, ...buttonProps } = props;
   return (
     <button
       ref={ref}
-      className={cn(buttonVariants({ variant, colorScheme, size, iconOnly, className }))}
+      className={classNames}
       disabled={disabled}
       aria-disabled={disabled}
-      {...props}
+      {...buttonProps}
     >
-      {iconOnly ? (
-        (leftIcon ?? rightIcon)
-      ) : (
-        <>
-          {leftIcon}
-          {children}
-          {rightIcon}
-        </>
-      )}
+      {content}
     </button>
   );
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { ButtonLink } from "@/components/Button/ButtonLink";
+import { Button } from "@/components/Button/Button";
 import { cn } from "@/lib/utils/utils";
 
 export interface MenuLinkProps {
@@ -13,7 +13,7 @@ export interface MenuLinkProps {
 
 export function MenuLink({ href, icon, label, isActive, onClick }: MenuLinkProps) {
   return (
-    <ButtonLink
+    <Button
       href={href}
       onClick={onClick}
       variant="ghost"
@@ -38,6 +38,6 @@ export function MenuLink({ href, icon, label, isActive, onClick }: MenuLinkProps
           {label}
         </p>
       </div>
-    </ButtonLink>
+    </Button>
   );
 }

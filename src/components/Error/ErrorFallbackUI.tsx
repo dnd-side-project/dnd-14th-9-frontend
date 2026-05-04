@@ -1,17 +1,26 @@
 "use client";
 
 import { Button } from "@/components/Button/Button";
-import { ButtonLink } from "@/components/Button/ButtonLink";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 
-interface ErrorFallbackUIProps {
+type ErrorFallbackUIBaseProps = {
   title: string;
   description: string;
   buttonLabel: string;
-  onRetry?: () => void;
-  href?: string;
   className?: string; // 컨테이너에 전달할 추가 클래스 (예: 상단 패딩용)
-}
+};
+
+type ErrorFallbackUIRetryProps = ErrorFallbackUIBaseProps & {
+  onRetry: () => void;
+  href?: never;
+};
+
+type ErrorFallbackUILinkProps = ErrorFallbackUIBaseProps & {
+  href: string;
+  onRetry?: never;
+};
+
+export type ErrorFallbackUIProps = ErrorFallbackUIRetryProps | ErrorFallbackUILinkProps;
 
 export function ErrorFallbackUI({
   title,
@@ -38,10 +47,10 @@ export function ErrorFallbackUI({
         {description}
       </div>
 
-      {href ? (
-        <ButtonLink href={href} variant="solid" colorScheme="tertiary" size="large">
+      {href !== undefined ? (
+        <Button href={href} variant="solid" colorScheme="tertiary" size="large">
           {buttonLabel}
-        </ButtonLink>
+        </Button>
       ) : (
         <Button onClick={onRetry} variant="solid" colorScheme="tertiary" size="large">
           {buttonLabel}
