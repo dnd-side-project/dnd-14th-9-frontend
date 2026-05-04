@@ -1,10 +1,10 @@
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
-  title: "Components/Badge",
-  component: Badge,
+  title: "Components/ChipBadge",
+  component: ChipBadge,
   tags: ["autodocs"],
   parameters: {
     layout: "centered",
@@ -28,6 +28,11 @@ const meta = {
       options: ["max", "xs"],
       description: "Badge의 모서리 둥글기",
     },
+    size: {
+      control: "select",
+      options: ["md", "sm"],
+      description: "Badge의 크기",
+    },
     children: {
       control: "text",
       description: "Badge에 표시될 텍스트",
@@ -40,7 +45,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof Badge>;
+} satisfies Meta<typeof ChipBadge>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -123,11 +128,10 @@ export const AllStatuses: Story = {
   },
   render: () => (
     <div className="flex flex-wrap gap-4">
-      <Badge status="recruiting">모집중</Badge>
-      <Badge status="closing">마감 임박</Badge>
-      <Badge status="inProgress">진행중</Badge>
-      <Badge status="closed">마감</Badge>
-      <Badge status="positive">긍정 상태</Badge>
+      <ChipBadge status="recruiting">모집중</ChipBadge>
+      <ChipBadge status="closing">마감 임박</ChipBadge>
+      <ChipBadge status="inProgress">진행중</ChipBadge>
+      <ChipBadge status="closed">마감</ChipBadge>
     </div>
   ),
   parameters: {
@@ -145,14 +149,33 @@ export const AllRadii: Story = {
   },
   render: () => (
     <div className="flex flex-wrap gap-4">
-      <Badge radius="max">Pill (max)</Badge>
-      <Badge radius="xs">Rounded (xs)</Badge>
+      <ChipBadge radius="max">Pill (max)</ChipBadge>
+      <ChipBadge radius="xs">Rounded (xs)</ChipBadge>
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story: "모든 radius 옵션을 비교합니다.",
+      },
+    },
+  },
+};
+
+export const AllSizes: Story = {
+  args: {
+    children: "Badge",
+  },
+  render: () => (
+    <div className="flex flex-wrap items-center gap-4">
+      <ChipBadge size="md">MD</ChipBadge>
+      <ChipBadge size="sm">SM</ChipBadge>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: "모든 size 옵션을 비교합니다.",
       },
     },
   },
