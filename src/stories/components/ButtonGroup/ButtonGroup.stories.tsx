@@ -12,8 +12,17 @@ const meta = {
     docs: {
       description: {
         component:
-          "여러 개의 Button을 가로로 정렬·관리하기 위한 컨테이너 컴포넌트입니다. 컨테이너 너비에 따라 자연스럽게 줄바꿈됩니다.",
+          "여러 개의 Button을 Figma Button/ButtonGroup의 layout, horizontal 속성에 맞춰 정렬·관리하기 위한 컨테이너 컴포넌트입니다.",
       },
+    },
+  },
+  argTypes: {
+    layout: {
+      control: "select",
+      options: ["single", "dual"],
+    },
+    horizontal: {
+      control: "boolean",
     },
   },
 } satisfies Meta<typeof ButtonGroup>;
@@ -55,6 +64,36 @@ export const ThreeButtons: Story = {
       },
     },
   },
+};
+
+export const DualVertical: Story = {
+  render: () => (
+    <ButtonGroup layout="dual" horizontal={false} className="w-80 [&>*]:w-full">
+      <Button variant="solid" colorScheme="tertiary">
+        건너뛰기
+      </Button>
+      <Button variant="solid" colorScheme="primary">
+        로그인하고 참여하기
+      </Button>
+    </ButtonGroup>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: "SessionDialog에서 사용하는 세로형 dual 버튼 그룹입니다.",
+      },
+    },
+  },
+};
+
+export const SingleVertical: Story = {
+  render: () => (
+    <ButtonGroup layout="single" horizontal={false} className="w-80 [&>*]:w-full">
+      <Button variant="solid" colorScheme="primary">
+        참여하기
+      </Button>
+    </ButtonGroup>
+  ),
 };
 
 export const MixedVariants: Story = {

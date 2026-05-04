@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils/utils";
 
 const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md text-base font-semibold transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-surface-disabled disabled:text-text-disabled",
+  "inline-flex cursor-pointer items-center justify-center gap-xs whitespace-nowrap font-semibold leading-[1.4] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary-default disabled:cursor-not-allowed disabled:text-text-disabled",
   {
     variants: {
       variant: {
@@ -19,11 +19,11 @@ const buttonVariants = cva(
         tertiary: "",
       },
       size: {
-        xlarge: "h-16 min-w-[106px] px-xl py-md",
-        large: "min-w-[94px] px-xl py-md",
-        medium: "h-12 min-w-[82px] px-lg py-sm",
-        small: "h-8 min-w-[70px] px-sm py-xs text-xs font-semibold",
-        xsmall: "min-w-[58px] px-2 py-1 text-xs font-semibold",
+        xlarge: "h-16 min-w-[106px] rounded-md px-2xl py-lg text-base",
+        large: "h-14 min-w-[90px] rounded-md px-xl py-md text-base",
+        medium: "h-11 min-w-[77px] rounded-md px-lg py-sm text-sm",
+        small: "h-8 min-w-14 rounded-sm px-sm py-xs text-xs",
+        xsmall: "h-[26px] min-w-12 rounded-xs px-xs py-2xs text-xs",
       },
       iconOnly: {
         true: "",
@@ -36,50 +36,51 @@ const buttonVariants = cva(
         variant: "solid",
         colorScheme: "primary",
         class:
-          "bg-surface-primary-default text-text-inverse hover:bg-surface-primary-subtle active:bg-green-700",
+          "bg-surface-primary-default text-text-inverse hover:bg-surface-primary-subtle active:bg-surface-primary-strong disabled:bg-surface-disabled",
       },
       {
         variant: "solid",
         colorScheme: "secondary",
-        class: "bg-[#27EA6714] text-text-brand-default hover:bg-[#27EA6729] active:bg-[#27EA673D]",
+        class:
+          "bg-surface-primary-alpha-subtler text-text-brand-default hover:bg-surface-primary-alpha-subtle active:bg-surface-primary-alpha-default disabled:bg-surface-disabled",
       },
       {
         variant: "solid",
         colorScheme: "tertiary",
         class:
-          "bg-surface-strong text-text-muted hover:bg-surface-subtle active:bg-surface-subtler active:text-text-secondary",
+          "bg-surface-strong text-text-muted hover:bg-surface-subtle active:bg-surface-subtler active:text-text-secondary disabled:bg-surface-disabled",
       },
       // OUTLINED
       {
         variant: "outlined",
         colorScheme: "primary",
         class:
-          "border-green-800 text-text-brand-subtle hover:border-border-primary-default hover:text-text-brand-default",
+          "border-border-primary-subtler text-text-brand-subtle hover:text-text-brand-subtler active:border-border-primary-default active:text-text-brand-default disabled:border-border-disabled disabled:bg-surface-disabled",
       },
       {
         variant: "outlined",
         colorScheme: "secondary",
         class:
-          "border-border-default text-text-tertiary hover:text-text-secondary active:border-border-strong active:text-text-primary",
+          "border-border-default text-text-tertiary hover:text-text-secondary active:border-border-strong active:text-text-primary disabled:border-border-disabled disabled:bg-surface-disabled",
       },
       // GHOST
       {
         variant: "ghost",
         colorScheme: "primary",
         class:
-          "text-surface-primary-default hover:text-surface-primary-subtle active:text-green-700",
+          "text-text-brand-default hover:text-text-brand-subtler active:text-text-brand-subtle",
       },
       {
         variant: "ghost",
         colorScheme: "secondary",
-        class: "text-text-muted hover:text-text-secondary active:text-text-primary",
+        class: "text-text-tertiary hover:text-text-secondary active:text-text-primary",
       },
       // iconOnly
-      { iconOnly: true, size: "xlarge", class: "min-w-0 w-16 p-xs" },
-      { iconOnly: true, size: "large", class: "min-w-0 w-14 p-xs" },
-      { iconOnly: true, size: "medium", class: "min-w-0 w-12 p-xs" },
-      { iconOnly: true, size: "small", class: "min-w-0 w-10 p-xs" },
-      { iconOnly: true, size: "xsmall", class: "min-w-0 w-[26px] p-xs" },
+      { iconOnly: true, size: "xlarge", class: "size-16 min-w-0 p-lg" },
+      { iconOnly: true, size: "large", class: "size-14 min-w-0 p-md" },
+      { iconOnly: true, size: "medium", class: "size-11 min-w-0 p-sm" },
+      { iconOnly: true, size: "small", class: "size-8 min-w-0 p-xs" },
+      { iconOnly: true, size: "xsmall", class: "size-[26px] min-w-0 p-2xs" },
     ],
     defaultVariants: {
       variant: "solid",
