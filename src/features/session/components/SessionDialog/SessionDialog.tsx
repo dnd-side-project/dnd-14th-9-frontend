@@ -66,6 +66,52 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
     isAuthenticated && (isWaitingRoomLoading || myMemberId === undefined);
 
   const statusDisplay = session ? getSessionStatusDisplay(session.status) : null;
+  const footerLayout =
+    sessionError || isRecovering || isCheckingParticipation || isAuthenticated ? "single" : "dual";
+
+  let footerContent;
+
+  if (sessionError) {
+    footerContent = (
+      <Button variant="solid" colorScheme="secondary" size="medium" onClick={handleClose}>
+        닫기
+      </Button>
+    );
+  } else if (isRecovering) {
+    footerContent = (
+      <Button variant="solid" colorScheme="primary" size="medium" disabled>
+        로그인 상태 확인 중...
+      </Button>
+    );
+  } else if (isCheckingParticipation) {
+    footerContent = (
+      <Button variant="solid" colorScheme="primary" size="medium" disabled>
+        참여 여부 확인 중...
+      </Button>
+    );
+  } else if (isAuthenticated) {
+    footerContent = (
+      <Button
+        variant="solid"
+        colorScheme="primary"
+        size="medium"
+        onClick={() => setShowJoinModal(true)}
+      >
+        참여하기
+      </Button>
+    );
+  } else {
+    footerContent = (
+      <>
+        <Button variant="solid" colorScheme="tertiary" size="medium" onClick={handleClose}>
+          건너뛰기
+        </Button>
+        <ButtonLink href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
+          로그인하고 참여하기
+        </ButtonLink>
+      </>
+    );
+  }
 
   return (
     <dialog
@@ -143,45 +189,9 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
           )}
 
           {/* 버튼 영역 */}
-          {sessionError ? (
-            <ButtonGroup layout="single" horizontal={false} className="w-full [&>*]:w-full">
-              <Button variant="solid" colorScheme="secondary" size="medium" onClick={handleClose}>
-                닫기
-              </Button>
-            </ButtonGroup>
-          ) : isRecovering ? (
-            <ButtonGroup layout="single" horizontal={false} className="w-full [&>*]:w-full">
-              <Button variant="solid" colorScheme="primary" size="medium" disabled>
-                로그인 상태 확인 중...
-              </Button>
-            </ButtonGroup>
-          ) : isCheckingParticipation ? (
-            <ButtonGroup layout="single" horizontal={false} className="w-full [&>*]:w-full">
-              <Button variant="solid" colorScheme="primary" size="medium" disabled>
-                참여 여부 확인 중...
-              </Button>
-            </ButtonGroup>
-          ) : isAuthenticated ? (
-            <ButtonGroup layout="single" horizontal={false} className="w-full [&>*]:w-full">
-              <Button
-                variant="solid"
-                colorScheme="primary"
-                size="medium"
-                onClick={() => setShowJoinModal(true)}
-              >
-                참여하기
-              </Button>
-            </ButtonGroup>
-          ) : (
-            <ButtonGroup layout="dual" horizontal={false} className="w-full [&>*]:w-full">
-              <Button variant="solid" colorScheme="tertiary" size="medium" onClick={handleClose}>
-                건너뛰기
-              </Button>
-              <ButtonLink href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
-                로그인하고 참여하기
-              </ButtonLink>
-            </ButtonGroup>
-          )}
+          <ButtonGroup layout={footerLayout} horizontal={false} className="w-full [&>*]:w-full">
+            {footerContent}
+          </ButtonGroup>
         </div>
       </div>
 
