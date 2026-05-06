@@ -4,7 +4,7 @@ import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { useSearchParams } from "next/navigation";
 
-import { PaginationFraction } from "@/components/Pagination/PaginationFraction";
+import { Pagination } from "@/components/Pagination/Pagination";
 import { useSuspenseMeForEdit } from "@/features/member/hooks/useMemberHooks";
 import { parseSessionListSearchParams } from "@/features/session/utils/parseSessionListSearchParams";
 import { getCategoryLabel } from "@/lib/constants/category";
@@ -15,6 +15,18 @@ import { EmptyRecommendedSessionPlaceholder } from "./EmptyRecommendedSessionPla
 import { RecommendedGrid } from "./RecommendedGrid";
 import { RecommendedGridSkeleton } from "./RecommendedGridSkeleton";
 import { collectInterestCategories, resolveRecommendedView } from "./recommendedSection.model";
+
+function SectionHeader({ children, pagination }: { children: ReactNode; pagination?: ReactNode }) {
+  return (
+    <>
+      <div className="flex items-center justify-between">
+        <div className="gap-xs flex flex-col">{children}</div>
+        {/* Desktop/Tablet: pagination 헤더 우측 */}
+        {pagination && <div className="hidden md:block">{pagination}</div>}
+      </div>
+    </>
+  );
+}
 
 export function RecommendedSectionContent() {
   const searchParams = useSearchParams();
@@ -64,21 +76,34 @@ export function RecommendedSectionContent() {
 
   // 검색 모드: keyword가 있으면 검색 전용 섹션 표시
   if (keyword) {
+    const desktopSearchPagination = (
+      <Pagination
+        type="fraction"
+        currentPage={searchPage}
+        totalPage={searchTotalPage}
+        onPageChange={handleSearchPageChange}
+      />
+    );
+
+    const mobileSearchPagination = (
+      <Pagination
+        type="list"
+        currentPage={searchPage}
+        totalPage={searchTotalPage}
+        onPageChange={handleSearchPageChange}
+      />
+    );
+
     return (
-      <section className="gap-xl flex flex-col">
-        <div className="flex items-center justify-between">
-          <div className="gap-xs flex flex-col">
-            <h2 className="text-text-primary text-2xl font-bold">지금 바로 참여할 수 있는 세션</h2>
-            <p className="text-text-disabled text-base">
-              입력한 검색어와 연관된 세션 중 바로 참여 가능한 방을 우선 보여드려요
-            </p>
-          </div>
-          <PaginationFraction
-            currentPage={searchPage}
-            totalPage={searchTotalPage}
-            onPageChange={handleSearchPageChange}
-          />
-        </div>
+      <section className="gap-lg xl:gap-2xl flex flex-col">
+        <SectionHeader pagination={desktopSearchPagination}>
+          <h2 className="text-text-primary text-lg font-bold md:text-2xl">
+            지금 바로 참여할 수 있는 세션
+          </h2>
+          <p className="text-text-muted text-[13px] md:text-base">
+            입력한 검색어와 연관된 세션 중 바로 참여 가능한 방을 우선 보여드려요
+          </p>
+        </SectionHeader>
         <Suspense fallback={<RecommendedGridSkeleton />}>
           <RecommendedGrid
             keyword={keyword}
@@ -95,6 +120,8 @@ export function RecommendedSectionContent() {
             emptyMessage="바로 참여 가능한 세션이 없습니다"
           />
         </Suspense>
+        {/* Mobile: pagination 섹션 하단 center (list 타입) */}
+        <div className="flex justify-center md:hidden">{mobileSearchPagination}</div>
       </section>
     );
   }
@@ -114,39 +141,51 @@ export function RecommendedSectionContent() {
     return null;
   }
 
-  const renderHeader = (action?: ReactNode) => (
-    <div className="flex items-center justify-between">
-      <div className="gap-xs flex flex-col">
-        <h2 className="text-text-primary text-2xl font-bold">
-          <span className="text-text-brand-default">{nickname}</span> 님을 위한 추천 세션
-        </h2>
-        <p className="text-text-disabled text-base">
-          설정한 관심 카테고리를 기준으로 세션을 추천해 드려요
-        </p>
-      </div>
-      {action}
-    </div>
+  const renderHeader = (paginationNode?: ReactNode) => (
+    <SectionHeader pagination={paginationNode}>
+      <h2 className="text-text-primary text-lg font-bold md:text-2xl">
+        <span className="text-text-brand-default">{nickname}</span> 님을 위한 추천 세션
+      </h2>
+      <p className="text-text-muted text-[13px] md:text-base">
+        설정한 관심 카테고리를 기준으로 세션을 추천해 드려요
+      </p>
+    </SectionHeader>
   );
 
   switch (view.type) {
-    case "carousel":
+    case "carousel": {
+      const desktopCarouselPagination = (
+        <Pagination
+          type="fraction"
+          currentPage={currentPage}
+          totalPage={totalPages}
+          onPageChange={handlePageChange}
+        />
+      );
+
+      const mobileCarouselPagination = (
+        <Pagination
+          type="list"
+          currentPage={currentPage}
+          totalPage={totalPages}
+          onPageChange={handlePageChange}
+        />
+      );
+
       return (
-        <section className="gap-xl flex flex-col">
-          {renderHeader(
-            <PaginationFraction
-              currentPage={currentPage}
-              totalPage={totalPages}
-              onPageChange={handlePageChange}
-            />
-          )}
+        <section className="gap-lg xl:gap-2xl flex flex-col">
+          {renderHeader(desktopCarouselPagination)}
           <Suspense fallback={<RecommendedGridSkeleton />}>
             <RecommendedGrid category={view.category} />
           </Suspense>
+          {/* Mobile: pagination 섹션 하단 center (list 타입) */}
+          <div className="flex justify-center md:hidden">{mobileCarouselPagination}</div>
         </section>
       );
+    }
     case "single":
       return (
-        <section className="gap-xl flex flex-col">
+        <section className="gap-lg xl:gap-2xl flex flex-col">
           {renderHeader()}
           <Suspense fallback={<RecommendedGridSkeleton />}>
             <RecommendedGrid category={view.category} />
@@ -155,7 +194,7 @@ export function RecommendedSectionContent() {
       );
     case "empty":
       return (
-        <section className="gap-xl flex flex-col">
+        <section className="gap-lg xl:gap-2xl flex flex-col">
           {renderHeader()}
           <EmptyRecommendedSessionPlaceholder
             nickname={nickname}

@@ -27,7 +27,18 @@ export function HeaderAuthActions() {
           size="small"
           variant="solid"
           colorScheme="primary"
-          className="px-xs py-2xs md:px-sm md:py-xs"
+          className="hidden md:inline-flex"
+          hardNavigate
+        >
+          세션 만들기
+        </ButtonLink>
+        <ButtonLink
+          href="/session/create"
+          aria-label="세션 만들기"
+          size="xsmall"
+          variant="solid"
+          colorScheme="primary"
+          className="md:hidden"
           hardNavigate
         >
           세션 만들기
@@ -42,15 +53,27 @@ export function HeaderAuthActions() {
   }
 
   return (
-    <ButtonLink
-      href={LOGIN_ROUTE}
-      aria-label="로그인"
-      size="small"
-      variant="outlined"
-      colorScheme="secondary"
-      className="px-xs py-2xs md:px-sm md:py-xs"
-    >
-      회원가입 / 로그인
-    </ButtonLink>
+    <>
+      <ButtonLink
+        href={LOGIN_ROUTE}
+        aria-label="로그인"
+        size="small"
+        variant="outlined"
+        colorScheme="secondary"
+        className="hidden md:inline-flex"
+      >
+        회원가입 / 로그인
+      </ButtonLink>
+      <ButtonLink
+        href={LOGIN_ROUTE}
+        aria-label="로그인"
+        size="xsmall"
+        variant="outlined"
+        colorScheme="secondary"
+        className="md:hidden"
+      >
+        회원가입 / 로그인
+      </ButtonLink>
+    </>
   );
 }

@@ -1,12 +1,5 @@
-import { Suspense } from "react";
-
-import { Banner } from "@/features/session/components/Banner/Banner";
-import { RecommendedSection } from "@/features/session/components/RecommendedSection/RecommendedSection";
-import { RecommendedSectionSkeleton } from "@/features/session/components/RecommendedSection/RecommendedSectionSkeleton";
-import { SearchFilterSection } from "@/features/session/components/SearchFilterSection/SearchFilterSection";
-import { SearchFilterSectionSkeleton } from "@/features/session/components/SearchFilterSection/SearchFilterSectionSkeleton";
-import { SessionListPrefetch } from "@/features/session/components/SessionList/SessionListPrefetch";
-import { SessionListSkeleton } from "@/features/session/components/SessionList/SessionListSkeleton";
+import { HeroSection } from "@/features/session/components/HeroSection/HeroSection";
+import { MainSection } from "@/features/session/components/MainSection/MainSection";
 import { SESSION_LIST_PAGE_SIZE } from "@/features/session/constants/pagination";
 import {
   parseSessionListSearchParams,
@@ -57,21 +50,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   };
 
   return (
-    <div className="my-[64px] flex flex-col justify-center gap-[48px] px-[54px]">
-      <Suspense fallback={<SearchFilterSectionSkeleton />}>
-        <SearchFilterSection />
-      </Suspense>
-
-      {!isSearchMode && <Banner />}
-
-      {/* TODO(이경환): 팀 논의 필요 - 비로그인 시 빈 공간 vs 대체 콘텐츠 */}
-      <Suspense fallback={<RecommendedSectionSkeleton />}>
-        <RecommendedSection />
-      </Suspense>
-
-      <Suspense fallback={<SessionListSkeleton />}>
-        <SessionListPrefetch listParams={listParams} />
-      </Suspense>
+    <div className="my-[64px] flex flex-col gap-10 px-5 md:px-10 xl:px-[54px]">
+      <HeroSection isSearchMode={isSearchMode} />
+      <MainSection listParams={listParams} />
     </div>
   );
 }

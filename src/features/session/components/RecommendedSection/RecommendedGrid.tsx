@@ -52,40 +52,69 @@ export function RecommendedGrid({
   useEffect(() => {
     onMetaChange?.({ totalPage });
   }, [totalPage, onMetaChange]);
+
   const sessions = data.result.sessions;
-  const gridClassName =
-    "grid min-h-[300px] grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-y-[48px]";
 
   if (sessions.length === 0) {
     return (
-      <div className={gridClassName}>
-        <div className="text-text-muted col-span-full flex items-center justify-center text-sm">
+      <div className="flex min-h-[300px] items-center justify-center">
+        <p className="text-text-muted text-sm">
           {emptyMessage ?? "해당 카테고리에 모집 중인 세션이 없습니다"}
-        </div>
+        </p>
       </div>
     );
   }
 
   return (
-    <div className={gridClassName}>
-      {sessions.map((session) => (
-        <div key={session.sessionId} className="mx-auto w-full md:max-w-69">
-          <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
-            <Card
-              size="responsive"
-              thumbnailSrc={session.imageUrl}
-              category={session.category}
-              createdAt={session.startTime}
-              title={session.title}
-              nickname={session.hostNickname}
-              currentParticipants={session.currentParticipants}
-              maxParticipants={session.maxParticipants}
-              durationMinutes={session.sessionDurationMinutes}
-              sessionDate={session.startTime}
-            />
-          </Link>
+    <>
+      {/* Mobile: 가로 스크롤 (스크롤바 숨김 + 우측 fade overlay) */}
+      <div className="relative md:hidden">
+        <div className="scrollbar-hide flex gap-6 overflow-x-auto pb-1">
+          {sessions.map((session) => (
+            <div key={session.sessionId} className="w-[226px] shrink-0">
+              <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
+                <Card
+                  thumbnailSrc={session.imageUrl}
+                  category={session.category}
+                  createdAt={session.startTime}
+                  title={session.title}
+                  nickname={session.hostNickname}
+                  currentParticipants={session.currentParticipants}
+                  maxParticipants={session.maxParticipants}
+                  durationMinutes={session.sessionDurationMinutes}
+                  sessionDate={session.startTime}
+                />
+              </Link>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+        {/* 우측 fade overlay */}
+        <div
+          aria-hidden="true"
+          className="from-surface-default pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l to-transparent"
+        />
+      </div>
+
+      {/* Tablet / Desktop: 일반 grid */}
+      <div className="hidden min-h-[300px] grid-cols-2 gap-6 md:grid xl:grid-cols-4 xl:gap-y-[48px]">
+        {sessions.map((session) => (
+          <div key={session.sessionId} className="mx-auto w-full xl:max-w-69">
+            <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
+              <Card
+                thumbnailSrc={session.imageUrl}
+                category={session.category}
+                createdAt={session.startTime}
+                title={session.title}
+                nickname={session.hostNickname}
+                currentParticipants={session.currentParticipants}
+                maxParticipants={session.maxParticipants}
+                durationMinutes={session.sessionDurationMinutes}
+                sessionDate={session.startTime}
+              />
+            </Link>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

@@ -7,8 +7,8 @@ import { HeaderAuthActions } from "./HeaderAuthActions";
 
 export function Header() {
   return (
-    <header className="border-border-subtle bg-surface-default sticky top-0 z-50 w-full border-b">
-      <div className="px-lg md:px-xl md:py-sm mx-auto flex h-full max-w-[1280px] items-center justify-between py-[15px] xl:px-[50px]">
+    <header className="border-border-subtle bg-surface-default sticky top-0 z-50 h-[56px] w-full border-b">
+      <div className="px-lg md:px-xl mx-auto flex h-full max-w-[1280px] items-center justify-between xl:px-[50px]">
         <Link
           href={ROOT_ROUTE}
           aria-label="홈으로 이동"

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { ShareIcon } from "@/components/Icon/ShareIcon";
-import { PaginationList } from "@/components/Pagination/PaginationList";
+import { Pagination } from "@/components/Pagination/Pagination";
 
 import { SESSION_LIST_PAGE_SIZE } from "../../constants/pagination";
 import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
@@ -66,10 +66,12 @@ export function SessionList() {
 
   return (
     <section className="gap-lg flex flex-col">
-      <div className="flex flex-col gap-[10px]">
-        <h2 className="text-text-primary text-2xl font-bold">지금 모집 중인 세션</h2>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-text-disabled text-base">현재 모집 중인 세션에 바로 참여해 보세요</p>
+      <div className="flex flex-col gap-1">
+        <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between xl:gap-5">
+          <p className="text-text-muted text-[13px] md:text-base">
+            현재 모집 중인 세션에 바로 참여해 보세요
+          </p>
           <SessionListFilterBar
             values={values}
             onSetDateRange={setDateRange}
@@ -87,9 +89,9 @@ export function SessionList() {
           모집 중인 세션이 없습니다
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-y-[48px]">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 xl:gap-y-[48px]">
           {sessions.map((session) => (
-            <div key={session.sessionId} className="relative mx-auto w-full md:max-w-69">
+            <div key={session.sessionId} className="relative mx-auto w-full xl:max-w-69">
               <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
                 <Card
                   size="responsive"
@@ -119,7 +121,7 @@ export function SessionList() {
 
       {totalPage > 0 && (
         <div className="py-3xl flex justify-center">
-          <PaginationList totalPage={totalPage} currentPage={page} onPageChange={setPage} />
+          <Pagination type="list" totalPage={totalPage} currentPage={page} onPageChange={setPage} />
         </div>
       )}
     </section>
