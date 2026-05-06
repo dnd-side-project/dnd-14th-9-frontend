@@ -26,9 +26,19 @@ export interface WaitingMembersEventData {
   members: WaitingMember[];
 }
 
+// 강퇴 이벤트 데이터
+export interface KickedEventData {
+  memberIds: number[];
+}
+
+// waiting-members-updated SSE 이벤트 payload (discriminated union)
+export type WaitingMembersSSEPayload =
+  | { eventType: "ROOM_UPDATE"; data: WaitingMembersEventData }
+  | { eventType: "KICKED"; data: KickedEventData };
+
 // SSE 이벤트 타입 (discriminated union)
 export type WaitingRoomSSEEvent =
-  | { type: "waiting-members-updated"; data: WaitingMembersEventData }
+  | { type: "waiting-members-updated"; data: WaitingMembersSSEPayload }
   | { type: "error"; data: { code: string; message: string } };
 
 export type WaitingRoomSSEEventType = WaitingRoomSSEEvent["type"];

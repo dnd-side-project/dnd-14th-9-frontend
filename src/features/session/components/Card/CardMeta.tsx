@@ -11,6 +11,8 @@ export interface CardMetaProps {
   maxParticipants: number;
   durationMinutes: number;
   sessionDate: Date | string;
+  /** Figma size 변형과 카드 density를 동기화합니다. */
+  size?: "md" | "sm" | "responsive";
 }
 
 export function CardMeta({
@@ -19,24 +21,37 @@ export function CardMeta({
   maxParticipants,
   durationMinutes,
   sessionDate,
+  size = "md",
 }: CardMetaProps) {
+  const iconClassName = cn(
+    size === "sm" && "size-3",
+    size === "md" && "size-4",
+    size === "responsive" && "size-3 md:size-4"
+  );
+  const textClassName = cn(
+    size === "sm" && "text-[10px]",
+    size === "md" && "text-[11px]",
+    size === "responsive" && "text-[10px] md:text-[11px]"
+  );
+
   return (
     <div
       className={cn(
-        "text-text-disabled flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] leading-none",
+        "text-text-disabled flex flex-wrap items-center gap-x-2 gap-y-2 leading-none",
+        textClassName,
         className
       )}
     >
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <UsersIcon size="xsmall" />
+        <UsersIcon className={iconClassName} />
         <span>{formatParticipantCount(currentParticipants, maxParticipants)}</span>
       </span>
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <ClockIcon size="xsmall" />
+        <ClockIcon className={iconClassName} />
         <span>{formatSessionDuration(durationMinutes)}</span>
       </span>
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <CalendarIcon size="xsmall" />
+        <CalendarIcon className={iconClassName} />
         <span>{formatSessionDateTime(sessionDate)}</span>
       </span>
     </div>

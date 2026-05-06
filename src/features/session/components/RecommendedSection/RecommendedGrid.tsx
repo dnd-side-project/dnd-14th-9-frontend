@@ -69,9 +69,10 @@ export function RecommendedGrid({
   return (
     <div className={gridClassName}>
       {sessions.map((session) => (
-        <div key={session.sessionId} className="mx-auto w-full max-w-69">
+        <div key={session.sessionId} className="mx-auto w-full md:max-w-69">
           <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
             <Card
+              size="responsive"
               thumbnailSrc={session.imageUrl}
               category={session.category}
               createdAt={session.startTime}

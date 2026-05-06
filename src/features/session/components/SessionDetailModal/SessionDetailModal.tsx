@@ -108,12 +108,14 @@ export function SessionDetailModal({ sessionId }: SessionDetailModalProps) {
           </div>
         ) : session ? (
           <Card
+            size="md"
             className="max-w-full"
             thumbnailSrc={session.imageUrl}
             category={session.category}
             statusText={statusDisplay?.text}
             statusBadgeStatus={statusDisplay?.badgeStatus}
             title={session.title}
+            nickname={session.hostNickname}
             description={session.summary}
             currentParticipants={session.currentParticipants}
             maxParticipants={session.maxParticipants}
