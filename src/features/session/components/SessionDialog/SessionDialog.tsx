@@ -46,9 +46,10 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
   const session = data?.result;
   const myMemberId = meData?.result?.id;
 
-  // 참여 여부 확인
+  // 참여 여부 확인 (내 member id가 확정된 뒤에만 판정)
   const isParticipant =
-    waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false;
+    myMemberId !== undefined &&
+    (waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false);
 
   // 자동 리다이렉트: 이미 참여 중이면 세션 페이지로 이동
   // 서버 컴포넌트가 세션 상태에 따라 적절한 페이지(대기실/진행중)로 라우팅
@@ -61,7 +62,8 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
   }, [isParticipant, sessionId, dialogRef]);
 
   // 참여 여부 확인 중인지 여부
-  const isCheckingParticipation = isAuthenticated && isWaitingRoomLoading;
+  const isCheckingParticipation =
+    isAuthenticated && (isWaitingRoomLoading || myMemberId === undefined);
 
   const statusDisplay = session ? getSessionStatusDisplay(session.status) : null;
 
