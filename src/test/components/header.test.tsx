@@ -22,7 +22,11 @@ describe("Header", () => {
     mockedUseAuthState.mockReturnValue({ status: "guest" });
     render(<Header />);
 
-    expect(screen.getAllByRole("link", { name: "로그인" })[0]).toHaveAttribute("href", "/login");
+    const loginLinks = screen.getAllByRole("link", { name: "로그인" });
+
+    expect(loginLinks).toHaveLength(2);
+    expect(loginLinks[0]).toHaveAttribute("href", "/login");
+    expect(loginLinks[1]).toHaveAttribute("href", "/login");
     expect(screen.queryByTestId("profile-dropdown")).not.toBeInTheDocument();
   });
 
@@ -48,10 +52,11 @@ describe("Header", () => {
     });
     render(<Header />);
 
-    expect(screen.getAllByRole("link", { name: "세션 만들기" })[0]).toHaveAttribute(
-      "href",
-      "/session/create"
-    );
+    const createSessionLinks = screen.getAllByRole("link", { name: "세션 만들기" });
+
+    expect(createSessionLinks).toHaveLength(2);
+    expect(createSessionLinks[0]).toHaveAttribute("href", "/session/create");
+    expect(createSessionLinks[1]).toHaveAttribute("href", "/session/create");
     expect(screen.getByTestId("profile-dropdown")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "로그인" })).not.toBeInTheDocument();
   });

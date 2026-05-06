@@ -182,7 +182,7 @@ describe("RecommendedSectionContent", () => {
       expect.objectContaining({ page: 1 })
     );
 
-    fireEvent.click(screen.getAllByRole("button", { name: /fraction/i })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /fraction/i }));
 
     await waitFor(() => {
       expect(mockUseSuspenseSessionList).toHaveBeenLastCalledWith(
