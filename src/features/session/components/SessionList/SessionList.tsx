@@ -66,7 +66,7 @@ export function SessionList() {
 
   return (
     <section className="gap-lg flex flex-col">
-      <div className="flex flex-col gap-1 md:gap-[4px]">
+      <div className="flex flex-col gap-1">
         <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between xl:gap-5">
           <p className="text-text-muted text-[13px] md:text-base">
