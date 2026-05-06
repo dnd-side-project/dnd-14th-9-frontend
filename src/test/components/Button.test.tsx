@@ -28,11 +28,18 @@ describe("Button", () => {
 
   it("icon-only medium button matches the Figma md square dimensions", () => {
     render(
-      <Button iconOnly size="medium" leftIcon={<span aria-label="더하기">+</span>}>
-        숨겨진 텍스트
-      </Button>
+      <Button
+        iconOnly
+        size="medium"
+        aria-label="더하기"
+        leftIcon={<span aria-hidden="true">+</span>}
+      />
     );
 
-    expect(screen.getByRole("button")).toHaveClass("size-11", "min-w-0", "p-sm");
+    expect(screen.getByRole("button", { name: "더하기" })).toHaveClass(
+      "size-11",
+      "min-w-0",
+      "p-sm"
+    );
   });
 });
