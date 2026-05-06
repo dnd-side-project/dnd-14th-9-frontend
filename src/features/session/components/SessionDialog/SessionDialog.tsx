@@ -36,18 +36,32 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
   const [showJoinModal, setShowJoinModal] = useState(false);
 
   // 현재 사용자 정보 (인증된 경우만)
-  const { data: meData } = useMe({ enabled: isAuthenticated });
+  const {
+    data: meData,
+    isLoading: isMeLoading,
+    error: meError,
+    refetch: refetchMe,
+  } = useMe({
+    enabled: isAuthenticated,
+  });
 
   // 대기방 참여자 정보 (인증된 경우만)
-  const { data: waitingRoomData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
+  const {
+    data: waitingRoomData,
+    isLoading: isWaitingRoomLoading,
+    error: waitingRoomError,
+    refetch: refetchWaitingRoom,
+  } = useWaitingRoom(sessionId, {
     enabled: isAuthenticated,
   });
 
   const session = data?.result;
   const myMemberId = meData?.result?.id;
+  const hasParticipationCheckError = Boolean(meError || waitingRoomError);
 
   // 참여 여부 확인 (내 member id가 확정된 뒤에만 판정)
   const isParticipant =
+    !hasParticipationCheckError &&
     myMemberId !== undefined &&
     (waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false);
 
@@ -62,12 +76,17 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
   }, [isParticipant, sessionId, dialogRef]);
 
   // 참여 여부 확인 중인지 여부
-  const isCheckingParticipation =
-    isAuthenticated && (isWaitingRoomLoading || myMemberId === undefined);
+  const isCheckingParticipation = isAuthenticated && (isMeLoading || isWaitingRoomLoading);
 
   const statusDisplay = session ? getSessionStatusDisplay(session.status) : null;
   const footerLayout =
-    sessionError || isRecovering || isCheckingParticipation || isAuthenticated ? "single" : "dual";
+    sessionError ||
+    hasParticipationCheckError ||
+    isRecovering ||
+    isCheckingParticipation ||
+    isAuthenticated
+      ? "single"
+      : "dual";
 
   let footerContent;
 
@@ -87,6 +106,20 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
     footerContent = (
       <Button variant="solid" colorScheme="primary" size="medium" disabled>
         참여 여부 확인 중...
+      </Button>
+    );
+  } else if (hasParticipationCheckError) {
+    footerContent = (
+      <Button
+        variant="solid"
+        colorScheme="secondary"
+        size="medium"
+        onClick={() => {
+          void refetchMe();
+          void refetchWaitingRoom();
+        }}
+      >
+        다시 시도하기
       </Button>
     );
   } else if (isAuthenticated) {
