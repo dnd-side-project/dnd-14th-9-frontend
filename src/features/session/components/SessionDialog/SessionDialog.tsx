@@ -190,7 +190,7 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
             <button
               type="button"
               onClick={handleClose}
-              className="text-text-muted hover:text-text-primary p-2 md:hidden"
+              className="text-text-muted hover:text-text-primary focus-visible:ring-text-muted rounded-sm p-2 focus-visible:ring-2 md:hidden"
               aria-label="닫기"
             >
               <CloseIcon />
