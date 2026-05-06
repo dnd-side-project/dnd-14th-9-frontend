@@ -37,6 +37,10 @@ const CHIP_BADGE_VARIANTS = cva(
         max: "rounded-max",
         xs: "rounded-xs",
       },
+      size: {
+        md: ["px-3", "text-xs"],
+        sm: ["px-2", "text-[10px]"],
+      },
     },
     compoundVariants: [
       {
