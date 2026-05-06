@@ -89,7 +89,10 @@ export function RecommendedGrid({
           ))}
         </div>
         {/* 우측 fade overlay */}
-        <div className="from-surface-default pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l to-transparent" />
+        <div
+          aria-hidden="true"
+          className="from-surface-default pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l to-transparent"
+        />
       </div>
 
       {/* Tablet / Desktop: 일반 grid */}
