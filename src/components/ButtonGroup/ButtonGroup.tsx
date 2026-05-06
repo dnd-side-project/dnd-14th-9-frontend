@@ -3,6 +3,7 @@ import { type HTMLAttributes } from "react";
 import { cn } from "@/lib/utils/utils";
 
 export type ButtonGroupProps = HTMLAttributes<HTMLDivElement> & {
+  /** `layout` is only applied when `horizontal` is false. */
   layout?: "single" | "dual";
   horizontal?: boolean;
   ref?: React.Ref<HTMLDivElement>;

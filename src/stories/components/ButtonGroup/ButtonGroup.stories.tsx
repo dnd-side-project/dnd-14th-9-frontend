@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "여러 개의 Button을 Figma Button/ButtonGroup의 layout, horizontal 속성에 맞춰 정렬·관리하기 위한 컨테이너 컴포넌트입니다.",
+          "여러 개의 Button을 Figma Button/ButtonGroup의 layout, horizontal 속성에 맞춰 정렬·관리하기 위한 컨테이너 컴포넌트입니다. `layout`은 `horizontal={false}`인 세로 배치에서만 적용됩니다.",
       },
     },
   },
@@ -20,9 +20,12 @@ const meta = {
     layout: {
       control: "select",
       options: ["single", "dual"],
+      description: "세로 배치(horizontal={false})에서만 버튼 그룹 간격 규칙을 바꿉니다.",
     },
     horizontal: {
       control: "boolean",
+      description:
+        "true면 가로 배치이며 layout 값과 관계없이 동일한 Figma 가로 그룹 규칙을 사용합니다.",
     },
   },
 } satisfies Meta<typeof ButtonGroup>;
