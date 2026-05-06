@@ -45,7 +45,7 @@ const CHIP_BADGE_VARIANTS = cva(
     compoundVariants: [
       {
         radius: "xs",
-        class: "border-0",
+        class: ["border-0", "px-2"],
       },
     ],
     defaultVariants: {
