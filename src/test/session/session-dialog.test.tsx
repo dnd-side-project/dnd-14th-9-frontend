@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 
 import { SessionDialog } from "@/features/session/components/SessionDialog/SessionDialog";
 
@@ -7,6 +7,7 @@ const mockUseMe = jest.fn();
 const mockUseSessionDetail = jest.fn();
 const mockUseWaitingRoom = jest.fn();
 const mockUseShareSession = jest.fn();
+const mockNavigateWithHardReload = jest.fn();
 
 jest.mock("@/features/auth/hooks/useAuthState", () => ({
   useAuthState: () => mockUseAuthState(),
@@ -34,7 +35,7 @@ jest.mock("@/hooks/useDialog", () => ({
 }));
 
 jest.mock("@/lib/navigation/hardNavigate", () => ({
-  navigateWithHardReload: jest.fn(),
+  navigateWithHardReload: (...args: unknown[]) => mockNavigateWithHardReload(...args),
 }));
 
 jest.mock("@/features/lobby/components/SessionJoinModal", () => ({
@@ -64,6 +65,7 @@ jest.mock("@/components/Icon/ShareIcon", () => ({
 describe("SessionDialog", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    HTMLDialogElement.prototype.close = jest.fn();
 
     mockUseShareSession.mockReturnValue({
       shareSession: jest.fn(),
@@ -93,6 +95,7 @@ describe("SessionDialog", () => {
         },
       },
       isLoading: false,
+      error: null,
     });
   });
 
@@ -125,5 +128,51 @@ describe("SessionDialog", () => {
     expect(
       screen.queryByRole("link", { name: "로그인하고 참여하기", hidden: true })
     ).not.toBeInTheDocument();
+  });
+
+  it("me 정보가 아직 없으면 참여 여부 확인 중 상태를 유지해야 한다", () => {
+    mockUseAuthState.mockReturnValue({ status: "authenticated" });
+    mockUseMe.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: null,
+    });
+
+    render(<SessionDialog sessionId="1" />);
+
+    expect(
+      screen.getByRole("button", { name: "참여 여부 확인 중...", hidden: true })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "참여하기", hidden: true })
+    ).not.toBeInTheDocument();
+  });
+
+  it("이미 참여 중인 사용자는 세션 페이지로 자동 이동해야 한다", async () => {
+    mockUseAuthState.mockReturnValue({ status: "authenticated" });
+    mockUseMe.mockReturnValue({
+      data: {
+        result: {
+          id: 7,
+        },
+      },
+      isLoading: false,
+      error: null,
+    });
+    mockUseWaitingRoom.mockReturnValue({
+      data: {
+        result: {
+          members: [{ memberId: 7 }],
+        },
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    render(<SessionDialog sessionId="1" />);
+
+    await waitFor(() => {
+      expect(mockNavigateWithHardReload).toHaveBeenCalledWith("/session/1");
+    });
   });
 });
