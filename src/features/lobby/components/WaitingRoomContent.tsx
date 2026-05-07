@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import dynamic from "next/dynamic";
 
@@ -53,11 +53,26 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   const { data: initialWaitingData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
     enabled: isAuthenticated,
   });
-  // 실시간 업데이트: SSE로 수신
-  const { data: sseWaitingData } = useWaitingMembersSSE({ sessionId, enabled: true });
-
   const isAuthDataLoading = isAuthenticated && (isWaitingRoomLoading || isMeLoading);
   const myMemberId = isAuthDataLoading ? undefined : meData?.result?.id;
+
+  // SSE KICKED 이벤트 콜백
+  const handleKicked = useCallback(
+    (memberIds: number[]) => {
+      if (myMemberId && memberIds.includes(myMemberId)) {
+        setIsKicked(true);
+      }
+    },
+    [myMemberId]
+  );
+  // 실시간 업데이트: SSE로 수신
+  // myMemberId가 확정된 후에만 구독 시작 (인증/로딩 완료를 함의).
+  // 미확정 상태에서 KICKED 이벤트가 도착하면 handleKicked 가드에 걸려 영구 손실됨.
+  const { data: sseWaitingData } = useWaitingMembersSSE({
+    sessionId,
+    enabled: !!myMemberId,
+    onKicked: handleKicked,
+  });
 
   const { isSessionTransitionRef } = useLeaveOnUnmount({
     sessionId,
@@ -100,7 +115,15 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   }
 
   // SSE를 통한 강퇴 감지 (참여자였는데 멤버 목록에서 사라진 경우)
-  if (wasParticipant && sseWaitingData && myMemberId && !isKicked && !isLeaving) {
+  // members가 누락된 비정상 payload는 강퇴 추론에서 제외
+  if (
+    wasParticipant &&
+    sseWaitingData &&
+    Array.isArray(sseWaitingData.members) &&
+    myMemberId &&
+    !isKicked &&
+    !isLeaving
+  ) {
     const isStillMember = sseWaitingData.members.some((m) => m.memberId === myMemberId);
     if (!isStillMember) {
       setIsKicked(true);

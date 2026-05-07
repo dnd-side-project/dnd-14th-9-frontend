@@ -6,11 +6,16 @@ import { SSEClient } from "./client";
 
 import type { SSEConnectionStatus, SSEError } from "./types";
 
+export interface SSEEventMeta {
+  /** 이벤트 리스너가 등록된 시점의 url (in-flight 이벤트 race 검증용) */
+  url: string;
+}
+
 interface UseSSEOptions<T> {
   url: string;
   eventName: string;
   enabled?: boolean;
-  onData?: (data: T) => void;
+  onData?: (data: T, meta: SSEEventMeta) => void;
   onError?: (error: SSEError) => void;
 }
 
@@ -81,10 +86,14 @@ export function useSSE<T>({
     });
 
     // 이벤트 리스너 등록
+    // registeredUrl: 이 effect 인스턴스가 구독을 시작한 시점의 url을 클로저로 캡쳐.
+    // EventSource.close() 이후에도 이미 dispatch queue에 들어간 message 이벤트는
+    // 처리될 수 있어, 콜백 측에서 등록 시점 url을 알아야 stale 이벤트를 식별할 수 있음.
+    const registeredUrl = url;
     const unsubscribeEvent = client.on<T>(eventName, (eventData) => {
       setData(eventData);
       setError(null);
-      onDataRef.current?.(eventData);
+      onDataRef.current?.(eventData, { url: registeredUrl });
     });
 
     // 에러 리스너

@@ -1,5 +1,5 @@
 import { Avatar } from "@/components/Avatar/Avatar";
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import type { MemberProfileView } from "@/features/member/types";
 import { cn } from "@/lib/utils/utils";
 
@@ -44,13 +44,13 @@ export function AccountProfileCard({
           />
           <div className="gap-xs flex flex-col justify-center">
             <p className="text-text-primary text-lg font-bold">{profile.nickname}</p>
-            <Badge
+            <ChipBadge
               status="closed"
               radius="xs"
               className="bg-alpha-white-8 text-text-secondary px-xs py-2xs border-none text-xs font-semibold"
             >
               {profile.email}
-            </Badge>
+            </ChipBadge>
           </div>
         </div>
       ) : null}
