@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils/utils";
 // 카테고리 필터 버튼 스타일 정의
 const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
   [
-    "inline-flex items-center justify-center",
+    "inline-flex items-center justify-center shrink-0",
     "bg-surface-strong",
     "text-text-muted",
     "text-sm font-semibold",
@@ -20,9 +20,9 @@ const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
   {
     variants: {
       isSelected: {
-        true: "bg-[#52EE8533] text-green-600",
+        true: "bg-[#52EE8533] text-green-600 gap-2xs",
         false:
-          "hover:bg-[#52EE8533] hover:text-green-600 active:bg-[#52EE8533] active:text-green-600",
+          "hover:bg-[#52EE8533] hover:text-green-600 active:bg-[#52EE8533] active:text-green-600 gap-xs",
       },
     },
     defaultVariants: {
