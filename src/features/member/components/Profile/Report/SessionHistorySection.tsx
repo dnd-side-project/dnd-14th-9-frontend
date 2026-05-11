@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { PaginationList } from "@/components/Pagination/PaginationList";
+import { Pagination } from "@/components/Pagination/Pagination";
 import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
 import type { SessionHistoryItem, SessionHistoryPagination } from "@/features/member/types";
@@ -51,7 +51,8 @@ export default function SessionHistorySection({ items, pagination }: SessionHist
           </div>
 
           <div className="py-3xl flex w-full justify-center">
-            <PaginationList
+            <Pagination
+              type="list"
               totalPage={pagination.totalPage}
               currentPage={pagination.currentPage}
               onPageChange={handlePageChange}
