@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "axdf2halbi8o.compat.objectstorage.ap-chuncheon-1.oraclecloud.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "gak-aws-s3-bucket.s3.ap-northeast-2.amazonaws.com",
         pathname: "/**",
       },
