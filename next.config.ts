@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "axdf2halbi8o.compat.objectstorage.ap-chuncheon-1.oraclecloud.com",
-        pathname: "/**",
+        pathname: "/gak-bucket/**",
       },
       {
         protocol: "https",
