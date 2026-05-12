@@ -154,7 +154,22 @@ export function SessionList() {
 
       {totalPage > 0 && (
         <div className="py-3xl flex justify-center">
-          <Pagination type="list" totalPage={totalPage} currentPage={page} onPageChange={setPage} />
+          {/* Mobile: fraction 타입 (< 1 / 3 >) */}
+          <Pagination
+            className="md:hidden"
+            type="fraction"
+            totalPage={totalPage}
+            currentPage={page}
+            onPageChange={setPage}
+          />
+          {/* Tablet+: list 타입 (← 이전 | 1 | 2 | 3 | ...10 | 다음 →) */}
+          <Pagination
+            className="hidden md:flex"
+            type="list"
+            totalPage={totalPage}
+            currentPage={page}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </section>
