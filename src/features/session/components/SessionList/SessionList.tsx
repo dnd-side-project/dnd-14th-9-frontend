@@ -89,34 +89,67 @@ export function SessionList() {
           모집 중인 세션이 없습니다
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 xl:gap-y-[48px]">
-          {sessions.map((session) => (
-            <div key={session.sessionId} className="relative mx-auto w-full xl:max-w-69">
-              <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
-                <Card
-                  size="responsive"
-                  thumbnailSrc={session.imageUrl}
-                  category={session.category}
-                  createdAt={session.startTime}
-                  title={session.title}
-                  nickname={session.hostNickname}
-                  currentParticipants={session.currentParticipants}
-                  maxParticipants={session.maxParticipants}
-                  durationMinutes={session.sessionDurationMinutes}
-                  sessionDate={session.startTime}
-                />
-              </Link>
-              <button
-                type="button"
-                className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 flex cursor-pointer items-center justify-center rounded-full p-1.5 backdrop-blur-sm transition-colors"
-                onClick={() => shareSession(session.sessionId)}
-                aria-label="세션 링크 복사"
-              >
-                <ShareIcon size="small" className="text-text-secondary" />
-              </button>
-            </div>
-          ))}
-        </div>
+        <>
+          {/* Mobile 전용: 최대 5장 (1열) */}
+          <div className="grid grid-cols-1 gap-6 md:hidden">
+            {sessions.slice(0, 5).map((session) => (
+              <div key={session.sessionId} className="relative mx-auto w-full">
+                <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
+                  <Card
+                    size="responsive"
+                    thumbnailSrc={session.imageUrl}
+                    category={session.category}
+                    createdAt={session.startTime}
+                    title={session.title}
+                    nickname={session.hostNickname}
+                    currentParticipants={session.currentParticipants}
+                    maxParticipants={session.maxParticipants}
+                    durationMinutes={session.sessionDurationMinutes}
+                    sessionDate={session.startTime}
+                  />
+                </Link>
+                <button
+                  type="button"
+                  className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 flex cursor-pointer items-center justify-center rounded-full p-1.5 backdrop-blur-sm transition-colors"
+                  onClick={() => shareSession(session.sessionId)}
+                  aria-label="세션 링크 복사"
+                >
+                  <ShareIcon size="small" className="text-text-secondary" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Tablet+ 전용: 최대 8장 (2열 / 4열) */}
+          <div className="hidden md:grid md:grid-cols-2 md:gap-6 xl:grid-cols-4 xl:gap-y-[48px]">
+            {sessions.map((session) => (
+              <div key={session.sessionId} className="relative mx-auto w-full xl:max-w-69">
+                <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
+                  <Card
+                    size="responsive"
+                    thumbnailSrc={session.imageUrl}
+                    category={session.category}
+                    createdAt={session.startTime}
+                    title={session.title}
+                    nickname={session.hostNickname}
+                    currentParticipants={session.currentParticipants}
+                    maxParticipants={session.maxParticipants}
+                    durationMinutes={session.sessionDurationMinutes}
+                    sessionDate={session.startTime}
+                  />
+                </Link>
+                <button
+                  type="button"
+                  className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 flex cursor-pointer items-center justify-center rounded-full p-1.5 backdrop-blur-sm transition-colors"
+                  onClick={() => shareSession(session.sessionId)}
+                  aria-label="세션 링크 복사"
+                >
+                  <ShareIcon size="small" className="text-text-secondary" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {totalPage > 0 && (
