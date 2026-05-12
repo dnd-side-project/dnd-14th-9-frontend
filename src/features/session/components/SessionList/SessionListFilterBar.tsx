@@ -89,7 +89,7 @@ export function SessionListFilterBar({
       )}
       <div className="gap-md relative z-20 flex flex-col xl:items-end">
         {/* Tablet/Mobile: 모든 필터와 Sort가 하나의 가로 스크롤 영역에 포함됨 */}
-        <div className="scrollbar-hide flex w-full items-center gap-[15px] overflow-x-auto xl:w-auto xl:overflow-visible">
+        <div className="scrollbar-hide flex w-full items-center gap-[16px] overflow-x-auto xl:w-auto xl:overflow-visible">
           <DateRangeFilter
             isOpen={isDatePickerOpen}
             label={dateFilterLabel}
