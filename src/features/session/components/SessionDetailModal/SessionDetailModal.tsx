@@ -18,8 +18,7 @@ import { useSessionDetail, useWaitingRoom } from "../../hooks/useSessionHooks";
 import { useShareSession } from "../../hooks/useShareSession";
 import { Card } from "../Card/Card";
 import { CardSkeleton } from "../Card/CardSkeleton";
-
-import { getSessionStatusDisplay } from "./utils";
+import { getSessionStatusDisplay } from "../SessionDialog/utils";
 
 interface SessionDetailModalProps {
   sessionId: string;
