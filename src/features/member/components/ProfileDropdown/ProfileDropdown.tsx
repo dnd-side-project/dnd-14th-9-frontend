@@ -115,13 +115,22 @@ export function ProfileDropdown() {
         onClick={toggleDropdown}
         className="focus-visible:ring-primary flex cursor-pointer rounded-full transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:outline-none"
       >
-        <Avatar
-          type={profile?.profileImageUrl ? "image" : "empty"}
-          src={profile?.profileImageUrl ?? undefined}
-          alt={profile?.nickname ?? "프로필"}
-          size="medium"
-          className="h-8 w-8"
-        />
+        <>
+          <Avatar
+            type={profile?.profileImageUrl ? "image" : "empty"}
+            src={profile?.profileImageUrl ?? undefined}
+            alt={profile?.nickname ?? "프로필"}
+            size="medium"
+            className="hidden md:inline-flex"
+          />
+          <Avatar
+            type={profile?.profileImageUrl ? "image" : "empty"}
+            src={profile?.profileImageUrl ?? undefined}
+            alt={profile?.nickname ?? "프로필"}
+            size="small"
+            className="md:hidden"
+          />
+        </>
       </button>
 
       {isOpen && (

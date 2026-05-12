@@ -1,4 +1,4 @@
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { getCategoryLabel } from "@/lib/constants/category";
 import type { Category } from "@/lib/constants/category";
 
@@ -19,7 +19,7 @@ export function InterestBadges({ profile }: { profile: MemberProfileView }) {
       {badges.map(({ rank, label }) => (
         <div key={rank} className="gap-xs flex items-center">
           <p className="text-text-primary text-xs font-semibold">{rank}</p>
-          <Badge>{label}</Badge>
+          <ChipBadge>{label}</ChipBadge>
         </div>
       ))}
     </div>

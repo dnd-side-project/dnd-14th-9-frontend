@@ -1,4 +1,4 @@
-import { Badge } from "@/components/Badge/Badge";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { ChipGroup } from "@/components/ChipGroup/ChipGroup";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "여러 개의 Chip(Badge)을 가로로 정렬하고 레이아웃을 관리하는 컨테이너 컴포넌트입니다. 4개를 초과하면 자동으로 줄바꿈됩니다.",
+          "여러 개의 ChipBadge를 가로로 정렬하고 레이아웃을 관리하는 컨테이너 컴포넌트입니다. 4개를 초과하면 자동으로 줄바꿈됩니다.",
       },
     },
     backgrounds: {
@@ -37,8 +37,8 @@ export const Default: Story = {
   },
   render: () => (
     <ChipGroup>
-      <Badge status="recruiting">모집중</Badge>
-      <Badge status="inProgress">진행중</Badge>
+      <ChipBadge status="recruiting">모집중</ChipBadge>
+      <ChipBadge status="inProgress">진행중</ChipBadge>
     </ChipGroup>
   ),
   parameters: {
@@ -56,16 +56,16 @@ export const AllStatuses: Story = {
   },
   render: () => (
     <ChipGroup>
-      <Badge status="recruiting">모집중</Badge>
-      <Badge status="closing">마감 임박</Badge>
-      <Badge status="inProgress">진행중</Badge>
-      <Badge status="closed">마감</Badge>
+      <ChipBadge status="recruiting">모집중</ChipBadge>
+      <ChipBadge status="closing">마감 임박</ChipBadge>
+      <ChipBadge status="inProgress">진행중</ChipBadge>
+      <ChipBadge status="closed">마감</ChipBadge>
     </ChipGroup>
   ),
   parameters: {
     docs: {
       description: {
-        story: "4개의 Badge를 모두 포함한 ChipGroup입니다.",
+        story: "4개의 ChipBadge를 모두 포함한 ChipGroup입니다.",
       },
     },
   },
@@ -77,12 +77,12 @@ export const ManyChips: Story = {
   },
   render: () => (
     <ChipGroup>
-      <Badge status="recruiting">1번</Badge>
-      <Badge status="closing">2번</Badge>
-      <Badge status="inProgress">3번</Badge>
-      <Badge status="closed">4번</Badge>
-      <Badge status="recruiting">5번</Badge>
-      <Badge status="recruiting">6번</Badge>
+      <ChipBadge status="recruiting">1번</ChipBadge>
+      <ChipBadge status="closing">2번</ChipBadge>
+      <ChipBadge status="inProgress">3번</ChipBadge>
+      <ChipBadge status="closed">4번</ChipBadge>
+      <ChipBadge status="recruiting">5번</ChipBadge>
+      <ChipBadge status="recruiting">6번</ChipBadge>
     </ChipGroup>
   ),
   parameters: {
@@ -101,18 +101,18 @@ export const DifferentSizes: Story = {
   },
   render: () => (
     <ChipGroup>
-      <Badge status="recruiting" radius="max">
+      <ChipBadge status="recruiting" radius="max">
         Pill
-      </Badge>
-      <Badge status="inProgress" radius="xs">
+      </ChipBadge>
+      <ChipBadge status="inProgress" radius="xs">
         Rounded
-      </Badge>
+      </ChipBadge>
     </ChipGroup>
   ),
   parameters: {
     docs: {
       description: {
-        story: "Chip의 크기/스타일은 하위 Badge 컴포넌트에서 직접 제어합니다.",
+        story: "Chip의 크기/스타일은 하위 ChipBadge 컴포넌트에서 직접 제어합니다.",
       },
     },
   },

@@ -3,8 +3,8 @@
 import { useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
-import { Badge } from "@/components/Badge/Badge";
 import { Button } from "@/components/Button/Button";
+import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
 import { HostBadgeIcon } from "@/components/Icon/HostBadgeIcon";
@@ -174,13 +174,13 @@ export function ParticipantListCard({
                   </span>
                   <div className="mt-md flex items-center gap-2">
                     <span className="text-xs text-gray-500">달성도</span>
-                    <Badge status="recruiting" radius="max">
+                    <ChipBadge status="recruiting" radius="max">
                       {participant.achievementRate}%
-                    </Badge>
+                    </ChipBadge>
                     <span className="text-xs text-gray-500">집중도</span>
-                    <Badge status="closing" radius="max">
+                    <ChipBadge status="closing" radius="max">
                       {participant.focusRate}%
-                    </Badge>
+                    </ChipBadge>
                   </div>
                 </div>
 
