@@ -66,22 +66,22 @@ export function SessionList() {
 
   return (
     <section className="gap-lg flex flex-col">
-      <div className="flex flex-col gap-1">
-        <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-5">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+        <div className="flex flex-col gap-1 xl:justify-center">
+          <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
           <p className="text-text-muted text-[13px] md:text-base">
             현재 모집 중인 세션에 바로 참여해 보세요
           </p>
-          <SessionListFilterBar
-            values={values}
-            onSetDateRange={setDateRange}
-            onToggleTimeSlot={toggleTimeSlot}
-            onSetDurationRange={setDurationRange}
-            onSetParticipants={setParticipantsCount}
-            onSetSort={setSort}
-            onResetFilters={resetFilters}
-          />
         </div>
+        <SessionListFilterBar
+          values={values}
+          onSetDateRange={setDateRange}
+          onToggleTimeSlot={toggleTimeSlot}
+          onSetDurationRange={setDurationRange}
+          onSetParticipants={setParticipantsCount}
+          onSetSort={setSort}
+          onResetFilters={resetFilters}
+        />
       </div>
 
       {sessions.length === 0 ? (
