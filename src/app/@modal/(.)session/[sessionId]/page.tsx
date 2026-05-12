@@ -1,4 +1,4 @@
-import { SessionDetailModal } from "@/features/session/components/SessionDetailModal/SessionDetailModal";
+import { SessionDialog } from "@/features/session/components/SessionDialog/SessionDialog";
 
 interface SessionModalPageProps {
   params: Promise<{ sessionId: string }>;
@@ -7,5 +7,5 @@ interface SessionModalPageProps {
 export default async function Page({ params }: SessionModalPageProps) {
   const { sessionId } = await params;
 
-  return <SessionDetailModal sessionId={sessionId} />;
+  return <SessionDialog sessionId={sessionId} />;
 }

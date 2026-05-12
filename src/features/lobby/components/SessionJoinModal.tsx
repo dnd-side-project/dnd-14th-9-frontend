@@ -202,7 +202,7 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
         )}
 
         {/* 하단 버튼 */}
-        <ButtonGroup className="self-end">
+        <ButtonGroup layout="dual" horizontal className="self-end">
           <Button
             variant="solid"
             colorScheme="tertiary"

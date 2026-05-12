@@ -307,7 +307,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
 
       {/* 하단 버튼 (수정 모드) */}
       {isEditing && (
-        <ButtonGroup className="self-end">
+        <ButtonGroup layout="dual" horizontal className="self-end">
           <Button
             variant="solid"
             colorScheme="tertiary"
