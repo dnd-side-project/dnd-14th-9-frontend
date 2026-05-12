@@ -89,8 +89,8 @@ export function SessionListFilterBar({
       )}
       <div className="gap-md relative z-20 flex flex-col">
         {/* Tablet/Mobile: filter 4개 + sort 같은 row (justify-between) */}
-        <div className="flex items-center justify-between xl:contents">
-          <div className="flex items-center justify-end xl:contents">
+        <div className="flex w-full min-w-0 items-center justify-between gap-3 xl:contents">
+          <div className="flex min-w-0 flex-1 items-center justify-start xl:contents">
             <div className="scrollbar-hide flex items-center gap-[15px] overflow-x-auto">
               <DateRangeFilter
                 isOpen={isDatePickerOpen}
