@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
-import { ButtonLink } from "@/components/Button/ButtonLink";
 import { ButtonGroup } from "@/components/ButtonGroup/ButtonGroup";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
@@ -139,9 +138,9 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
         <Button variant="solid" colorScheme="tertiary" size="medium" onClick={handleClose}>
           건너뛰기
         </Button>
-        <ButtonLink href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
+        <Button href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
           로그인하고 참여하기
-        </ButtonLink>
+        </Button>
       </>
     );
   }
