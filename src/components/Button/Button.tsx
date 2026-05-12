@@ -187,7 +187,7 @@ export function Button({
   if (props.href !== undefined) {
     const { href, hardNavigate, onClick, ref, ...linkProps } = props;
 
-    if (hardNavigate === true) {
+    if (hardNavigate) {
       return (
         <Link
           ref={ref}
