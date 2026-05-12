@@ -195,11 +195,10 @@ export function Button({
           href={href}
           onClick={(e) => {
             onClick?.(e);
-            if (e.defaultPrevented) {
-              return;
+            if (!e.defaultPrevented) {
+              e.preventDefault();
+              navigateWithHardReload(e.currentTarget.href);
             }
-            e.preventDefault();
-            navigateWithHardReload(e.currentTarget.href);
           }}
         >
           {content}

@@ -125,7 +125,7 @@ export function NumericStepper({
             colorScheme="secondary"
             size="xsmall"
             iconOnly
-            leftIcon={<PlusIcon className="h-[13px] w-[13px]" />}
+            leftIcon={<PlusIcon size="small" />}
             onClick={handleIncrementClick}
             disabled={isAtMax}
             className="flex h-7 w-7 min-w-0 items-center justify-center rounded-xs p-0"
