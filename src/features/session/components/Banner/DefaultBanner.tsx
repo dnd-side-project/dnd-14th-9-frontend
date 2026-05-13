@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
 import Image from "next/image";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
+import { useViewportWidth } from "@/hooks/useViewportWidth";
+import { BREAKPOINT_MD_PX, BREAKPOINT_XL_PX } from "@/lib/constants/breakpoints";
 
 type Viewport = "mobile" | "tablet" | "desktop";
 type CardKey = "goals" | "datepicker" | "profile";
@@ -126,21 +128,16 @@ const CARD_STYLES: Record<Viewport, Record<"default" | "hover", Record<CardKey, 
   },
 };
 
-function useViewport(): Viewport {
-  const [viewport, setViewport] = useState<Viewport>("desktop");
+function getViewport(width: number | null): Viewport {
+  if (width === null || width >= BREAKPOINT_XL_PX) {
+    return "desktop";
+  }
 
-  useEffect(() => {
-    const update = () => {
-      if (window.innerWidth < 768) setViewport("mobile");
-      else if (window.innerWidth < 1280) setViewport("tablet");
-      else setViewport("desktop");
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
+  if (width < BREAKPOINT_MD_PX) {
+    return "mobile";
+  }
 
-  return viewport;
+  return "tablet";
 }
 
 interface DefaultBannerProps {
@@ -148,7 +145,7 @@ interface DefaultBannerProps {
 }
 
 export function DefaultBanner({ isHovered }: DefaultBannerProps) {
-  const viewport = useViewport();
+  const viewport = getViewport(useViewportWidth());
   const state = isHovered ? "hover" : "default";
   const cardStyles = CARD_STYLES[viewport][state];
 

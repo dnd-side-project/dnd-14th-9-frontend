@@ -1,17 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { ShareIcon } from "@/components/Icon/ShareIcon";
 import { Pagination } from "@/components/Pagination/Pagination";
+import { useViewportWidth } from "@/hooks/useViewportWidth";
+import { BREAKPOINT_MD_PX } from "@/lib/constants/breakpoints";
 
 import {
   SESSION_LIST_DEFAULT_PAGE_SIZE,
   SESSION_LIST_DESKTOP_PAGE_SIZE,
-  SESSION_LIST_MD_BREAKPOINT,
   SESSION_LIST_MOBILE_PAGE_SIZE,
 } from "../../constants/pagination";
 import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
@@ -24,30 +25,18 @@ import { SessionListFilterBar } from "./SessionListFilterBar";
 
 import type { SessionListItem } from "../../types";
 
-function getSessionListPageSize(width: number) {
-  return width < SESSION_LIST_MD_BREAKPOINT
-    ? SESSION_LIST_MOBILE_PAGE_SIZE
-    : SESSION_LIST_DESKTOP_PAGE_SIZE;
+function getSessionListPageSize(width: number | null) {
+  if (width === null) {
+    return SESSION_LIST_DEFAULT_PAGE_SIZE;
+  }
+
+  return width < BREAKPOINT_MD_PX ? SESSION_LIST_MOBILE_PAGE_SIZE : SESSION_LIST_DESKTOP_PAGE_SIZE;
 }
 
 function useResponsiveSessionListPageSize() {
-  const [pageSize, setPageSize] = useState(SESSION_LIST_DEFAULT_PAGE_SIZE);
-  const [isViewportResolved, setIsViewportResolved] = useState(false);
-
-  useEffect(() => {
-    const updatePageSize = () => {
-      const nextPageSize = getSessionListPageSize(window.innerWidth);
-      setPageSize((currentPageSize) =>
-        currentPageSize === nextPageSize ? currentPageSize : nextPageSize
-      );
-      setIsViewportResolved(true);
-    };
-
-    updatePageSize();
-    window.addEventListener("resize", updatePageSize);
-
-    return () => window.removeEventListener("resize", updatePageSize);
-  }, []);
+  const viewportWidth = useViewportWidth();
+  const pageSize = getSessionListPageSize(viewportWidth);
+  const isViewportResolved = viewportWidth !== null;
 
   return { pageSize, isViewportResolved };
 }
