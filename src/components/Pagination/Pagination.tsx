@@ -132,7 +132,6 @@ export function Pagination(props: PaginationProps) {
               aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex items-center justify-center rounded-md leading-[1.4] font-semibold transition-colors",
-                // Mobile: size-[32px] / Desktop: px-md py-xs
                 "md:px-md md:py-xs size-8 text-[13px] md:size-auto md:text-base",
                 isActive
                   ? "bg-surface-strong text-text-primary cursor-default"

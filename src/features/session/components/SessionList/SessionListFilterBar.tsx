@@ -88,7 +88,7 @@ export function SessionListFilterBar({
         <div className="bg-overlay-default fixed inset-0 z-10 w-full" />
       )}
       <div className="gap-md relative z-20 flex flex-col xl:items-end">
-        {/* Tablet/Mobile: 모든 필터와 Sort가 하나의 가로 스크롤 영역에 포함됨 */}
+        {/* 좁은 화면에서 필터 조작 공간을 확보하기 위해 정렬까지 같은 스크롤 영역에 둡니다. */}
         <div className="scrollbar-hide flex w-full items-center gap-[16px] overflow-x-auto xl:w-auto xl:overflow-visible">
           <DateRangeFilter
             isOpen={isDatePickerOpen}
@@ -136,7 +136,7 @@ export function SessionListFilterBar({
             />
           </div>
 
-          {/* Tablet/Mobile에서만 같은 row에 Sort 표시 (여백이 있을 땐 우측 정렬) */}
+          {/* 좁은 화면에서 정렬 필터가 스크롤 끝으로 밀리지 않도록 남는 공간을 먼저 채웁니다. */}
           <SortFilter
             isOpen={isSortOpen}
             value={values.sort}
@@ -146,7 +146,7 @@ export function SessionListFilterBar({
           />
         </div>
 
-        {/* Desktop(xl): sort 별도 row */}
+        {/* 넓은 화면에서는 필터 줄 폭을 안정적으로 유지하기 위해 정렬을 별도 행으로 분리합니다. */}
         <SortFilter
           isOpen={isSortOpen}
           value={values.sort}

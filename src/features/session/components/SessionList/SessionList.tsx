@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -8,7 +8,12 @@ import { useSearchParams } from "next/navigation";
 import { ShareIcon } from "@/components/Icon/ShareIcon";
 import { Pagination } from "@/components/Pagination/Pagination";
 
-import { SESSION_LIST_PAGE_SIZE } from "../../constants/pagination";
+import {
+  SESSION_LIST_DEFAULT_PAGE_SIZE,
+  SESSION_LIST_DESKTOP_PAGE_SIZE,
+  SESSION_LIST_MD_BREAKPOINT,
+  SESSION_LIST_MOBILE_PAGE_SIZE,
+} from "../../constants/pagination";
 import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
 import { useSessionListFilters } from "../../hooks/useSessionListFilters";
 import { useShareSession } from "../../hooks/useShareSession";
@@ -16,6 +21,70 @@ import { parseSessionListSearchParams } from "../../utils/parseSessionListSearch
 import { Card } from "../Card/Card";
 
 import { SessionListFilterBar } from "./SessionListFilterBar";
+
+import type { SessionListItem } from "../../types";
+
+function getSessionListPageSize(width: number) {
+  return width < SESSION_LIST_MD_BREAKPOINT
+    ? SESSION_LIST_MOBILE_PAGE_SIZE
+    : SESSION_LIST_DESKTOP_PAGE_SIZE;
+}
+
+function useResponsiveSessionListPageSize() {
+  const [pageSize, setPageSize] = useState(SESSION_LIST_DEFAULT_PAGE_SIZE);
+  const [isViewportResolved, setIsViewportResolved] = useState(false);
+
+  useEffect(() => {
+    const updatePageSize = () => {
+      const nextPageSize = getSessionListPageSize(window.innerWidth);
+      setPageSize((currentPageSize) =>
+        currentPageSize === nextPageSize ? currentPageSize : nextPageSize
+      );
+      setIsViewportResolved(true);
+    };
+
+    updatePageSize();
+    window.addEventListener("resize", updatePageSize);
+
+    return () => window.removeEventListener("resize", updatePageSize);
+  }, []);
+
+  return { pageSize, isViewportResolved };
+}
+
+interface SessionCardItemProps {
+  session: SessionListItem;
+  onShare: (sessionId: number) => void;
+}
+
+function SessionCardItem({ session, onShare }: SessionCardItemProps) {
+  return (
+    <div className="relative mx-auto w-full xl:max-w-69">
+      <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
+        <Card
+          size="responsive"
+          thumbnailSrc={session.imageUrl}
+          category={session.category}
+          createdAt={session.startTime}
+          title={session.title}
+          nickname={session.hostNickname}
+          currentParticipants={session.currentParticipants}
+          maxParticipants={session.maxParticipants}
+          durationMinutes={session.sessionDurationMinutes}
+          sessionDate={session.startTime}
+        />
+      </Link>
+      <button
+        type="button"
+        className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 flex cursor-pointer items-center justify-center rounded-full p-1.5 backdrop-blur-sm transition-colors"
+        onClick={() => onShare(session.sessionId)}
+        aria-label="세션 링크 복사"
+      >
+        <ShareIcon size="small" className="text-text-secondary" />
+      </button>
+    </div>
+  );
+}
 
 /**
  * SessionList - 모집 중 세션 목록
@@ -38,8 +107,8 @@ export function SessionList() {
   } = useSessionListFilters();
   const searchParams = useSearchParams();
   const { shareSession } = useShareSession();
+  const { pageSize, isViewportResolved } = useResponsiveSessionListPageSize();
 
-  // URL 파라미터 파싱
   const { keyword, category, page } = parseSessionListSearchParams(searchParams);
 
   const { data } = useSuspenseSessionList({
@@ -47,7 +116,7 @@ export function SessionList() {
     category,
     sort: values.sort,
     page,
-    size: SESSION_LIST_PAGE_SIZE,
+    size: pageSize,
     startDate: values.startDate ?? undefined,
     endDate: values.endDate ?? undefined,
     timeSlots: values.timeSlots.length > 0 ? values.timeSlots : undefined,
@@ -59,10 +128,10 @@ export function SessionList() {
   const totalPage = data.result.totalPage;
 
   useEffect(() => {
-    if (totalPage > 0 && page > totalPage) {
+    if (isViewportResolved && totalPage > 0 && page > totalPage) {
       setPage(totalPage);
     }
-  }, [page, setPage, totalPage]);
+  }, [isViewportResolved, page, setPage, totalPage]);
 
   return (
     <section className="gap-lg flex flex-col">
@@ -89,67 +158,11 @@ export function SessionList() {
           모집 중인 세션이 없습니다
         </div>
       ) : (
-        <>
-          {/* Mobile 전용: 최대 5장 (1열) */}
-          <div className="grid grid-cols-1 gap-6 md:hidden">
-            {sessions.slice(0, 5).map((session) => (
-              <div key={session.sessionId} className="relative mx-auto w-full">
-                <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
-                  <Card
-                    size="responsive"
-                    thumbnailSrc={session.imageUrl}
-                    category={session.category}
-                    createdAt={session.startTime}
-                    title={session.title}
-                    nickname={session.hostNickname}
-                    currentParticipants={session.currentParticipants}
-                    maxParticipants={session.maxParticipants}
-                    durationMinutes={session.sessionDurationMinutes}
-                    sessionDate={session.startTime}
-                  />
-                </Link>
-                <button
-                  type="button"
-                  className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 flex cursor-pointer items-center justify-center rounded-full p-1.5 backdrop-blur-sm transition-colors"
-                  onClick={() => shareSession(session.sessionId)}
-                  aria-label="세션 링크 복사"
-                >
-                  <ShareIcon size="small" className="text-text-secondary" />
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {/* Tablet+ 전용: 최대 8장 (2열 / 4열) */}
-          <div className="hidden md:grid md:grid-cols-2 md:gap-6 xl:grid-cols-4 xl:gap-y-[48px]">
-            {sessions.map((session) => (
-              <div key={session.sessionId} className="relative mx-auto w-full xl:max-w-69">
-                <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
-                  <Card
-                    size="responsive"
-                    thumbnailSrc={session.imageUrl}
-                    category={session.category}
-                    createdAt={session.startTime}
-                    title={session.title}
-                    nickname={session.hostNickname}
-                    currentParticipants={session.currentParticipants}
-                    maxParticipants={session.maxParticipants}
-                    durationMinutes={session.sessionDurationMinutes}
-                    sessionDate={session.startTime}
-                  />
-                </Link>
-                <button
-                  type="button"
-                  className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 flex cursor-pointer items-center justify-center rounded-full p-1.5 backdrop-blur-sm transition-colors"
-                  onClick={() => shareSession(session.sessionId)}
-                  aria-label="세션 링크 복사"
-                >
-                  <ShareIcon size="small" className="text-text-secondary" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 xl:gap-y-[48px]">
+          {sessions.map((session) => (
+            <SessionCardItem key={session.sessionId} session={session} onShare={shareSession} />
+          ))}
+        </div>
       )}
 
       {totalPage > 0 && (
