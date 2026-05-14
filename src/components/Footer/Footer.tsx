@@ -81,11 +81,10 @@ export function Footer() {
         <div className="flex w-full flex-col items-start px-[8px]">
           {/* Description Container */}
           <div className="flex w-full items-center justify-center">
-            <div className="text-text-disabled min-w-px flex-1 text-[11px] leading-none whitespace-pre-wrap md:text-xs">
-              <p className="mb-0 leading-[1.4]">GAK 문의 / 제휴: dnd9team@gmail.com</p>
-              <p className="mb-0 leading-[1.4]">​</p>
-              <p className="leading-[1.4]">
-                모든 제작물의 저작건은 GAK의 소유이므로 사전 허가 없이 무단복제, 도용을 금합니다.
+            <div className="text-text-disabled flex min-w-px flex-1 flex-col gap-[1.4em] text-[11px] leading-[1.4] md:text-xs">
+              <p>GAK 문의 / 제휴: dnd9team@gmail.com</p>
+              <p>
+                모든 제작물의 저작권은 GAK의 소유이므로 사전 허가 없이 무단복제, 도용을 금합니다.
               </p>
             </div>
           </div>
