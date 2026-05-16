@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ButtonLink } from "@/components/Button/ButtonLink";
+import { Button } from "@/components/Button/Button";
 import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
 import { LOGIN_ROUTE, ROOT_ROUTE } from "@/lib/routes/route-paths";
 
@@ -21,7 +21,7 @@ function HeaderStory({ isAuthenticated }: { isAuthenticated: boolean }) {
       <div className="gap-sm flex items-center justify-end">
         {isAuthenticated ? (
           <>
-            <ButtonLink
+            <Button
               href="/session/create"
               aria-label="세션 만들기"
               size="small"
@@ -30,11 +30,11 @@ function HeaderStory({ isAuthenticated }: { isAuthenticated: boolean }) {
               className="px-xs py-2xs md:px-sm md:py-xs"
             >
               세션 만들기
-            </ButtonLink>
+            </Button>
             <ProfileDropdown />
           </>
         ) : (
-          <ButtonLink
+          <Button
             href={LOGIN_ROUTE}
             aria-label="로그인"
             size="small"
@@ -43,7 +43,7 @@ function HeaderStory({ isAuthenticated }: { isAuthenticated: boolean }) {
             className="px-xs py-2xs md:px-sm md:py-xs"
           >
             회원가입 / 로그인
-          </ButtonLink>
+          </Button>
         )}
       </div>
     </header>

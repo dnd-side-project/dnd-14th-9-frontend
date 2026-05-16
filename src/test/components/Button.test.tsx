@@ -1,45 +1,62 @@
-import { render, screen } from "@testing-library/react";
+import type { MouseEvent } from "react";
+
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { Button } from "@/components/Button/Button";
+import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 
-describe("Button", () => {
-  it("medium size matches the Figma md dimensions", () => {
-    render(<Button size="medium">확인</Button>);
+jest.mock("@/lib/navigation/hardNavigate", () => ({
+  navigateWithHardReload: jest.fn(),
+}));
 
-    expect(screen.getByRole("button", { name: "확인" })).toHaveClass(
-      "h-11",
-      "min-w-[77px]",
-      "px-lg",
-      "py-sm",
-      "text-sm"
-    );
+describe("Button (href support)", () => {
+  const hardReloadMock = jest.mocked(navigateWithHardReload);
+
+  beforeEach(() => {
+    window.history.replaceState({}, "", "/");
   });
 
-  it("solid primary uses the Figma state tokens", () => {
-    render(<Button>확인</Button>);
-
-    expect(screen.getByRole("button", { name: "확인" })).toHaveClass(
-      "bg-surface-primary-default",
-      "text-text-inverse",
-      "hover:bg-surface-primary-subtle",
-      "active:bg-surface-primary-strong"
-    );
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  it("icon-only medium button matches the Figma md square dimensions", () => {
+  it("soft navigation에서 UrlObject href를 정상 렌더링한다", () => {
     render(
-      <Button
-        iconOnly
-        size="medium"
-        aria-label="더하기"
-        leftIcon={<span aria-hidden="true">+</span>}
-      />
+      <Button href={{ pathname: "/session", query: { page: "2" }, hash: "top" }}>세션 보기</Button>
     );
 
-    expect(screen.getByRole("button", { name: "더하기" })).toHaveClass(
-      "size-11",
-      "min-w-0",
-      "p-sm"
+    expect(screen.getByRole("link", { name: "세션 보기" })).toHaveAttribute(
+      "href",
+      "/session?page=2#top"
     );
+  });
+
+  it("hardNavigate일 때 브라우저가 계산한 href로 full reload를 수행한다", () => {
+    render(
+      <Button href="/login?from=header#cta" hardNavigate>
+        로그인
+      </Button>
+    );
+
+    fireEvent.click(screen.getByRole("link", { name: "로그인" }));
+
+    expect(hardReloadMock).toHaveBeenCalledWith("http://localhost/login?from=header#cta");
+  });
+
+  it("hardNavigate에서 onClick이 기본 동작을 막으면 reload하지 않는다", () => {
+    const handleClick = jest.fn((e: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
+      e.preventDefault();
+    });
+
+    render(
+      <Button href="/login" hardNavigate onClick={handleClick}>
+        로그인
+      </Button>
+    );
+
+    fireEvent.click(screen.getByRole("link", { name: "로그인" }));
+
+    expect(handleClick).toHaveBeenCalledTimes(1);
+    expect(hardReloadMock).not.toHaveBeenCalled();
   });
 });

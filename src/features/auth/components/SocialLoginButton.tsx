@@ -1,4 +1,4 @@
-import { Button, type ButtonProps } from "@/components/Button/Button";
+import { Button, type NativeButtonProps } from "@/components/Button/Button";
 import { GoogleIcon } from "@/components/Icon/GoogleIcon";
 import { KakaoIcon } from "@/components/Icon/KakaoIcon";
 import { LoadingSpinner } from "@/components/LoadingSpinner/LoadingSpinner";
@@ -7,7 +7,7 @@ import type { LoginProvider } from "@/lib/auth/oauth-provider-policy";
 import { cn } from "@/lib/utils/utils";
 
 export interface SocialLoginButtonProps extends Omit<
-  ButtonProps,
+  NativeButtonProps,
   "children" | "leftIcon" | "rightIcon" | "variant"
 > {
   provider: LoginProvider;

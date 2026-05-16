@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import { ButtonLink } from "@/components/Button/ButtonLink";
+import { Button } from "@/components/Button/Button";
 import { ChevronRightIcon } from "@/components/Icon/ChevronRightIcon";
 
 const FEEDBACK_FORM_URL = "https://forms.gle/T8dyZ7WKoG9tBLsG6";
@@ -25,7 +25,7 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
           </p>
         </div>
 
-        <ButtonLink
+        <Button
           href={FEEDBACK_FORM_URL}
           target="_blank"
           rel="noopener noreferrer"
@@ -37,10 +37,15 @@ export function FeedbackBanner({ isHovered }: FeedbackBannerProps) {
               ? "border-alpha-white-48 bg-alpha-white-24 text-text-primary"
               : "border-alpha-white-24 bg-alpha-white-8 text-cyan-200"
           }`}
-          rightIcon={<ChevronRightIcon size="xsmall" className="md:h-5 md:w-5" />}
+          rightIcon={
+            <>
+              <ChevronRightIcon size="xsmall" className="md:hidden" />
+              <ChevronRightIcon size="small" className="hidden md:inline-block" />
+            </>
+          }
         >
           피드백 남기기
-        </ButtonLink>
+        </Button>
       </div>
 
       {/* Image Container */}
