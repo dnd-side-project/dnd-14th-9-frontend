@@ -1,13 +1,10 @@
 "use client";
 
-/* eslint-disable no-console */
 import { useEffect, useRef, useState } from "react";
 
 import { SSEClient } from "./client";
 
 import type { SSEConnectionStatus, SSEError } from "./types";
-
-const isDev = process.env.NODE_ENV === "development";
 
 export interface SSEEventMeta {
   /** 이벤트 리스너가 등록된 시점의 url (in-flight 이벤트 race 검증용) */
@@ -77,14 +74,11 @@ export function useSSE<T>({
   useEffect(() => {
     if (!enabled) return;
 
-    if (isDev) console.log(`[useSSE] subscribe`, { url, eventName });
-
     const client = new SSEClient();
     clientRef.current = client;
 
     // 상태 변경 리스너 - 연결 시작 시 이전 에러 초기화
     const unsubscribeStatus = client.onStatusChange((newStatus) => {
-      if (isDev) console.log(`[useSSE] status`, { eventName, status: newStatus });
       setStatus(newStatus);
       if (newStatus === "connecting") {
         setError(null);
@@ -97,7 +91,6 @@ export function useSSE<T>({
     // 처리될 수 있어, 콜백 측에서 등록 시점 url을 알아야 stale 이벤트를 식별할 수 있음.
     const registeredUrl = url;
     const unsubscribeEvent = client.on<T>(eventName, (eventData) => {
-      if (isDev) console.log(`[useSSE] event ${eventName}`, eventData);
       setData(eventData);
       setError(null);
       onDataRef.current?.(eventData, { url: registeredUrl });
@@ -105,7 +98,6 @@ export function useSSE<T>({
 
     // 에러 리스너
     const unsubscribeError = client.on<SSEError>("error", (sseError) => {
-      if (isDev) console.warn(`[useSSE] error`, { eventName, ...sseError });
       setError(sseError);
       onErrorRef.current?.(sseError);
     });
@@ -115,7 +107,6 @@ export function useSSE<T>({
 
     // cleanup
     return () => {
-      if (isDev) console.log(`[useSSE] unsubscribe`, { url, eventName });
       unsubscribeStatus();
       unsubscribeEvent();
       unsubscribeError();

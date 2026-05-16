@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { NextRequest } from "next/server";
 
 import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
@@ -15,23 +14,15 @@ export function createSSEProxyHandler<TParams extends Record<string, string>>(
   return async function GET(request: NextRequest, { params }: { params: Promise<TParams> }) {
     const resolvedParams = await params;
     const rawToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
-    const pathname = request.nextUrl.pathname;
 
     if (!rawToken) {
-      console.warn("[SSE Proxy] 401 Unauthorized — accessToken cookie missing", { pathname });
       return new Response("Unauthorized", { status: 401 });
     }
 
     const backendUrl = options.buildBackendUrl(SERVER_API_URL ?? "", resolvedParams);
-    console.log("[SSE Proxy] → connecting", {
-      pathname,
-      backendUrl,
-      tokenPreview: `${rawToken.slice(0, 8)}…(len=${rawToken.length})`,
-    });
-
     const abortController = new AbortController();
+
     request.signal.addEventListener("abort", () => {
-      console.log("[SSE Proxy] client aborted", { pathname });
       abortController.abort();
     });
 
@@ -43,13 +34,6 @@ export function createSSEProxyHandler<TParams extends Record<string, string>>(
         },
         cache: "no-store",
         signal: abortController.signal,
-      });
-
-      console.log("[SSE Proxy] ← backend response", {
-        pathname,
-        status: response.status,
-        ok: response.ok,
-        contentType: response.headers.get("content-type"),
       });
 
       if (!response.ok) {
@@ -75,7 +59,6 @@ export function createSSEProxyHandler<TParams extends Record<string, string>>(
           } catch {
             // 클라이언트/백엔드 연결 해제 시 정상 종료
           } finally {
-            console.log("[SSE Proxy] stream closed", { pathname });
             try {
               controller.close();
             } catch {
