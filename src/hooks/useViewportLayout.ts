@@ -27,8 +27,8 @@ function getViewportLayout(width: number | null): ViewportLayout {
 /**
  * 현재 브라우저 viewport가 프로젝트 breakpoint 기준으로 어떤 레이아웃인지 알려주는 훅입니다.
  *
- * `ResizeObserver`는 특정 DOM 요소의 크기를 관찰할 때 적합하지만,
- * 이 훅은 요소가 아닌 브라우저 viewport 너비(`window.innerWidth`)가 필요하므로 window resize 이벤트를 사용합니다.
+ * `ResizeObserver`로 `document.documentElement`를 관찰하여 viewport 너비 변화를 감지합니다.
+ * layout/paint 이후 배치로 처리되므로 별도의 debounce 없이 성능이 최적화됩니다.
  *
  * SSR/hydration 단계처럼 아직 viewport를 알 수 없는 시점에는 desktop 레이아웃을 fallback으로 반환하고,
  * 클라이언트에서 실제 너비를 읽은 뒤 `isResolved`를 true로 전환합니다.
@@ -37,15 +37,14 @@ export function useViewportLayout(): ViewportLayoutState {
   const [width, setWidth] = useState<number | null>(null);
 
   useEffect(() => {
-    const updateWidth = () => {
-      setWidth(window.innerWidth);
-    };
+    const observer = new ResizeObserver(([entry]) => {
+      setWidth(entry.contentRect.width);
+    });
 
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
+    observer.observe(document.documentElement);
 
     return () => {
-      window.removeEventListener("resize", updateWidth);
+      observer.disconnect();
     };
   }, []);
 

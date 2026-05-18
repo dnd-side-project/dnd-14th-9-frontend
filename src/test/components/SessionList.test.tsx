@@ -88,18 +88,16 @@ function createSessionListResult({ count = 5, totalPage = 3 } = {}) {
   };
 }
 
+let resizeCallback: ResizeObserverCallback;
+let currentWidth = 1280;
+
 function setViewportWidth(width: number) {
-  Object.defineProperty(window, "innerWidth", {
-    configurable: true,
-    writable: true,
-    value: width,
-  });
+  currentWidth = width;
 }
 
 function dispatchResize(width: number) {
   act(() => {
-    setViewportWidth(width);
-    window.dispatchEvent(new Event("resize"));
+    resizeCallback([{ contentRect: { width } } as ResizeObserverEntry], {} as ResizeObserver);
   });
 }
 
@@ -135,7 +133,22 @@ function getLatestSessionListParams() {
 describe("SessionList", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    setViewportWidth(1280);
+    currentWidth = 1280;
+
+    global.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
+      resizeCallback = callback;
+      return {
+        observe: jest.fn(() => {
+          callback(
+            [{ contentRect: { width: currentWidth } } as ResizeObserverEntry],
+            {} as ResizeObserver
+          );
+        }),
+        disconnect: jest.fn(),
+        unobserve: jest.fn(),
+      };
+    }) as unknown as typeof ResizeObserver;
+
     setSearchParams("page=1");
     setupFilters();
     mockUseSuspenseSessionList.mockReturnValue(createSessionListResult({ count: 8, totalPage: 4 }));

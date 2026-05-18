@@ -2,8 +2,9 @@ import { act, render, screen } from "@testing-library/react";
 
 import { useViewportLayout } from "@/hooks/useViewportLayout";
 
-const addEventListenerSpy = jest.spyOn(window, "addEventListener");
-const removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
+let observerCallback: ResizeObserverCallback;
+const disconnectMock = jest.fn();
+const observeMock = jest.fn();
 
 function ViewportProbe({ label }: { label: string }) {
   const { layout, isResolved } = useViewportLayout();
@@ -19,34 +20,42 @@ function ViewportProbe({ label }: { label: string }) {
 describe("useViewportLayout", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    Object.defineProperty(window, "innerWidth", {
-      configurable: true,
-      writable: true,
-      value: 1024,
-    });
+    global.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
+      observerCallback = callback;
+      return {
+        observe: observeMock,
+        disconnect: disconnectMock,
+        unobserve: jest.fn(),
+      };
+    }) as unknown as typeof ResizeObserver;
   });
 
-  it("mount 시 현재 viewport layout을 읽고 resize listener를 등록한다", () => {
+  it("mount 시 ResizeObserver로 document.documentElement를 관찰한다", () => {
     const { unmount } = render(<ViewportProbe label="A" />);
 
-    expect(addEventListenerSpy).toHaveBeenCalledWith("resize", expect.any(Function));
+    act(() => {
+      observerCallback(
+        [{ contentRect: { width: 1024 } } as ResizeObserverEntry],
+        {} as ResizeObserver
+      );
+    });
+
+    expect(observeMock).toHaveBeenCalledWith(document.documentElement);
     expect(screen.getByText("tablet:resolved")).toBeInTheDocument();
 
     unmount();
 
-    expect(removeEventListenerSpy).toHaveBeenCalledWith("resize", expect.any(Function));
+    expect(disconnectMock).toHaveBeenCalled();
   });
 
-  it("resize 시 최신 viewport layout을 읽는다", () => {
+  it("viewport 너비 변경 시 최신 레이아웃을 반환한다", () => {
     render(<ViewportProbe label="A" />);
 
     act(() => {
-      Object.defineProperty(window, "innerWidth", {
-        configurable: true,
-        writable: true,
-        value: 375,
-      });
-      window.dispatchEvent(new Event("resize"));
+      observerCallback(
+        [{ contentRect: { width: 375 } } as ResizeObserverEntry],
+        {} as ResizeObserver
+      );
     });
 
     expect(screen.getByText("mobile:resolved")).toBeInTheDocument();
