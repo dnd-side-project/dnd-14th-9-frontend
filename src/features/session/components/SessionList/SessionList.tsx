@@ -2,10 +2,8 @@
 
 import { useEffect } from "react";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { ShareIcon } from "@/components/Icon/ShareIcon";
 import { Pagination } from "@/components/Pagination/Pagination";
 import { useViewportLayout } from "@/hooks/useViewportLayout";
 
@@ -17,11 +15,9 @@ import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
 import { useSessionListFilters } from "../../hooks/useSessionListFilters";
 import { useShareSession } from "../../hooks/useShareSession";
 import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
-import { Card } from "../Card/Card";
 
+import { SessionCardItem } from "./SessionCardItem";
 import { SessionListFilterBar } from "./SessionListFilterBar";
-
-import type { SessionListItem } from "../../types";
 
 function useResponsiveSessionListPageSize() {
   const { layout, isResolved } = useViewportLayout();
@@ -29,40 +25,6 @@ function useResponsiveSessionListPageSize() {
     layout === "mobile" ? SESSION_LIST_MOBILE_PAGE_SIZE : SESSION_LIST_DESKTOP_PAGE_SIZE;
 
   return { pageSize, isViewportResolved: isResolved };
-}
-
-interface SessionCardItemProps {
-  session: SessionListItem;
-  onShare: (sessionId: number) => void;
-}
-
-function SessionCardItem({ session, onShare }: SessionCardItemProps) {
-  return (
-    <div className="relative mx-auto w-full xl:max-w-69">
-      <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
-        <Card
-          size="responsive"
-          thumbnailSrc={session.imageUrl}
-          category={session.category}
-          createdAt={session.startTime}
-          title={session.title}
-          nickname={session.hostNickname}
-          currentParticipants={session.currentParticipants}
-          maxParticipants={session.maxParticipants}
-          durationMinutes={session.sessionDurationMinutes}
-          sessionDate={session.startTime}
-        />
-      </Link>
-      <button
-        type="button"
-        className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 flex cursor-pointer items-center justify-center rounded-full p-1.5 backdrop-blur-sm transition-colors"
-        onClick={() => onShare(session.sessionId)}
-        aria-label="세션 링크 복사"
-      >
-        <ShareIcon size="small" className="text-text-secondary" />
-      </button>
-    </div>
-  );
 }
 
 /**
