@@ -7,11 +7,9 @@ import { useSearchParams } from "next/navigation";
 
 import { ShareIcon } from "@/components/Icon/ShareIcon";
 import { Pagination } from "@/components/Pagination/Pagination";
-import { useViewportWidth } from "@/hooks/useViewportWidth";
-import { BREAKPOINT_MD_PX } from "@/lib/constants/breakpoints";
+import { useViewportLayout } from "@/hooks/useViewportLayout";
 
 import {
-  SESSION_LIST_DEFAULT_PAGE_SIZE,
   SESSION_LIST_DESKTOP_PAGE_SIZE,
   SESSION_LIST_MOBILE_PAGE_SIZE,
 } from "../../constants/pagination";
@@ -25,20 +23,12 @@ import { SessionListFilterBar } from "./SessionListFilterBar";
 
 import type { SessionListItem } from "../../types";
 
-function getSessionListPageSize(width: number | null) {
-  if (width === null) {
-    return SESSION_LIST_DEFAULT_PAGE_SIZE;
-  }
-
-  return width < BREAKPOINT_MD_PX ? SESSION_LIST_MOBILE_PAGE_SIZE : SESSION_LIST_DESKTOP_PAGE_SIZE;
-}
-
 function useResponsiveSessionListPageSize() {
-  const viewportWidth = useViewportWidth();
-  const pageSize = getSessionListPageSize(viewportWidth);
-  const isViewportResolved = viewportWidth !== null;
+  const { layout, isResolved } = useViewportLayout();
+  const pageSize =
+    layout === "mobile" ? SESSION_LIST_MOBILE_PAGE_SIZE : SESSION_LIST_DESKTOP_PAGE_SIZE;
 
-  return { pageSize, isViewportResolved };
+  return { pageSize, isViewportResolved: isResolved };
 }
 
 interface SessionCardItemProps {

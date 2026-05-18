@@ -6,8 +6,7 @@ import Image from "next/image";
 
 import { ButtonLink } from "@/components/Button/ButtonLink";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
-import { useViewportWidth } from "@/hooks/useViewportWidth";
-import { BREAKPOINT_MD_PX, BREAKPOINT_XL_PX } from "@/lib/constants/breakpoints";
+import { useViewportLayout } from "@/hooks/useViewportLayout";
 
 type Viewport = "mobile" | "tablet" | "desktop";
 type CardKey = "goals" | "datepicker" | "profile";
@@ -128,26 +127,14 @@ const CARD_STYLES: Record<Viewport, Record<"default" | "hover", Record<CardKey, 
   },
 };
 
-function getViewport(width: number | null): Viewport {
-  if (width === null || width >= BREAKPOINT_XL_PX) {
-    return "desktop";
-  }
-
-  if (width < BREAKPOINT_MD_PX) {
-    return "mobile";
-  }
-
-  return "tablet";
-}
-
 interface DefaultBannerProps {
   isHovered: boolean;
 }
 
 export function DefaultBanner({ isHovered }: DefaultBannerProps) {
-  const viewport = getViewport(useViewportWidth());
+  const { layout } = useViewportLayout();
   const state = isHovered ? "hover" : "default";
-  const cardStyles = CARD_STYLES[viewport][state];
+  const cardStyles = CARD_STYLES[layout][state];
 
   return (
     <section className="border-sm border-alpha-white-16 relative flex h-[264px] w-full flex-col items-start justify-between overflow-hidden rounded-sm bg-linear-to-b from-gray-950 to-gray-900 xl:flex-row xl:items-center xl:justify-start">
