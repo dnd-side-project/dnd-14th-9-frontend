@@ -87,75 +87,72 @@ export function SessionListFilterBar({
       {openFilter && openFilter !== "sort" && (
         <div className="bg-overlay-default fixed inset-0 z-10 w-full" />
       )}
-      <div className="gap-md relative z-20 flex flex-col">
-        {/* Tablet/Mobile: filter 4개 + sort 같은 row (justify-between) */}
-        <div className="flex items-center justify-between xl:contents">
-          <div className="flex items-center justify-end xl:contents">
-            <div className="scrollbar-hide flex items-center gap-[15px] overflow-x-auto">
-              <DateRangeFilter
-                isOpen={isDatePickerOpen}
-                label={dateFilterLabel}
-                value={selectedDateRange}
-                hasSelection={hasDateSelection}
-                onOpenChange={handleDateOpenChange}
-                onChange={handleDateRangeChange}
-              />
+      <div className="gap-md relative z-20 flex flex-col xl:items-end">
+        {/* 좁은 화면에서 필터 조작 공간을 확보하기 위해 정렬까지 같은 스크롤 영역에 둡니다. */}
+        <div className="scrollbar-hide flex w-full items-center gap-[16px] overflow-x-auto xl:w-auto xl:overflow-visible">
+          <DateRangeFilter
+            isOpen={isDatePickerOpen}
+            label={dateFilterLabel}
+            value={selectedDateRange}
+            hasSelection={hasDateSelection}
+            onOpenChange={handleDateOpenChange}
+            onChange={handleDateRangeChange}
+          />
 
-              <StartTimeFilter
-                isOpen={isTimeSlotOpen}
-                selectedTimeSlots={values.timeSlots}
-                onOpenChange={handleTimeSlotOpenChange}
-                onToggleTimeSlot={onToggleTimeSlot}
-              />
+          <StartTimeFilter
+            isOpen={isTimeSlotOpen}
+            selectedTimeSlots={values.timeSlots}
+            onOpenChange={handleTimeSlotOpenChange}
+            onToggleTimeSlot={onToggleTimeSlot}
+          />
 
-              <DurationFilter
-                isOpen={isDurationOpen}
-                value={values.durationRange}
-                onOpenChange={handleDurationOpenChange}
-                onSelect={onSetDurationRange}
-              />
+          <DurationFilter
+            isOpen={isDurationOpen}
+            value={values.durationRange}
+            onOpenChange={handleDurationOpenChange}
+            onSelect={onSetDurationRange}
+          />
 
-              <ParticipantsFilter
-                isOpen={isParticipantsOpen}
-                participants={values.participants}
-                onOpenChange={handleParticipantsOpenChange}
-                onChange={onSetParticipants}
-              />
-            </div>
-            <div
-              className={`flex items-center overflow-hidden transition-all duration-300 ease-in-out ${
-                hasAnyFilter ? "ml-xs max-w-[40px] opacity-100" : "ml-0 max-w-0 opacity-0"
-              }`}
-            >
-              <Button
-                size="small"
-                variant="ghost"
-                colorScheme="secondary"
-                iconOnly
-                leftIcon={<ArrowRotateRightIcon />}
-                className="text-text-tertiary hover:text-text-primary active:bg-surface-strong active:text-text-primary h-[32px] w-[32px] shrink-0 p-[8px]!"
-                onClick={onResetFilters}
-              />
-            </div>
+          <ParticipantsFilter
+            isOpen={isParticipantsOpen}
+            participants={values.participants}
+            onOpenChange={handleParticipantsOpenChange}
+            onChange={onSetParticipants}
+          />
+
+          <div
+            className={`flex items-center overflow-hidden transition-all duration-300 ease-in-out ${
+              hasAnyFilter ? "ml-xs max-w-[40px] opacity-100" : "ml-0 max-w-0 opacity-0"
+            }`}
+          >
+            <Button
+              size="small"
+              variant="ghost"
+              colorScheme="secondary"
+              iconOnly
+              leftIcon={<ArrowRotateRightIcon />}
+              className="text-text-tertiary hover:text-text-primary active:bg-surface-strong active:text-text-primary h-[32px] w-[32px] shrink-0 p-[8px]!"
+              onClick={onResetFilters}
+            />
           </div>
 
-          {/* Tablet/Mobile에서만 같은 row에 Sort 표시 */}
+          {/* 좁은 화면에서 정렬 필터가 스크롤 끝으로 밀리지 않도록 남는 공간을 먼저 채웁니다. */}
           <SortFilter
             isOpen={isSortOpen}
             value={values.sort}
             onOpenChange={handleSortOpenChange}
             onSelect={onSetSort}
-            className="shrink-0 xl:hidden"
+            className="ml-auto shrink-0 xl:hidden"
           />
         </div>
 
-        {/* Desktop(xl): sort 별도 row */}
+        {/* 넓은 화면에서는 필터 줄 폭을 안정적으로 유지하기 위해 정렬을 별도 행으로 분리합니다. */}
         <SortFilter
           isOpen={isSortOpen}
           value={values.sort}
           onOpenChange={handleSortOpenChange}
           onSelect={onSetSort}
-          className="hidden self-end xl:flex"
+          className="hidden shrink-0 xl:flex"
         />
       </div>
     </>

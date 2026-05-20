@@ -2,20 +2,30 @@
 
 import { useEffect } from "react";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { ShareIcon } from "@/components/Icon/ShareIcon";
 import { Pagination } from "@/components/Pagination/Pagination";
+import { useViewportLayout } from "@/hooks/useViewportLayout";
 
-import { SESSION_LIST_PAGE_SIZE } from "../../constants/pagination";
+import {
+  SESSION_LIST_DESKTOP_PAGE_SIZE,
+  SESSION_LIST_MOBILE_PAGE_SIZE,
+} from "../../constants/pagination";
 import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
 import { useSessionListFilters } from "../../hooks/useSessionListFilters";
 import { useShareSession } from "../../hooks/useShareSession";
 import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
-import { Card } from "../Card/Card";
 
+import { SessionCardItem } from "./SessionCardItem";
 import { SessionListFilterBar } from "./SessionListFilterBar";
+
+function useResponsiveSessionListPageSize() {
+  const { layout, isResolved } = useViewportLayout();
+  const pageSize =
+    layout === "mobile" ? SESSION_LIST_MOBILE_PAGE_SIZE : SESSION_LIST_DESKTOP_PAGE_SIZE;
+
+  return { pageSize, isViewportResolved: isResolved };
+}
 
 /**
  * SessionList - 모집 중 세션 목록
@@ -38,8 +48,8 @@ export function SessionList() {
   } = useSessionListFilters();
   const searchParams = useSearchParams();
   const { shareSession } = useShareSession();
+  const { pageSize, isViewportResolved } = useResponsiveSessionListPageSize();
 
-  // URL 파라미터 파싱
   const { keyword, category, page } = parseSessionListSearchParams(searchParams);
 
   const { data } = useSuspenseSessionList({
@@ -47,7 +57,7 @@ export function SessionList() {
     category,
     sort: values.sort,
     page,
-    size: SESSION_LIST_PAGE_SIZE,
+    size: pageSize,
     startDate: values.startDate ?? undefined,
     endDate: values.endDate ?? undefined,
     timeSlots: values.timeSlots.length > 0 ? values.timeSlots : undefined,
@@ -59,16 +69,16 @@ export function SessionList() {
   const totalPage = data.result.totalPage;
 
   useEffect(() => {
-    if (totalPage > 0 && page > totalPage) {
+    if (isViewportResolved && totalPage > 0 && page > totalPage) {
       setPage(totalPage);
     }
-  }, [page, setPage, totalPage]);
+  }, [isViewportResolved, page, setPage, totalPage]);
 
   return (
     <section className="gap-lg flex flex-col">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-[10px]">
         <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between xl:gap-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-5">
           <p className="text-text-muted text-[13px] md:text-base">
             현재 모집 중인 세션에 바로 참여해 보세요
           </p>
@@ -91,30 +101,7 @@ export function SessionList() {
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 xl:gap-y-[48px]">
           {sessions.map((session) => (
-            <div key={session.sessionId} className="relative mx-auto w-full xl:max-w-69">
-              <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
-                <Card
-                  size="responsive"
-                  thumbnailSrc={session.imageUrl}
-                  category={session.category}
-                  createdAt={session.startTime}
-                  title={session.title}
-                  nickname={session.hostNickname}
-                  currentParticipants={session.currentParticipants}
-                  maxParticipants={session.maxParticipants}
-                  durationMinutes={session.sessionDurationMinutes}
-                  sessionDate={session.startTime}
-                />
-              </Link>
-              <button
-                type="button"
-                className="bg-surface-default/80 hover:bg-surface-default absolute top-2 right-2 flex cursor-pointer items-center justify-center rounded-full p-1.5 backdrop-blur-sm transition-colors"
-                onClick={() => shareSession(session.sessionId)}
-                aria-label="세션 링크 복사"
-              >
-                <ShareIcon size="small" className="text-text-secondary" />
-              </button>
-            </div>
+            <SessionCardItem key={session.sessionId} session={session} onShare={shareSession} />
           ))}
         </div>
       )}

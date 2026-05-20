@@ -1,6 +1,6 @@
 import { HeroSection } from "@/features/session/components/HeroSection/HeroSection";
 import { MainSection } from "@/features/session/components/MainSection/MainSection";
-import { SESSION_LIST_PAGE_SIZE } from "@/features/session/constants/pagination";
+import { SESSION_LIST_DEFAULT_PAGE_SIZE } from "@/features/session/constants/pagination";
 import {
   parseSessionListSearchParams,
   toURLSearchParams,
@@ -45,7 +45,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   // 모집 중 세션 목록 prefetch (첫 페이지 로드 성능 최적화)
   const listParams = {
     ...parsedParams,
-    size: SESSION_LIST_PAGE_SIZE,
+    size: SESSION_LIST_DEFAULT_PAGE_SIZE,
     timeSlots: parsedParams.timeSlots.length > 0 ? parsedParams.timeSlots : undefined,
   };
 

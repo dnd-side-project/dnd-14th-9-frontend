@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
 import Image from "next/image";
 
 import { Button } from "@/components/Button/Button";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
+import { useViewportLayout } from "@/hooks/useViewportLayout";
 
 type Viewport = "mobile" | "tablet" | "desktop";
 type CardKey = "goals" | "datepicker" | "profile";
@@ -126,31 +127,14 @@ const CARD_STYLES: Record<Viewport, Record<"default" | "hover", Record<CardKey, 
   },
 };
 
-function useViewport(): Viewport {
-  const [viewport, setViewport] = useState<Viewport>("desktop");
-
-  useEffect(() => {
-    const update = () => {
-      if (window.innerWidth < 768) setViewport("mobile");
-      else if (window.innerWidth < 1280) setViewport("tablet");
-      else setViewport("desktop");
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  return viewport;
-}
-
 interface DefaultBannerProps {
   isHovered: boolean;
 }
 
 export function DefaultBanner({ isHovered }: DefaultBannerProps) {
-  const viewport = useViewport();
+  const { layout } = useViewportLayout();
   const state = isHovered ? "hover" : "default";
-  const cardStyles = CARD_STYLES[viewport][state];
+  const cardStyles = CARD_STYLES[layout][state];
 
   return (
     <section className="border-sm border-alpha-white-16 relative flex h-[264px] w-full flex-col items-start justify-between overflow-hidden rounded-sm bg-linear-to-b from-gray-950 to-gray-900 xl:flex-row xl:items-center xl:justify-start">
