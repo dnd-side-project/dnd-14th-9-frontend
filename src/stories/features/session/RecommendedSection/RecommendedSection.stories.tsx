@@ -1,5 +1,4 @@
 import { RecommendedGridSkeleton } from "@/features/session/components/RecommendedSection/RecommendedGridSkeleton";
-import { RecommendedSectionSkeleton } from "@/features/session/components/RecommendedSection/RecommendedSectionSkeleton";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
@@ -86,44 +85,6 @@ export const GridSkeletonDesktop: Story = {
     docs: {
       description: {
         story: "desktop(1280px~): xl:grid-cols-4로 4열 렌더링되어야 합니다.",
-      },
-    },
-  },
-};
-
-// ---------------------------------------------------------------------------
-// RecommendedSectionSkeleton (헤더 포함 전체) — 뷰포트별
-// ---------------------------------------------------------------------------
-
-/** mobile: 섹션 헤더 + 가로 스크롤 그리드 전체 스켈레톤 */
-export const SectionSkeletonMobile: Story = {
-  render: () => (
-    <StoryWrapper>
-      <RecommendedSectionSkeleton />
-    </StoryWrapper>
-  ),
-  parameters: {
-    viewport: { defaultViewport: "mobile1" },
-    docs: {
-      description: {
-        story: "mobile: 섹션 헤더(제목+부제+페이지네이션 영역) + 가로 스크롤 그리드 전체 확인",
-      },
-    },
-  },
-};
-
-/** desktop: 섹션 헤더 + 4열 그리드 전체 스켈레톤 */
-export const SectionSkeletonDesktop: Story = {
-  render: () => (
-    <StoryWrapper>
-      <RecommendedSectionSkeleton />
-    </StoryWrapper>
-  ),
-  parameters: {
-    viewport: { defaultViewport: "desktop" },
-    docs: {
-      description: {
-        story: "desktop: 섹션 헤더(우측 페이지네이션 영역) + 4열 그리드 전체 확인",
       },
     },
   },
