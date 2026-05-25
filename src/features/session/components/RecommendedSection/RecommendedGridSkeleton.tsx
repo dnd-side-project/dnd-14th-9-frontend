@@ -1,10 +1,5 @@
 import { CardSkeleton } from "../Card/CardSkeleton";
 
-interface RecommendedGridSkeletonProps {
-  /** 스토리북 검증 등을 위해 특정 breakpoint 레이아웃을 강제합니다. */
-  forceBreakpoint?: "mobile" | "tablet" | "desktop";
-}
-
 /**
  * RecommendedGridSkeleton - 추천 세션 카드 4장 그리드 로딩 스켈레톤
  *
@@ -12,25 +7,11 @@ interface RecommendedGridSkeletonProps {
  * - mobile(md 미만): 가로 스크롤 + 우측 fade overlay
  * - tablet/desktop(md 이상): grid (2열 → xl 4열)
  */
-export function RecommendedGridSkeleton({ forceBreakpoint }: RecommendedGridSkeletonProps) {
-  const mobileContainerClass = forceBreakpoint
-    ? forceBreakpoint === "mobile"
-      ? "relative block"
-      : "hidden"
-    : "relative md:hidden";
-
-  const gridContainerClass = forceBreakpoint
-    ? forceBreakpoint === "tablet"
-      ? "grid grid-cols-2 gap-6"
-      : forceBreakpoint === "desktop"
-        ? "grid grid-cols-4 gap-6 gap-y-[48px]"
-        : "hidden"
-    : "hidden grid-cols-2 gap-6 md:grid xl:grid-cols-4 xl:gap-y-[48px]";
-
+export function RecommendedGridSkeleton() {
   return (
     <>
       {/* Mobile: 가로 스크롤 */}
-      <div className={mobileContainerClass}>
+      <div className="relative md:hidden">
         <div className="flex gap-6 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="w-[226px] shrink-0">
@@ -46,7 +27,7 @@ export function RecommendedGridSkeleton({ forceBreakpoint }: RecommendedGridSkel
       </div>
 
       {/* Tablet / Desktop: grid */}
-      <div className={gridContainerClass}>
+      <div className="hidden grid-cols-2 gap-6 md:grid xl:grid-cols-4 xl:gap-y-[48px]">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="mx-auto w-full xl:max-w-69">
             <CardSkeleton size="responsive" />

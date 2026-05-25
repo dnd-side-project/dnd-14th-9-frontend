@@ -29,8 +29,8 @@ const customViewports = {
  * 실제 카드 컴포넌트(SessionCardItem)에 가짜 데이터를 직접 주입한 모집 중 세션 목록의 실제 반응형 레이아웃과,
  * 이에 대응하는 로딩 스켈레톤(SessionListSkeleton)의 반응형 레이아웃 정합성을 1:1 비교 검증합니다.
  *
- * 💡 실제 API 호출, React Query, useSearchParams 등의 비즈니스 의존성을 완전히 제거하기 위해,
- * 스토리북 상에서 가짜 데이터를 직접 props로 주입(Presenter UI)하여 렌더링합니다.
+ * 💡 프로덕션 컴포넌트를 단 한 줄도 수정하지 않기 위해,
+ * 스토리북 파일 내에서 CSS style override 기법을 사용하여 미디어 쿼리(md:, xl:)를 우회 강제합니다.
  */
 const meta = {
   title: "Features/Session/SessionList",
@@ -52,17 +52,90 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// ---------------------------------------------------------------------------
+// CSS Breakpoint Style Override (프로덕션 컴포넌트 오염 방지용 트릭)
+// ---------------------------------------------------------------------------
+function BreakpointOverrideStyle({ mode }: { mode: "mobile" | "tablet" | "lg" | "desktop" }) {
+  if (mode === "mobile") {
+    return (
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        /* 모바일 강제: 헤더 세로 스택, 1열 그리드 */
+        .breakpoint-mobile .md\\:flex-row {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          justify-content: flex-start !important;
+        }
+        .breakpoint-mobile .md\\:grid-cols-2 {
+          grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+        }
+      `,
+        }}
+      />
+    );
+  }
+
+  if (mode === "tablet" || mode === "lg") {
+    return (
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        /* 태블릿 강제: 헤더 가로 배치, 2열 그리드 */
+        .breakpoint-tablet .md\\:flex-row,
+        .breakpoint-lg .md\\:flex-row {
+          flex-direction: row !important;
+          align-items: flex-start !important;
+          justify-content: space-between !important;
+        }
+        .breakpoint-tablet .md\\:grid-cols-2,
+        .breakpoint-lg .md\\:grid-cols-2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+        .breakpoint-tablet .xl\\:grid-cols-4,
+        .breakpoint-lg .xl\\:grid-cols-4 {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+      `,
+        }}
+      />
+    );
+  }
+
+  // desktop
+  return (
+    <style
+      dangerouslySetInnerHTML={{
+        __html: `
+      /* 데스크탑 강제: 헤더 가로 배치, 4열 그리드 */
+      .breakpoint-desktop .md\\:flex-row {
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        justify-content: space-between !important;
+      }
+      .breakpoint-desktop .xl\\:grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      }
+    `,
+      }}
+    />
+  );
+}
+
 function FixedWidthFrame({
   width,
   title,
+  mode,
   children,
 }: {
   width: number;
   title: string;
+  mode: "mobile" | "tablet" | "lg" | "desktop";
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={`flex flex-col gap-2 breakpoint-${mode}`}>
+      <BreakpointOverrideStyle mode={mode} />
       <div className="text-text-muted px-2 text-xs font-bold">{title}</div>
       <div
         className="dark border-border-subtle rounded-md border bg-[#0b0f0e] p-5 md:px-10 xl:px-[54px]"
@@ -102,6 +175,7 @@ export const CompareMobile: Story = {
     <div className="flex flex-col gap-8">
       <FixedWidthFrame
         width={375}
+        mode="mobile"
         title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Mobile (1열 + 세로 헤더)"
       >
         <section className="gap-lg flex flex-col">
@@ -111,7 +185,6 @@ export const CompareMobile: Story = {
               <p className="text-text-muted text-[13px]">
                 현재 모집 중인 세션에 바로 참여해 보세요
               </p>
-              {/* 모바일 가짜 필터바 버튼 예시 */}
               <div className="flex gap-2 overflow-x-auto pb-1">
                 <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs whitespace-nowrap">
                   정렬
@@ -135,9 +208,10 @@ export const CompareMobile: Story = {
 
       <FixedWidthFrame
         width={375}
+        mode="mobile"
         title="[스켈레톤] SessionListSkeleton - Mobile (1열 + 세로 헤더)"
       >
-        <SessionListSkeleton forceBreakpoint="mobile" />
+        <SessionListSkeleton />
       </FixedWidthFrame>
     </div>
   ),
@@ -154,6 +228,7 @@ export const CompareTablet: Story = {
     <div className="flex flex-col gap-8">
       <FixedWidthFrame
         width={768}
+        mode="tablet"
         title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Tablet (2열 + 가로 헤더)"
       >
         <section className="gap-lg flex flex-col">
@@ -184,9 +259,10 @@ export const CompareTablet: Story = {
 
       <FixedWidthFrame
         width={768}
+        mode="tablet"
         title="[스켈레톤] SessionListSkeleton - Tablet (2열 + 가로 헤더)"
       >
-        <SessionListSkeleton forceBreakpoint="tablet" />
+        <SessionListSkeleton />
       </FixedWidthFrame>
     </div>
   ),
@@ -203,6 +279,7 @@ export const CompareLg: Story = {
     <div className="flex flex-col gap-8">
       <FixedWidthFrame
         width={1024}
+        mode="lg"
         title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Lg (⚠️ 2열 유지 확인)"
       >
         <section className="gap-lg flex flex-col">
@@ -231,8 +308,12 @@ export const CompareLg: Story = {
         </section>
       </FixedWidthFrame>
 
-      <FixedWidthFrame width={1024} title="[스켈레톤] SessionListSkeleton - Lg (⚠️ 2열 유지 확인)">
-        <SessionListSkeleton forceBreakpoint="lg" />
+      <FixedWidthFrame
+        width={1024}
+        mode="lg"
+        title="[스켈레톤] SessionListSkeleton - Lg (⚠️ 2열 유지 확인)"
+      >
+        <SessionListSkeleton />
       </FixedWidthFrame>
     </div>
   ),
@@ -249,6 +330,7 @@ export const CompareDesktop: Story = {
     <div className="flex flex-col gap-8">
       <FixedWidthFrame
         width={1440}
+        mode="desktop"
         title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Desktop (4열 그리드)"
       >
         <section className="gap-lg flex flex-col">
@@ -277,8 +359,12 @@ export const CompareDesktop: Story = {
         </section>
       </FixedWidthFrame>
 
-      <FixedWidthFrame width={1440} title="[스켈레톤] SessionListSkeleton - Desktop (4열 그리드)">
-        <SessionListSkeleton forceBreakpoint="desktop" />
+      <FixedWidthFrame
+        width={1440}
+        mode="desktop"
+        title="[스켈레톤] SessionListSkeleton - Desktop (4열 그리드)"
+      >
+        <SessionListSkeleton />
       </FixedWidthFrame>
     </div>
   ),

@@ -25,8 +25,8 @@ const customViewports = {
  * 실제 카드 컴포넌트(Card)에 가짜 데이터를 직접 주입한 추천 세션 목록의 실제 반응형 레이아웃과,
  * 이에 대응하는 로딩 스켈레톤(RecommendedGridSkeleton)의 반응형 레이아웃 정합성을 1:1 비교 검증합니다.
  *
- * 💡 실제 API 호출이나 React Query 의존성을 완전히 제거하기 위해,
- * 스토리북 상에서 가짜 데이터를 직접 주입(Presenter UI)하여 렌더링합니다.
+ * 💡 프로덕션 컴포넌트를 단 한 줄도 수정하지 않기 위해,
+ * 스토리북 파일 내에서 CSS style override 기법을 사용하여 미디어 쿼리(md:, xl:)를 우회 강제합니다.
  */
 const meta = {
   title: "Features/Session/RecommendedSection",
@@ -48,17 +48,84 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// ---------------------------------------------------------------------------
+// CSS Breakpoint Style Override (프로덕션 컴포넌트 오염 방지용 트릭)
+// ---------------------------------------------------------------------------
+function BreakpointOverrideStyle({ mode }: { mode: "mobile" | "tablet" | "desktop" }) {
+  if (mode === "mobile") {
+    return (
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        /* 모바일 강제: 가로 스크롤 영역 보임, 그리드 영역 숨김 */
+        .breakpoint-mobile .md\\:hidden {
+          display: block !important;
+        }
+        .breakpoint-mobile .md\\:grid {
+          display: none !important;
+        }
+      `,
+        }}
+      />
+    );
+  }
+
+  if (mode === "tablet") {
+    return (
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        /* 태블릿 강제: 가로 스크롤 숨김, 2열 그리드 강제 */
+        .breakpoint-tablet .md\\:hidden {
+          display: none !important;
+        }
+        .breakpoint-tablet .md\\:grid {
+          display: grid !important;
+        }
+        .breakpoint-tablet .xl\\:grid-cols-4 {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+      `,
+        }}
+      />
+    );
+  }
+
+  // desktop
+  return (
+    <style
+      dangerouslySetInnerHTML={{
+        __html: `
+      /* 데스크탑 강제: 가로 스크롤 숨김, 4열 그리드 강제 */
+      .breakpoint-desktop .md\\:hidden {
+        display: none !important;
+      }
+      .breakpoint-desktop .md\\:grid {
+        display: grid !important;
+      }
+      .breakpoint-desktop .xl\\:grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      }
+    `,
+      }}
+    />
+  );
+}
+
 function FixedWidthFrame({
   width,
   title,
+  mode,
   children,
 }: {
   width: number;
   title: string;
+  mode: "mobile" | "tablet" | "desktop";
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={`flex flex-col gap-2 breakpoint-${mode}`}>
+      <BreakpointOverrideStyle mode={mode} />
       <div className="text-text-muted px-2 text-xs font-bold">{title}</div>
       <div
         className="dark border-border-subtle rounded-md border bg-[#0b0f0e] p-5"
@@ -94,6 +161,7 @@ export const CompareMobile: Story = {
     <div className="flex flex-col gap-8">
       <FixedWidthFrame
         width={375}
+        mode="mobile"
         title="[실제 컴포넌트 가짜 데이터 주입] RecommendedGrid - Mobile (가로 스크롤)"
       >
         <div className="relative">
@@ -120,9 +188,10 @@ export const CompareMobile: Story = {
 
       <FixedWidthFrame
         width={375}
+        mode="mobile"
         title="[스켈레톤] RecommendedGridSkeleton - Mobile (가로 스크롤)"
       >
-        <RecommendedGridSkeleton forceBreakpoint="mobile" />
+        <RecommendedGridSkeleton />
       </FixedWidthFrame>
     </div>
   ),
@@ -139,6 +208,7 @@ export const CompareTablet: Story = {
     <div className="flex flex-col gap-8">
       <FixedWidthFrame
         width={768}
+        mode="tablet"
         title="[실제 컴포넌트 가짜 데이터 주입] RecommendedGrid - Tablet (2열 그리드)"
       >
         <div className="grid grid-cols-2 gap-6">
@@ -160,8 +230,12 @@ export const CompareTablet: Story = {
         </div>
       </FixedWidthFrame>
 
-      <FixedWidthFrame width={768} title="[스켈레톤] RecommendedGridSkeleton - Tablet (2열 그리드)">
-        <RecommendedGridSkeleton forceBreakpoint="tablet" />
+      <FixedWidthFrame
+        width={768}
+        mode="tablet"
+        title="[스켈레톤] RecommendedGridSkeleton - Tablet (2열 그리드)"
+      >
+        <RecommendedGridSkeleton />
       </FixedWidthFrame>
     </div>
   ),
@@ -178,6 +252,7 @@ export const CompareDesktop: Story = {
     <div className="flex flex-col gap-8">
       <FixedWidthFrame
         width={1440}
+        mode="desktop"
         title="[실제 컴포넌트 가짜 데이터 주입] RecommendedGrid - Desktop (4열 그리드)"
       >
         <div className="grid grid-cols-4 gap-6 gap-y-[48px]">
@@ -201,9 +276,10 @@ export const CompareDesktop: Story = {
 
       <FixedWidthFrame
         width={1440}
+        mode="desktop"
         title="[스켈레톤] RecommendedGridSkeleton - Desktop (4열 그리드)"
       >
-        <RecommendedGridSkeleton forceBreakpoint="desktop" />
+        <RecommendedGridSkeleton />
       </FixedWidthFrame>
     </div>
   ),
