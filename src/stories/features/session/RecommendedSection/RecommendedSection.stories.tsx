@@ -1,3 +1,4 @@
+import { Card } from "@/features/session/components/Card/Card";
 import { RecommendedGridSkeleton } from "@/features/session/components/RecommendedSection/RecommendedGridSkeleton";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
@@ -12,20 +13,20 @@ const customViewports = {
     styles: { width: "768px", height: "600px" },
   },
   desktop: {
-    name: "Desktop (1280px)",
-    styles: { width: "1280px", height: "800px" },
+    name: "Desktop (1440px)",
+    styles: { width: "1440px", height: "800px" },
   },
 };
 
 /**
- * RecommendedSection 스켈레톤 스토리
+ * RecommendedSection 스켈레톤 & 실제 컴포넌트 비교 스토리
  *
- * 목적: 스켈레톤 UI가 실제 RecommendedGrid의 반응형 레이아웃과
- * 일치하는지 breakpoint별로 고정된 너비에서 시각적으로 검증합니다.
+ * 목적:
+ * 실제 카드 컴포넌트(Card)에 가짜 데이터를 직접 주입한 추천 세션 목록의 실제 반응형 레이아웃과,
+ * 이에 대응하는 로딩 스켈레톤(RecommendedGridSkeleton)의 반응형 레이아웃 정합성을 1:1 비교 검증합니다.
  *
- * ⚠️ CSS 미디어 쿼리는 뷰포트(iframe) 크기를 따르기 때문에,
- * customViewports를 등록하고 각 스토리별로 defaultViewport를 결합하여
- * 실제 뷰포트 크기와 FixedWidthFrame 너비를 일치시킵니다.
+ * 💡 실제 API 호출이나 React Query 의존성을 완전히 제거하기 위해,
+ * 스토리북 상에서 가짜 데이터를 직접 주입(Presenter UI)하여 렌더링합니다.
  */
 const meta = {
   title: "Features/Session/RecommendedSection",
@@ -38,7 +39,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "추천 세션 그리드 스켈레톤입니다. 커스텀 뷰포트 설정과 고정 너비 컨테이너의 결합을 통해 실제 RecommendedGrid와 동일한 반응형 구조를 안전하게 검증합니다.",
+          "추천 세션 영역의 실제 컴포넌트와 스켈레톤 컴포넌트 비교 스토리입니다. 반응형 레이아웃의 구조적 정합성을 확인합니다.",
       },
     },
   },
@@ -47,76 +48,166 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function FixedWidthFrame({ width, children }: { width: number; children: React.ReactNode }) {
+function FixedWidthFrame({
+  width,
+  title,
+  children,
+}: {
+  width: number;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="dark bg-[#0b0f0e] p-5" style={{ width, overflow: "hidden" }}>
-      {children}
+    <div className="flex flex-col gap-2">
+      <div className="text-text-muted px-2 text-xs font-bold">{title}</div>
+      <div
+        className="dark border-border-subtle rounded-md border bg-[#0b0f0e] p-5"
+        style={{ width, overflow: "hidden" }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// RecommendedGridSkeleton — breakpoint별 고정 너비
+// Mock Data (가짜 데이터 직접 주입 방식)
 // ---------------------------------------------------------------------------
+const mockRecommendedSessions = Array.from({ length: 4 }, (_, i) => ({
+  sessionId: i + 1,
+  category: "DEVELOPMENT",
+  title: `추천 세션 타이틀 ${i + 1}`,
+  hostNickname: `호스트 닉네임 ${i + 1}`,
+  status: "WAITING",
+  currentParticipants: i + 1,
+  maxParticipants: 10,
+  sessionDurationMinutes: 60,
+  startTime: "2026-02-21T10:00:00",
+  imageUrl: "",
+}));
 
-/**
- * mobile: 너비 375px 고정
- * → md(768px) 미만이므로 가로 스크롤 구조가 보여야 합니다.
- * → `w-[226px] shrink-0` 카드 + 우측 fade overlay 확인
- */
-export const GridSkeletonMobile: Story = {
+// ---------------------------------------------------------------------------
+// 1. Mobile (375px) — 가로 스크롤 구조 비교
+// ---------------------------------------------------------------------------
+export const CompareMobile: Story = {
   render: () => (
-    <FixedWidthFrame width={375}>
-      <RecommendedGridSkeleton />
-    </FixedWidthFrame>
+    <div className="flex flex-col gap-8">
+      <FixedWidthFrame
+        width={375}
+        title="[실제 컴포넌트 가짜 데이터 주입] RecommendedGrid - Mobile (가로 스크롤)"
+      >
+        <div className="relative">
+          <div className="scrollbar-hide flex gap-6 overflow-x-auto pb-1">
+            {mockRecommendedSessions.map((session) => (
+              <div key={session.sessionId} className="w-[226px] shrink-0">
+                <Card
+                  thumbnailSrc={session.imageUrl}
+                  category={session.category}
+                  createdAt={session.startTime}
+                  title={session.title}
+                  nickname={session.hostNickname}
+                  currentParticipants={session.currentParticipants}
+                  maxParticipants={session.maxParticipants}
+                  durationMinutes={session.sessionDurationMinutes}
+                  sessionDate={session.startTime}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="from-surface-default pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l to-transparent" />
+        </div>
+      </FixedWidthFrame>
+
+      <FixedWidthFrame
+        width={375}
+        title="[스켈레톤] RecommendedGridSkeleton - Mobile (가로 스크롤)"
+      >
+        <RecommendedGridSkeleton forceBreakpoint="mobile" />
+      </FixedWidthFrame>
+    </div>
   ),
   parameters: {
     viewport: { defaultViewport: "mobile" },
-    docs: {
-      description: {
-        story:
-          "너비 375px 고정 (md 미만): 카드가 `w-[226px] shrink-0`으로 가로 스크롤되어야 합니다. 우측 fade overlay도 확인하세요.",
-      },
-    },
   },
 };
 
-/**
- * tablet: 너비 768px 고정
- * → md(768px) 이상이므로 2열 그리드가 보여야 합니다.
- */
-export const GridSkeletonTablet: Story = {
+// ---------------------------------------------------------------------------
+// 2. Tablet (768px) — 2열 그리드 구조 비교
+// ---------------------------------------------------------------------------
+export const CompareTablet: Story = {
   render: () => (
-    <FixedWidthFrame width={768}>
-      <RecommendedGridSkeleton />
-    </FixedWidthFrame>
+    <div className="flex flex-col gap-8">
+      <FixedWidthFrame
+        width={768}
+        title="[실제 컴포넌트 가짜 데이터 주입] RecommendedGrid - Tablet (2열 그리드)"
+      >
+        <div className="grid grid-cols-2 gap-6">
+          {mockRecommendedSessions.map((session) => (
+            <div key={session.sessionId} className="mx-auto w-full xl:max-w-69">
+              <Card
+                thumbnailSrc={session.imageUrl}
+                category={session.category}
+                createdAt={session.startTime}
+                title={session.title}
+                nickname={session.hostNickname}
+                currentParticipants={session.currentParticipants}
+                maxParticipants={session.maxParticipants}
+                durationMinutes={session.sessionDurationMinutes}
+                sessionDate={session.startTime}
+              />
+            </div>
+          ))}
+        </div>
+      </FixedWidthFrame>
+
+      <FixedWidthFrame width={768} title="[스켈레톤] RecommendedGridSkeleton - Tablet (2열 그리드)">
+        <RecommendedGridSkeleton forceBreakpoint="tablet" />
+      </FixedWidthFrame>
+    </div>
   ),
   parameters: {
     viewport: { defaultViewport: "tablet" },
-    docs: {
-      description: {
-        story: "너비 768px 고정 (md): grid-cols-2로 2열 렌더링되어야 합니다.",
-      },
-    },
   },
 };
 
-/**
- * desktop: 너비 1280px 고정
- * → xl(1280px) 이상이므로 4열 그리드가 보여야 합니다.
- */
-export const GridSkeletonDesktop: Story = {
+// ---------------------------------------------------------------------------
+// 3. Desktop (1440px) — xl: 4열 그리드 구조 비교
+// ---------------------------------------------------------------------------
+export const CompareDesktop: Story = {
   render: () => (
-    <FixedWidthFrame width={1280}>
-      <RecommendedGridSkeleton />
-    </FixedWidthFrame>
+    <div className="flex flex-col gap-8">
+      <FixedWidthFrame
+        width={1440}
+        title="[실제 컴포넌트 가짜 데이터 주입] RecommendedGrid - Desktop (4열 그리드)"
+      >
+        <div className="grid grid-cols-4 gap-6 gap-y-[48px]">
+          {mockRecommendedSessions.map((session) => (
+            <div key={session.sessionId} className="mx-auto w-full xl:max-w-69">
+              <Card
+                thumbnailSrc={session.imageUrl}
+                category={session.category}
+                createdAt={session.startTime}
+                title={session.title}
+                nickname={session.hostNickname}
+                currentParticipants={session.currentParticipants}
+                maxParticipants={session.maxParticipants}
+                durationMinutes={session.sessionDurationMinutes}
+                sessionDate={session.startTime}
+              />
+            </div>
+          ))}
+        </div>
+      </FixedWidthFrame>
+
+      <FixedWidthFrame
+        width={1440}
+        title="[스켈레톤] RecommendedGridSkeleton - Desktop (4열 그리드)"
+      >
+        <RecommendedGridSkeleton forceBreakpoint="desktop" />
+      </FixedWidthFrame>
+    </div>
   ),
   parameters: {
     viewport: { defaultViewport: "desktop" },
-    docs: {
-      description: {
-        story: "너비 1280px 고정 (xl): xl:grid-cols-4로 4열 렌더링되어야 합니다.",
-      },
-    },
   },
 };

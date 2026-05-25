@@ -1,3 +1,4 @@
+import { SessionCardItem } from "@/features/session/components/SessionList/SessionCardItem";
 import { SessionListSkeleton } from "@/features/session/components/SessionList/SessionListSkeleton";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
@@ -16,20 +17,20 @@ const customViewports = {
     styles: { width: "1024px", height: "800px" },
   },
   desktop: {
-    name: "Desktop (1280px)",
-    styles: { width: "1280px", height: "800px" },
+    name: "Desktop (1440px)",
+    styles: { width: "1440px", height: "800px" },
   },
 };
 
 /**
- * SessionList 스켈레톤 스토리
+ * SessionList 스켈레톤 & 실제 컴포넌트 비교 스토리
  *
- * 목적: 스켈레톤 UI가 실제 SessionList의 반응형 레이아웃과
- * 일치하는지 breakpoint별로 고정된 너비에서 시각적으로 검증합니다.
+ * 목적:
+ * 실제 카드 컴포넌트(SessionCardItem)에 가짜 데이터를 직접 주입한 모집 중 세션 목록의 실제 반응형 레이아웃과,
+ * 이에 대응하는 로딩 스켈레톤(SessionListSkeleton)의 반응형 레이아웃 정합성을 1:1 비교 검증합니다.
  *
- * ⚠️ CSS 미디어 쿼리는 뷰포트(iframe) 크기를 따르기 때문에,
- * customViewports를 등록하고 각 스토리별로 defaultViewport를 결합하여
- * 실제 뷰포트 크기와 FixedWidthFrame 너비를 일치시킵니다.
+ * 💡 실제 API 호출, React Query, useSearchParams 등의 비즈니스 의존성을 완전히 제거하기 위해,
+ * 스토리북 상에서 가짜 데이터를 직접 props로 주입(Presenter UI)하여 렌더링합니다.
  */
 const meta = {
   title: "Features/Session/SessionList",
@@ -42,7 +43,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "모집 중 세션 목록 스켈레톤입니다. 커스텀 뷰포트 설정과 고정 너비 컨테이너의 결합을 통해 실제 SessionList와 동일한 반응형 구조를 검증합니다.",
+          "모집 중 세션 목록 실제 컴포넌트와 스켈레톤 컴포넌트 비교 스토리입니다. 반응형 레이아웃의 구조적 정합성을 확인합니다.",
       },
     },
   },
@@ -51,101 +52,237 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function FixedWidthFrame({ width, children }: { width: number; children: React.ReactNode }) {
+function FixedWidthFrame({
+  width,
+  title,
+  children,
+}: {
+  width: number;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div
-      className="dark bg-[#0b0f0e] p-5 md:px-10 xl:px-[54px]"
-      style={{ width, overflow: "hidden" }}
-    >
-      {children}
+    <div className="flex flex-col gap-2">
+      <div className="text-text-muted px-2 text-xs font-bold">{title}</div>
+      <div
+        className="dark border-border-subtle rounded-md border bg-[#0b0f0e] p-5 md:px-10 xl:px-[54px]"
+        style={{ width, overflow: "hidden" }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// SessionListSkeleton — breakpoint별 고정 너비
+// Mock Data (가짜 데이터 직접 주입 방식)
 // ---------------------------------------------------------------------------
+const mockSessions = Array.from({ length: 8 }, (_, i) => ({
+  sessionId: i + 1,
+  category: "DEVELOPMENT" as const,
+  title: `모집 중인 세션 타이틀 ${i + 1}`,
+  hostNickname: `호스트 ${i + 1}`,
+  status: "WAITING" as const,
+  currentParticipants: i + 1,
+  maxParticipants: 10,
+  sessionDurationMinutes: 60,
+  startTime: "2026-02-21T10:00:00",
+  imageUrl: "",
+}));
 
-/**
- * mobile: 너비 375px 고정
- * → md(768px) 미만이므로 1열 그리드 및 헤더 세로 스택이 보여야 합니다.
- */
-export const SkeletonMobile: Story = {
+const mockOnShare = (id: number) => {
+  alert(`Share Session Link: ${id}`);
+};
+
+// ---------------------------------------------------------------------------
+// 1. Mobile (375px) — 1열 그리드 및 세로 헤더 비교
+// ---------------------------------------------------------------------------
+export const CompareMobile: Story = {
   render: () => (
-    <FixedWidthFrame width={375}>
-      <SessionListSkeleton />
-    </FixedWidthFrame>
+    <div className="flex flex-col gap-8">
+      <FixedWidthFrame
+        width={375}
+        title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Mobile (1열 + 세로 헤더)"
+      >
+        <section className="gap-lg flex flex-col">
+          <div className="flex flex-col gap-[10px]">
+            <h2 className="text-text-primary text-lg font-bold">지금 모집 중인 세션</h2>
+            <div className="flex flex-col gap-3">
+              <p className="text-text-muted text-[13px]">
+                현재 모집 중인 세션에 바로 참여해 보세요
+              </p>
+              {/* 모바일 가짜 필터바 버튼 예시 */}
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs whitespace-nowrap">
+                  정렬
+                </button>
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs whitespace-nowrap">
+                  날짜
+                </button>
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs whitespace-nowrap">
+                  시간
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-6">
+            {mockSessions.map((session) => (
+              <SessionCardItem key={session.sessionId} session={session} onShare={mockOnShare} />
+            ))}
+          </div>
+        </section>
+      </FixedWidthFrame>
+
+      <FixedWidthFrame
+        width={375}
+        title="[스켈레톤] SessionListSkeleton - Mobile (1열 + 세로 헤더)"
+      >
+        <SessionListSkeleton forceBreakpoint="mobile" />
+      </FixedWidthFrame>
+    </div>
   ),
   parameters: {
     viewport: { defaultViewport: "mobile" },
-    docs: {
-      description: {
-        story:
-          "너비 375px 고정 (md 미만): 헤더 세로 스택 + 1열 그리드. 필터바가 헤더 아래 세로로 배치됩니다.",
-      },
-    },
   },
 };
 
-/**
- * tablet: 너비 768px 고정
- * → md(768px) 이상이므로 2열 그리드 및 헤더 가로 배치가 보여야 합니다.
- */
-export const SkeletonTablet: Story = {
+// ---------------------------------------------------------------------------
+// 2. Tablet (768px) — 2열 그리드 및 가로 헤더 비교
+// ---------------------------------------------------------------------------
+export const CompareTablet: Story = {
   render: () => (
-    <FixedWidthFrame width={768}>
-      <SessionListSkeleton />
-    </FixedWidthFrame>
+    <div className="flex flex-col gap-8">
+      <FixedWidthFrame
+        width={768}
+        title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Tablet (2열 + 가로 헤더)"
+      >
+        <section className="gap-lg flex flex-col">
+          <div className="flex flex-col gap-[10px]">
+            <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
+            <div className="flex flex-row items-start justify-between gap-5">
+              <p className="text-text-muted text-base">현재 모집 중인 세션에 바로 참여해 보세요</p>
+              <div className="flex gap-2">
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
+                  정렬
+                </button>
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
+                  날짜
+                </button>
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
+                  시간
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+            {mockSessions.map((session) => (
+              <SessionCardItem key={session.sessionId} session={session} onShare={mockOnShare} />
+            ))}
+          </div>
+        </section>
+      </FixedWidthFrame>
+
+      <FixedWidthFrame
+        width={768}
+        title="[스켈레톤] SessionListSkeleton - Tablet (2열 + 가로 헤더)"
+      >
+        <SessionListSkeleton forceBreakpoint="tablet" />
+      </FixedWidthFrame>
+    </div>
   ),
   parameters: {
     viewport: { defaultViewport: "tablet" },
-    docs: {
-      description: {
-        story: "너비 768px 고정 (md): 헤더 가로 배치(제목+설명 / 필터바) + 2열 그리드.",
-      },
-    },
   },
 };
 
-/**
- * lg: 너비 1024px 고정
- * → md 이상, xl 미만이므로 2열 그리드가 유지되어야 합니다.
- * ⚠️ 3열이 되면 실제 SessionList와 불일치입니다.
- */
-export const SkeletonLg: Story = {
+// ---------------------------------------------------------------------------
+// 3. Lg (1024px) — ⚠️ 2열 유지 확인 비교
+// ---------------------------------------------------------------------------
+export const CompareLg: Story = {
   render: () => (
-    <FixedWidthFrame width={1024}>
-      <SessionListSkeleton />
-    </FixedWidthFrame>
+    <div className="flex flex-col gap-8">
+      <FixedWidthFrame
+        width={1024}
+        title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Lg (⚠️ 2열 유지 확인)"
+      >
+        <section className="gap-lg flex flex-col">
+          <div className="flex flex-col gap-[10px]">
+            <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
+            <div className="flex flex-row items-start justify-between gap-5">
+              <p className="text-text-muted text-base">현재 모집 중인 세션에 바로 참여해 보세요</p>
+              <div className="flex gap-2">
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
+                  정렬
+                </button>
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
+                  날짜
+                </button>
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
+                  시간
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+            {mockSessions.map((session) => (
+              <SessionCardItem key={session.sessionId} session={session} onShare={mockOnShare} />
+            ))}
+          </div>
+        </section>
+      </FixedWidthFrame>
+
+      <FixedWidthFrame width={1024} title="[스켈레톤] SessionListSkeleton - Lg (⚠️ 2열 유지 확인)">
+        <SessionListSkeleton forceBreakpoint="lg" />
+      </FixedWidthFrame>
+    </div>
   ),
   parameters: {
     viewport: { defaultViewport: "lg" },
-    docs: {
-      description: {
-        story:
-          "너비 1024px 고정 (lg): ⚠️ 2열 유지 확인 포인트. 3열이 되면 실제 SessionList와 불일치입니다.",
-      },
-    },
   },
 };
 
-/**
- * desktop: 너비 1280px 고정
- * → xl(1280px) 이상이므로 4열 그리드가 보여야 합니다.
- */
-export const SkeletonDesktop: Story = {
+// ---------------------------------------------------------------------------
+// 4. Desktop (1440px) — 4열 그리드 비교
+// ---------------------------------------------------------------------------
+export const CompareDesktop: Story = {
   render: () => (
-    <FixedWidthFrame width={1280}>
-      <SessionListSkeleton />
-    </FixedWidthFrame>
+    <div className="flex flex-col gap-8">
+      <FixedWidthFrame
+        width={1440}
+        title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Desktop (4열 그리드)"
+      >
+        <section className="gap-lg flex flex-col">
+          <div className="flex flex-col gap-[10px]">
+            <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
+            <div className="flex flex-row items-start justify-between gap-5">
+              <p className="text-text-muted text-base">현재 모집 중인 세션에 바로 참여해 보세요</p>
+              <div className="flex gap-2">
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
+                  정렬
+                </button>
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
+                  날짜
+                </button>
+                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
+                  시간
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-4 gap-6 gap-y-[48px]">
+            {mockSessions.map((session) => (
+              <SessionCardItem key={session.sessionId} session={session} onShare={mockOnShare} />
+            ))}
+          </div>
+        </section>
+      </FixedWidthFrame>
+
+      <FixedWidthFrame width={1440} title="[스켈레톤] SessionListSkeleton - Desktop (4열 그리드)">
+        <SessionListSkeleton forceBreakpoint="desktop" />
+      </FixedWidthFrame>
+    </div>
   ),
   parameters: {
     viewport: { defaultViewport: "desktop" },
-    docs: {
-      description: {
-        story:
-          "너비 1280px 고정 (xl): xl:grid-cols-4로 4열 렌더링되며 xl:gap-y-[48px]가 적용됩니다.",
-      },
-    },
   },
 };
