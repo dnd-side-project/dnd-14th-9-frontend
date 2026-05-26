@@ -17,31 +17,35 @@ export function SessionInfoCard({ session }: SessionInfoCardProps) {
 
   return (
     <section className="gap-lg border-gray p-lg flex flex-col rounded-lg border max-md:rounded-none max-md:border-0 max-md:p-0">
-      <Thumbnail
-        src={session.imageUrl}
-        alt={session.title}
-        radius="lg"
-        className="aspect-video w-full"
-      />
+      <div className="gap-lg flex flex-col xl:flex-row-reverse">
+        <div className="w-full xl:w-[45%] xl:shrink-0">
+          <Thumbnail
+            src={session.imageUrl}
+            alt={session.title}
+            radius="lg"
+            className="xl:aspect-auto! xl:h-51.75"
+          />
+        </div>
 
-      <div className="gap-sm flex flex-col">
-        <h2 className="text-lg font-bold text-gray-50 md:text-2xl">{session.title}</h2>
-        <p className="text-sm text-gray-200 md:text-base">{session.summary}</p>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 md:text-base">
-          <span className="flex items-center gap-1">
-            <UsersIcon size="small" className="max-md:h-4 max-md:w-4" />
-            <span>
-              {formatParticipantCount(session.currentParticipants, session.maxParticipants)}
+        <div className="gap-sm flex flex-col xl:flex-1">
+          <h2 className="text-lg font-bold text-gray-50 md:text-2xl">{session.title}</h2>
+          <p className="text-sm text-gray-200 md:text-base">{session.summary}</p>
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 md:text-base">
+            <span className="flex items-center gap-1">
+              <UsersIcon size="small" className="max-md:h-4 max-md:w-4" />
+              <span>
+                {formatParticipantCount(session.currentParticipants, session.maxParticipants)}
+              </span>
             </span>
-          </span>
-          <span className="flex items-center gap-1">
-            <ClockIcon size="small" className="max-md:h-4 max-md:w-4" />
-            <span>{formatSessionDuration(session.sessionDurationMinutes)}</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <CalendarIcon size="small" className="max-md:h-4 max-md:w-4" />
-            <span>{formatSessionDateTime(session.startTime)}</span>
-          </span>
+            <span className="flex items-center gap-1">
+              <ClockIcon size="small" className="max-md:h-4 max-md:w-4" />
+              <span>{formatSessionDuration(session.sessionDurationMinutes)}</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <CalendarIcon size="small" className="max-md:h-4 max-md:w-4" />
+              <span>{formatSessionDateTime(session.startTime)}</span>
+            </span>
+          </div>
         </div>
       </div>
 
@@ -50,7 +54,7 @@ export function SessionInfoCard({ session }: SessionInfoCardProps) {
         <p className="mt-sm text-sm font-semibold text-gray-400 md:text-base">{session.notice}</p>
       </div>
 
-      <div className="gap-lg flex flex-col">
+      <div className="gap-lg flex flex-col xl:flex-row">
         <div className="px-lg py-lg gap-md flex flex-1 flex-col rounded-lg bg-gray-900 xl:flex-row xl:items-center xl:justify-between xl:gap-0">
           <div className="flex flex-col gap-1">
             <p className="text-sm font-semibold text-gray-50 md:text-base">
@@ -64,7 +68,10 @@ export function SessionInfoCard({ session }: SessionInfoCardProps) {
             <span className="text-common-white text-[15px] font-bold">
               {requiredAchievementRate}%
             </span>
-            <ProgressBar progress={requiredAchievementRate} indicatorClassName="bg-green-600" />
+            <ProgressBar
+              progress={requiredAchievementRate}
+              indicatorClassName="ml-auto bg-green-600"
+            />
           </div>
         </div>
         <div className="px-lg py-lg gap-md flex flex-1 flex-col rounded-lg bg-gray-900 xl:flex-row xl:items-center xl:justify-between xl:gap-0">
@@ -76,7 +83,10 @@ export function SessionInfoCard({ session }: SessionInfoCardProps) {
           </div>
           <div className="flex w-full shrink-0 flex-col items-end gap-1 xl:w-50">
             <span className="text-common-white text-[15px] font-bold">{requiredFocusRate}%</span>
-            <ProgressBar progress={requiredFocusRate} indicatorClassName="bg-green-600" />
+            <ProgressBar
+              progress={requiredFocusRate}
+              indicatorClassName="ml-auto bg-border-stronger"
+            />
           </div>
         </div>
       </div>
