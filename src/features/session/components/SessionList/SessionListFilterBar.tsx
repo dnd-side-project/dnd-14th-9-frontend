@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Button } from "@/components/Button/Button";
 import type { DateRange } from "@/components/DatePicker/DatePicker.types";
 import { ArrowRotateRightIcon } from "@/components/Icon/ArrowRotateRightIcon";
+import { useViewportLayout } from "@/hooks/useViewportLayout";
+import { cn } from "@/lib/utils/utils";
 
 import { DateRangeFilter } from "./DateRangeFilter";
 import { DurationFilter } from "./DurationFilter";
@@ -28,6 +30,8 @@ interface SessionListFilterBarProps {
 
 type OpenFilterKey = "date" | "timeSlot" | "duration" | "participants" | "sort" | null;
 
+const FILTER_PANEL_SPACE_CLASS = "-mb-[380px] pb-[380px] xl:mb-0 xl:pb-0";
+
 export function SessionListFilterBar({
   values,
   onSetDateRange,
@@ -38,11 +42,14 @@ export function SessionListFilterBar({
   onResetFilters,
 }: SessionListFilterBarProps) {
   const [openFilter, setOpenFilter] = useState<OpenFilterKey>(null);
+  const { layout } = useViewportLayout();
   const isDatePickerOpen = openFilter === "date";
   const isTimeSlotOpen = openFilter === "timeSlot";
   const isDurationOpen = openFilter === "duration";
   const isParticipantsOpen = openFilter === "participants";
   const isSortOpen = openFilter === "sort";
+  const shouldReserveFilterPanelSpace = Boolean(openFilter);
+  const isDesktopLayout = layout === "desktop";
 
   const selectedDateRange: DateRange = {
     startDate: parseDateParam(values.startDate),
@@ -89,7 +96,12 @@ export function SessionListFilterBar({
       )}
       <div className="gap-md relative z-20 flex flex-col xl:items-end">
         {/* 좁은 화면에서 필터 조작 공간을 확보하기 위해 정렬까지 같은 스크롤 영역에 둡니다. */}
-        <div className="scrollbar-hide flex w-full items-center gap-[16px] overflow-x-auto xl:w-auto xl:overflow-visible">
+        <div
+          className={cn(
+            "scrollbar-hide flex w-full items-center gap-[16px] overflow-x-auto xl:w-auto xl:overflow-visible",
+            shouldReserveFilterPanelSpace && FILTER_PANEL_SPACE_CLASS
+          )}
+        >
           <DateRangeFilter
             isOpen={isDatePickerOpen}
             label={dateFilterLabel}
@@ -136,24 +148,26 @@ export function SessionListFilterBar({
             />
           </div>
 
-          {/* 좁은 화면에서 정렬 필터가 스크롤 끝으로 밀리지 않도록 남는 공간을 먼저 채웁니다. */}
+          {!isDesktopLayout && (
+            <SortFilter
+              isOpen={isSortOpen}
+              value={values.sort}
+              onOpenChange={handleSortOpenChange}
+              onSelect={onSetSort}
+              className="ml-auto shrink-0"
+            />
+          )}
+        </div>
+
+        {isDesktopLayout && (
           <SortFilter
             isOpen={isSortOpen}
             value={values.sort}
             onOpenChange={handleSortOpenChange}
             onSelect={onSetSort}
-            className="ml-auto shrink-0 xl:hidden"
+            className="shrink-0"
           />
-        </div>
-
-        {/* 넓은 화면에서는 필터 줄 폭을 안정적으로 유지하기 위해 정렬을 별도 행으로 분리합니다. */}
-        <SortFilter
-          isOpen={isSortOpen}
-          value={values.sort}
-          onOpenChange={handleSortOpenChange}
-          onSelect={onSetSort}
-          className="hidden shrink-0 xl:flex"
-        />
+        )}
       </div>
     </>
   );
