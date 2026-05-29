@@ -138,7 +138,7 @@ function FixedWidthFrame({
       <BreakpointOverrideStyle mode={mode} />
       <div className="text-text-muted px-2 text-xs font-bold">{title}</div>
       <div
-        className="dark border-border-subtle rounded-md border bg-[#0b0f0e] p-5 md:px-10 xl:px-[54px]"
+        className="dark border-border-subtle bg-surface-default rounded-md border p-5 md:px-10 xl:px-[54px]"
         style={{ width, overflow: "hidden" }}
       >
         {children}
@@ -167,6 +167,38 @@ const mockOnShare = (id: number) => {
   alert(`Share Session Link: ${id}`);
 };
 
+function FilterButton({ children }: { children: React.ReactNode }) {
+  return (
+    <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs whitespace-nowrap">
+      {children}
+    </button>
+  );
+}
+
+function SessionListHeader({ mode }: { mode: "mobile" | "tablet" | "lg" | "desktop" }) {
+  const isMobile = mode === "mobile";
+
+  return (
+    <div className="flex flex-col gap-[10px]">
+      <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
+      <div
+        className={
+          isMobile ? "flex flex-col gap-3" : "flex flex-row items-start justify-between gap-5"
+        }
+      >
+        <p className={isMobile ? "text-text-muted text-[13px]" : "text-text-muted text-base"}>
+          현재 모집 중인 세션에 바로 참여해 보세요
+        </p>
+        <div className={isMobile ? "flex gap-2 overflow-x-auto pb-1" : "flex gap-2"}>
+          <FilterButton>정렬</FilterButton>
+          <FilterButton>날짜</FilterButton>
+          <FilterButton>시간</FilterButton>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // 1. Mobile (375px) — 1열 그리드 및 세로 헤더 비교
 // ---------------------------------------------------------------------------
@@ -179,25 +211,7 @@ export const CompareMobile: Story = {
         title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Mobile (1열 + 세로 헤더)"
       >
         <section className="gap-lg flex flex-col">
-          <div className="flex flex-col gap-[10px]">
-            <h2 className="text-text-primary text-lg font-bold">지금 모집 중인 세션</h2>
-            <div className="flex flex-col gap-3">
-              <p className="text-text-muted text-[13px]">
-                현재 모집 중인 세션에 바로 참여해 보세요
-              </p>
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs whitespace-nowrap">
-                  정렬
-                </button>
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs whitespace-nowrap">
-                  날짜
-                </button>
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs whitespace-nowrap">
-                  시간
-                </button>
-              </div>
-            </div>
-          </div>
+          <SessionListHeader mode="mobile" />
           <div className="grid grid-cols-1 gap-6">
             {mockSessions.map((session) => (
               <SessionCardItem key={session.sessionId} session={session} onShare={mockOnShare} />
@@ -232,23 +246,7 @@ export const CompareTablet: Story = {
         title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Tablet (2열 + 가로 헤더)"
       >
         <section className="gap-lg flex flex-col">
-          <div className="flex flex-col gap-[10px]">
-            <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
-            <div className="flex flex-row items-start justify-between gap-5">
-              <p className="text-text-muted text-base">현재 모집 중인 세션에 바로 참여해 보세요</p>
-              <div className="flex gap-2">
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
-                  정렬
-                </button>
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
-                  날짜
-                </button>
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
-                  시간
-                </button>
-              </div>
-            </div>
-          </div>
+          <SessionListHeader mode="tablet" />
           <div className="grid grid-cols-2 gap-6">
             {mockSessions.map((session) => (
               <SessionCardItem key={session.sessionId} session={session} onShare={mockOnShare} />
@@ -283,23 +281,7 @@ export const CompareLg: Story = {
         title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Lg (⚠️ 2열 유지 확인)"
       >
         <section className="gap-lg flex flex-col">
-          <div className="flex flex-col gap-[10px]">
-            <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
-            <div className="flex flex-row items-start justify-between gap-5">
-              <p className="text-text-muted text-base">현재 모집 중인 세션에 바로 참여해 보세요</p>
-              <div className="flex gap-2">
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
-                  정렬
-                </button>
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
-                  날짜
-                </button>
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
-                  시간
-                </button>
-              </div>
-            </div>
-          </div>
+          <SessionListHeader mode="lg" />
           <div className="grid grid-cols-2 gap-6">
             {mockSessions.map((session) => (
               <SessionCardItem key={session.sessionId} session={session} onShare={mockOnShare} />
@@ -334,23 +316,7 @@ export const CompareDesktop: Story = {
         title="[실제 컴포넌트 가짜 데이터 주입] SessionList - Desktop (4열 그리드)"
       >
         <section className="gap-lg flex flex-col">
-          <div className="flex flex-col gap-[10px]">
-            <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
-            <div className="flex flex-row items-start justify-between gap-5">
-              <p className="text-text-muted text-base">현재 모집 중인 세션에 바로 참여해 보세요</p>
-              <div className="flex gap-2">
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
-                  정렬
-                </button>
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
-                  날짜
-                </button>
-                <button className="bg-surface-subtle text-text-secondary rounded-md px-3 py-1.5 text-xs">
-                  시간
-                </button>
-              </div>
-            </div>
-          </div>
+          <SessionListHeader mode="desktop" />
           <div className="grid grid-cols-4 gap-6 gap-y-[48px]">
             {mockSessions.map((session) => (
               <SessionCardItem key={session.sessionId} session={session} onShare={mockOnShare} />

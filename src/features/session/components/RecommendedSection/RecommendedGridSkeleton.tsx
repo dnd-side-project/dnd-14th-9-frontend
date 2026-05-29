@@ -12,7 +12,7 @@ export function RecommendedGridSkeleton() {
     <>
       {/* Mobile: 가로 스크롤 */}
       <div className="relative md:hidden">
-        <div className="flex gap-6 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="scrollbar-hide flex gap-6 overflow-x-auto pb-1">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="w-[226px] shrink-0">
               <CardSkeleton size="sm" />
@@ -27,7 +27,7 @@ export function RecommendedGridSkeleton() {
       </div>
 
       {/* Tablet / Desktop: grid */}
-      <div className="hidden grid-cols-2 gap-6 md:grid xl:grid-cols-4 xl:gap-y-[48px]">
+      <div className="hidden min-h-[300px] grid-cols-2 gap-6 md:grid xl:grid-cols-4 xl:gap-y-[48px]">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="mx-auto w-full xl:max-w-69">
             <CardSkeleton size="responsive" />

@@ -1,5 +1,6 @@
 import { Card } from "@/features/session/components/Card/Card";
 import { RecommendedGridSkeleton } from "@/features/session/components/RecommendedSection/RecommendedGridSkeleton";
+import type { SessionListItem } from "@/features/session/types";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
@@ -25,8 +26,8 @@ const customViewports = {
  * 실제 카드 컴포넌트(Card)에 가짜 데이터를 직접 주입한 추천 세션 목록의 실제 반응형 레이아웃과,
  * 이에 대응하는 로딩 스켈레톤(RecommendedGridSkeleton)의 반응형 레이아웃 정합성을 1:1 비교 검증합니다.
  *
- * 💡 프로덕션 컴포넌트를 단 한 줄도 수정하지 않기 위해,
- * 스토리북 파일 내에서 CSS style override 기법을 사용하여 미디어 쿼리(md:, xl:)를 우회 강제합니다.
+ * 💡 각 breakpoint를 한 화면에서 안정적으로 비교하기 위해,
+ * 스토리북 파일 내 CSS style override 기법으로 미디어 쿼리(md:, xl:)를 우회 강제합니다.
  */
 const meta = {
   title: "Features/Session/RecommendedSection",
@@ -140,12 +141,12 @@ function FixedWidthFrame({
 // ---------------------------------------------------------------------------
 // Mock Data (가짜 데이터 직접 주입 방식)
 // ---------------------------------------------------------------------------
-const mockRecommendedSessions = Array.from({ length: 4 }, (_, i) => ({
+const MOCK_RECOMMENDED_SESSIONS: SessionListItem[] = Array.from({ length: 4 }, (_, i) => ({
   sessionId: i + 1,
-  category: "DEVELOPMENT",
+  category: "DEVELOPMENT" as const,
   title: `추천 세션 타이틀 ${i + 1}`,
   hostNickname: `호스트 닉네임 ${i + 1}`,
-  status: "WAITING",
+  status: "WAITING" as const,
   currentParticipants: i + 1,
   maxParticipants: 10,
   sessionDurationMinutes: 60,
@@ -166,9 +167,10 @@ export const CompareMobile: Story = {
       >
         <div className="relative">
           <div className="scrollbar-hide flex gap-6 overflow-x-auto pb-1">
-            {mockRecommendedSessions.map((session) => (
+            {MOCK_RECOMMENDED_SESSIONS.map((session) => (
               <div key={session.sessionId} className="w-[226px] shrink-0">
                 <Card
+                  size="sm"
                   thumbnailSrc={session.imageUrl}
                   category={session.category}
                   createdAt={session.startTime}
@@ -212,9 +214,10 @@ export const CompareTablet: Story = {
         title="[실제 컴포넌트 가짜 데이터 주입] RecommendedGrid - Tablet (2열 그리드)"
       >
         <div className="grid grid-cols-2 gap-6">
-          {mockRecommendedSessions.map((session) => (
+          {MOCK_RECOMMENDED_SESSIONS.map((session) => (
             <div key={session.sessionId} className="mx-auto w-full xl:max-w-69">
               <Card
+                size="responsive"
                 thumbnailSrc={session.imageUrl}
                 category={session.category}
                 createdAt={session.startTime}
@@ -256,9 +259,10 @@ export const CompareDesktop: Story = {
         title="[실제 컴포넌트 가짜 데이터 주입] RecommendedGrid - Desktop (4열 그리드)"
       >
         <div className="grid grid-cols-4 gap-6 gap-y-[48px]">
-          {mockRecommendedSessions.map((session) => (
+          {MOCK_RECOMMENDED_SESSIONS.map((session) => (
             <div key={session.sessionId} className="mx-auto w-full xl:max-w-69">
               <Card
+                size="responsive"
                 thumbnailSrc={session.imageUrl}
                 category={session.category}
                 createdAt={session.startTime}
