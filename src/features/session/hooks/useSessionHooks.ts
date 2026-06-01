@@ -79,6 +79,14 @@ export const sessionQueries = {
 
 export const useSessionList = sessionCrud.useList;
 
+function sessionListQueryOptions(params: SessionListParams) {
+  return queryOptions({
+    queryKey: sessionKeys.list(params),
+    queryFn: () => sessionApi.getList(params),
+    refetchOnWindowFocus: "always",
+  });
+}
+
 interface UseSessionListQueryOptions {
   enabled?: boolean;
 }
@@ -88,20 +96,13 @@ export function useSessionListQuery(
   options?: UseSessionListQueryOptions
 ) {
   return useQuery({
-    queryKey: sessionKeys.list(params),
-    queryFn: () => sessionApi.getList(params),
+    ...sessionListQueryOptions(params),
     enabled: options?.enabled ?? true,
-    refetchOnWindowFocus: "always",
   });
 }
 
 export function useSuspenseSessionList(params: SessionListParams) {
-  return useSuspenseQuery({
-    queryKey: sessionKeys.list(params),
-    queryFn: () => sessionApi.getList(params),
-    // staleTime: 0,
-    refetchOnWindowFocus: "always",
-  });
+  return useSuspenseQuery(sessionListQueryOptions(params));
 }
 export const useSessionDetail = sessionCrud.useDetail!;
 /**

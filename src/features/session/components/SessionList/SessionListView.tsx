@@ -1,42 +1,33 @@
+import type { ComponentProps } from "react";
+
 import { Pagination } from "@/components/Pagination/Pagination";
 
 import { SessionCardItem } from "./SessionCardItem";
 import { SessionListErrorState } from "./SessionListErrorState";
 import { SessionListFilterBar } from "./SessionListFilterBar";
 
-import type { SessionListFilterValues } from "../../hooks/useSessionListFilters";
-import type { DurationRange, SessionListItem, SessionSort, TimeSlot } from "../../types";
+import type { SessionListItem } from "../../types";
+
+type SessionListFilterBarProps = ComponentProps<typeof SessionListFilterBar>;
 
 interface SessionListViewProps {
-  values: SessionListFilterValues;
+  filterBarProps: SessionListFilterBarProps;
   sessions: SessionListItem[];
   totalPage: number;
   currentPage: number;
   isError: boolean;
   onRetry: () => void;
-  onSetDateRange: (startDate: Date | null, endDate: Date | null) => void;
-  onToggleTimeSlot: (timeSlot: TimeSlot) => void;
-  onSetDurationRange: (durationRange: DurationRange) => void;
-  onSetParticipants: (participants: number) => void;
-  onSetSort: (sort: SessionSort) => void;
-  onResetFilters: () => void;
   onPageChange: (page: number) => void;
   onShareSession: (sessionId: number) => void;
 }
 
 export function SessionListView({
-  values,
+  filterBarProps,
   sessions,
   totalPage,
   currentPage,
   isError,
   onRetry,
-  onSetDateRange,
-  onToggleTimeSlot,
-  onSetDurationRange,
-  onSetParticipants,
-  onSetSort,
-  onResetFilters,
   onPageChange,
   onShareSession,
 }: SessionListViewProps) {
@@ -48,15 +39,7 @@ export function SessionListView({
           <p className="text-text-muted text-[13px] md:text-base">
             현재 모집 중인 세션에 바로 참여해 보세요
           </p>
-          <SessionListFilterBar
-            values={values}
-            onSetDateRange={onSetDateRange}
-            onToggleTimeSlot={onToggleTimeSlot}
-            onSetDurationRange={onSetDurationRange}
-            onSetParticipants={onSetParticipants}
-            onSetSort={onSetSort}
-            onResetFilters={onResetFilters}
-          />
+          <SessionListFilterBar {...filterBarProps} />
         </div>
       </div>
 

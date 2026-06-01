@@ -84,16 +84,18 @@ export function SessionList() {
 
   return (
     <SessionListView
-      values={values}
+      filterBarProps={{
+        values,
+        onSetDateRange: setDateRange,
+        onToggleTimeSlot: toggleTimeSlot,
+        onSetDurationRange: setDurationRange,
+        onSetParticipants: setParticipantsCount,
+        onSetSort: setSort,
+        onResetFilters: resetFilters,
+      }}
       sessions={sessions}
       totalPage={totalPage}
       currentPage={page}
-      onSetDateRange={setDateRange}
-      onToggleTimeSlot={toggleTimeSlot}
-      onSetDurationRange={setDurationRange}
-      onSetParticipants={setParticipantsCount}
-      onSetSort={setSort}
-      onResetFilters={resetFilters}
       isError={isError}
       onRetry={() => void refetch()}
       onPageChange={setPage}
