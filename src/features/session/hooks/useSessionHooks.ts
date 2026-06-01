@@ -78,6 +78,23 @@ export const sessionQueries = {
 };
 
 export const useSessionList = sessionCrud.useList;
+
+interface UseSessionListQueryOptions {
+  enabled?: boolean;
+}
+
+export function useSessionListQuery(
+  params: SessionListParams,
+  options?: UseSessionListQueryOptions
+) {
+  return useQuery({
+    queryKey: sessionKeys.list(params),
+    queryFn: () => sessionApi.getList(params),
+    enabled: options?.enabled ?? true,
+    refetchOnWindowFocus: "always",
+  });
+}
+
 export function useSuspenseSessionList(params: SessionListParams) {
   return useSuspenseQuery({
     queryKey: sessionKeys.list(params),

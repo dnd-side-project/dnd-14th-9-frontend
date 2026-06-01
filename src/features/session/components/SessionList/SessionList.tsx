@@ -4,20 +4,19 @@ import { useEffect } from "react";
 
 import { useSearchParams } from "next/navigation";
 
-import { Pagination } from "@/components/Pagination/Pagination";
 import { useViewportLayout } from "@/hooks/useViewportLayout";
 
 import {
   SESSION_LIST_DESKTOP_PAGE_SIZE,
   SESSION_LIST_MOBILE_PAGE_SIZE,
 } from "../../constants/pagination";
-import { useSuspenseSessionList } from "../../hooks/useSessionHooks";
+import { useSessionListQuery } from "../../hooks/useSessionHooks";
 import { useSessionListFilters } from "../../hooks/useSessionListFilters";
 import { useShareSession } from "../../hooks/useShareSession";
 import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
 
-import { SessionCardItem } from "./SessionCardItem";
-import { SessionListFilterBar } from "./SessionListFilterBar";
+import { SessionListSkeleton } from "./SessionListSkeleton";
+import { SessionListView } from "./SessionListView";
 
 function useResponsiveSessionListPageSize() {
   const { layout, isResolved } = useViewportLayout();
@@ -28,12 +27,13 @@ function useResponsiveSessionListPageSize() {
 }
 
 /**
- * SessionList - 모집 중 세션 목록
+ * SessionList - 모집 중 세션 목록 데이터 컨테이너
  *
  * 역할:
  * - URL searchParams 기반 필터링/페이지네이션
- * - SearchFilterSection의 검색어/카테고리 변경에 반응
- * - 정렬 드롭다운 + 카드 그리드 + PaginationList
+ * - viewport 확정 이후 실제 화면 크기에 맞는 page size로 세션 목록 요청
+ * - 요청 상태에 따른 skeleton/error 처리
+ * - 실제 렌더링은 SessionListView에 위임
  */
 export function SessionList() {
   const {
@@ -52,21 +52,23 @@ export function SessionList() {
 
   const { keyword, category, page } = parseSessionListSearchParams(searchParams);
 
-  const { data } = useSuspenseSessionList({
-    keyword,
-    category,
-    sort: values.sort,
-    page,
-    size: pageSize,
-    startDate: values.startDate ?? undefined,
-    endDate: values.endDate ?? undefined,
-    timeSlots: values.timeSlots.length > 0 ? values.timeSlots : undefined,
-    durationRange: values.durationRange ?? undefined,
-    participants: values.participants ? Number(values.participants) : undefined,
-  });
+  const { data, isPending, isError, error } = useSessionListQuery(
+    {
+      keyword,
+      category,
+      sort: values.sort,
+      page,
+      size: pageSize,
+      startDate: values.startDate ?? undefined,
+      endDate: values.endDate ?? undefined,
+      timeSlots: values.timeSlots.length > 0 ? values.timeSlots : undefined,
+      durationRange: values.durationRange ?? undefined,
+      participants: values.participants ? Number(values.participants) : undefined,
+    },
+    { enabled: isViewportResolved }
+  );
 
-  const sessions = data.result.sessions;
-  const totalPage = data.result.totalPage;
+  const totalPage = data?.result.totalPage ?? 0;
 
   useEffect(() => {
     if (isViewportResolved && totalPage > 0 && page > totalPage) {
@@ -74,43 +76,30 @@ export function SessionList() {
     }
   }, [isViewportResolved, page, setPage, totalPage]);
 
+  if (isError) {
+    throw error;
+  }
+
+  if (!isViewportResolved || isPending || !data) {
+    return <SessionListSkeleton />;
+  }
+
+  const sessions = data.result.sessions;
+
   return (
-    <section className="gap-lg flex flex-col">
-      <div className="flex flex-col gap-[10px]">
-        <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
-        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-5">
-          <p className="text-text-muted text-[13px] md:text-base">
-            현재 모집 중인 세션에 바로 참여해 보세요
-          </p>
-          <SessionListFilterBar
-            values={values}
-            onSetDateRange={setDateRange}
-            onToggleTimeSlot={toggleTimeSlot}
-            onSetDurationRange={setDurationRange}
-            onSetParticipants={setParticipantsCount}
-            onSetSort={setSort}
-            onResetFilters={resetFilters}
-          />
-        </div>
-      </div>
-
-      {sessions.length === 0 ? (
-        <div className="text-text-muted flex h-60 items-center justify-center text-sm">
-          모집 중인 세션이 없습니다
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 xl:gap-y-[48px]">
-          {sessions.map((session) => (
-            <SessionCardItem key={session.sessionId} session={session} onShare={shareSession} />
-          ))}
-        </div>
-      )}
-
-      {totalPage > 0 && (
-        <div className="py-3xl flex justify-center">
-          <Pagination type="list" totalPage={totalPage} currentPage={page} onPageChange={setPage} />
-        </div>
-      )}
-    </section>
+    <SessionListView
+      values={values}
+      sessions={sessions}
+      totalPage={totalPage}
+      currentPage={page}
+      onSetDateRange={setDateRange}
+      onToggleTimeSlot={toggleTimeSlot}
+      onSetDurationRange={setDurationRange}
+      onSetParticipants={setParticipantsCount}
+      onSetSort={setSort}
+      onResetFilters={resetFilters}
+      onPageChange={setPage}
+      onShareSession={shareSession}
+    />
   );
 }
