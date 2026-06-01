@@ -74,6 +74,7 @@ export function RecommendedGrid({
             <div key={session.sessionId} className="w-[226px] shrink-0">
               <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
                 <Card
+                  size="sm"
                   thumbnailSrc={session.imageUrl}
                   category={session.category}
                   createdAt={session.startTime}
@@ -101,6 +102,7 @@ export function RecommendedGrid({
           <div key={session.sessionId} className="mx-auto w-full xl:max-w-69">
             <Link href={`/session/${session.sessionId}`} scroll={false} className="block">
               <Card
+                size="responsive"
                 thumbnailSrc={session.imageUrl}
                 category={session.category}
                 createdAt={session.startTime}
