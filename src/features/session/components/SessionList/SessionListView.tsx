@@ -1,6 +1,7 @@
 import { Pagination } from "@/components/Pagination/Pagination";
 
 import { SessionCardItem } from "./SessionCardItem";
+import { SessionListErrorState } from "./SessionListErrorState";
 import { SessionListFilterBar } from "./SessionListFilterBar";
 
 import type { SessionListFilterValues } from "../../hooks/useSessionListFilters";
@@ -11,6 +12,8 @@ interface SessionListViewProps {
   sessions: SessionListItem[];
   totalPage: number;
   currentPage: number;
+  isError: boolean;
+  onRetry: () => void;
   onSetDateRange: (startDate: Date | null, endDate: Date | null) => void;
   onToggleTimeSlot: (timeSlot: TimeSlot) => void;
   onSetDurationRange: (durationRange: DurationRange) => void;
@@ -26,6 +29,8 @@ export function SessionListView({
   sessions,
   totalPage,
   currentPage,
+  isError,
+  onRetry,
   onSetDateRange,
   onToggleTimeSlot,
   onSetDurationRange,
@@ -55,7 +60,9 @@ export function SessionListView({
         </div>
       </div>
 
-      {sessions.length === 0 ? (
+      {isError ? (
+        <SessionListErrorState onRetry={onRetry} />
+      ) : sessions.length === 0 ? (
         <div className="text-text-muted flex h-60 items-center justify-center text-sm">
           모집 중인 세션이 없습니다
         </div>
@@ -67,7 +74,7 @@ export function SessionListView({
         </div>
       )}
 
-      {totalPage > 0 && (
+      {!isError && totalPage > 0 && (
         <div className="py-3xl flex justify-center">
           <Pagination
             type="list"

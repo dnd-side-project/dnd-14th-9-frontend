@@ -52,7 +52,7 @@ export function SessionList() {
 
   const { keyword, category, page } = parseSessionListSearchParams(searchParams);
 
-  const { data, isPending, isError, error } = useSessionListQuery(
+  const { data, isPending, isError, refetch } = useSessionListQuery(
     {
       keyword,
       category,
@@ -76,15 +76,11 @@ export function SessionList() {
     }
   }, [isViewportResolved, page, setPage, totalPage]);
 
-  if (isError) {
-    throw error;
-  }
-
-  if (!isViewportResolved || isPending || !data) {
+  if (!isViewportResolved || isPending) {
     return <SessionListSkeleton />;
   }
 
-  const sessions = data.result.sessions;
+  const sessions = data?.result.sessions ?? [];
 
   return (
     <SessionListView
@@ -98,6 +94,8 @@ export function SessionList() {
       onSetParticipants={setParticipantsCount}
       onSetSort={setSort}
       onResetFilters={resetFilters}
+      isError={isError}
+      onRetry={() => void refetch()}
       onPageChange={setPage}
       onShareSession={shareSession}
     />

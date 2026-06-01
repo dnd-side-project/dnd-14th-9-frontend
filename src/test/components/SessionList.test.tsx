@@ -15,6 +15,7 @@ const mockSetPage = jest.fn();
 const mockSessionListFilterBar = jest.fn();
 const mockCard = jest.fn();
 const mockPagination = jest.fn();
+const mockRefetch = jest.fn();
 
 jest.mock("next/navigation", () => ({
   useSearchParams: () => mockUseSearchParams(),
@@ -103,6 +104,7 @@ function createSessionListResult({ count = 5, totalPage = 3 } = {}) {
     isPending: false,
     isError: false,
     error: null,
+    refetch: mockRefetch,
   };
 }
 
@@ -217,6 +219,7 @@ describe("SessionList", () => {
       isPending: true,
       isError: false,
       error: null,
+      refetch: mockRefetch,
     });
 
     render(<SessionList />);
@@ -305,6 +308,27 @@ describe("SessionList", () => {
     );
   });
 
+  it("세션 목록 요청 실패 시 페이지 전체 에러 대신 목록 영역에서 재시도 UI를 보여준다", () => {
+    mockUseSessionListQuery.mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: true,
+      error: new Error("failed"),
+      refetch: mockRefetch,
+    });
+
+    render(<SessionList />);
+
+    expect(screen.getByRole("heading", { name: "지금 모집 중인 세션" })).toBeInTheDocument();
+    expect(screen.getByText("세션 목록을 불러오지 못했습니다")).toBeInTheDocument();
+    expect(screen.getByText("잠시 후 다시 시도해주세요.")).toBeInTheDocument();
+    expect(screen.queryByTestId("session-card")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /pagination/i })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "다시 불러오기" }));
+
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
+  });
   it("세션이 없으면 empty state만 보여준다", () => {
     mockUseSessionListQuery.mockReturnValue(createSessionListResult({ count: 0, totalPage: 0 }));
 
