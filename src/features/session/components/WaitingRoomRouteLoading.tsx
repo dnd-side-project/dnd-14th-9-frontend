@@ -3,8 +3,8 @@ import { WaitingRoomSkeleton } from "./WaitingRoomSkeleton";
 export function WaitingRoomRouteLoading() {
   return (
     <WaitingRoomSkeleton
-      infoCardHeightClassName="h-52"
-      participantCardHeightClassName="h-[280px] xl:h-[320px]"
+      infoCardHeightClassName="h-[560px] xl:h-[360px]"
+      participantCardHeightClassName="h-[360px] xl:h-[628px]"
     />
   );
 }
