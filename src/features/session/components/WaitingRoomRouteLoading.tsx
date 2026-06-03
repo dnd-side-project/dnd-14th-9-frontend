@@ -4,7 +4,7 @@ export function WaitingRoomRouteLoading() {
   return (
     <WaitingRoomSkeleton
       infoCardHeightClassName="h-52"
-      participantCardHeightClassName="h-[320px]"
+      participantCardHeightClassName="h-[280px] xl:h-[320px]"
     />
   );
 }
