@@ -42,7 +42,7 @@ export function KickConfirmDialog({
         ref={setDialogRef}
         onCancel={onClose}
         onClick={handleBackdropClick}
-        className="bg-surface-default p-3xl fixed inset-0 m-auto flex w-full max-w-80 flex-col gap-6 rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default)"
+        className="bg-surface-default p-3xl max-md:p-xl fixed inset-0 m-auto flex w-full max-w-80 flex-col gap-6 rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default) max-md:w-[calc(100%-2rem)]"
       >
         <div className="flex flex-col gap-2">
           <h2 className="text-text-primary text-lg font-bold">정말 강퇴하시겠습니까?</h2>

@@ -103,12 +103,12 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
             e.stopPropagation();
           }
         }}
-        className="bg-surface-default gap-lg px-xl pt-xl pb-2xl fixed inset-0 m-auto flex w-full max-w-160 flex-col rounded-lg border border-gray-900 not-[&:modal]:hidden backdrop:bg-(--color-overlay-default)"
+        className="bg-surface-default gap-lg px-xl pt-xl pb-2xl max-md:gap-md max-md:p-md fixed inset-0 m-auto flex w-full max-w-160 flex-col overflow-y-auto rounded-lg border border-gray-900 not-[&:modal]:hidden backdrop:bg-(--color-overlay-default) max-md:m-0 max-md:h-dvh max-md:max-h-dvh max-md:w-screen max-md:max-w-full max-md:rounded-none max-md:border-0 md:max-h-[90dvh]"
       >
         {/* 헤더 */}
         <div className="flex flex-col gap-1">
-          <h2 className="text-text-primary text-2xl font-bold">나의 목표</h2>
-          <p className="text-text-secondary text-base font-normal">
+          <h2 className="text-text-primary text-lg font-bold md:text-2xl">나의 목표</h2>
+          <p className="text-text-secondary text-sm font-normal md:text-base">
             목표와 투두리스트를 작성해야 세션에 참여할 수 있어요!
           </p>
         </div>
@@ -202,7 +202,11 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
         )}
 
         {/* 하단 버튼 */}
-        <ButtonGroup layout="dual" horizontal className="self-end">
+        <ButtonGroup
+          layout="dual"
+          horizontal
+          className="self-end max-md:w-full max-md:flex-col max-md:items-stretch max-md:self-stretch max-md:*:w-full"
+        >
           <Button
             variant="solid"
             colorScheme="tertiary"

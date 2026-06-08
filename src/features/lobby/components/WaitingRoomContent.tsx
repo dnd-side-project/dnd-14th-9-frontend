@@ -141,7 +141,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
 
   if (error || !data?.result) {
     return (
-      <div className="flex h-[calc(100vh-200px)] min-h-100 items-center justify-center">
+      <div className="flex h-[calc(100dvh-200px)] min-h-100 items-center justify-center">
         <ErrorFallbackUI
           title="세션 정보를 불러올 수 없어요"
           description="데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요."
@@ -157,7 +157,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   // 비로그인 사용자 → 로그인 유도
   if (!isAuthenticated) {
     return (
-      <div className="flex h-[calc(100vh-200px)] min-h-100 flex-col items-center justify-center gap-4">
+      <div className="flex h-[calc(100dvh-200px)] min-h-100 flex-col items-center justify-center gap-4">
         <p className="text-text-secondary text-lg">세션에 참여하려면 로그인이 필요합니다</p>
         <Button href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
           로그인하고 참여하기
@@ -185,7 +185,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
       <div className="relative left-1/2 ml-[-50vw] w-screen">
         <CountdownBanner targetTime={new Date(session.startTime)} />
       </div>
-      <div className="gap-3xl p-3xl flex flex-col">
+      <div className="gap-xl md:gap-2xl xl:gap-3xl p-md md:p-xl xl:p-3xl flex flex-col">
         <LobbyHeader
           sessionId={sessionId}
           showDialog={showLeaveDialog}
@@ -195,7 +195,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
           onLeavingChange={setIsLeaving}
         />
         <SessionInfoCard session={session} />
-        <div className="gap-lg flex">
+        <div className="gap-lg flex flex-col xl:flex-row">
           <GoalAndTodoCard sessionId={sessionId} task={myTask} />
           <ParticipantListCard
             sessionId={sessionId}

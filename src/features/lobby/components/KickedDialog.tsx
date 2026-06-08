@@ -27,7 +27,7 @@ export function KickedDialog({ onConfirm }: KickedDialogProps) {
       <dialog
         ref={setDialogRef}
         onCancel={(e) => e.preventDefault()}
-        className="bg-surface-default p-3xl fixed inset-0 m-auto flex w-full max-w-80 flex-col gap-6 rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default)"
+        className="bg-surface-default p-3xl max-md:p-xl fixed inset-0 m-auto flex w-full max-w-80 flex-col gap-6 rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default) max-md:w-[calc(100%-2rem)]"
       >
         <h2 className="text-text-primary text-lg font-bold">강퇴 되었습니다.</h2>
 
