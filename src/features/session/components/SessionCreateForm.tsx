@@ -409,13 +409,13 @@ export function SessionCreateForm() {
       )}
 
       {/* 버튼 그룹 */}
-      <div className="mt-20 mb-20 flex justify-center gap-4">
+      <div className="mt-10 mb-10 flex flex-col gap-3 md:mt-20 md:mb-20 md:flex-row md:justify-center md:gap-4">
         <Button
           type="button"
           variant="solid"
           colorScheme="tertiary"
           size="large"
-          className="w-full max-w-70.5"
+          className="px-md py-sm md:px-xl md:py-md w-full text-xs md:max-w-70.5 md:text-base"
           disabled={isPending}
           onClick={() => router.back()}
         >
@@ -426,7 +426,7 @@ export function SessionCreateForm() {
           variant="solid"
           colorScheme="primary"
           size="large"
-          className="w-full max-w-70.5"
+          className="px-md py-sm md:px-xl md:py-md w-full text-xs md:max-w-70.5 md:text-base"
           disabled={isPending}
         >
           {isPending ? "생성 중..." : "세션 만들기"}
