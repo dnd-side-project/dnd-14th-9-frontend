@@ -274,11 +274,11 @@ export function SessionCreateForm() {
       {/* 세션 세부 설정 */}
       <div className="flex flex-col gap-2">
         <span className="text-text-secondary text-base">세션 세부 설정</span>
-        <div className="flex gap-5">
+        <div className="flex flex-col gap-3 xl:flex-row xl:gap-5">
           {/* 시작일시 */}
           <div
             ref={datePickerContainerRef}
-            className="relative flex-1 rounded-sm border border-gray-700 px-3 py-4"
+            className="relative w-full rounded-sm border border-gray-700 px-3 py-4 xl:flex-1"
           >
             <div className="flex flex-col gap-3">
               <span className="text-text-secondary text-sm">시작일시</span>
@@ -331,7 +331,7 @@ export function SessionCreateForm() {
             max={SESSION_DURATION_MINUTES_MAX}
             step={SESSION_DURATION_MINUTES_STEP}
             onChange={setDuration}
-            className="w-45"
+            className="w-full xl:w-45"
           />
 
           {/* 참여인원 */}
@@ -344,7 +344,7 @@ export function SessionCreateForm() {
             max={SESSION_PARTICIPANTS_MAX}
             step={1}
             onChange={setParticipants}
-            className="w-45"
+            className="w-full xl:w-45"
           />
         </div>
       </div>
