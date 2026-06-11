@@ -350,8 +350,8 @@ export function SessionCreateForm() {
       </div>
 
       {/* To do 달성도 범위 설정 */}
-      <div className="flex gap-5">
-        <div className="flex flex-1 flex-col gap-2">
+      <div className="flex flex-col gap-3 xl:flex-row xl:gap-5">
+        <div className="flex w-full flex-col gap-2 xl:flex-1">
           <div className="flex items-center gap-1">
             <span className="text-text-secondary text-base leading-none">
               To do 달성도 범위 설정
@@ -377,7 +377,7 @@ export function SessionCreateForm() {
           </div>
         </div>
         {/* 집중도 범위 설정 */}
-        <div className="flex flex-1 flex-col gap-2">
+        <div className="flex w-full flex-col gap-2 xl:flex-1">
           <div className="flex items-center gap-1">
             <span className="text-text-secondary text-base leading-none">집중도 범위 설정</span>
             <div className="group relative flex items-center">
