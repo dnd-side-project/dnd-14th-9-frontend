@@ -313,6 +313,7 @@ export function SessionCreateForm() {
                     setStartDateTime(date);
                     clearFieldError("startTime");
                   }}
+                  className="max-md:w-[calc(100vw-2rem)]"
                 />
               </div>
             )}
