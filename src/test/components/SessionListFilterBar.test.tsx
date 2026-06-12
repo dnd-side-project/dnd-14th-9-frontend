@@ -69,7 +69,7 @@ describe("SessionListFilterBar", () => {
     expect(row).toHaveClass("xl:mb-0");
   });
 
-  it("reserves compact (<xl) panel space for the sort dropdown", () => {
+  it("reserves nonDesktop (<xl) panel space for the sort dropdown", () => {
     const { container } = renderFilterBar();
 
     fireEvent.click(screen.getAllByRole("button", { name: /인기순/ })[0]);
@@ -99,14 +99,14 @@ describe("SessionListFilterBar", () => {
     expect(screen.getAllByRole("button", { name: /인기순/ })).toHaveLength(2);
   });
 
-  it("opens only the desktop sort dropdown on desktop viewport and ignores the compact trigger", () => {
+  it("opens only the desktop sort dropdown on desktop viewport and ignores the nonDesktop trigger", () => {
     mockDesktopViewport();
     renderFilterBar();
-    const [compactSortTrigger, desktopSortTrigger] = screen.getAllByRole("button", {
+    const [nonDesktopSortTrigger, desktopSortTrigger] = screen.getAllByRole("button", {
       name: /인기순/,
     });
 
-    fireEvent.click(compactSortTrigger);
+    fireEvent.click(nonDesktopSortTrigger);
     expect(screen.queryByRole("dialog", { name: "정렬 선택" })).not.toBeInTheDocument();
 
     fireEvent.click(desktopSortTrigger);
