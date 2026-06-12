@@ -14,6 +14,10 @@ jest.mock("@/features/session/components/SessionList/SessionListFilterBar", () =
   },
 }));
 
+jest.mock("@/features/session/components/SessionList/SessionListSkeleton", () => ({
+  SessionListSkeleton: () => <div data-testid="session-list-skeleton" />,
+}));
+
 jest.mock("@/features/session/components/SessionList/SessionListErrorState", () => ({
   SessionListErrorState: ({ onRetry }: { onRetry: () => void }) => (
     <button type="button" onClick={onRetry}>
@@ -100,6 +104,7 @@ function renderSessionListView(
     totalPage: 3,
     currentPage: 1,
     isError: false,
+    isLoading: false,
     onRetry: jest.fn(),
     onPageChange: jest.fn(),
     onShareSession: jest.fn(),
@@ -123,6 +128,15 @@ describe("SessionListView", () => {
     expect(screen.getByText("현재 모집 중인 세션에 바로 참여해 보세요")).toBeInTheDocument();
     expect(screen.getByTestId("session-list-filter-bar")).toBeInTheDocument();
     expect(mockSessionListFilterBar).toHaveBeenCalledWith(props.filterBarProps);
+  });
+
+  it("로딩 중에도 헤더와 필터바를 유지하고 목록 영역에 skeleton을 보여준다", () => {
+    renderSessionListView({ isLoading: true });
+
+    expect(screen.getByRole("heading", { name: "지금 모집 중인 세션" })).toBeInTheDocument();
+    expect(screen.getByTestId("session-list-filter-bar")).toBeInTheDocument();
+    expect(screen.getByTestId("session-list-skeleton")).toBeInTheDocument();
+    expect(screen.queryByTestId("session-card")).not.toBeInTheDocument();
   });
 
   it("에러 상태에서는 재시도 UI만 보여주고 목록/empty/pagination은 숨긴다", () => {

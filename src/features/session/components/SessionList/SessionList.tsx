@@ -15,7 +15,6 @@ import { useSessionListFilters } from "../../hooks/useSessionListFilters";
 import { useShareSession } from "../../hooks/useShareSession";
 import { parseSessionListSearchParams } from "../../utils/parseSessionListSearchParams";
 
-import { SessionListSkeleton } from "./SessionListSkeleton";
 import { SessionListView } from "./SessionListView";
 
 function useResponsiveSessionListPageSize() {
@@ -76,10 +75,7 @@ export function SessionList() {
     }
   }, [isViewportResolved, page, setPage, totalPage]);
 
-  if (!isViewportResolved || isPending) {
-    return <SessionListSkeleton />;
-  }
-
+  const isLoading = !isViewportResolved || isPending;
   const sessions = data?.result.sessions ?? [];
 
   return (
@@ -97,6 +93,7 @@ export function SessionList() {
       totalPage={totalPage}
       currentPage={page}
       isError={isError}
+      isLoading={isLoading}
       onRetry={() => void refetch()}
       onPageChange={setPage}
       onShareSession={shareSession}

@@ -1,11 +1,13 @@
 import { SessionCardItem } from "./SessionCardItem";
 import { SessionListErrorState } from "./SessionListErrorState";
+import { SessionListSkeleton } from "./SessionListSkeleton";
 
 import type { SessionListItem } from "../../types";
 
 interface SessionListContentProps {
   sessions: SessionListItem[];
   isError: boolean;
+  isLoading: boolean;
   onRetry: () => void;
   onShareSession: (sessionId: number) => void;
 }
@@ -13,9 +15,14 @@ interface SessionListContentProps {
 export function SessionListContent({
   sessions,
   isError,
+  isLoading,
   onRetry,
   onShareSession,
 }: SessionListContentProps) {
+  if (isLoading) {
+    return <SessionListSkeleton />;
+  }
+
   if (isError) {
     return <SessionListErrorState onRetry={onRetry} />;
   }

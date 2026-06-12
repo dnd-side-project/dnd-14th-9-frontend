@@ -15,6 +15,7 @@ interface SessionListViewProps {
   totalPage: number;
   currentPage: number;
   isError: boolean;
+  isLoading: boolean;
   onRetry: () => void;
   onPageChange: (page: number) => void;
   onShareSession: (sessionId: number) => void;
@@ -26,6 +27,7 @@ export function SessionListView({
   totalPage,
   currentPage,
   isError,
+  isLoading,
   onRetry,
   onPageChange,
   onShareSession,
@@ -47,6 +49,7 @@ export function SessionListView({
       <SessionListContent
         sessions={sessions}
         isError={isError}
+        isLoading={isLoading}
         onRetry={onRetry}
         onShareSession={onShareSession}
       />

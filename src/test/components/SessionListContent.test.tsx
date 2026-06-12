@@ -5,6 +5,10 @@ import type { SessionListItem } from "@/features/session/types";
 
 const mockSessionCardItem = jest.fn();
 
+jest.mock("@/features/session/components/SessionList/SessionListSkeleton", () => ({
+  SessionListSkeleton: () => <div data-testid="session-list-skeleton" />,
+}));
+
 jest.mock("@/features/session/components/SessionList/SessionListErrorState", () => ({
   SessionListErrorState: ({ onRetry }: { onRetry: () => void }) => (
     <button type="button" onClick={onRetry}>
@@ -54,6 +58,7 @@ function renderSessionListContent(
   const props: React.ComponentProps<typeof SessionListContent> = {
     sessions: [createSession(1), createSession(2)],
     isError: false,
+    isLoading: false,
     onRetry: jest.fn(),
     onShareSession: jest.fn(),
     ...overrides,
@@ -67,6 +72,15 @@ function renderSessionListContent(
 describe("SessionListContent", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it("로딩 상태에서는 목록 영역 skeleton만 보여준다", () => {
+    renderSessionListContent({ isLoading: true });
+
+    expect(screen.getByTestId("session-list-skeleton")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "다시 불러오기" })).not.toBeInTheDocument();
+    expect(screen.queryByText("모집 중인 세션이 없습니다")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("session-card")).not.toBeInTheDocument();
   });
 
   it("에러 상태에서는 재시도 UI만 보여주고 retry 콜백을 연결한다", () => {
