@@ -96,7 +96,7 @@ export function ParticipantListCard({
   };
 
   return (
-    <div className="gap-lg border-gray p-lg flex h-157 flex-4 flex-col rounded-lg border">
+    <div className="gap-lg border-gray p-lg flex h-auto w-full flex-col rounded-lg border xl:h-157 xl:flex-4">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
@@ -120,7 +120,7 @@ export function ParticipantListCard({
       </span>
 
       {/* 참여자 목록 */}
-      <ul className="scrollbar-hide flex flex-1 flex-col gap-2 overflow-y-auto">
+      <ul className="scrollbar-hide flex flex-col gap-2 overflow-y-auto xl:flex-1">
         {members.map((participant) => {
           const memberIdStr = String(participant.memberId);
           const isExpanded = expandedId === memberIdStr;

@@ -197,7 +197,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
   const displayTodos = isEditing ? draftTodos : todos;
 
   return (
-    <div className="gap-lg border-gray p-lg flex h-157 flex-6 flex-col rounded-lg border">
+    <div className="gap-lg border-gray p-lg flex h-auto w-full flex-col rounded-lg border xl:h-157 xl:flex-6">
       {/* 헤더 */}
       <div className="flex items-end justify-between">
         <div className="flex flex-col gap-1">
@@ -242,7 +242,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
       </div>
 
       {/* Todo */}
-      <div className="gap-sm mt-sm flex min-h-0 flex-1 flex-col">
+      <div className="gap-sm mt-sm flex min-h-0 flex-col xl:flex-1">
         <div className="flex items-center justify-between">
           <span className="text-text-secondary text-sm font-semibold">
             투두리스트 <span className="text-green-600">{displayTodos.length}</span>
@@ -261,7 +261,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
         </div>
 
         {isEditing ? (
-          <ul className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+          <ul className="scrollbar-hide flex min-h-0 flex-col gap-2 overflow-y-auto xl:flex-1">
             {draftTodos.map((todo, index) => (
               <li key={todo.subtaskId} className="flex shrink-0 items-start gap-2">
                 <TextInput
@@ -292,7 +292,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
         ) : displayTodos.length === 0 ? (
           <p className="text-text-muted py-md text-center text-sm">등록된 할 일이 없습니다</p>
         ) : (
-          <ul className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+          <ul className="scrollbar-hide flex min-h-0 flex-col gap-2 overflow-y-auto xl:flex-1">
             {todos.map((todo) => (
               <li
                 key={todo.subtaskId}
