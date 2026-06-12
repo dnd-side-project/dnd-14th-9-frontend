@@ -29,11 +29,12 @@ interface SessionListFilterBarProps {
 }
 
 type OpenFilterKey = "date" | "timeSlot" | "duration" | "participants" | "sort" | null;
-type SortFilterLayout = "mobile" | "desktop";
+type SortFilterLayout = "compact" | "desktop";
 
 // 모바일/태블릿에서 overflow-x-auto로 인해 필터 팝업이 잘리는 현상을 방지하기 위한 여백 확보 클래스입니다.
 // 가장 높이가 높은 필터 패널(약 380px)을 기준으로 패딩을 주고, 음수 마진으로 레이아웃 흐름을 유지합니다.
 const FILTER_PANEL_SPACE_CLASS = "-mb-[380px] pb-[380px] xl:mb-0 xl:pb-0";
+// 필터바는 xl 미만에서 모바일/태블릿 UI가 동일하므로 compact(<xl)와 desktop(xl 이상)만 구분합니다.
 const DESKTOP_SORT_MEDIA_QUERY = `(min-width: ${BREAKPOINT_XL_PX}px)`;
 
 export function SessionListFilterBar({
@@ -96,7 +97,7 @@ export function SessionListFilterBar({
 
     if (
       (layout === "desktop" && !isDesktopViewport) ||
-      (layout === "mobile" && isDesktopViewport)
+      (layout === "compact" && isDesktopViewport)
     ) {
       return;
     }
@@ -165,9 +166,9 @@ export function SessionListFilterBar({
           </div>
 
           <SortFilter
-            isOpen={openFilter === "sort" && openSortLayout === "mobile"}
+            isOpen={openFilter === "sort" && openSortLayout === "compact"}
             value={values.sort}
-            onOpenChange={(isOpen) => handleSortOpenChange(isOpen, "mobile")}
+            onOpenChange={(isOpen) => handleSortOpenChange(isOpen, "compact")}
             onSelect={onSetSort}
             className="ml-auto shrink-0 xl:hidden"
           />
