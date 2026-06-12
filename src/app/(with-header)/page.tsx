@@ -1,6 +1,5 @@
 import { HeroSection } from "@/features/session/components/HeroSection/HeroSection";
 import { MainSection } from "@/features/session/components/MainSection/MainSection";
-import { SESSION_LIST_DEFAULT_PAGE_SIZE } from "@/features/session/constants/pagination";
 import {
   parseSessionListSearchParams,
   toURLSearchParams,
@@ -23,8 +22,8 @@ export const metadata = createPageMetadata({
  *
  * 데이터 흐름 아키텍처:
  * 1. page.tsx는 URL 파라미터 파싱 및 섹션 배치만 담당
- * 2. SessionListPrefetch에서 prefetch + HydrationBoundary 처리
- * 3. Suspense로 SessionList만 비동기 스트리밍
+ * 2. RecommendedSection은 Suspense 기반으로 추천 세션을 렌더링
+ * 3. SessionList는 클라이언트에서 viewport 확정 이후 화면 크기에 맞는 size로 데이터를 요청
  * 4. 나머지 섹션은 독립적으로 렌더링
  *
  * 섹션 구성:
@@ -42,17 +41,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const parsedParams = parseSessionListSearchParams(toURLSearchParams(await searchParams));
   const isSearchMode = Boolean(parsedParams.keyword);
 
-  // 모집 중 세션 목록 prefetch (첫 페이지 로드 성능 최적화)
-  const listParams = {
-    ...parsedParams,
-    size: SESSION_LIST_DEFAULT_PAGE_SIZE,
-    timeSlots: parsedParams.timeSlots.length > 0 ? parsedParams.timeSlots : undefined,
-  };
-
   return (
     <div className="my-[64px] flex flex-col gap-10 px-5 md:px-10 xl:px-[54px]">
       <HeroSection isSearchMode={isSearchMode} />
-      <MainSection listParams={listParams} />
+      <MainSection />
     </div>
   );
 }

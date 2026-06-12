@@ -78,13 +78,31 @@ export const sessionQueries = {
 };
 
 export const useSessionList = sessionCrud.useList;
-export function useSuspenseSessionList(params: SessionListParams) {
-  return useSuspenseQuery({
+
+function sessionListQueryOptions(params: SessionListParams) {
+  return queryOptions({
     queryKey: sessionKeys.list(params),
     queryFn: () => sessionApi.getList(params),
-    // staleTime: 0,
     refetchOnWindowFocus: "always",
   });
+}
+
+interface UseSessionListQueryOptions {
+  enabled?: boolean;
+}
+
+export function useSessionListQuery(
+  params: SessionListParams,
+  options?: UseSessionListQueryOptions
+) {
+  return useQuery({
+    ...sessionListQueryOptions(params),
+    enabled: options?.enabled ?? true,
+  });
+}
+
+export function useSuspenseSessionList(params: SessionListParams) {
+  return useSuspenseQuery(sessionListQueryOptions(params));
 }
 export const useSessionDetail = sessionCrud.useDetail!;
 /**
