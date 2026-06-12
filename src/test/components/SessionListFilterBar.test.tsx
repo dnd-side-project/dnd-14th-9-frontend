@@ -2,7 +2,9 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 import { SessionListFilterBar } from "@/features/session/components/SessionList/SessionListFilterBar";
 import type { SessionListFilterValues } from "@/features/session/hooks/useSessionListFilters";
-import { BREAKPOINT_XL_PX } from "@/lib/constants/breakpoints";
+import { useViewportLayout } from "@/hooks/useViewportLayout";
+
+jest.mock("@/hooks/useViewportLayout");
 
 const defaultValues: SessionListFilterValues = {
   startDate: null,
@@ -39,20 +41,10 @@ function getScrollableFilterRow(container: HTMLElement) {
   return row;
 }
 
-function mockDesktopViewport() {
-  window.matchMedia = jest.fn().mockImplementation((query: string) => ({
-    matches: query === `(min-width: ${BREAKPOINT_XL_PX}px)`,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }));
-}
-
 describe("SessionListFilterBar", () => {
+  beforeEach(() => {
+    (useViewportLayout as jest.Mock).mockReturnValue({ layout: "mobile", isResolved: true });
+  });
   it("reserves mobile/tablet panel space when a non-sort filter opens", () => {
     const { container } = renderFilterBar();
 
@@ -72,9 +64,9 @@ describe("SessionListFilterBar", () => {
   it("reserves nonDesktop (<xl) panel space for the sort dropdown", () => {
     const { container } = renderFilterBar();
 
-    fireEvent.click(screen.getAllByRole("button", { name: /인기순/ })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /인기순/ }));
 
-    expect(screen.getAllByRole("dialog", { name: "정렬 선택" })).toHaveLength(1);
+    expect(screen.getByRole("dialog", { name: "정렬 선택" })).toBeInTheDocument();
     expect(getScrollableFilterRow(container)).toHaveClass("pb-[380px]");
     expect(getScrollableFilterRow(container)).toHaveClass("-mb-[380px]");
     expect(getScrollableFilterRow(container)).toHaveClass("xl:pb-0");
@@ -83,7 +75,7 @@ describe("SessionListFilterBar", () => {
 
   it("closes the sort dropdown when the visible sort trigger is clicked again", () => {
     renderFilterBar();
-    const sortTrigger = screen.getAllByRole("button", { name: /인기순/ })[0];
+    const sortTrigger = screen.getByRole("button", { name: /인기순/ });
 
     fireEvent.click(sortTrigger);
     expect(screen.getAllByRole("dialog", { name: "정렬 선택" })).toHaveLength(1);
@@ -93,25 +85,20 @@ describe("SessionListFilterBar", () => {
     expect(screen.queryByRole("dialog", { name: "정렬 선택" })).not.toBeInTheDocument();
   });
 
-  it("renders sort filter triggers for both mobile and desktop layouts", () => {
+  it("renders one sort filter trigger for the current viewport", () => {
     renderFilterBar();
 
-    expect(screen.getAllByRole("button", { name: /인기순/ })).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: /인기순/ })).toHaveLength(1);
   });
 
-  it("opens only the desktop sort dropdown on desktop viewport and ignores the nonDesktop trigger", () => {
-    mockDesktopViewport();
+  it("renders and opens the sort filter on desktop viewport", () => {
+    (useViewportLayout as jest.Mock).mockReturnValue({ layout: "desktop", isResolved: true });
     renderFilterBar();
-    const [nonDesktopSortTrigger, desktopSortTrigger] = screen.getAllByRole("button", {
-      name: /인기순/,
-    });
 
-    fireEvent.click(nonDesktopSortTrigger);
-    expect(screen.queryByRole("dialog", { name: "정렬 선택" })).not.toBeInTheDocument();
+    const sortTrigger = screen.getByRole("button", { name: /인기순/ });
+    fireEvent.click(sortTrigger);
 
-    fireEvent.click(desktopSortTrigger);
-
-    expect(screen.getAllByRole("dialog", { name: "정렬 선택" })).toHaveLength(1);
+    expect(screen.getByRole("dialog", { name: "정렬 선택" })).toBeInTheDocument();
   });
 
   it("keeps filter callbacks wired through the existing selection handlers", () => {

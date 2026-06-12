@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/Button/Button";
 import type { DateRange } from "@/components/DatePicker/DatePicker.types";
 import { ArrowRotateRightIcon } from "@/components/Icon/ArrowRotateRightIcon";
-import { BREAKPOINT_XL_PX } from "@/lib/constants/breakpoints";
+import { useViewportLayout } from "@/hooks/useViewportLayout";
 import { cn } from "@/lib/utils/utils";
 
 import { DateRangeFilter } from "./DateRangeFilter";
@@ -29,13 +29,10 @@ interface SessionListFilterBarProps {
 }
 
 type OpenFilterKey = "date" | "timeSlot" | "duration" | "participants" | "sort" | null;
-type SortFilterLayout = "nonDesktop" | "desktop";
 
 // 모바일/태블릿에서 overflow-x-auto로 인해 필터 팝업이 잘리는 현상을 방지하기 위한 여백 확보 클래스입니다.
 // 가장 높이가 높은 필터 패널(약 380px)을 기준으로 패딩을 주고, 음수 마진으로 레이아웃 흐름을 유지합니다.
 const FILTER_PANEL_SPACE_CLASS = "-mb-[380px] pb-[380px] xl:mb-0 xl:pb-0";
-// 필터바는 xl 미만에서 모바일/태블릿 UI가 동일하므로 nonDesktop(<xl)와 desktop(xl 이상)만 구분합니다.
-const DESKTOP_SORT_MEDIA_QUERY = `(min-width: ${BREAKPOINT_XL_PX}px)`;
 
 export function SessionListFilterBar({
   values,
@@ -47,7 +44,8 @@ export function SessionListFilterBar({
   onResetFilters,
 }: SessionListFilterBarProps) {
   const [openFilter, setOpenFilter] = useState<OpenFilterKey>(null);
-  const [openSortLayout, setOpenSortLayout] = useState<SortFilterLayout | null>(null);
+  const { layout } = useViewportLayout();
+  const isDesktop = layout === "desktop";
   const isDatePickerOpen = openFilter === "date";
   const isTimeSlotOpen = openFilter === "timeSlot";
   const isDurationOpen = openFilter === "duration";
@@ -73,36 +71,22 @@ export function SessionListFilterBar({
   };
 
   const handleDateOpenChange = (isOpen: boolean) => {
-    setOpenSortLayout(null);
     setOpenFilter(isOpen ? "date" : null);
   };
 
   const handleTimeSlotOpenChange = (isOpen: boolean) => {
-    setOpenSortLayout(null);
     setOpenFilter(isOpen ? "timeSlot" : null);
   };
 
   const handleDurationOpenChange = (isOpen: boolean) => {
-    setOpenSortLayout(null);
     setOpenFilter(isOpen ? "duration" : null);
   };
 
   const handleParticipantsOpenChange = (isOpen: boolean) => {
-    setOpenSortLayout(null);
     setOpenFilter(isOpen ? "participants" : null);
   };
 
-  const handleSortOpenChange = (isOpen: boolean, layout: SortFilterLayout) => {
-    const isDesktopViewport = window.matchMedia?.(DESKTOP_SORT_MEDIA_QUERY).matches ?? false;
-
-    if (
-      (layout === "desktop" && !isDesktopViewport) ||
-      (layout === "nonDesktop" && isDesktopViewport)
-    ) {
-      return;
-    }
-
-    setOpenSortLayout(isOpen ? layout : null);
+  const handleSortOpenChange = (isOpen: boolean) => {
     setOpenFilter(isOpen ? "sort" : null);
   };
 
@@ -165,22 +149,26 @@ export function SessionListFilterBar({
             />
           </div>
 
-          <SortFilter
-            isOpen={openFilter === "sort" && openSortLayout === "nonDesktop"}
-            value={values.sort}
-            onOpenChange={(isOpen) => handleSortOpenChange(isOpen, "nonDesktop")}
-            onSelect={onSetSort}
-            className="ml-auto shrink-0 xl:hidden"
-          />
+          {!isDesktop && (
+            <SortFilter
+              isOpen={openFilter === "sort"}
+              value={values.sort}
+              onOpenChange={handleSortOpenChange}
+              onSelect={onSetSort}
+              className="ml-auto shrink-0"
+            />
+          )}
         </div>
 
-        <SortFilter
-          isOpen={openFilter === "sort" && openSortLayout === "desktop"}
-          value={values.sort}
-          onOpenChange={(isOpen) => handleSortOpenChange(isOpen, "desktop")}
-          onSelect={onSetSort}
-          className="hidden shrink-0 xl:flex"
-        />
+        {isDesktop && (
+          <SortFilter
+            isOpen={openFilter === "sort"}
+            value={values.sort}
+            onOpenChange={handleSortOpenChange}
+            onSelect={onSetSort}
+            className="shrink-0"
+          />
+        )}
       </div>
     </>
   );
