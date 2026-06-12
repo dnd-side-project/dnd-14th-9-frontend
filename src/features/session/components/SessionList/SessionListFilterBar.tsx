@@ -44,8 +44,9 @@ export function SessionListFilterBar({
   onResetFilters,
 }: SessionListFilterBarProps) {
   const [openFilter, setOpenFilter] = useState<OpenFilterKey>(null);
-  const { layout } = useViewportLayout();
-  const isDesktop = layout === "desktop";
+  const { layout, isResolved } = useViewportLayout();
+  // isResolved되기 전(SSR)에는 훅이 "desktop"을 반환하므로 desktop SortFilter가 기본 렌더링됩니다.
+  const isDesktop = !isResolved || layout === "desktop";
   const isDatePickerOpen = openFilter === "date";
   const isTimeSlotOpen = openFilter === "timeSlot";
   const isDurationOpen = openFilter === "duration";
@@ -86,6 +87,7 @@ export function SessionListFilterBar({
     setOpenFilter(isOpen ? "participants" : null);
   };
 
+  // viewport 가드 불필요 — 한 번에 하나의 SortFilter 인스턴스만 마운트됩니다.
   const handleSortOpenChange = (isOpen: boolean) => {
     setOpenFilter(isOpen ? "sort" : null);
   };
