@@ -7,7 +7,6 @@ import type { ViewportLayout } from "@/hooks/useViewportLayout";
 
 const mockUseSearchParams = jest.fn();
 const mockUseSessionListQuery = jest.fn();
-const mockUseSuspenseSessionList = jest.fn();
 const mockUseSessionListFilters = jest.fn();
 const mockUseViewportLayout = jest.fn();
 const mockShareSession = jest.fn();
@@ -28,9 +27,6 @@ jest.mock("@/hooks/useViewportLayout", () => ({
 jest.mock("@/features/session/hooks/useSessionHooks", () => ({
   useSessionListQuery: (params: SessionListParams, options?: { enabled?: boolean }) =>
     mockUseSessionListQuery(params, options),
-  // Red 단계에서 기존 구현이 아직 이 hook을 호출하므로 남겨둔다.
-  // 구현 후에는 호출되지 않아야 한다.
-  useSuspenseSessionList: (params: SessionListParams) => mockUseSuspenseSessionList(params),
 }));
 
 jest.mock("@/features/session/hooks/useSessionListFilters", () => ({
@@ -153,7 +149,6 @@ describe("SessionList", () => {
     setSearchParams("page=1");
     setupFilters();
     mockUseSessionListQuery.mockReturnValue(createSessionListResult({ count: 8, totalPage: 4 }));
-    mockUseSuspenseSessionList.mockReturnValue(createSessionListResult({ count: 8, totalPage: 4 }));
   });
 
   it("viewport가 확정되기 전에는 query를 비활성화하고 skeleton을 보여준다", () => {
