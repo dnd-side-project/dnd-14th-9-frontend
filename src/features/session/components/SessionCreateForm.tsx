@@ -213,62 +213,64 @@ export function SessionCreateForm() {
         className="h-[260px] max-w-full"
       />
 
-      {/* 대표 이미지 */}
-      <div className="flex flex-col gap-2">
-        <span className="text-text-secondary text-base">대표 이미지</span>
-        {imagePreviewUrl ? (
-          <div className="relative max-w-95">
-            <Image
-              src={imagePreviewUrl}
-              alt="대표 이미지 미리보기"
-              width={380}
-              height={144}
-              unoptimized
-              className="h-36 w-full rounded-lg object-cover"
+      {/* 대표 이미지 + 카테고리 (태블릿에서만 가로 정렬, 모바일·PC는 세로) */}
+      <div className="gap-xl xl:gap-xl flex flex-col md:flex-row md:items-start md:gap-5 xl:flex-col xl:items-stretch">
+        {/* 대표 이미지 */}
+        <div className="flex flex-col gap-2 md:w-95 md:shrink-0">
+          <span className="text-text-secondary text-base">대표 이미지</span>
+          {imagePreviewUrl ? (
+            <div className="relative w-full">
+              <Image
+                src={imagePreviewUrl}
+                alt="대표 이미지 미리보기"
+                width={380}
+                height={144}
+                unoptimized
+                className="h-36 w-full rounded-lg object-cover"
+              />
+              <Button
+                type="button"
+                variant="solid"
+                colorScheme="tertiary"
+                size="small"
+                onClick={handleImageRemove}
+                className="absolute top-2 right-2"
+              >
+                삭제
+              </Button>
+            </div>
+          ) : (
+            <ImageUploader
+              hintText="최대 5MB 파일만 업로드 가능해요"
+              accept="image/jpeg,image/png"
+              onFileSelect={setSelectedImage}
             />
-            <Button
-              type="button"
-              variant="solid"
-              colorScheme="tertiary"
-              size="small"
-              onClick={handleImageRemove}
-              className="absolute top-2 right-2"
-            >
-              삭제
-            </Button>
-          </div>
-        ) : (
-          <ImageUploader
-            hintText="최대 5MB 파일만 업로드 가능해요"
-            accept="image/jpeg,image/png"
-            containerClassName="max-w-[380px]"
-            onFileSelect={setSelectedImage}
-          />
-        )}
-        <span className="text-text-secondary text-sm">* .jpg, .png 파일만 가능해요</span>
-      </div>
-
-      {/* 카테고리 */}
-      <div className="flex flex-col gap-2">
-        <span className="text-text-secondary text-base">카테고리</span>
-        <div className="flex flex-wrap gap-3">
-          {ONBOARDING_CATEGORIES.map((category) => (
-            <CategoryFilterButton
-              key={category}
-              isSelected={selectedCategory === category}
-              onClick={() => {
-                setSelectedCategory(category);
-                clearFieldError("category");
-              }}
-              type="button"
-            >
-              {CATEGORY_LABELS[category]}
-            </CategoryFilterButton>
-          ))}
+          )}
+          <span className="text-text-secondary text-sm">* .jpg, .png 파일만 가능해요</span>
         </div>
-        {formErrors.category && (
-          <span className="text-status-error text-sm">{formErrors.category}</span>
-        )}
+
+        {/* 카테고리 */}
+        <div className="flex flex-col gap-2 md:flex-1 xl:flex-none">
+          <span className="text-text-secondary text-base">카테고리</span>
+          <div className="flex flex-wrap gap-3">
+            {ONBOARDING_CATEGORIES.map((category) => (
+              <CategoryFilterButton
+                key={category}
+                isSelected={selectedCategory === category}
+                onClick={() => {
+                  setSelectedCategory(category);
+                  clearFieldError("category");
+                }}
+                type="button"
+              >
+                {CATEGORY_LABELS[category]}
+              </CategoryFilterButton>
+            ))}
+          </div>
+          {formErrors.category && (
+            <span className="text-status-error text-sm">{formErrors.category}</span>
+          )}
+        </div>
       </div>
 
       {/* 세션 세부 설정 */}
@@ -322,31 +324,34 @@ export function SessionCreateForm() {
             )}
           </div>
 
-          {/* 진행시간 */}
-          <NumericStepper
-            label="진행시간"
-            hint="5분 단위로 설정"
-            value={duration}
-            displayValue={formatDurationKorean(duration)}
-            min={SESSION_DURATION_MINUTES_MIN}
-            max={SESSION_DURATION_MINUTES_MAX}
-            step={SESSION_DURATION_MINUTES_STEP}
-            onChange={setDuration}
-            className="w-full xl:w-45"
-          />
+          {/* 진행시간 + 참여인원 (모바일·태블릿에서 가로 정렬) */}
+          <div className="grid grid-cols-2 gap-3 xl:contents">
+            {/* 진행시간 */}
+            <NumericStepper
+              label="진행시간"
+              hint="5분 단위로 설정"
+              value={duration}
+              displayValue={formatDurationKorean(duration)}
+              min={SESSION_DURATION_MINUTES_MIN}
+              max={SESSION_DURATION_MINUTES_MAX}
+              step={SESSION_DURATION_MINUTES_STEP}
+              onChange={setDuration}
+              className="w-full xl:w-45"
+            />
 
-          {/* 참여인원 */}
-          <NumericStepper
-            label="참여인원"
-            hint="최대 10명까지 가능"
-            value={participants}
-            displayValue={`${participants}명`}
-            min={SESSION_PARTICIPANTS_MIN}
-            max={SESSION_PARTICIPANTS_MAX}
-            step={1}
-            onChange={setParticipants}
-            className="w-full xl:w-45"
-          />
+            {/* 참여인원 */}
+            <NumericStepper
+              label="참여인원"
+              hint="최대 10명까지 가능"
+              value={participants}
+              displayValue={`${participants}명`}
+              min={SESSION_PARTICIPANTS_MIN}
+              max={SESSION_PARTICIPANTS_MAX}
+              step={1}
+              onChange={setParticipants}
+              className="w-full xl:w-45"
+            />
+          </div>
         </div>
       </div>
 
