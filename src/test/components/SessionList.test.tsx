@@ -1,24 +1,32 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { SessionList } from "@/features/session/components/SessionList/SessionList";
 import type { SessionListFilterValues } from "@/features/session/hooks/useSessionListFilters";
 import type { SessionListItem, SessionListParams } from "@/features/session/types";
+import type { ViewportLayout } from "@/hooks/useViewportLayout";
 
 const mockUseSearchParams = jest.fn();
-const mockUseSuspenseSessionList = jest.fn();
+const mockUseSessionListQuery = jest.fn();
 const mockUseSessionListFilters = jest.fn();
+const mockUseViewportLayout = jest.fn();
 const mockShareSession = jest.fn();
 const mockSetPage = jest.fn();
 const mockSessionListFilterBar = jest.fn();
 const mockCard = jest.fn();
 const mockPagination = jest.fn();
+const mockRefetch = jest.fn();
 
 jest.mock("next/navigation", () => ({
   useSearchParams: () => mockUseSearchParams(),
 }));
 
+jest.mock("@/hooks/useViewportLayout", () => ({
+  useViewportLayout: () => mockUseViewportLayout(),
+}));
+
 jest.mock("@/features/session/hooks/useSessionHooks", () => ({
-  useSuspenseSessionList: (params: SessionListParams) => mockUseSuspenseSessionList(params),
+  useSessionListQuery: (params: SessionListParams, options?: { enabled?: boolean }) =>
+    mockUseSessionListQuery(params, options),
 }));
 
 jest.mock("@/features/session/hooks/useSessionListFilters", () => ({
@@ -27,6 +35,10 @@ jest.mock("@/features/session/hooks/useSessionListFilters", () => ({
 
 jest.mock("@/features/session/hooks/useShareSession", () => ({
   useShareSession: () => ({ shareSession: mockShareSession }),
+}));
+
+jest.mock("@/features/session/components/SessionList/SessionListSkeleton", () => ({
+  SessionListSkeleton: () => <div data-testid="session-list-skeleton" />,
 }));
 
 jest.mock("@/features/session/components/SessionList/SessionListFilterBar", () => ({
@@ -85,20 +97,15 @@ function createSessionListResult({ count = 5, totalPage = 3 } = {}) {
         sessions: Array.from({ length: count }, (_, index) => createSession(index + 1)),
       },
     },
+    isPending: false,
+    isError: false,
+    error: null,
+    refetch: mockRefetch,
   };
 }
 
-let resizeCallback: ResizeObserverCallback;
-let currentWidth = 1280;
-
-function setViewportWidth(width: number) {
-  currentWidth = width;
-}
-
-function dispatchResize(width: number) {
-  act(() => {
-    resizeCallback([{ contentRect: { width } } as ResizeObserverEntry], {} as ResizeObserver);
-  });
+function setViewportLayout(layout: ViewportLayout, isResolved = true) {
+  mockUseViewportLayout.mockReturnValue({ layout, isResolved });
 }
 
 function setSearchParams(queryString: string) {
@@ -127,35 +134,38 @@ function setupFilters(values: Partial<SessionListFilterValues> = {}) {
 }
 
 function getLatestSessionListParams() {
-  return mockUseSuspenseSessionList.mock.calls.at(-1)?.[0] as SessionListParams | undefined;
+  return mockUseSessionListQuery.mock.calls.at(-1)?.[0] as SessionListParams | undefined;
+}
+
+function getLatestSessionListOptions() {
+  return mockUseSessionListQuery.mock.calls.at(-1)?.[1] as { enabled?: boolean } | undefined;
 }
 
 describe("SessionList", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    currentWidth = 1280;
 
-    global.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
-      resizeCallback = callback;
-      return {
-        observe: jest.fn(() => {
-          callback(
-            [{ contentRect: { width: currentWidth } } as ResizeObserverEntry],
-            {} as ResizeObserver
-          );
-        }),
-        disconnect: jest.fn(),
-        unobserve: jest.fn(),
-      };
-    }) as unknown as typeof ResizeObserver;
-
+    setViewportLayout("desktop", true);
     setSearchParams("page=1");
     setupFilters();
-    mockUseSuspenseSessionList.mockReturnValue(createSessionListResult({ count: 8, totalPage: 4 }));
+    mockUseSessionListQuery.mockReturnValue(createSessionListResult({ count: 8, totalPage: 4 }));
   });
 
-  it("모바일 viewport에서는 hydration 이후 최신 세션 목록 요청과 기존 필터 값을 유지한다", async () => {
-    setViewportWidth(375);
+  it("viewport가 확정되기 전에는 query를 비활성화하고 skeleton을 보여준다", () => {
+    setViewportLayout("desktop", false);
+
+    render(<SessionList />);
+
+    expect(mockUseSessionListQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ size: 8 }),
+      expect.objectContaining({ enabled: false })
+    );
+    expect(screen.getByTestId("session-list-skeleton")).toBeInTheDocument();
+    expect(screen.queryByTestId("session-card")).not.toBeInTheDocument();
+  });
+
+  it("모바일 viewport에서는 세션 목록 요청 size를 5로 설정하고 기존 필터 값을 유지한다", async () => {
+    setViewportLayout("mobile", true);
     setSearchParams(
       "q=react&category=DEVELOPMENT&page=2&sort=LATEST&startDate=2026-02-01&endDate=2026-02-28&timeSlots=MORNING,EVENING&durationRange=TWO_TO_FOUR_HOURS&participants=6"
     );
@@ -185,20 +195,37 @@ describe("SessionList", () => {
           participants: 6,
         })
       );
+      expect(getLatestSessionListOptions()).toEqual(expect.objectContaining({ enabled: true }));
     });
   });
 
-  it("md 이상 viewport에서는 세션 목록 요청 size를 8로 유지한다", () => {
-    setViewportWidth(1024);
+  it("tablet/desktop viewport에서는 세션 목록 요청 size를 8로 설정한다", () => {
+    setViewportLayout("tablet", true);
 
     render(<SessionList />);
 
     expect(getLatestSessionListParams()).toEqual(expect.objectContaining({ size: 8 }));
+    expect(getLatestSessionListOptions()).toEqual(expect.objectContaining({ enabled: true }));
+  });
+
+  it("pending 상태에서는 기존 skeleton을 보여준다", () => {
+    mockUseSessionListQuery.mockReturnValue({
+      data: undefined,
+      isPending: true,
+      isError: false,
+      error: null,
+      refetch: mockRefetch,
+    });
+
+    render(<SessionList />);
+
+    expect(screen.getByTestId("session-list-skeleton")).toBeInTheDocument();
+    expect(screen.queryByTestId("session-card")).not.toBeInTheDocument();
   });
 
   it("모바일에서는 5개 기준 응답을 slice 없이 그대로 렌더링한다", async () => {
-    setViewportWidth(375);
-    mockUseSuspenseSessionList.mockImplementation((params: SessionListParams) =>
+    setViewportLayout("mobile", true);
+    mockUseSessionListQuery.mockImplementation((params: SessionListParams) =>
       createSessionListResult({ count: params.size ?? 8, totalPage: 5 })
     );
 
@@ -211,20 +238,21 @@ describe("SessionList", () => {
   });
 
   it("mobile에서 md 이상으로 커질 때 active totalPage가 줄면 마지막 유효 페이지로 보정한다", async () => {
-    setViewportWidth(375);
+    setViewportLayout("mobile", true);
     setSearchParams("page=4");
-    mockUseSuspenseSessionList.mockImplementation((params: SessionListParams) =>
+    mockUseSessionListQuery.mockImplementation((params: SessionListParams) =>
       createSessionListResult({ count: params.size ?? 8, totalPage: params.size === 5 ? 4 : 3 })
     );
 
-    render(<SessionList />);
+    const { rerender } = render(<SessionList />);
 
     await waitFor(() => {
       expect(getLatestSessionListParams()).toEqual(expect.objectContaining({ size: 5 }));
     });
     expect(mockSetPage).not.toHaveBeenCalled();
 
-    dispatchResize(1024);
+    setViewportLayout("desktop", true);
+    rerender(<SessionList />);
 
     await waitFor(() => {
       expect(getLatestSessionListParams()).toEqual(expect.objectContaining({ size: 8 }));
@@ -233,7 +261,7 @@ describe("SessionList", () => {
   });
 
   it("세션 카드 링크와 공유 버튼 동작을 유지한다", () => {
-    mockUseSuspenseSessionList.mockReturnValue(createSessionListResult({ count: 1, totalPage: 1 }));
+    mockUseSessionListQuery.mockReturnValue(createSessionListResult({ count: 1, totalPage: 1 }));
 
     render(<SessionList />);
 
@@ -275,8 +303,29 @@ describe("SessionList", () => {
     );
   });
 
+  it("세션 목록 요청 실패 시 페이지 전체 에러 대신 목록 영역에서 재시도 UI를 보여준다", () => {
+    mockUseSessionListQuery.mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: true,
+      error: new Error("failed"),
+      refetch: mockRefetch,
+    });
+
+    render(<SessionList />);
+
+    expect(screen.getByRole("heading", { name: "지금 모집 중인 세션" })).toBeInTheDocument();
+    expect(screen.getByText("세션 목록을 불러오지 못했습니다")).toBeInTheDocument();
+    expect(screen.getByText("잠시 후 다시 시도해주세요.")).toBeInTheDocument();
+    expect(screen.queryByTestId("session-card")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /pagination/i })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "다시 불러오기" }));
+
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
+  });
   it("세션이 없으면 empty state만 보여준다", () => {
-    mockUseSuspenseSessionList.mockReturnValue(createSessionListResult({ count: 0, totalPage: 0 }));
+    mockUseSessionListQuery.mockReturnValue(createSessionListResult({ count: 0, totalPage: 0 }));
 
     render(<SessionList />);
 
