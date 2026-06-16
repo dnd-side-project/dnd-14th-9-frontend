@@ -153,7 +153,7 @@ Before claiming completion:
 
 - Verify the implemented UI against the provided Figma frame.
 - Confirm reused or extended components still pass relevant tests.
-- Add or update Storybook stories when a shared component variant/state changes.
+- Add or update Storybook stories (`src/stories/`) when a shared component variant/state changes.
 - Run targeted tests first, then relevant `typecheck` and `lint` checks.
 - For pixel-sensitive work, use visual verification separately; `DESIGN.md`
   governs reuse and decision rules, while the approved Figma frame governs exact
