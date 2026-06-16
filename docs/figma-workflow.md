@@ -211,5 +211,7 @@ Use this summary for nontrivial Figma-driven UI work:
 - Tests:
 - Typecheck/lint:
 - Visual verification:
+- Accessibility verification:
+- Component/token regeneration:
 - Known gaps:
 ```

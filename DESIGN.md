@@ -41,12 +41,16 @@ rounded:
   lg: "var(--radius-lg)"
   max: "var(--radius-max)"
 spacing:
+  3xs: "var(--spacing-3xs)"
+  2xs: "var(--spacing-2xs)"
   xs: "var(--spacing-xs)"
   sm: "var(--spacing-sm)"
   md: "var(--spacing-md)"
   lg: "var(--spacing-lg)"
   xl: "var(--spacing-xl)"
-  "2xl": "var(--spacing-2xl)"
+  2xl: "var(--spacing-2xl)"
+  3xl: "var(--spacing-3xl)"
+  4xl: "var(--spacing-4xl)"
 components:
   button-primary:
     backgroundColor: "var(--color-surface-primary-default)"
@@ -118,8 +122,8 @@ boundaries. Detailed Figma intake and implementation workflow lives in
   horizontal padding by breakpoint.
 - Preserve the current home session-list tradeoff unless product/API decisions
   change: mobile shows 5 cards, tablet/desktop show 8 cards.
-- Prefer tokenized spacing steps (`xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`,
-  `4xl`) before arbitrary spacing.
+- Prefer tokenized spacing steps (`3xs`, `2xs`, `xs`, `sm`, `md`, `lg`, `xl`,
+  `2xl`, `3xl`, `4xl`) before arbitrary spacing.
 - Keep session and focus flows low-friction: discovery, creation, joining,
   waiting, active session, and result review should make state transitions clear.
 
