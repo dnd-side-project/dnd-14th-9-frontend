@@ -46,7 +46,7 @@ spacing:
   md: "var(--spacing-md)"
   lg: "var(--spacing-lg)"
   xl: "var(--spacing-xl)"
-  2xl: "var(--spacing-2xl)"
+  "2xl": "var(--spacing-2xl)"
 components:
   button-primary:
     backgroundColor: "{colors.primary}"
