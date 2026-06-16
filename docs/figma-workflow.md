@@ -32,6 +32,19 @@ Also identify whether the target appears to be:
 - an outdated design,
 - incomplete because states or responsive variants are missing.
 
+## When no Figma link is available
+
+When only verbal or text requirements are provided without a Figma link:
+
+1. Use adjacent implemented screens or components as visual references to fill in
+   intake items as completely as possible.
+2. Mark uncertain items as `unconfirmed` and include them in the intake confirmation
+   report.
+3. Before finalizing the implementation direction, share the unconfirmed items list
+   with the user and wait for confirmation.
+4. If a Figma link is provided later, re-run the full intake process and review for
+   discrepancies against the in-progress implementation.
+
 ## Figma intake confirmation
 
 Before choosing the implementation direction for nontrivial UI work, report the
