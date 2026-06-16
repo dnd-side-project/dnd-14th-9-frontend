@@ -142,13 +142,14 @@ boundaries. Detailed Figma intake and implementation workflow lives in
 
 Reuse existing components before creating new abstractions:
 
-- Actions: `src/components/Button/Button.tsx`, `ButtonGroup`
-- Badges and chips: `ChipBadge`, `ChipGroup`, `CategoryFilterButton`
-- Inputs: `src/components/Input/*`, `SearchInput`
-- Pickers and filters: `Dropdown`, `Filter`, `DatePicker`
+- Actions: `src/components/Button/Button.tsx`, `src/components/ButtonGroup/ButtonGroup.tsx`
+- Badges and chips: `src/components/ChipBadge/ChipBadge.tsx`, `src/components/ChipGroup/ChipGroup.tsx`, `src/components/CategoryFilterButton/CategoryFilterButton.tsx`
+- Inputs: `src/components/Input/*`, `src/components/SearchInput/SearchInput.tsx`
+- Pickers and filters: `src/components/Dropdown/Dropdown.tsx`, `src/components/Filter/Filter.tsx`, `src/components/DatePicker/DatePicker.tsx`
 - Cards and lists: existing session/member feature components first
-- Shell and feedback: `Header`, `Footer`, dialogs, `Toast`, `ErrorFallbackUI`,
-  `SkeletonBlock`, `LoadingSpinner`
+- Shell and feedback: `src/components/Header/Header.tsx`, `src/components/Footer/Footer.tsx`,
+  dialogs, `src/components/Toast/Toast.tsx`, `src/components/Error/ErrorFallbackUI.tsx`,
+  `src/components/Skeleton/SkeletonBlock.tsx`, `src/components/LoadingSpinner/LoadingSpinner.tsx`
 
 Extend shared components only when the new variant or state is reusable across
 surfaces. Compose locally for screen-specific layout differences. Do not start a
