@@ -49,23 +49,23 @@ spacing:
   "2xl": "var(--spacing-2xl)"
 components:
   button-primary:
-    backgroundColor: "{colors.primary}"
+    backgroundColor: "var(--color-surface-primary-default)"
     textColor: "var(--color-text-inverse)"
-    rounded: "{rounded.md}"
+    rounded: "var(--radius-md)"
     padding: "var(--spacing-md) var(--spacing-lg)"
   badge-status:
     backgroundColor: "var(--color-alpha-white-8)"
     textColor: "var(--color-text-secondary)"
-    rounded: "{rounded.max}"
+    rounded: "var(--radius-max)"
     padding: "var(--spacing-2xs) var(--spacing-xs)"
   input-field:
     backgroundColor: "var(--color-surface-strong)"
-    textColor: "{colors.foreground}"
-    rounded: "{rounded.sm}"
+    textColor: "var(--color-text-primary)"
+    rounded: "var(--radius-sm)"
     padding: "var(--spacing-md)"
   session-card:
     backgroundColor: "var(--color-surface-default)"
-    rounded: "{rounded.sm}"
+    rounded: "var(--radius-sm)"
 ---
 
 # Design
