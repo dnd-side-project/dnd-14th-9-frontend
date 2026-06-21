@@ -49,6 +49,9 @@ AGENTS.md
 
 # docs
 docs
+!docs/
+docs/*
+!docs/figma-workflow.md
 
 .playwright-mcp
 .omx/
