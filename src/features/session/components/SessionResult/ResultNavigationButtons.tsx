@@ -29,7 +29,7 @@ export function ResultNavigationButtons({ actions }: ResultNavigationButtonsProp
   const router = useRouter();
 
   return (
-    <section className="mt-2xl mb-3xl gap-md flex justify-center">
+    <section className="mt-2xl mb-3xl gap-md flex flex-col sm:flex-row sm:justify-center">
       {actions.map((action) =>
         action.replace ? (
           action.variant === "solid" ? (
