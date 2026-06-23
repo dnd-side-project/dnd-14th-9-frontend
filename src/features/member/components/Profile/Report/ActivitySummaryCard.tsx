@@ -25,7 +25,7 @@ export default function ActivitySummaryCard({
     <ReportCard>
       <SectionTitle>{title}</SectionTitle>
       <div className="p-xl gap-2xl border-border-subtle flex flex-1 flex-col rounded-md border">
-        <div className="gap-2xl flex">
+        <div className="gap-x-2xl gap-y-md flex flex-wrap">
           <div className="flex flex-col">
             <h3 className="text-base font-semibold">{focusedTimeLabel}</h3>
             <p className="text-text-brand-default text-[32px] font-bold">
@@ -40,7 +40,7 @@ export default function ActivitySummaryCard({
           </div>
           {achievementRate !== undefined && (
             <>
-              <span className="text-text-disabled flex items-start text-2xl">|</span>
+              <span className="text-text-disabled flex items-start text-2xl max-md:hidden">|</span>
               <div className="flex flex-col">
                 <h3 className="text-base font-semibold">{achievementRateLabel}</h3>
                 <p className="text-text-secondary text-[32px] font-bold">{achievementRate}%</p>
