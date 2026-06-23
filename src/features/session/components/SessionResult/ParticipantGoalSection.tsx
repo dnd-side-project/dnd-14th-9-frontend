@@ -46,7 +46,7 @@ export function ParticipantGoalSection({
 
   return (
     <li className="bg-surface-strong border-border-subtle rounded-sm border">
-      <div className="p-sm flex items-start gap-3">
+      <div className="p-sm flex flex-wrap items-start gap-3">
         {/* 프로필 이미지 */}
         <div className="shrink-0">
           <Avatar
@@ -77,7 +77,7 @@ export function ParticipantGoalSection({
         </div>
 
         {/* 오른쪽: 이모지 버튼들 */}
-        <div className="gap-sm flex shrink-0">
+        <div className="gap-sm flex shrink-0 max-md:w-full max-md:justify-end">
           {EMOJI_CONFIG.map((config) => {
             const isActive = activeEmoji === config.key;
             return (
