@@ -55,7 +55,7 @@ export async function ParticipantsReportContent({ sessionId }: ParticipantsRepor
       <SessionDetailSection {...detailProps} />
 
       {/* 활동 요약 */}
-      <div className="gap-lg flex">
+      <div className="gap-lg flex flex-col xl:flex-row">
         <ActivitySummaryCard
           data={activitySummary}
           title="전체 활동 요약"
