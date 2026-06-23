@@ -12,7 +12,7 @@ export default async function ParticipantsReportPage({
   const { sessionId } = await params;
 
   return (
-    <div className="gap-lg p-3xl flex flex-col">
+    <div className="gap-lg p-lg md:p-3xl flex flex-col">
       <SessionResultHeader />
       <Suspense fallback={<SessionResultSkeleton />}>
         <ParticipantsReportContent sessionId={sessionId} />
