@@ -33,7 +33,7 @@ export default function ReceivedEmojiCard({ data }: ReceivedEmojiCardProps) {
     <ReportCard>
       <SectionTitle>받은 이모지</SectionTitle>
       {data.length > 0 && (
-        <div className="p-xl border-sm border-border-subtle flex min-h-40 items-center justify-center gap-4 rounded-md">
+        <div className="p-xl border-sm border-border-subtle flex min-h-40 flex-wrap items-center justify-center gap-4 rounded-md">
           {hasAnyReaction ? (
             <>
               {/** 큰 이모지 카드 */}
