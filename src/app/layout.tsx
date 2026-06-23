@@ -6,6 +6,7 @@ import { getQueryClient } from "@/lib/getQueryClient";
 import GoogleAnalytics from "@/lib/GoogleAnalytics";
 import { rootMetadata } from "@/lib/seo/metadata";
 import { AuthStateProvider } from "@/providers/AuthStateProvider";
+import { MockProvider } from "@/providers/MockProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
 
 import { geistMono, geistSans, pretendard } from "./fonts";
@@ -31,13 +32,15 @@ export default async function RootLayout({
         {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ? (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS} />
         ) : null}
-        <QueryProvider dehydratedState={dehydrate(queryClient)}>
-          <AuthStateProvider hasAuthCookies={hasAuthCookies}>
-            {children}
-            {modal}
-            <ToastViewport />
-          </AuthStateProvider>
-        </QueryProvider>
+        <MockProvider>
+          <QueryProvider dehydratedState={dehydrate(queryClient)}>
+            <AuthStateProvider hasAuthCookies={hasAuthCookies}>
+              {children}
+              {modal}
+              <ToastViewport />
+            </AuthStateProvider>
+          </QueryProvider>
+        </MockProvider>
       </body>
     </html>
   );
