@@ -44,6 +44,10 @@ interface AuthFailureResponseOptions {
 type RefreshFailureReason = "http_error" | "invalid_response" | "timeout" | "network_error";
 type RouteType = "public" | "protected" | "api";
 
+function isMockModeEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_USE_MOCK === "true";
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublicPageRoute = isKnownPublicPageRoute(pathname);
@@ -51,6 +55,11 @@ export async function proxy(request: NextRequest) {
 
   // well-known 경로는 인증 처리 없이 통과한다.
   if (pathname.startsWith("/.well-known")) {
+    return NextResponse.next();
+  }
+
+  // 로컬 mock 모드에서는 MSW가 인증 API 응답을 담당하므로 proxy 인증 관문을 통과시킨다.
+  if (isMockModeEnabled()) {
     return NextResponse.next();
   }
 
