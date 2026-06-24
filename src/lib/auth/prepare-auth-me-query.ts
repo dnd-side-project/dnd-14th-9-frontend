@@ -6,9 +6,11 @@ import type { QueryClient } from "@tanstack/react-query";
 
 export async function prepareAuthMeQuery(queryClient: QueryClient) {
   const { hasAuthCookies } = await getServerAuthCookieState();
+  const shouldUseMockAuth = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+  const effectiveHasAuthCookies = hasAuthCookies || shouldUseMockAuth;
 
-  if (!hasAuthCookies) {
-    return { hasAuthCookies };
+  if (!effectiveHasAuthCookies) {
+    return { hasAuthCookies: false };
   }
 
   try {
@@ -17,5 +19,5 @@ export async function prepareAuthMeQuery(queryClient: QueryClient) {
     queryClient.removeQueries({ queryKey: memberKeys.me(), exact: true });
   }
 
-  return { hasAuthCookies };
+  return { hasAuthCookies: effectiveHasAuthCookies };
 }

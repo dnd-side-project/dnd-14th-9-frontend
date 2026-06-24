@@ -6,7 +6,8 @@ const isMockEnabled = process.env.NEXT_PUBLIC_USE_MOCK === "true";
 
 async function startWorker() {
   const { worker } = await import("@/mocks/browser");
-  await worker.start({ onUnhandledRequest: "bypass" });
+  const { strictUnhandledApiRequest } = await import("@/mocks/unhandled-request");
+  await worker.start({ onUnhandledRequest: strictUnhandledApiRequest });
 }
 
 interface MockProviderProps {
