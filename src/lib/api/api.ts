@@ -125,7 +125,8 @@ async function buildHeaders(
   }
 
   // 서버 사이드에서만 httpOnly 쿠키 접근 가능
-  if (isServer && !options?.skipAuth) {
+  // Mock 모드에서는 MSW가 인증 응답을 제공하므로 request scope 쿠키 접근을 생략한다.
+  if (isServer && !options?.skipAuth && !isMockModeEnabled()) {
     // 서버에서 내부 /api 호출 시에는 Authorization 대신 현재 요청의 쿠키를 전달한다.
     if (isLocalApiEndpoint && !headers.Cookie) {
       const requestHeaders = await getHeadersFn();

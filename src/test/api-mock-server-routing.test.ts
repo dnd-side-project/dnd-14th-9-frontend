@@ -60,6 +60,38 @@ describe("server api mock routing", () => {
     );
   });
 
+  it("routes profile settings and report APIs to local mock endpoints in mock mode", async () => {
+    process.env.NEXT_PUBLIC_USE_MOCK = "true";
+    process.env.FRONTEND_ORIGIN = "http://localhost:3000";
+    jest.doMock("@/mocks/server-control", () => ({ ensureMockServer: jest.fn() }));
+    const fetchMock = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve(mockJsonResponse({ isSuccess: true })));
+    global.fetch = fetchMock as typeof fetch;
+
+    const { memberApi } = await import("@/features/member/api");
+
+    await memberApi.getMeForEdit();
+    await memberApi.getMyReportStats();
+    await memberApi.getMyReportSessions({ page: 2, size: 4 });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      "http://localhost:3000/api/members/me/edit",
+      expect.objectContaining({ method: "GET" })
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "http://localhost:3000/api/members/me/report-stats",
+      expect.objectContaining({ method: "GET" })
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
+      "http://localhost:3000/api/members/me/report-sessions?page=2&size=4",
+      expect.objectContaining({ method: "GET" })
+    );
+  });
+
   it("uses the backend base URL when mock mode is disabled", async () => {
     process.env.NEXT_PUBLIC_USE_MOCK = "false";
     process.env.BACKEND_API_BASE = "https://backend.example.com";
