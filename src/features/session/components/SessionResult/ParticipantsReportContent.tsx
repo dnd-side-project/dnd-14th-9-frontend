@@ -68,11 +68,13 @@ export async function ParticipantsReportContent({ sessionId }: ParticipantsRepor
       </div>
 
       {/* 참여자 목록 */}
-      <section className="gap-lg border-border-subtle p-lg flex flex-col rounded-lg border">
+      <section className="gap-lg py-lg flex flex-col rounded-lg">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
-            <h2 className="text-text-primary text-2xl font-bold">참여자 목록</h2>
-            <p className="text-text-secondary text-base">이번 세션에 함께한 참여자들이에요</p>
+            <h2 className="text-text-primary text-base font-bold md:text-lg">참여자 목록</h2>
+            <p className="text-text-secondary text-[11px] md:text-[15px]">
+              이번 세션에 함께한 참여자들이에요
+            </p>
           </div>
         </div>
         <div className="flex items-center justify-between">

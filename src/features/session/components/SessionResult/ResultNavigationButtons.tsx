@@ -25,11 +25,14 @@ interface ResultNavigationButtonsProps {
   actions: NavigationAction[];
 }
 
+// 모바일은 medium 버튼, 태블릿(md) 이상은 large 버튼 치수로 키웁니다.
+const RESPONSIVE_BUTTON_SIZE = "md:h-14 md:min-w-22.5 md:px-xl md:py-md md:text-base";
+
 export function ResultNavigationButtons({ actions }: ResultNavigationButtonsProps) {
   const router = useRouter();
 
   return (
-    <section className="mt-2xl mb-3xl gap-md flex flex-col sm:flex-row sm:justify-center">
+    <section className="mt-2xl mb-3xl gap-md flex justify-center">
       {actions.map((action) =>
         action.replace ? (
           action.variant === "solid" ? (
@@ -37,7 +40,8 @@ export function ResultNavigationButtons({ actions }: ResultNavigationButtonsProp
               key={action.label}
               variant="solid"
               colorScheme={action.colorScheme}
-              size="large"
+              size="medium"
+              className={RESPONSIVE_BUTTON_SIZE}
               onClick={() => router.replace(action.href)}
             >
               {action.label}
@@ -47,7 +51,8 @@ export function ResultNavigationButtons({ actions }: ResultNavigationButtonsProp
               key={action.label}
               variant="outlined"
               colorScheme={action.colorScheme}
-              size="large"
+              size="medium"
+              className={RESPONSIVE_BUTTON_SIZE}
               onClick={() => router.replace(action.href)}
             >
               {action.label}
@@ -61,8 +66,9 @@ export function ResultNavigationButtons({ actions }: ResultNavigationButtonsProp
               buttonVariants({
                 variant: action.variant,
                 colorScheme: action.colorScheme,
-                size: "large",
-              })
+                size: "medium",
+              }),
+              RESPONSIVE_BUTTON_SIZE
             )}
           >
             {action.label}

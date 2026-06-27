@@ -24,7 +24,7 @@ export default function ActivitySummaryCard({
   return (
     <ReportCard>
       <SectionTitle>{title}</SectionTitle>
-      <div className="p-xl gap-2xl border-border-subtle flex flex-1 flex-col rounded-md border">
+      <div className="p-xl gap-2xl border-border-subtle flex flex-1 flex-col rounded-md border max-md:border-0 max-md:px-0">
         <div className="gap-x-2xl gap-y-md flex flex-wrap">
           <div className="flex flex-col">
             <h3 className="text-base font-semibold">{focusedTimeLabel}</h3>

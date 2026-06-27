@@ -6,11 +6,11 @@ export function SessionResultSkeleton() {
   return (
     <>
       {/* SessionDetailSection skeleton */}
-      <section className="gap-lg flex rounded-lg">
-        <div className="flex-3">
-          <SkeletonBlock className="h-[200px] w-full rounded-lg" />
+      <section className="gap-lg flex flex-col rounded-lg xl:flex-row">
+        <div className="xl:flex-3">
+          <SkeletonBlock className="h-50 w-full rounded-lg" />
         </div>
-        <div className="gap-sm flex flex-7 flex-col">
+        <div className="gap-sm flex flex-col xl:flex-7">
           <SkeletonBlock className="h-6 w-16" />
           <SkeletonBlock className="h-8 w-48" />
           <SkeletonBlock className="h-5 w-full" />
@@ -20,7 +20,7 @@ export function SessionResultSkeleton() {
       </section>
 
       {/* ActivitySummaryCard + ReceivedEmojiCard skeleton */}
-      <div className="gap-lg flex">
+      <div className="gap-lg flex flex-col xl:flex-row">
         <SkeletonBlock className="h-[200px] flex-1 rounded-lg" />
         <SkeletonBlock className="h-[200px] flex-1 rounded-lg" />
       </div>

@@ -33,21 +33,23 @@ export default function ReceivedEmojiCard({ data }: ReceivedEmojiCardProps) {
     <ReportCard>
       <SectionTitle>받은 이모지</SectionTitle>
       {data.length > 0 && (
-        <div className="p-xl border-sm border-border-subtle flex min-h-40 flex-wrap items-center justify-center gap-4 rounded-md">
+        <div className="p-xl border-sm border-border-subtle flex min-h-40 flex-wrap items-center justify-center gap-4 rounded-md max-md:min-h-0 max-md:flex-nowrap max-md:gap-2 max-md:border-0 max-md:px-0">
           {hasAnyReaction ? (
             <>
               {/** 큰 이모지 카드 */}
-              <div className="px-xl py-2xl bg-surface-strong gap-lg flex flex-col items-center justify-center rounded-md">
-                <p className="text-text-secondary px-lg py-xs flex items-center justify-center text-base font-semibold">
+              <div className="px-xl py-2xl bg-surface-strong gap-lg max-md:gap-xs max-md:px-sm max-md:py-sm flex flex-col items-center justify-center rounded-md max-md:h-21 max-md:w-19.5 max-md:flex-none">
+                <p className="text-text-secondary px-lg py-xs flex items-center justify-center text-base font-semibold max-md:p-0">
                   {TopIcon ? (
-                    <TopIcon size="xlarge" />
+                    <TopIcon size="xlarge" className="max-md:size-5" />
                   ) : (
                     EMOJI_META[topEmoji.emojiName]?.label || `${topEmoji.emojiName} 이모지`
                   )}
                 </p>
                 <div className="gap-xs flex flex-col items-center">
-                  <p className="text-text-primary text-2xl font-bold">{topEmoji.count}</p>
-                  <p className="text-text-tertiary font-regular text-[11px]">
+                  <p className="text-text-primary text-2xl font-bold max-md:text-base">
+                    {topEmoji.count}
+                  </p>
+                  <p className="text-text-tertiary font-regular text-[11px] max-md:hidden">
                     {EMOJI_META[topEmoji.emojiName]?.topText ||
                       `${topEmoji.emojiName} 이모지를 제일 많이 받았어요!`}
                   </p>
@@ -60,11 +62,11 @@ export default function ReceivedEmojiCard({ data }: ReceivedEmojiCardProps) {
                 return (
                   <div
                     key={emoji.emojiName}
-                    className="gap-xs py-lg px-md bg-surface-strong flex flex-1 flex-col items-center justify-center self-end rounded-sm"
+                    className="gap-xs py-lg px-md bg-surface-strong max-md:gap-xs max-md:px-sm max-md:py-sm flex flex-1 flex-col items-center justify-center self-end rounded-sm max-md:h-21 max-md:w-19.5 max-md:flex-none max-md:self-auto"
                   >
-                    <p className="px-lg py-sm flex items-center justify-center">
+                    <p className="px-lg py-sm flex items-center justify-center max-md:p-0">
                       {Icon ? (
-                        <Icon size="medium" className="text-text-tertiary" />
+                        <Icon size="medium" className="text-text-tertiary max-md:size-5" />
                       ) : (
                         EMOJI_META[emoji.emojiName]?.label || `${emoji.emojiName} 이모지`
                       )}
