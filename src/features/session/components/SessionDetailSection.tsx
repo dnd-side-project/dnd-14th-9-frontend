@@ -29,14 +29,16 @@ export function SessionDetailSection({
   notice,
 }: SessionDetailSectionProps) {
   return (
-    <section className={`gap-lg flex rounded-lg ${className ?? ""}`}>
-      {/* 왼쪽: 썸네일 (30%) */}
-      <div className="flex-3">
-        <Thumbnail src={thumbnailUrl} alt={title} radius="lg" className="h-full" />
+    <section
+      className={`gap-lg flex flex-col rounded-lg xl:flex-row xl:items-start ${className ?? ""}`}
+    >
+      {/* 썸네일: Thumbnail 내장 aspect-ratio(276/146) 사용, 데스크탑 30% */}
+      <div className="xl:flex-3">
+        <Thumbnail src={thumbnailUrl} alt={title} radius="lg" />
       </div>
 
-      {/* 오른쪽: 정보 영역 (70%) */}
-      <div className="gap-sm flex flex-7 flex-col">
+      {/* 정보 영역: 데스크탑 70% */}
+      <div className="gap-sm flex flex-col xl:flex-7">
         {/* 카테고리 Badge */}
         <ChipBadge radius="xs" className="w-fit border-0">
           {category}

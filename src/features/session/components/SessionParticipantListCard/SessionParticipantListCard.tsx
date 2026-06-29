@@ -30,7 +30,7 @@ export function SessionParticipantListCard({
   return (
     <>
       <div
-        className={`gap-lg border-gray p-lg flex h-157 flex-4 flex-col rounded-lg border ${className ?? ""}`}
+        className={`gap-lg border-gray p-lg flex h-auto flex-col rounded-lg border xl:h-157 xl:flex-4 ${className ?? ""}`}
       >
         {/* 헤더 */}
         <div className="flex items-center justify-between">
