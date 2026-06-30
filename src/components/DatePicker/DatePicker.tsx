@@ -185,7 +185,7 @@ function DatePickerSingle({
         className
       )}
     >
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4 md:flex-row">
         {/* Calendar Section */}
         <div className="flex flex-1 flex-col">
           {/* Header */}
@@ -269,7 +269,7 @@ function DatePickerSingle({
         {showTimePicker && (
           <div
             className={cn(
-              "border-divider-subtle flex flex-col border-l pl-4",
+              "border-divider-subtle flex flex-col border-t pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-4",
               !selectedDate && "pointer-events-none opacity-50"
             )}
           >
