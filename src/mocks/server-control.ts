@@ -1,12 +1,10 @@
+import { isMockModeEnabled } from "./is-mock-mode-enabled";
+
 const MOCK_SERVER_STARTED_KEY = "__gak_msw_server_started__";
 
 type GlobalWithMockServerState = typeof globalThis & {
   [MOCK_SERVER_STARTED_KEY]?: boolean;
 };
-
-export function isMockModeEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_USE_MOCK === "true";
-}
 
 export async function ensureMockServer(): Promise<void> {
   if (!isMockModeEnabled()) return;

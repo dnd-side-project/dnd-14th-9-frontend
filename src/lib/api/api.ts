@@ -1,4 +1,5 @@
 import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
 
 import {
   API_URL,
@@ -19,10 +20,6 @@ interface RequestOptions {
 }
 
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? process.env.NEXT_PUBLIC_FRONTEND_ORIGIN;
-
-function isMockModeEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_USE_MOCK === "true";
-}
 
 function toMockApiEndpoint(endpoint: string): string {
   if (/^\/api(?:\/|$)/.test(endpoint)) return endpoint;

@@ -92,6 +92,30 @@ describe("server api mock routing", () => {
     );
   });
 
+  it("production에서는 NEXT_PUBLIC_USE_MOCK=true여도 backend base URL을 사용한다", async () => {
+    Object.defineProperty(process.env, "NODE_ENV", {
+      value: "production",
+      configurable: true,
+      writable: true,
+    });
+    process.env.NEXT_PUBLIC_USE_MOCK = "true";
+    process.env.BACKEND_API_BASE = "https://backend.example.com";
+    const ensureMockServer = jest.fn().mockResolvedValue(undefined);
+    jest.doMock("@/mocks/server-control", () => ({ ensureMockServer }));
+    const fetchMock = jest.fn().mockResolvedValue(mockJsonResponse({ isSuccess: true }));
+    global.fetch = fetchMock as typeof fetch;
+
+    const { api } = await import("@/lib/api/api");
+
+    await api.server.get("/sessions/900", { skipAuth: true });
+
+    expect(ensureMockServer).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://backend.example.com/sessions/900",
+      expect.objectContaining({ method: "GET" })
+    );
+  });
+
   it("uses the backend base URL when mock mode is disabled", async () => {
     process.env.NEXT_PUBLIC_USE_MOCK = "false";
     process.env.BACKEND_API_BASE = "https://backend.example.com";

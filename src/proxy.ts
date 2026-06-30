@@ -13,6 +13,7 @@ import { isKnownPublicPageRoute, isProtectedPageRoute } from "@/lib/auth/route-a
 import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
+import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
 
 // 공개 API 라우트 (인증 불필요)
 const PUBLIC_API_ROUTE_PATTERNS = [
@@ -43,10 +44,6 @@ interface AuthFailureResponseOptions {
 
 type RefreshFailureReason = "http_error" | "invalid_response" | "timeout" | "network_error";
 type RouteType = "public" | "protected" | "api";
-
-function isMockModeEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_USE_MOCK === "true";
-}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

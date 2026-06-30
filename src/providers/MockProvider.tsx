@@ -2,7 +2,9 @@
 
 import { type ReactNode, useEffect, useState } from "react";
 
-const isMockEnabled = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
+
+const isMockEnabled = isMockModeEnabled();
 
 async function startWorker() {
   const { worker } = await import("@/mocks/browser");
