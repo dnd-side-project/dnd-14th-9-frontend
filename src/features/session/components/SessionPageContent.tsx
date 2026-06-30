@@ -168,7 +168,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
         totalCount={inProgressData?.participantCount ?? session.currentParticipants}
         className="mt-xl"
       />
-      <div className="gap-lg mt-xl flex">
+      <div className="gap-lg mt-xl flex flex-col xl:flex-row">
         <SessionGoalAndTodoCard
           goal={myMember?.task?.goal ?? ""}
           todos={myMember?.task?.todos ?? []}
