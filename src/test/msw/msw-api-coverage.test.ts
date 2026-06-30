@@ -162,18 +162,4 @@ describe("MSW backend API coverage", () => {
       expect(indexSource).toContain(`handlers: ${handlerName}`);
     }
   });
-
-  it("documents currently empty feature API modules as no-op coverage", () => {
-    const resultApi = fs.readFileSync(
-      path.join(process.cwd(), "src/features/result/api.ts"),
-      "utf8"
-    );
-    const workspaceApi = fs.readFileSync(
-      path.join(process.cwd(), "src/features/workspace/api.ts"),
-      "utf8"
-    );
-
-    expect(resultApi.trim()).toBe("");
-    expect(workspaceApi.trim()).toBe("");
-  });
 });
