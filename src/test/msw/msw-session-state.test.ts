@@ -182,6 +182,21 @@ describe("MSW session state store", () => {
     expect(inProgressSSE.members[0].task?.todos).toHaveLength(5);
   });
 
+  it("result focusRate가 0이면 기존 focusRate로 대체하지 않는다", () => {
+    submitMockSessionResult(900, {
+      totalFocusSeconds: 0,
+      overallSeconds: 2400,
+    });
+
+    expect(getMockMyReport(900).sessionMemberResult.focusRate).toBe(0);
+    expect(getMockSessionReport(900).members[0]).toEqual(
+      expect.objectContaining({
+        memberId: 1,
+        focusRate: 0,
+      })
+    );
+  });
+
   it("unknown session id는 기본 세션으로 조용히 대체하지 않는다", () => {
     expect(() => getMockSessionDetail(404404)).toThrow(MockSessionNotFoundError);
   });

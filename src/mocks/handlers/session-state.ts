@@ -351,10 +351,9 @@ function calculateFocusRate(result?: MockMemberResult): number {
 }
 
 function applyMemberDerivedRates(member: MockSessionMember): MockSessionMember {
-  const focusRate = calculateFocusRate(member.result);
   return {
     ...member,
-    focusRate: focusRate || member.focusRate,
+    focusRate: member.result ? calculateFocusRate(member.result) : member.focusRate,
     achievementRate: calculateAchievementRate(member),
   };
 }
@@ -546,7 +545,6 @@ export function submitMockSessionResult(
     totalFocusSeconds: body.totalFocusSeconds,
     overallSeconds: body.overallSeconds,
   };
-  member.focusRate = calculateFocusRate(member.result);
   member.achievementRate = calculateAchievementRate(member);
   if (!session.members.find((candidate) => candidate.memberId === member.memberId)) {
     session.members.push(member);
