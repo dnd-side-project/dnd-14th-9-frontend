@@ -18,12 +18,17 @@ interface MockProviderProps {
 
 export function MockProvider({ children }: MockProviderProps) {
   const [ready, setReady] = useState(!isMockEnabled);
+  const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
     if (!isMockEnabled) return;
-    startWorker().then(() => setReady(true));
+
+    startWorker()
+      .then(() => setReady(true))
+      .catch(setError);
   }, []);
 
+  if (error) throw error;
   if (!ready) return null;
   return <>{children}</>;
 }
