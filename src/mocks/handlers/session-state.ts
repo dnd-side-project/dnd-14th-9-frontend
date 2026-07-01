@@ -325,7 +325,8 @@ function getSessionOrThrow(sessionId: number): MockSessionRecord {
 }
 
 function getMemberOrDefault(session: MockSessionRecord): MockSessionMember {
-  if (session.members[0]) return session.members[0];
+  const currentMember = session.members.find((member) => member.memberId === MOCK_MEMBER_ID);
+  if (currentMember) return currentMember;
 
   return {
     memberId: MOCK_MEMBER_ID,

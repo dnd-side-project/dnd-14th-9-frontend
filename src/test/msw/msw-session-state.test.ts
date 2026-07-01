@@ -197,6 +197,27 @@ describe("MSW session state store", () => {
     );
   });
 
+  it("현재 사용자가 첫 번째 참여자가 아니어도 내 리포트는 memberId 기준으로 조회한다", () => {
+    kickMockSessionMembers(900, [1]);
+    joinMockSession(900, {
+      goal: "현재 사용자 목표",
+      todos: ["현재 사용자 할 일"],
+    });
+
+    submitMockSessionResult(900, {
+      totalFocusSeconds: 1200,
+      overallSeconds: 2400,
+    });
+
+    expect(getMockMyReport(900).sessionMemberResult).toEqual(
+      expect.objectContaining({
+        memberId: 1,
+        focusRate: 50,
+        task: expect.objectContaining({ goal: "현재 사용자 목표" }),
+      })
+    );
+  });
+
   it("unknown session id는 기본 세션으로 조용히 대체하지 않는다", () => {
     expect(() => getMockSessionDetail(404404)).toThrow(MockSessionNotFoundError);
   });
