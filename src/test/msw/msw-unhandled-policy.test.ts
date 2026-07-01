@@ -1,3 +1,4 @@
+import { MEMBER_PROFILE_IMAGE_FORM_KEY } from "@/features/member/api";
 import {
   parseRequiredJsonText,
   readRequiredMultipartJsonPart,
@@ -58,18 +59,22 @@ describe("MSW strict unhandled API policy", () => {
     } as Request;
 
     await expect(
-      requireMultipartPart(emptyImageRequest, "profileImage", "member profile image update")
+      requireMultipartPart(
+        emptyImageRequest,
+        MEMBER_PROFILE_IMAGE_FORM_KEY,
+        "member profile image update"
+      )
     ).rejects.toThrow("member profile image update profileImage part is required");
   });
 
   it("multipart profileImage key는 실제 memberApi 필드명과 일치한다", async () => {
     const formData = new FormData();
     const profileImage = new Blob(["mock-image"], { type: "image/png" });
-    formData.append("profileImage", profileImage);
+    formData.append(MEMBER_PROFILE_IMAGE_FORM_KEY, profileImage);
     const request = { formData: async () => formData } as Request;
 
     await expect(
-      requireMultipartPart(request, "profileImage", "member profile image update")
+      requireMultipartPart(request, MEMBER_PROFILE_IMAGE_FORM_KEY, "member profile image update")
     ).resolves.toBeTruthy();
   });
 });

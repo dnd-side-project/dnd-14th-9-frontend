@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 
+import { MEMBER_PROFILE_IMAGE_FORM_KEY } from "@/features/member/api";
 import type {
   MemberEditInfo,
   MemberProfileView,
@@ -94,7 +95,11 @@ export const memberHandlers = [
 
   http.patch("*/api/members/me/profile-image", async ({ request }) => {
     try {
-      await requireMultipartPart(request, "profileImage", "member profile image update");
+      await requireMultipartPart(
+        request,
+        MEMBER_PROFILE_IMAGE_FORM_KEY,
+        "member profile image update"
+      );
       return HttpResponse.json(ok(MOCK_ME_EDIT));
     } catch (error) {
       return badRequestJson(error);
