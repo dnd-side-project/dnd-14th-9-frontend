@@ -13,6 +13,7 @@ import { isKnownPublicPageRoute, isProtectedPageRoute } from "@/lib/auth/route-a
 import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
+import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
 
 // 공개 API 라우트 (인증 불필요)
 const PUBLIC_API_ROUTE_PATTERNS = [
@@ -51,6 +52,11 @@ export async function proxy(request: NextRequest) {
 
   // well-known 경로는 인증 처리 없이 통과한다.
   if (pathname.startsWith("/.well-known")) {
+    return NextResponse.next();
+  }
+
+  // 로컬 mock 모드에서는 MSW가 인증 API 응답을 담당하므로 proxy 인증 관문을 통과시킨다.
+  if (isMockModeEnabled()) {
     return NextResponse.next();
   }
 

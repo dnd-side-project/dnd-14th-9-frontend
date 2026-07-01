@@ -28,6 +28,7 @@ const PROTECTED_PAGE_ACCESS_PATHS = [
   "/session/create",
   "/session/1/result",
 ];
+const originalMockMode = process.env.NEXT_PUBLIC_USE_MOCK;
 
 describe("Proxy Middleware", () => {
   let consoleErrorSpy: jest.SpyInstance;
@@ -55,12 +56,18 @@ describe("Proxy Middleware", () => {
     consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     // 환경 변수 설정
     process.env.BACKEND_API_BASE = "http://localhost:8080";
+    process.env.NEXT_PUBLIC_USE_MOCK = "false";
   });
 
   afterEach(() => {
     consoleErrorSpy.mockRestore();
     // 환경 변수 정리
     delete process.env.BACKEND_API_BASE;
+    if (originalMockMode === undefined) {
+      delete process.env.NEXT_PUBLIC_USE_MOCK;
+    } else {
+      process.env.NEXT_PUBLIC_USE_MOCK = originalMockMode;
+    }
   });
 
   /**
@@ -361,6 +368,35 @@ describe("Proxy Middleware", () => {
         );
         expect(mockFetch).not.toHaveBeenCalled();
       }
+    });
+  });
+
+  describe("mock 모드 인증 우회", () => {
+    it("mock 모드에서는 보호된 페이지를 토큰 없이 통과시켜야 함", async () => {
+      process.env.NEXT_PUBLIC_USE_MOCK = "true";
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`);
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("redirectAfterLogin="))).toBe(
+        false
+      );
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("mock 모드에서는 보호된 API를 토큰 없이 통과시켜야 함", async () => {
+      process.env.NEXT_PUBLIC_USE_MOCK = "true";
+      const request = new NextRequest("http://localhost:3000/api/members/me/profile");
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
+      expect(mockFetch).not.toHaveBeenCalled();
     });
   });
 
