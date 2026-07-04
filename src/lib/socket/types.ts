@@ -70,3 +70,32 @@ export type SessionCommandType = SessionCommand["type"];
 
 // 특정 이벤트의 data 타입 추출
 export type EventData<T extends SessionEventType> = Extract<SessionEvent, { type: T }>["data"];
+
+// ============================================
+// 채팅 (STOMP, /sub/chat/{sessionId} 구독 + /pub/chat/{sessionId} 발행)
+// ============================================
+
+export type ChatMessageType = "TEXT" | "QUICK_ACTION";
+
+export type QuickActionType = "START_NOW" | "PHONE_BAN" | "LIKE" | "BREAK_TIME" | "TODO_DONE";
+
+// 클라 -> 서버
+export interface ChatSendPayload {
+  type: ChatMessageType;
+  content?: string;
+  quickActionType?: QuickActionType;
+}
+
+// 서버 -> 클라 (/sub/chat/{sessionId})
+export interface ChatReceivedMessage {
+  memberId: number;
+  type: ChatMessageType;
+  content: string | null;
+  quickActionType: QuickActionType | null;
+}
+
+// 서버 -> 클라 (/user/queue/chat/error)
+export interface ChatError {
+  code: "CHAT400" | "SESSION400_5" | "SESSION403_01";
+  message: string;
+}
