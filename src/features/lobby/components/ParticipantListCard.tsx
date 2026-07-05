@@ -7,7 +7,6 @@ import { Button } from "@/components/Button/Button";
 import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
-import { HostBadgeIcon } from "@/components/Icon/HostBadgeIcon";
 import { useKickMembers } from "@/features/session/hooks/useSessionHooks";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
@@ -150,19 +149,14 @@ export function ParticipantListCard({
                 )}
 
                 {/* 프로필 이미지 */}
-                <div className="relative shrink-0">
-                  <Avatar
-                    size="xlarge"
-                    type={participant.profileImageUrl ? "image" : "empty"}
-                    src={participant.profileImageUrl}
-                    alt={participant.nickname}
-                  />
-                  {isHost && (
-                    <span className="absolute -right-0.5 -bottom-0.5">
-                      <HostBadgeIcon />
-                    </span>
-                  )}
-                </div>
+                <Avatar
+                  className="shrink-0"
+                  size="xlarge"
+                  type={participant.profileImageUrl ? "image" : "empty"}
+                  src={participant.profileImageUrl}
+                  alt={participant.nickname}
+                  showBadge={isHost}
+                />
 
                 {/* 정보 */}
                 <div className="flex min-w-0 flex-1 flex-col gap-1">

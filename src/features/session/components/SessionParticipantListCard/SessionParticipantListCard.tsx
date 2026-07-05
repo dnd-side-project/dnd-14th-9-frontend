@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Avatar } from "@/components/Avatar/Avatar";
 import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
-import { HostBadgeIcon } from "@/components/Icon/HostBadgeIcon";
 
 import type { InProgressMember } from "../../types";
 
@@ -66,19 +65,14 @@ export function SessionParticipantListCard({
               >
                 <div className="p-sm flex items-start gap-3">
                   {/* 프로필 이미지 */}
-                  <div className="relative shrink-0">
-                    <Avatar
-                      size="xlarge"
-                      type={member.profileImageUrl ? "image" : "empty"}
-                      src={member.profileImageUrl}
-                      alt={member.nickname}
-                    />
-                    {isHost && (
-                      <span className="absolute -right-0.5 -bottom-0.5">
-                        <HostBadgeIcon />
-                      </span>
-                    )}
-                  </div>
+                  <Avatar
+                    className="shrink-0"
+                    size="xlarge"
+                    type={member.profileImageUrl ? "image" : "empty"}
+                    src={member.profileImageUrl}
+                    alt={member.nickname}
+                    showBadge={isHost}
+                  />
 
                   {/* 정보 */}
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
