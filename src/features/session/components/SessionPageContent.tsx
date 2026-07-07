@@ -27,7 +27,7 @@ import { SessionDetailSection } from "./SessionDetailSection";
 import { SessionGoalAndTodoCard } from "./SessionGoalAndTodoCard/SessionGoalAndTodoCard";
 import { SessionHeader } from "./SessionHeader";
 import { SessionPageContentSkeleton } from "./SessionPageContentSkeleton";
-import { SessionParticipantListCard } from "./SessionParticipantListCard";
+import { SessionParticipantListCard } from "./SessionParticipantListCard/SessionParticipantListCard";
 import { SessionTimerSection } from "./SessionTimerSection";
 
 interface SessionPageContentProps {

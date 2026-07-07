@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import { SessionParticipantListCard } from "@/features/session/components/SessionParticipantListCard";
+import { SessionParticipantListCard } from "@/features/session/components/SessionParticipantListCard/SessionParticipantListCard";
 
 jest.mock("@/features/session/components/ChatDialog/ChatDialog", () => ({
   ChatDialog: ({ onClose }: { onClose: () => void }) => (
