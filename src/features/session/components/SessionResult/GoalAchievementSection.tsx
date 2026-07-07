@@ -18,8 +18,10 @@ export function GoalAchievementSection({
     <section className="flex flex-col">
       {/* 헤더 (별도) */}
       <div className="mb-md flex flex-col">
-        <h3 className="text-lg font-semibold text-gray-50">나의 목표 달성 요약</h3>
-        <p className="mt-2xs text-sm text-gray-500">세션을 진행하면서 달성한 투두리스트에요</p>
+        <h3 className="text-base font-semibold text-gray-50 md:text-lg">나의 목표 달성 요약</h3>
+        <p className="mt-2xs text-[11px] text-gray-500 md:text-[15px]">
+          세션을 진행하면서 달성한 투두리스트에요
+        </p>
       </div>
 
       {/* 컨텐츠 영역 (border 있음) */}

@@ -50,7 +50,7 @@ export async function SessionResultContent({ sessionId }: SessionResultContentPr
       <SessionDetailSection {...detailProps} />
 
       {/* 나의 활동 요약 */}
-      <div className="gap-lg flex">
+      <div className="gap-lg flex flex-col xl:flex-row">
         <ActivitySummaryCard
           data={activitySummary}
           title="나의 활동 요약"
