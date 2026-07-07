@@ -11,6 +11,11 @@ import type { QuickActionType } from "@/lib/socket/types";
 interface QuickActionConfig {
   Icon: ComponentType<Omit<IconProps, "svg">>;
   label: string;
+  /**
+   * 퀵액션 선택 시 입력창에 자동 입력될 지정 텍스트.
+   * 디자이너가 문구를 확정하면 채운다 — 채우는 즉시 자동 입력이 동작한다.
+   */
+  message?: string;
 }
 
 // 퀵액션 종류별 아이콘/라벨 (라벨은 Figma 원문)
