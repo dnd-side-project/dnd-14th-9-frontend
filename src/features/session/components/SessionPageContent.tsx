@@ -178,6 +178,13 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
           members={inProgressData?.members}
           participantCount={inProgressData?.participantCount}
           averageAchievementRate={inProgressData?.averageAchievementRate}
+          sessionId={sessionId}
+          isHost={myMember?.role === "HOST"}
+          myMemberId={myMemberId}
+          category={session.category}
+          title={session.title}
+          description={session.summary}
+          notice={session.notice}
         />
       </div>
     </div>

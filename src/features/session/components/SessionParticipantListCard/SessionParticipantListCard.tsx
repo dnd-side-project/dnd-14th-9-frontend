@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
+import { Button } from "@/components/Button/Button";
+import { ChatIcon } from "@/components/Icon/ChatIcon";
 import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
+
+import { ChatDialog } from "../ChatDialog/ChatDialog";
 
 import type { InProgressMember } from "../../types";
 
@@ -13,6 +17,13 @@ interface SessionParticipantListCardProps {
   participantCount?: number;
   averageAchievementRate?: number;
   className?: string;
+  sessionId: string;
+  isHost: boolean;
+  myMemberId?: number;
+  category: string;
+  title: string;
+  description: string;
+  notice: string;
 }
 
 export function SessionParticipantListCard({
@@ -20,8 +31,18 @@ export function SessionParticipantListCard({
   participantCount = 0,
   averageAchievementRate = 0,
   className,
+  sessionId,
+  isHost,
+  myMemberId,
+  category,
+  title,
+  description,
+  notice,
 }: SessionParticipantListCardProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const chatButtonRef = useRef<HTMLButtonElement>(null);
+
   const handleToggle = (memberId: number) => {
     setExpandedId((prev) => (prev === memberId ? null : memberId));
   };
@@ -37,7 +58,17 @@ export function SessionParticipantListCard({
             <h2 className="text-text-primary text-2xl font-bold">참여자 목록</h2>
             <p className="text-text-secondary text-base">이번 세션에서 함께할 참여자들이에요</p>
           </div>
-          {/* TODO: 채팅 기능 활성화 시 복원 */}
+          <Button
+            ref={chatButtonRef}
+            variant="solid"
+            colorScheme="primary"
+            size="medium"
+            iconOnly
+            leftIcon={<ChatIcon />}
+            aria-label="채팅 열기"
+            className="rounded-max"
+            onClick={() => setIsChatOpen(true)}
+          />
         </div>
 
         {/* 참여자 수 + 평균 목표 달성률 */}
@@ -157,6 +188,24 @@ export function SessionParticipantListCard({
           })}
         </ul>
       </div>
+
+      {isChatOpen && (
+        <ChatDialog
+          sessionId={sessionId}
+          isHost={isHost}
+          myMemberId={myMemberId}
+          category={category}
+          title={title}
+          description={description}
+          notice={notice}
+          participantCount={participantCount}
+          members={members}
+          onClose={() => {
+            setIsChatOpen(false);
+            chatButtonRef.current?.focus();
+          }}
+        />
+      )}
     </>
   );
 }
