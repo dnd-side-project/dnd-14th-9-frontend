@@ -30,6 +30,7 @@ class ChatSocket {
   private client: Client | null = null;
   private listeners = new Map<keyof ChatEventMap, Set<ChatEventCallback<any>>>();
   private reconnectAttempts = 0;
+  private reconnectTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private options: Required<SocketOptions>;
   private sessionId: string | null = null;
   private token: string | null = null;
@@ -187,7 +188,7 @@ class ChatSocket {
     const delay = Math.min(exponentialDelay, this.options.maxReconnectDelay);
     this.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
 
-    setTimeout(() => {
+    this.reconnectTimeoutId = setTimeout(() => {
       if (this.sessionId && this.token) {
         this.connect(this.sessionId, this.token);
       }
@@ -208,6 +209,10 @@ class ChatSocket {
   }
 
   private cleanup(): void {
+    if (this.reconnectTimeoutId) {
+      clearTimeout(this.reconnectTimeoutId);
+      this.reconnectTimeoutId = null;
+    }
     this.discardClient();
     this.sessionId = null;
     this.token = null;
