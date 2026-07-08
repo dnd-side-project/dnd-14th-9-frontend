@@ -21,6 +21,18 @@ describe("GET /api/chat/ws-token", () => {
     expect(body).toEqual({ accessToken: "valid_access_token" });
   });
 
+  it("토큰 응답이 캐시되지 않도록 Cache-Control: no-store를 설정해야 함", async () => {
+    const request = new NextRequest("http://localhost:3000/api/chat/ws-token", {
+      headers: {
+        cookie: "accessToken=valid_access_token",
+      },
+    });
+
+    const response = await GET(request);
+
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+  });
+
   it("accessToken 쿠키가 없으면 401을 반환해야 함", async () => {
     const request = new NextRequest("http://localhost:3000/api/chat/ws-token");
 

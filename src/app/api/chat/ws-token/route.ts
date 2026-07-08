@@ -9,5 +9,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  return NextResponse.json({ accessToken });
+  // 토큰이 중간 프록시/브라우저 캐시에 보관되지 않도록 한다
+  return NextResponse.json({ accessToken }, { headers: { "Cache-Control": "no-store" } });
 }
