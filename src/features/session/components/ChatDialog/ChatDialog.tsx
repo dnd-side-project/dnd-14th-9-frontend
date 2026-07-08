@@ -71,7 +71,7 @@ export function ChatDialog({
         ref={setDialogRef}
         onCancel={onClose}
         onClick={handleBackdropClick}
-        className="bg-surface-default p-3xl max-md:p-xl fixed inset-0 m-auto flex h-[min(720px,85vh)] w-full max-w-[590px] flex-col gap-5 rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default) max-md:w-[calc(100%-2rem)]"
+        className="bg-surface-default fixed inset-0 m-auto flex h-[min(720px,85vh)] w-full max-w-[590px] flex-col rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default) max-md:w-[calc(100%-2rem)]"
       >
         <button
           type="button"
@@ -82,32 +82,36 @@ export function ChatDialog({
           <CloseIcon size="medium" />
         </button>
 
-        <ChatSessionInfo
-          category={category}
-          title={title}
-          description={description}
-          notice={notice}
-          participantCount={participantCount}
-        />
-
-        {status === "disconnected" ? (
-          <div className="text-text-secondary flex flex-1 items-center justify-center text-sm">
-            연결할 수 없어요
-          </div>
-        ) : (
-          <ChatMessageList messages={messages} members={members} myMemberId={myMemberId} />
-        )}
-
-        <div className="flex flex-col gap-3">
-          {isHost && (
-            <ChatQuickActionBar selected={selectedQuickAction} onSelect={selectQuickAction} />
-          )}
-          <ChatMessageInput
-            value={inputValue}
-            onChange={setInputValue}
-            onSend={sendMessage}
-            disabled={!isHost || status !== "connected"}
+        {/* 패딩은 dialog가 아닌 이 래퍼에 둔다 — dialog에 패딩이 있으면 그 여백 클릭 시
+            event.target이 dialog가 되어 배경 클릭으로 오인, 모달이 닫힌다. */}
+        <div className="p-3xl max-md:p-xl flex min-h-0 flex-1 flex-col gap-5">
+          <ChatSessionInfo
+            category={category}
+            title={title}
+            description={description}
+            notice={notice}
+            participantCount={participantCount}
           />
+
+          {status === "disconnected" ? (
+            <div className="text-text-secondary flex flex-1 items-center justify-center text-sm">
+              연결할 수 없어요
+            </div>
+          ) : (
+            <ChatMessageList messages={messages} members={members} myMemberId={myMemberId} />
+          )}
+
+          <div className="flex flex-col gap-3">
+            {isHost && (
+              <ChatQuickActionBar selected={selectedQuickAction} onSelect={selectQuickAction} />
+            )}
+            <ChatMessageInput
+              value={inputValue}
+              onChange={setInputValue}
+              onSend={sendMessage}
+              disabled={!isHost || status !== "connected"}
+            />
+          </div>
         </div>
       </dialog>
     </Portal>
