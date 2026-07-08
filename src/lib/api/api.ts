@@ -1,4 +1,5 @@
 import { ACCESS_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
 
 import {
   API_URL,
@@ -19,6 +20,19 @@ interface RequestOptions {
 }
 
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? process.env.NEXT_PUBLIC_FRONTEND_ORIGIN;
+
+function toMockApiEndpoint(endpoint: string): string {
+  if (/^\/api(?:\/|$)/.test(endpoint)) return endpoint;
+
+  return `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+}
+
+async function ensureServerMockIfNeeded(isServer: boolean): Promise<void> {
+  if (!isServer || !isMockModeEnabled()) return;
+
+  const { ensureMockServer } = await import("@/mocks/server-control");
+  await ensureMockServer();
+}
 
 // next/headers 모듈 캐싱 — 매 요청마다 동적 import를 반복하지 않음
 let cachedCookiesFn:
@@ -55,11 +69,11 @@ function buildUrl(endpoint: string, isServer: boolean, params?: RequestOptions["
   } else if (isServer) {
     const isLocalApiEndpoint = /^\/api(?:\/|$)/.test(endpoint);
 
-    if (isLocalApiEndpoint) {
+    if (isLocalApiEndpoint || isMockModeEnabled()) {
       if (!FRONTEND_ORIGIN) {
         throw new Error("Frontend origin is not configured for /api endpoints");
       }
-      url = new URL(endpoint, FRONTEND_ORIGIN);
+      url = new URL(isMockModeEnabled() ? toMockApiEndpoint(endpoint) : endpoint, FRONTEND_ORIGIN);
     } else {
       const baseUrl = SERVER_API_URL || API_URL;
       if (!baseUrl) {
@@ -108,7 +122,8 @@ async function buildHeaders(
   }
 
   // 서버 사이드에서만 httpOnly 쿠키 접근 가능
-  if (isServer && !options?.skipAuth) {
+  // Mock 모드에서는 MSW가 인증 응답을 제공하므로 request scope 쿠키 접근을 생략한다.
+  if (isServer && !options?.skipAuth && !isMockModeEnabled()) {
     // 서버에서 내부 /api 호출 시에는 Authorization 대신 현재 요청의 쿠키를 전달한다.
     if (isLocalApiEndpoint && !headers.Cookie) {
       const requestHeaders = await getHeadersFn();
@@ -140,6 +155,9 @@ async function createRequestContext(
   const hasBody = data !== undefined && method !== "GET";
   const isFormData = data instanceof FormData;
   const isRawBody = data instanceof ArrayBuffer || ArrayBuffer.isView(data);
+
+  await ensureServerMockIfNeeded(isServer);
+
   const url = buildUrl(endpoint, isServer, options?.params);
   const headers = await buildHeaders(isServer, endpoint, options, hasBody, isFormData);
 
