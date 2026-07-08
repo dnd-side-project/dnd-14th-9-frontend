@@ -316,6 +316,31 @@ describe("ChatSocket", () => {
       // 재연결 시도는 STOMP 에러로 인한 1회뿐이어야 한다
       expect(statuses.filter((status) => status === "reconnecting")).toHaveLength(1);
     });
+
+    it("폐기된 client의 뒤늦은 stompError는 새 연결을 끊거나 재연결을 다시 트리거하지 않아야 합니다", () => {
+      // close가 먼저 오고(→재연결로 새 client 생성) 폐기된 구 client의 stompError가
+      // 뒤늦게 도착하는 경우. 신원 비교 가드가 없으면 살아있는 새 연결을 끊고
+      // 재연결을 이중 예약한다.
+      const socket = createChatSocket({ maxReconnectAttempts: 3, reconnectInterval: 1000 });
+      const statuses: string[] = [];
+      socket.on("status", (status: string) => statuses.push(status));
+
+      socket.connect("42", "token-abc");
+      mockInstances[0].simulateConnect();
+
+      // 구 client(A) 소켓이 먼저 닫힘 → A 폐기 + 재연결 예약(1회)
+      mockInstances[0].simulateWebSocketClose();
+      jest.advanceTimersByTime(1000); // 타이머 → 재연결로 새 client(B) 생성
+      mockInstances[1].simulateConnect(); // B 연결됨
+
+      // 폐기된 A가 뒤늦게 쏜 stompError
+      mockInstances[0].simulateStompError("Late error from discarded client");
+
+      // B는 살아있어야 하고, 재연결은 close로 인한 1회뿐이어야 한다
+      expect(socket.status).toBe("connected");
+      expect(mockInstances[1].deactivate).not.toHaveBeenCalled();
+      expect(statuses.filter((status) => status === "reconnecting")).toHaveLength(1);
+    });
   });
 
   describe("disconnect", () => {

@@ -136,6 +136,9 @@ class ChatSocket {
       },
 
       onStompError: (frame: IFrame) => {
+        // 이미 교체·폐기된 client가 뒤늦게 쏜 error는 무시한다 (onWebSocketClose와 대칭)
+        if (this.client !== client) return;
+
         this.log(`STOMP error: ${frame.headers["message"]}`, "error");
         this.log(`Details: ${frame.body}`, "error");
         // STOMP CONNECT 거부(토큰 없음/만료 등)는 연결 실패이지 /user/queue/chat/error
