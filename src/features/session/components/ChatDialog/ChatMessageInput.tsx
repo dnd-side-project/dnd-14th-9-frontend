@@ -18,7 +18,8 @@ export function ChatMessageInput({
   disabled = false,
 }: ChatMessageInputProps) {
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter") {
+    // 한글 IME 조합 중 Enter(글자 확정)는 전송으로 처리하지 않는다
+    if (event.key === "Enter" && !event.nativeEvent.isComposing) {
       event.preventDefault();
       onSend();
     }
