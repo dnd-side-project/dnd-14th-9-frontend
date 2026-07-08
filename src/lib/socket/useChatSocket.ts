@@ -53,7 +53,12 @@ export function useChatSocket({
     const unsubscribeMessage = socket.on("message", (message) => onMessageRef.current?.(message));
     const unsubscribeError = socket.on("error", (chatError) => onErrorRef.current?.(chatError));
 
-    fetch("/api/chat/ws-token")
+    // 토큰 응답이 안 오면(병적 stall) status가 idle에 멈춰 죽은 화면이 되므로 타임아웃을
+    // 건다. 같은 controller로 언마운트 시 진행 중인 요청도 취소한다.
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    fetch("/api/chat/ws-token", { signal: controller.signal })
       .then((response) => {
         if (!response.ok) throw new Error("Failed to fetch ws token");
         return response.json() as Promise<{ accessToken: string }>;
@@ -64,10 +69,13 @@ export function useChatSocket({
       })
       .catch(() => {
         if (!cancelled) setStatus("disconnected");
-      });
+      })
+      .finally(() => clearTimeout(timeoutId));
 
     return () => {
       cancelled = true;
+      controller.abort();
+      clearTimeout(timeoutId);
       unsubscribeStatus();
       unsubscribeMessage();
       unsubscribeError();
