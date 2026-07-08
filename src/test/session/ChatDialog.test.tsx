@@ -125,6 +125,14 @@ describe("ChatDialog", () => {
       expect(screen.getByPlaceholderText("텍스트를 입력해 주세요")).toBeEnabled();
       expect(screen.getByRole("button", { name: /보내기/ })).toBeEnabled();
     });
+
+    it("호스트여도 연결되지 않은 상태면 입력창과 보내기 버튼이 비활성화된다", () => {
+      // 연결 전/재연결 중에 전송하면 메시지가 조용히 유실되므로 입력을 막는다
+      mockStatus = "connecting";
+      render(<ChatDialog {...BASE_PROPS} isHost />);
+      expect(screen.getByPlaceholderText("텍스트를 입력해 주세요")).toBeDisabled();
+      expect(screen.getByRole("button", { name: /보내기/ })).toBeDisabled();
+    });
   });
 
   describe("메시지 전송 (호스트)", () => {

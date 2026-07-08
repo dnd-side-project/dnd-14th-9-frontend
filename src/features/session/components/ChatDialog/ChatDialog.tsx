@@ -106,7 +106,7 @@ export function ChatDialog({
             value={inputValue}
             onChange={setInputValue}
             onSend={sendMessage}
-            disabled={!isHost}
+            disabled={!isHost || status !== "connected"}
           />
         </div>
       </dialog>
