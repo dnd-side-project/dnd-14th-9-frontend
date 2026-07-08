@@ -29,6 +29,32 @@ describe("RootLayout auth prefetch flow", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it("mock mode에서는 인증 쿠키가 없어도 mock me prefetch를 수행하고 인증 힌트를 반환해야 한다", async () => {
+    const previousUseMock = process.env.NEXT_PUBLIC_USE_MOCK;
+    process.env.NEXT_PUBLIC_USE_MOCK = "true";
+    mockedGetServerAuthCookieState.mockResolvedValue({
+      hasAccessToken: false,
+      hasRefreshToken: false,
+      hasAuthCookies: false,
+    });
+    const queryClient = new QueryClient();
+    const fetchSpy = jest.spyOn(queryClient, "fetchQuery").mockResolvedValue({
+      isSuccess: true,
+      result: { id: 1 },
+    } as never);
+
+    try {
+      await expect(prepareAuthMeQuery(queryClient)).resolves.toEqual({ hasAuthCookies: true });
+      expect(fetchSpy).toHaveBeenCalledWith(memberQueries.me());
+    } finally {
+      if (previousUseMock === undefined) {
+        delete process.env.NEXT_PUBLIC_USE_MOCK;
+      } else {
+        process.env.NEXT_PUBLIC_USE_MOCK = previousUseMock;
+      }
+    }
+  });
+
   it("인증 쿠키가 있으면 me prefetch를 수행해야 한다", async () => {
     mockedGetServerAuthCookieState.mockResolvedValue({
       hasAccessToken: true,

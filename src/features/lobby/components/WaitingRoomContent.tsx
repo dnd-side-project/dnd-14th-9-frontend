@@ -14,6 +14,7 @@ import { useSessionStatusSSE } from "@/features/session/hooks/useSessionStatusSS
 import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
+import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
 
 import { useLeaveOnUnmount } from "../hooks/useLeaveOnUnmount";
 import { useWaitingMembersSSE } from "../hooks/useWaitingMembersSSE";
@@ -47,6 +48,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
 
   const authState = useAuthState();
   const isAuthenticated = authState.status === "authenticated";
+  const isMockMode = isMockModeEnabled();
   const { data, isLoading, error, refetch } = useSessionDetail(sessionId);
   const { data: meData, isLoading: isMeLoading } = useMe({ enabled: isAuthenticated });
   // 초기 데이터: REST API로 조회
@@ -82,10 +84,11 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   });
 
   // 세션 상태 SSE - 대기 상태가 아니면 적절한 페이지로 이동
+  // mock mode에서는 UI 확인을 위해 대기방 화면에 직접 접근할 수 있도록 자동 이동을 제한한다.
   // hard navigation을 사용하여 modal interceptor routing 우회
   useSessionStatusSSE({
     sessionId,
-    enabled: true,
+    enabled: !isMockMode,
     onStatusChange: (eventData) => {
       const { status } = eventData;
       let targetUrl: string | null = null;

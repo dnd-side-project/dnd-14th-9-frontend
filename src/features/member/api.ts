@@ -19,6 +19,8 @@ import type {
   UpdateProfileImageResponse,
 } from "./types";
 
+export const MEMBER_PROFILE_IMAGE_FORM_KEY = "profileImage";
+
 const AUTH_MEMBER_QUERY_OPTIONS = {
   // 인증 실패를 빠르게 surface하고, 지수 백오프로 인한 초기 로딩 지연을 방지한다.
   retry: { maxRetries: 0 },
@@ -67,7 +69,7 @@ export const memberApi = {
     body: UpdateProfileImageRequest
   ): Promise<UpdateProfileImageResponse> => {
     const formData = new FormData();
-    formData.append("profileImage", body.profileImage);
+    formData.append(MEMBER_PROFILE_IMAGE_FORM_KEY, body.profileImage);
 
     return patchProfileImage<UpdateProfileImageResponse>("/api/members/me/profile-image", formData);
   },
