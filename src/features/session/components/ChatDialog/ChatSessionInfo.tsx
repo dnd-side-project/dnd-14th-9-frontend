@@ -28,10 +28,12 @@ export function ChatSessionInfo({
         <p className="text-text-tertiary text-[15px]">{description}</p>
       </div>
 
-      <div className="px-lg py-sm gap-md flex flex-row items-center rounded-lg bg-gray-900">
-        <p className="text-common-white shrink-0 text-sm font-semibold">공지사항</p>
-        <p className="text-sm text-gray-400">{notice}</p>
-      </div>
+      {notice && (
+        <div className="px-lg py-sm gap-md flex flex-row items-center rounded-lg bg-gray-900">
+          <p className="text-common-white shrink-0 text-sm font-semibold">공지사항</p>
+          <p className="text-sm text-gray-400">{notice}</p>
+        </div>
+      )}
     </>
   );
 }
