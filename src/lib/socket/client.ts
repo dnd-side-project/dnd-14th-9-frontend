@@ -33,7 +33,6 @@ class ChatSocket {
   private options: Required<SocketOptions>;
   private sessionId: string | null = null;
   private token: string | null = null;
-  private intentionalDisconnect = false;
 
   private _status: ConnectionStatus = "idle";
 
@@ -86,7 +85,10 @@ class ChatSocket {
 
     const brokerURL = this.buildBrokerURL();
 
-    this.client = new Client({
+    // 이 콜백들이 속한 client 인스턴스를 클로저에 캡처한다. deactivate()는 비동기라
+    // 폐기된 client의 close 이벤트가 뒤늦게 도착하는데, this.client와 비교해 "지금
+    // 살아있는 client의 이벤트"만 처리하기 위함이다.
+    const client = new Client({
       brokerURL,
       connectHeaders: {
         Authorization: `Bearer ${this.token}`,
@@ -104,10 +106,10 @@ class ChatSocket {
         this.setStatus("connected");
         this.reconnectAttempts = 0;
 
-        if (!this.client || !this.sessionId) return;
+        if (!this.sessionId) return;
 
         // 채팅 메시지 구독
-        this.client.subscribe(`/sub/chat/${this.sessionId}`, (message: IMessage) => {
+        client.subscribe(`/sub/chat/${this.sessionId}`, (message: IMessage) => {
           try {
             const chatMessage: ChatReceivedMessage = JSON.parse(message.body);
             this.log(`Received message from ${chatMessage.memberId}`);
@@ -120,7 +122,7 @@ class ChatSocket {
         });
 
         // 채팅 에러 구독
-        this.client.subscribe(`/user/queue/chat/error`, (message: IMessage) => {
+        client.subscribe(`/user/queue/chat/error`, (message: IMessage) => {
           try {
             const chatError: ChatError = JSON.parse(message.body);
             this.log(`Received error: ${chatError.code}`, "error");
@@ -145,7 +147,8 @@ class ChatSocket {
       },
 
       onWebSocketClose: () => {
-        if (this.intentionalDisconnect) return;
+        // 이미 교체·폐기된 client가 뒤늦게 쏜 close는 무시한다
+        if (this.client !== client) return;
 
         this.log("WebSocket closed");
         this.setStatus("disconnected");
@@ -158,6 +161,8 @@ class ChatSocket {
         console.error(event);
       },
     });
+
+    this.client = client;
   }
 
   private tryReconnect(): void {
@@ -190,28 +195,20 @@ class ChatSocket {
   // 유지된다 — 네트워크가 끊겨 onWebSocketClose/onStompError가 발생해도 자동으로
   // false가 되지 않는다. 그대로 두면 connect()의 "이미 활성 연결"(active) 가드가
   // 재연결 시도를 막아버리므로, 재연결 전에 반드시 기존 client를 명시적으로
-  // 정리(deactivate + null)해야 한다.
+  // 정리(deactivate + null)해야 한다. this.client를 null로 비우면 폐기된 client의
+  // 뒤늦은 onWebSocketClose가 신원 비교(this.client !== client)에서 걸러진다.
   private discardClient(): void {
     if (!this.client) return;
 
-    this.intentionalDisconnect = true;
     this.client.deactivate();
-    this.intentionalDisconnect = false;
     this.client = null;
   }
 
   private cleanup(): void {
-    this.intentionalDisconnect = true;
-
-    if (this.client) {
-      this.client.deactivate();
-    }
-
-    this.client = null;
+    this.discardClient();
     this.sessionId = null;
     this.token = null;
     this.reconnectAttempts = 0;
-    this.intentionalDisconnect = false;
     this.removeAllListeners();
     this.setStatus("idle");
   }

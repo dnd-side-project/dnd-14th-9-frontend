@@ -60,16 +60,21 @@ class MockStompClient {
 }
 
 let mockClientInstance: MockStompClient | null = null;
+// 재연결로 새 client가 생성되면 옛 인스턴스 참조가 필요하므로 전부 보관한다
+const mockInstances: MockStompClient[] = [];
 
 jest.mock("@stomp/stompjs", () => ({
   Client: jest.fn().mockImplementation((config: MockStompConfig) => {
-    mockClientInstance = new MockStompClient(config);
-    return mockClientInstance;
+    const instance = new MockStompClient(config);
+    mockClientInstance = instance;
+    mockInstances.push(instance);
+    return instance;
   }),
 }));
 
 beforeEach(() => {
   mockClientInstance = null;
+  mockInstances.length = 0;
   process.env.NEXT_PUBLIC_WS_URL = "wss://api.gak.today";
 });
 
@@ -291,6 +296,25 @@ describe("ChatSocket", () => {
       mockClientInstance!.simulateStompError("Token expired");
 
       expect(errorCallback).not.toHaveBeenCalled();
+    });
+
+    it("폐기된 client의 뒤늦은 close는 재연결을 다시 트리거하지 않아야 합니다", () => {
+      // deactivate()는 비동기라, 폐기된 client의 close 이벤트가 discardClient() 완료 후
+      // 뒤늦게 도착한다. 이 뒤늦은 close가 진행 중인 재연결을 이중으로 트리거하면 안 된다.
+      const socket = createChatSocket({ maxReconnectAttempts: 3, reconnectInterval: 1000 });
+      const statuses: string[] = [];
+      socket.on("status", (status: string) => statuses.push(status));
+
+      socket.connect("42", "token-abc");
+      mockInstances[0].simulateConnect();
+
+      // STOMP 에러 → discardClient(구 client deactivate) + tryReconnect (1회)
+      mockInstances[0].simulateStompError("Token expired");
+      // 구 client의 deactivate가 유발하는 뒤늦은 close (비동기 close 재현)
+      mockInstances[0].simulateWebSocketClose();
+
+      // 재연결 시도는 STOMP 에러로 인한 1회뿐이어야 한다
+      expect(statuses.filter((status) => status === "reconnecting")).toHaveLength(1);
     });
   });
 
