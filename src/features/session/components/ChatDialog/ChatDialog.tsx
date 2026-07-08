@@ -71,6 +71,7 @@ export function ChatDialog({
         ref={setDialogRef}
         onCancel={onClose}
         onClick={handleBackdropClick}
+        aria-label={`${title} 채팅`}
         className="bg-surface-default fixed inset-0 m-auto flex h-[min(720px,85vh)] w-full max-w-[590px] flex-col rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default) max-md:w-[calc(100%-2rem)]"
       >
         <button
