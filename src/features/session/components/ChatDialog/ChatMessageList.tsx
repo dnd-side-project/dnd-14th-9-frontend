@@ -21,6 +21,9 @@ const formatTime = (date: Date) =>
 export function ChatMessageList({ messages, members, myMemberId }: ChatMessageListProps) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  // 발신자 조회용 Map (members는 참여자라 작아, 매 렌더 생성해도 부담 없음)
+  const memberMap = new Map(members.map((member) => [member.memberId, member]));
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView?.({ block: "end" });
   }, [messages]);
@@ -29,7 +32,7 @@ export function ChatMessageList({ messages, members, myMemberId }: ChatMessageLi
     <div className="scrollbar-hide flex flex-1 flex-col gap-3 overflow-y-auto">
       <p className="text-text-muted py-2 text-center text-[15px]">현재는 방장만 채팅할 수 있어요</p>
       {messages.map((message, index) => {
-        const sender = members.find((member) => member.memberId === message.memberId);
+        const sender = memberMap.get(message.memberId);
         const isMe = message.memberId === myMemberId;
         // 같은 발신자의 연속 메시지는 첫 메시지에만 아바타를 표시한다
         const previous = messages[index - 1];
