@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import { ChatBubble } from "@/components/ChatBubble/ChatBubble";
+import { formatTimeHHMM } from "@/lib/utils/date";
 
 import { QUICK_ACTION_CONFIG } from "./quickActionConfig";
 
@@ -14,9 +15,6 @@ interface ChatMessageListProps {
   members: InProgressMember[];
   myMemberId?: number;
 }
-
-const formatTime = (date: Date) =>
-  date.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false });
 
 export function ChatMessageList({ messages, members, myMemberId }: ChatMessageListProps) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -55,7 +53,7 @@ export function ChatMessageList({ messages, members, myMemberId }: ChatMessageLi
                 ? { icon: <quickAction.Icon size="xsmall" />, label: quickAction.label }
                 : undefined
             }
-            timestamp={formatTime(message.receivedAt)}
+            timestamp={formatTimeHHMM(message.receivedAt)}
           />
         );
       })}
