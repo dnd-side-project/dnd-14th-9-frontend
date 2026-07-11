@@ -53,6 +53,14 @@ export function ChatDialog({
     sendMessage,
   } = useSessionChat(sessionId);
 
+  // 메시지 영역 전체를 덮는 중앙 안내 문구. 재연결 중에는 null — 쌓인 메시지를 유지한다
+  const centerNotice =
+    status === "disconnected"
+      ? "연결할 수 없어요"
+      : status !== "connected" && messages.length === 0
+        ? "연결 중이에요"
+        : null;
+
   const setDialogRef = (node: HTMLDialogElement | null) => {
     if (node && !node.open) {
       node.showModal();
@@ -94,12 +102,17 @@ export function ChatDialog({
             participantCount={participantCount}
           />
 
-          {status === "disconnected" ? (
+          {centerNotice ? (
             <div className="text-text-secondary flex flex-1 items-center justify-center text-sm">
-              연결할 수 없어요
+              {centerNotice}
             </div>
           ) : (
-            <ChatMessageList messages={messages} members={members} myMemberId={myMemberId} />
+            <>
+              {status !== "connected" && (
+                <p className="text-text-secondary py-1 text-center text-sm">다시 연결 중이에요</p>
+              )}
+              <ChatMessageList messages={messages} members={members} myMemberId={myMemberId} />
+            </>
           )}
 
           <div className="flex flex-col gap-3">

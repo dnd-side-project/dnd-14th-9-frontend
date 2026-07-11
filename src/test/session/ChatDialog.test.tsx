@@ -251,6 +251,50 @@ describe("ChatDialog", () => {
       expect(screen.getByText("연결할 수 없어요")).toBeInTheDocument();
     });
 
+    it("connecting 상태면 연결 중 안내를 표시한다", () => {
+      mockStatus = "connecting";
+      render(<ChatDialog {...BASE_PROPS} />);
+      expect(screen.getByText("연결 중이에요")).toBeInTheDocument();
+    });
+
+    it("채팅 도중 재연결 중이면 기존 메시지를 유지하고 재연결 안내를 함께 표시한다", () => {
+      const { rerender } = render(<ChatDialog {...BASE_PROPS} />);
+
+      act(() => {
+        capturedOptions?.onMessage?.({
+          memberId: 2,
+          type: "TEXT",
+          content: "곧 돌아올게요",
+          quickActionType: null,
+        });
+      });
+
+      mockStatus = "reconnecting";
+      rerender(<ChatDialog {...BASE_PROPS} />);
+
+      expect(screen.getByText("곧 돌아올게요")).toBeInTheDocument();
+      expect(screen.getByText("다시 연결 중이에요")).toBeInTheDocument();
+    });
+
+    it("연결이 복구되면 재연결 안내가 사라진다", () => {
+      mockStatus = "reconnecting";
+      const { rerender } = render(<ChatDialog {...BASE_PROPS} />);
+
+      act(() => {
+        capturedOptions?.onMessage?.({
+          memberId: 2,
+          type: "TEXT",
+          content: "곧 돌아올게요",
+          quickActionType: null,
+        });
+      });
+
+      mockStatus = "connected";
+      rerender(<ChatDialog {...BASE_PROPS} />);
+
+      expect(screen.queryByText("다시 연결 중이에요")).not.toBeInTheDocument();
+    });
+
     it("채팅 에러 수신 시 토스트로 표시한다", () => {
       render(<ChatDialog {...BASE_PROPS} />);
 
