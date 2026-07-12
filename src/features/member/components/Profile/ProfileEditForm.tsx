@@ -88,7 +88,7 @@ export function ProfileEditForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col gap-20">
+    <form onSubmit={handleSubmit(onSubmit)} className="gap-2xl flex w-full flex-col md:gap-20">
       <div className="gap-2xl flex flex-col">
         <h3 className="text-text-primary text-lg font-bold">프로필 정보</h3>
 

@@ -61,15 +61,15 @@ export function ProfileAccountContent() {
   const { deleteAccount, isDeleting } = useDeleteAccountFlow();
 
   return (
-    <div className="flex flex-col items-center gap-32">
+    <div className="gap-2xl flex flex-col items-center md:gap-32">
       <div className="gap-xl flex w-full flex-col">
         <h4 className="text-text-primary text-lg font-bold">계정 관리</h4>
-        <div className="gap-lg flex w-full">
-          <aside className="gap-sm flex w-[276px] flex-col">
+        <div className="gap-lg flex w-full flex-col md:flex-row">
+          <aside className="gap-sm flex w-full flex-col md:w-69">
             <SidebarNavButton isActive>회원 탈퇴</SidebarNavButton>
             <SidebarNavButton onClick={() => setIsLogoutModalOpen(true)}>로그아웃</SidebarNavButton>
           </aside>
-          <div className="px-3xl flex flex-1 flex-col gap-20">
+          <div className="md:px-3xl gap-xl flex flex-1 flex-col md:gap-20">
             <DeleteAccountWarnings />
             <AccountProfileCard profile={profile} isLoading={isProfilePending} />
             <DeleteAccountAgreement onAgreementChange={setIsAgreed} />
