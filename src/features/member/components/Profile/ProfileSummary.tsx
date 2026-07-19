@@ -58,37 +58,37 @@ export function ProfileSummary() {
     <div className="gap-3xl flex w-full flex-col items-start">
       <h1 className="text-text-primary text-2xl font-bold">마이페이지</h1>
 
-      <div className="gap-lg flex w-full">
-        <label
-          className="relative h-16 w-16 shrink-0 cursor-pointer"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <input
-            type="file"
-            className="hidden"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={handleProfileImageChange}
-            disabled={isUpdatingProfileImage}
-          />
-          <Avatar
-            src={profile.profileImageUrl ?? undefined}
-            alt={profile.nickname}
-            size="xlarge"
-            type={profile.profileImageUrl ? "image" : "empty"}
-            edit={!isUpdatingProfileImage && isHovered}
-            className="h-full w-full"
-          />
-        </label>
+      <div className="gap-lg flex w-full flex-col xl:flex-row xl:items-start">
+        <div className="gap-lg flex w-full min-w-0 flex-1">
+          <label
+            className="relative h-16 w-16 shrink-0 cursor-pointer"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <input
+              type="file"
+              className="hidden"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleProfileImageChange}
+              disabled={isUpdatingProfileImage}
+            />
+            <Avatar
+              src={profile.profileImageUrl ?? undefined}
+              alt={profile.nickname}
+              size="xlarge"
+              type={profile.profileImageUrl ? "image" : "empty"}
+              edit={!isUpdatingProfileImage && isHovered}
+              className="h-full w-full"
+            />
+          </label>
 
-        <div className="flex flex-1 justify-between gap-[12px]">
           <div className="gap-2xs flex min-w-0 flex-1 flex-col items-start">
-            <div className="gap-xs flex items-center">
+            <div className="gap-xs flex flex-wrap items-center">
               <h2 className="text-text-primary text-lg font-bold">{profile.nickname}</h2>
               <ChipBadge
                 status="closed"
                 radius="xs"
-                className="bg-alpha-white-8 text-text-secondary px-xs py-2xs"
+                className="bg-alpha-white-8 text-text-secondary px-xs py-2xs max-w-full"
               >
                 {profile.email}
               </ChipBadge>
@@ -97,32 +97,32 @@ export function ProfileSummary() {
               {profile.bio || "아직 한 줄 소개가 없습니다."}
             </p>
           </div>
+        </div>
 
-          <div className="flex shrink-0 items-start justify-end gap-10">
-            <div className="flex w-[88px] flex-col items-start gap-1">
-              <span className="text-text-tertiary text-[15px] font-normal">참여한 세션</span>
-              <span className="text-text-secondary text-lg font-semibold">
-                {profile.participationSessionCount ?? 0}
-              </span>
-            </div>
-            <div className="flex w-[88px] flex-col items-start gap-1">
-              <span className="text-text-tertiary text-[15px] font-normal">누적 시간</span>
-              <span className="text-text-secondary text-lg font-semibold">
-                {formatSecondsToHours(profile.totalParticipationTime ?? 0)}
-              </span>
-            </div>
-            <div className="flex w-[88px] flex-col items-start gap-1">
-              <span className="text-text-tertiary text-[15px] font-normal">투두 달성률</span>
-              <span className="text-text-brand-default text-lg font-semibold">
-                {profile.todoCompletionRate ?? 0}%
-              </span>
-            </div>
-            <div className="flex w-[88px] flex-col items-start gap-1">
-              <span className="text-text-tertiary text-[15px] font-normal">집중률</span>
-              <span className="text-text-status-positive-default text-lg font-semibold">
-                {profile.focusRate ?? 0}%
-              </span>
-            </div>
+        <div className="gap-y-lg grid w-full grid-cols-2 gap-x-10 md:grid-cols-4 xl:flex xl:w-auto xl:shrink-0 xl:justify-end xl:gap-10">
+          <div className="flex w-full flex-col items-start gap-1 xl:w-22">
+            <span className="text-text-tertiary text-[15px] font-normal">참여한 세션</span>
+            <span className="text-text-secondary text-lg font-semibold">
+              {profile.participationSessionCount ?? 0}
+            </span>
+          </div>
+          <div className="flex w-full flex-col items-start gap-1 xl:w-22">
+            <span className="text-text-tertiary text-[15px] font-normal">누적 시간</span>
+            <span className="text-text-secondary text-lg font-semibold">
+              {formatSecondsToHours(profile.totalParticipationTime ?? 0)}
+            </span>
+          </div>
+          <div className="flex w-full flex-col items-start gap-1 xl:w-22">
+            <span className="text-text-tertiary text-[15px] font-normal">투두 달성률</span>
+            <span className="text-text-brand-default text-lg font-semibold">
+              {profile.todoCompletionRate ?? 0}%
+            </span>
+          </div>
+          <div className="flex w-full flex-col items-start gap-1 xl:w-22">
+            <span className="text-text-tertiary text-[15px] font-normal">집중률</span>
+            <span className="text-text-status-positive-default text-lg font-semibold">
+              {profile.focusRate ?? 0}%
+            </span>
           </div>
         </div>
       </div>

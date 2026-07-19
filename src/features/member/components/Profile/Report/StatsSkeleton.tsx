@@ -2,7 +2,7 @@ import ReportCard from "@/components/ReportCard/ReportCard";
 
 export default function StatsSkeleton() {
   return (
-    <div className="gap-lg grid grid-cols-2">
+    <div className="gap-lg grid grid-cols-1 md:grid-cols-2">
       <ActivitySummaryCardSkeleton />
       <CategoryParticipationCardSkeleton />
       <ReceivedEmojiCardSkeleton />

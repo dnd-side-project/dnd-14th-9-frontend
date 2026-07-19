@@ -15,7 +15,7 @@ export function ProfileTabs() {
   const pathname = usePathname();
 
   return (
-    <div className="border-border-subtle flex w-full items-center border-b-[2px]">
+    <div className="border-border-subtle scrollbar-hide flex w-full items-center overflow-x-auto border-b-[2px]">
       {TABS.map((tab) => {
         const isActive = pathname === tab.href;
         return (
@@ -23,7 +23,7 @@ export function ProfileTabs() {
             key={tab.href}
             href={tab.href}
             className={cn(
-              "flex flex-col items-start border-b-[2px] px-6 py-3 transition-colors",
+              "flex shrink-0 flex-col items-start border-b-[2px] px-4 py-3 transition-colors md:px-6",
               isActive
                 ? "border-border-stronger text-text-primary mb-[-2px]" // mb-[-2px] ensures the active border overlaps the container's bottom border visually
                 : "text-text-muted hover:text-text-primary mb-[-2px] border-transparent"
