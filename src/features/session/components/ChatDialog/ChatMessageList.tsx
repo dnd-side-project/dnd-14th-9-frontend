@@ -27,14 +27,13 @@ export function ChatMessageList({ messages, members, myMemberId }: ChatMessageLi
   }, [messages]);
 
   return (
-    <div className="scrollbar-hide flex flex-1 flex-col gap-3 overflow-y-auto">
-      <p className="text-text-muted py-2 text-center text-[15px]">현재는 방장만 채팅할 수 있어요</p>
-      {messages.map((message, index) => {
+    <div className="scrollbar-hide flex flex-1 flex-col gap-5 overflow-y-auto">
+      <p className="text-text-muted text-center text-[15px]">현재는 방장만 채팅할 수 있어요</p>
+      {messages.map((message) => {
         const sender = memberMap.get(message.memberId);
         const isMe = message.memberId === myMemberId;
-        // 같은 발신자의 연속 메시지는 첫 메시지에만 아바타를 표시한다
-        const previous = messages[index - 1];
-        const isFirstOfGroup = !previous || previous.memberId !== message.memberId;
+        // QUICK_ACTION 메시지는 지정 문구(content)와 칩을 함께 담고 있어,
+        // ChatBubble이 말풍선+칩을 아바타 하나로 묶어 그린다
         const quickAction = message.quickActionType
           ? QUICK_ACTION_CONFIG[message.quickActionType]
           : null;
@@ -44,7 +43,7 @@ export function ChatMessageList({ messages, members, myMemberId }: ChatMessageLi
             key={message.id}
             text={message.content ?? ""}
             align={isMe ? "right" : "left"}
-            showAvatar={!isMe && isFirstOfGroup}
+            showAvatar={!isMe}
             isSenderHost={sender?.role === "HOST"}
             avatarSrc={sender?.profileImageUrl}
             senderNickname={sender?.nickname}

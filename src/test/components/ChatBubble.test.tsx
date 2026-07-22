@@ -8,18 +8,33 @@ describe("ChatBubble", () => {
     expect(screen.getByText("안녕하세요")).toBeInTheDocument();
   });
 
-  it("quickAction이 있으면 label을 렌더링하고 text는 표시하지 않는다", () => {
+  it("text와 quickAction이 함께 있으면 말풍선과 칩을 모두 렌더링한다", () => {
+    // 디자인상 퀵액션 칩은 말풍선을 대체하지 않고 아래에 덧붙는다
     render(
       <ChatBubble
-        text="사용되지 않는 텍스트"
-        align="right"
+        text="핸드폰 내려놓고 집중!"
+        align="left"
+        quickAction={{ icon: <span data-testid="qa-icon" />, label: "핸드폰 금지" }}
+      />
+    );
+
+    expect(screen.getByText("핸드폰 내려놓고 집중!")).toBeInTheDocument();
+    expect(screen.getByText("핸드폰 금지")).toBeInTheDocument();
+    expect(screen.getByTestId("qa-icon")).toBeInTheDocument();
+  });
+
+  it("text가 비어 있으면 말풍선과 시간 없이 quickAction 칩만 렌더링한다", () => {
+    render(
+      <ChatBubble
+        text=""
+        align="left"
+        timestamp="14:00"
         quickAction={{ icon: <span data-testid="qa-icon" />, label: "좋아요" }}
       />
     );
 
     expect(screen.getByText("좋아요")).toBeInTheDocument();
-    expect(screen.getByTestId("qa-icon")).toBeInTheDocument();
-    expect(screen.queryByText("사용되지 않는 텍스트")).not.toBeInTheDocument();
+    expect(screen.queryByText("14:00")).not.toBeInTheDocument();
   });
 
   it("align=left이면 기본적으로 아바타를 노출한다", () => {
