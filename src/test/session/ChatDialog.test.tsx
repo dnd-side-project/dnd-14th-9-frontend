@@ -164,7 +164,8 @@ describe("ChatDialog", () => {
       expect(mockSend).toHaveBeenCalledWith({ type: "QUICK_ACTION", quickActionType: "LIKE" });
     });
 
-    it("텍스트+퀵액션을 함께 보내면 TEXT 다음 QUICK_ACTION 순서로 발행한다", () => {
+    it("텍스트+퀵액션을 함께 보내면 content를 포함한 QUICK_ACTION 한 건을 발행한다", () => {
+      // 백엔드 합의: 퀵액션은 지정 문구(content)와 quickActionType을 한 메시지에 담는다
       render(<ChatDialog {...BASE_PROPS} isHost />);
 
       fireEvent.click(screen.getByRole("button", { name: /핸드폰 금지/ }));
@@ -173,13 +174,11 @@ describe("ChatDialog", () => {
       });
       fireEvent.click(screen.getByRole("button", { name: /보내기/ }));
 
-      expect(mockSend).toHaveBeenNthCalledWith(1, {
-        type: "TEXT",
-        content: "핸드폰 내려놓고 집중!",
-      });
-      expect(mockSend).toHaveBeenNthCalledWith(2, {
+      expect(mockSend).toHaveBeenCalledTimes(1);
+      expect(mockSend).toHaveBeenCalledWith({
         type: "QUICK_ACTION",
         quickActionType: "PHONE_BAN",
+        content: "핸드폰 내려놓고 집중!",
       });
     });
 
@@ -241,6 +240,46 @@ describe("ChatDialog", () => {
       });
 
       expect(screen.getByText("잠깐 쉬어갈까요?")).toBeInTheDocument();
+    });
+
+    it("같은 발신자의 연속 메시지도 각각 아바타를 노출한다", () => {
+      // 디자인상 메시지 1개당 프로필 1개 — 연속 메시지를 묶어 아바타를 생략하지 않는다
+      render(<ChatDialog {...BASE_PROPS} />);
+
+      act(() => {
+        capturedOptions?.onMessage?.({
+          memberId: 2,
+          type: "TEXT",
+          content: "첫 번째",
+          quickActionType: null,
+        });
+        capturedOptions?.onMessage?.({
+          memberId: 2,
+          type: "TEXT",
+          content: "두 번째",
+          quickActionType: null,
+        });
+      });
+
+      expect(screen.getAllByLabelText("방장")).toHaveLength(2);
+    });
+
+    it("content가 있는 퀵액션 메시지는 말풍선과 칩을 아바타 하나로 묶어 렌더한다", () => {
+      // 백엔드 합의: 퀵액션 메시지 한 건에 지정 문구(content)와 quickActionType이 함께 담긴다
+      render(<ChatDialog {...BASE_PROPS} />);
+
+      act(() => {
+        capturedOptions?.onMessage?.({
+          memberId: 2,
+          type: "QUICK_ACTION",
+          content: "핸드폰 내려놓고 집중!",
+          quickActionType: "PHONE_BAN",
+        });
+      });
+
+      expect(screen.getByText("핸드폰 내려놓고 집중!")).toBeInTheDocument();
+      expect(screen.getByText("핸드폰 금지")).toBeInTheDocument();
+      expect(screen.getAllByLabelText("방장")).toHaveLength(1);
     });
   });
 

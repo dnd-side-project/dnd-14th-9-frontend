@@ -25,7 +25,7 @@ const MEMBERS: InProgressMember[] = [
 
 const at = (minute: number) => new Date(2026, 6, 3, 14, minute);
 
-// 호스트가 인사 → 연속 메시지(그룹핑) → 텍스트+퀵액션 순차 전송까지 재현한 가짜 데이터
+// 호스트가 인사 → 연속 메시지 → 지정 문구+퀵액션 한 건 전송까지 재현한 가짜 데이터
 const MESSAGES: ChatMessage[] = [
   {
     id: 1,
@@ -46,16 +46,8 @@ const MESSAGES: ChatMessage[] = [
   {
     id: 3,
     memberId: 1,
-    type: "TEXT",
-    content: "핸드폰 내려놓고 집중!",
-    quickActionType: null,
-    receivedAt: at(26),
-  },
-  {
-    id: 4,
-    memberId: 1,
     type: "QUICK_ACTION",
-    content: null,
+    content: "핸드폰 내려놓고 집중!",
     quickActionType: "PHONE_BAN",
     receivedAt: at(26),
   },
@@ -83,7 +75,7 @@ const META = {
 export default META;
 type Story = StoryObj<typeof META>;
 
-/** 참여자 시점 — 방장 메시지가 좌측(아바타는 그룹 첫 메시지에만) */
+/** 참여자 시점 — 방장 메시지가 좌측(메시지마다 아바타, 퀵액션 칩은 제외) */
 export const PARTICIPANT_VIEW: Story = {
   args: {
     myMemberId: 2,

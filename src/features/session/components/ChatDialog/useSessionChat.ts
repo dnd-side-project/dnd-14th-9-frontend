@@ -50,17 +50,21 @@ export function useSessionChat(sessionId: string) {
     }
   };
 
-  // 백엔드 계약상 한 메시지는 TEXT 또는 QUICK_ACTION 중 하나이므로,
-  // 텍스트+퀵액션 동시 전송은 두 메시지를 순차 발행한다.
+  // 퀵액션 선택 시 지정 문구(content)와 quickActionType을 한 메시지에 담아 보낸다
+  // (백엔드 합의: 2026-07-23, 퀵액션 버튼 → 입력창 자동 문구 → 함께 전송하는 디자인)
   const sendMessage = () => {
     const content = inputValue.trim();
     if (!content && !selectedQuickAction) return;
 
-    if (content) {
-      send({ type: "TEXT", content });
-    }
     if (selectedQuickAction) {
-      send({ type: "QUICK_ACTION", quickActionType: selectedQuickAction });
+      // content가 비어 있으면 필드 자체를 생략한다 (JSON 직렬화 시 undefined는 제외됨)
+      send({
+        type: "QUICK_ACTION",
+        quickActionType: selectedQuickAction,
+        content: content || undefined,
+      });
+    } else {
+      send({ type: "TEXT", content });
     }
 
     setInputValue("");
