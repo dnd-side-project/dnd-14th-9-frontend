@@ -10,12 +10,11 @@ import { ChatMessageInput } from "./ChatMessageInput";
 import { ChatMessageList } from "./ChatMessageList";
 import { ChatQuickActionBar } from "./ChatQuickActionBar";
 import { ChatSessionInfo } from "./ChatSessionInfo";
-import { useSessionChat } from "./useSessionChat";
 
+import type { useSessionChat } from "./useSessionChat";
 import type { InProgressMember } from "../../types";
 
 interface ChatDialogProps {
-  sessionId: string;
   isHost: boolean;
   myMemberId?: number;
   category: string;
@@ -24,11 +23,12 @@ interface ChatDialogProps {
   notice: string;
   participantCount: number;
   members: InProgressMember[];
+  /** 카드 레벨에서 소유하는 채팅 상태 — 다이얼로그를 닫아도 수신 기록이 유지된다 */
+  chat: ReturnType<typeof useSessionChat>;
   onClose: () => void;
 }
 
 export function ChatDialog({
-  sessionId,
   isHost,
   myMemberId,
   category,
@@ -37,6 +37,7 @@ export function ChatDialog({
   notice,
   participantCount,
   members,
+  chat,
   onClose,
 }: ChatDialogProps) {
   useBodyScrollLock();
@@ -51,7 +52,7 @@ export function ChatDialog({
     selectedQuickAction,
     selectQuickAction,
     sendMessage,
-  } = useSessionChat(sessionId);
+  } = chat;
 
   // 메시지 영역 전체를 덮는 중앙 안내 문구. 재연결 중에는 null — 쌓인 메시지를 유지한다
   const centerNotice =

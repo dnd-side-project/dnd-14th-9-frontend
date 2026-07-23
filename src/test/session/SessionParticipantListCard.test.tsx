@@ -2,6 +2,11 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 import { SessionParticipantListCard } from "@/features/session/components/SessionParticipantListCard/SessionParticipantListCard";
 
+// 카드가 useSessionChat(→ useChatSocket)을 직접 호출하므로 소켓 연결을 차단한다
+jest.mock("@/lib/socket/useChatSocket", () => ({
+  useChatSocket: () => ({ status: "connected", send: jest.fn() }),
+}));
+
 jest.mock("@/features/session/components/ChatDialog/ChatDialog", () => ({
   ChatDialog: ({ onClose }: { onClose: () => void }) => (
     <div data-testid="chat-dialog">

@@ -9,6 +9,7 @@ import { CheckIcon } from "@/components/Icon/CheckIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
 
 import { ChatDialog } from "../ChatDialog/ChatDialog";
+import { useSessionChat } from "../ChatDialog/useSessionChat";
 
 import type { InProgressMember } from "../../types";
 
@@ -42,6 +43,10 @@ export function SessionParticipantListCard({
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const chatButtonRef = useRef<HTMLButtonElement>(null);
+
+  // 채팅 상태(소켓 연결·수신 기록)를 카드가 소유한다 — 다이얼로그를 닫아도
+  // 연결과 기록이 유지되고, 닫혀 있는 동안 수신한 메시지도 보존된다.
+  const chat = useSessionChat(sessionId);
 
   const handleToggle = (memberId: number) => {
     setExpandedId((prev) => (prev === memberId ? null : memberId));
@@ -191,7 +196,7 @@ export function SessionParticipantListCard({
 
       {isChatOpen && (
         <ChatDialog
-          sessionId={sessionId}
+          chat={chat}
           isHost={isHost}
           myMemberId={myMemberId}
           category={category}

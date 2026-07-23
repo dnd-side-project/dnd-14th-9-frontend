@@ -14,8 +14,11 @@ export interface ChatMessage extends ChatReceivedMessage {
 }
 
 /**
- * 채팅 다이얼로그의 상태(수신 메시지 누적, 입력값, 퀵액션 스테이징)와
- * 전송 로직을 캡슐화한다. UI는 ChatDialog가 담당.
+ * 세션 채팅의 상태(수신 메시지 누적, 입력값, 퀵액션 스테이징)와 전송 로직을
+ * 캡슐화한다. UI는 ChatDialog가 담당.
+ *
+ * 세션 페이지에 머무는 동안 유지되는 컴포넌트(참여자 카드)에서 호출해야 한다 —
+ * 다이얼로그 내부에서 호출하면 닫을 때마다 연결과 수신 기록이 함께 사라진다.
  */
 export function useSessionChat(sessionId: string) {
   const messageIdRef = useRef(0);
