@@ -271,14 +271,6 @@ class ChatSocket {
     return () => this.listeners.get(event)?.delete(callback);
   }
 
-  off<T extends keyof ChatEventMap>(event: T, callback?: ChatEventCallback<T>): void {
-    if (callback) {
-      this.listeners.get(event)?.delete(callback);
-    } else {
-      this.listeners.delete(event);
-    }
-  }
-
   removeAllListeners(): void {
     this.listeners.clear();
   }
@@ -290,49 +282,3 @@ export function createChatSocket(options?: SocketOptions): ChatSocket {
 }
 
 export type { ChatSocket };
-
-// 사용 예시
-/**
- * import { createChatSocket } from '@/lib/socket/client';
- *
- * const chatSocket = createChatSocket();
- *
- * // 1. 연결 전 이벤트 리스너 등록
- * const unsubMessage = chatSocket.on('message', (message) => {
- *   console.log('New chat message:', message);
- * });
- *
- * const unsubError = chatSocket.on('error', (error) => {
- *   console.error('Chat error:', error.message);
- * });
- *
- * // 2. 연결
- * chatSocket.connect(sessionId, accessToken);
- *
- * // 3. 연결 상태 확인
- * console.log(chatSocket.status); // 'connecting' -> 'connected'
- *
- * // 4. 메시지 전송 (호스트 전용, 참여자가 보내면 서버가 드롭/에러 응답)
- * chatSocket.send({ type: 'TEXT', content: '모두 집중해주세요!' });
- * chatSocket.send({ type: 'QUICK_ACTION', quickActionType: 'LIKE' });
- *
- * // 5. 연결 해제 시 정리 (컴포넌트 언마운트 시)
- * chatSocket.disconnect();
- * unsubMessage();
- * unsubError();
- *
- * // React 컴포넌트 예시:
- * useEffect(() => {
- *   const unsubscribes = [
- *     chatSocket.on('message', handleMessage),
- *     chatSocket.on('error', handleError),
- *   ];
- *
- *   chatSocket.connect(sessionId, accessToken);
- *
- *   return () => {
- *     chatSocket.disconnect();
- *     unsubscribes.forEach(unsub => unsub());
- *   };
- * }, [sessionId, accessToken]);
- */

@@ -357,29 +357,7 @@ describe("ChatSocket", () => {
     });
   });
 
-  describe("on/off/removeAllListeners", () => {
-    it("off로 특정 리스너만 제거할 수 있어야 합니다", () => {
-      const socket = createChatSocket();
-      const callback1 = jest.fn();
-      const callback2 = jest.fn();
-      socket.on("message", callback1);
-      socket.on("message", callback2);
-
-      socket.off("message", callback1);
-
-      socket.connect("42", "token-abc");
-      mockClientInstance!.simulateConnect();
-      mockClientInstance!.simulateMessage("/sub/chat/42", {
-        memberId: 1,
-        type: "TEXT",
-        content: "hi",
-        quickActionType: null,
-      });
-
-      expect(callback1).not.toHaveBeenCalled();
-      expect(callback2).toHaveBeenCalled();
-    });
-
+  describe("on/removeAllListeners", () => {
     it("on은 unsubscribe 함수를 반환하고, 호출 시 리스너가 제거되어야 합니다", () => {
       const socket = createChatSocket();
       const callback = jest.fn();
