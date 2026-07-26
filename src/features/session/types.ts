@@ -127,6 +127,11 @@ export interface CreateSessionResponse {
   createdSessionId: number;
 }
 
+// 세션 수정 요청
+// PATCH /sessions/{sessionId} - 수정하려는 필드만 포함 (부분 수정)
+// 응답은 result가 없는 void(ApiSuccessResponse<null>)이므로 별도 응답 타입 없음
+export type UpdateSessionRequest = Partial<CreateSessionRequest>;
+
 // ============================================
 // 세션 참여 API 관련 타입
 // ============================================
