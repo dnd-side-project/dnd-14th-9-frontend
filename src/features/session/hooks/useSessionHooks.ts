@@ -40,6 +40,7 @@ import type {
   SubmitSessionResultRequest,
   SubmitSessionResultResponse,
   ToggleMyStatusResponse,
+  UpdateSessionRequest,
 } from "../types";
 
 const sessionCrud = createCrudHooks<
@@ -47,13 +48,14 @@ const sessionCrud = createCrudHooks<
   ApiSuccessResponse<SessionListResponse>,
   ApiSuccessResponse<SessionDetailResponse>,
   CreateSessionRequest,
-  never, // update 없음
+  never, // update는 image 파라미터가 필요해 useUpdateSession 커스텀 훅으로 구현
   CreateSessionResponse
 >({
   queryKey: "session",
   getList: sessionApi.getList,
   getDetail: sessionApi.getDetail,
   create: sessionApi.createSession,
+  remove: sessionApi.deleteSession,
 });
 
 export const sessionKeys = {
@@ -124,6 +126,37 @@ export function useCreateSession() {
     },
   });
 }
+
+/**
+ * 세션 수정 mutation 훅
+ *
+ * useCreateSession과 동일하게, CRUD 팩토리의 useUpdate는 image 파라미터를
+ * 전달할 수 없으므로 body와 image를 함께 넘기는 커스텀 mutation으로 구현합니다.
+ */
+export function useUpdateSession() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ApiSuccessResponse<null>,
+    ApiError,
+    { sessionId: string; body: UpdateSessionRequest; image?: File }
+  >({
+    mutationFn: ({ sessionId, body, image }) => sessionApi.updateSession(sessionId, body, image),
+    onSuccess: (_, { sessionId }) => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.waitingRoom(sessionId) });
+    },
+  });
+}
+
+/**
+ * 세션 삭제 mutation 훅
+ *
+ * CRUD 팩토리의 remove(=useDelete)를 그대로 사용합니다.
+ * variables는 sessionId(string), onSuccess에서 lists + detail을 무효화합니다.
+ */
+export const useDeleteSession = sessionCrud.useDelete!;
+
 export const prefetchSessionList = sessionCrud.prefetch;
 
 export function useSessionReport(sessionId: string) {
