@@ -15,6 +15,7 @@ import type {
   SubmitSessionResultRequest,
   SubmitSessionResultResponse,
   ToggleMyStatusResponse,
+  UpdateSessionRequest,
   WaitingRoomResponse,
 } from "@/features/session/types";
 import type { CreateSubtaskItem, CreateSubtaskResponse } from "@/features/task/api";
@@ -386,6 +387,30 @@ export function createMockSession(body: CreateSessionRequest): CreateSessionResp
   });
 
   return { createdSessionId: sessionId };
+}
+
+export function updateMockSession(sessionId: number, body: UpdateSessionRequest): void {
+  const session = getSessionOrThrow(sessionId);
+
+  // 부분 수정: 정의된 필드만 덮어쓴다.
+  if (body.title !== undefined) session.title = body.title;
+  if (body.summary !== undefined) session.summary = body.summary;
+  if (body.notice !== undefined) session.notice = body.notice;
+  if (body.category !== undefined) session.category = body.category;
+  if (body.startTime !== undefined) session.startTime = body.startTime;
+  if (body.sessionDurationMinutes !== undefined) {
+    session.sessionDurationMinutes = body.sessionDurationMinutes;
+  }
+  if (body.maxParticipants !== undefined) session.maxParticipants = body.maxParticipants;
+  if (body.requiredFocusRate !== undefined) session.requiredFocusRate = body.requiredFocusRate;
+  if (body.requiredAchievementRate !== undefined) {
+    session.requiredAchievementRate = body.requiredAchievementRate;
+  }
+}
+
+export function deleteMockSession(sessionId: number): void {
+  getSessionOrThrow(sessionId); // 미존재 시 MockSessionNotFoundError
+  sessions = sessions.filter((session) => session.sessionId !== sessionId);
 }
 
 export function getMockSessionList(params: SessionListParams = {}): SessionListResponse {

@@ -6,11 +6,13 @@ import type {
   SendReactionRequest,
   SessionListParams,
   SubmitSessionResultRequest,
+  UpdateSessionRequest,
 } from "@/features/session/types";
 
 import { MockJsonParseError, readRequiredJson, readRequiredMultipartJsonPart } from "./json";
 import {
   createMockSession,
+  deleteMockSession,
   getMockInProgress,
   getMockMyReport,
   getMockSessionDetail,
@@ -23,6 +25,7 @@ import {
   sendMockReaction,
   submitMockSessionResult,
   toggleMockMyStatus,
+  updateMockSession,
   MockMemberNotFoundError,
   MockSessionNotFoundError,
 } from "./session-state";
@@ -86,6 +89,25 @@ export const sessionHandlers = [
 
   http.get("*/api/sessions/:sessionId", ({ params }) => {
     return sessionJson(() => getMockSessionDetail(toSessionId(params.sessionId)));
+  }),
+
+  http.patch("*/api/sessions/:sessionId", async ({ request, params }) => {
+    return sessionJson(async () => {
+      const body = await readRequiredMultipartJsonPart<UpdateSessionRequest>(
+        request,
+        "request",
+        "session update"
+      );
+      updateMockSession(toSessionId(params.sessionId), body);
+      return null;
+    });
+  }),
+
+  http.delete("*/api/sessions/:sessionId", ({ params }) => {
+    return sessionJson(() => {
+      deleteMockSession(toSessionId(params.sessionId));
+      return null;
+    });
   }),
 
   http.get("*/api/sessions/:sessionId/report", ({ params }) => {
