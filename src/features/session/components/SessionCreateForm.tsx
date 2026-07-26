@@ -40,8 +40,10 @@ import {
   SESSION_PARTICIPANTS_MAX,
   SESSION_PARTICIPANTS_MIN,
 } from "../constants/sessionLimits";
-import { useCreateSession, useUpdateSession } from "../hooks/useSessionHooks";
+import { useCreateSession, useDeleteSession, useUpdateSession } from "../hooks/useSessionHooks";
 import { validateSessionForm, type SessionFormErrors } from "../utils/validateSessionForm";
+
+import { SessionDeleteConfirmDialog } from "./SessionDeleteConfirmDialog";
 
 import type { CreateSessionFormData } from "../schemas";
 import type { CreateSessionRequest, SessionDetailResponse, UpdateSessionRequest } from "../types";
@@ -122,10 +124,13 @@ export function SessionCreateForm({
   // validation / API 연동 상태
   const [formErrors, setFormErrors] = useState<SessionFormErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteServerError, setDeleteServerError] = useState<string | null>(null);
   const router = useRouter();
   const { mutate: createSession, isPending: isCreating } = useCreateSession();
   const { mutate: updateSession, isPending: isUpdating } = useUpdateSession();
-  const isPending = isCreating || isUpdating;
+  const { mutate: deleteSession, isPending: isDeleting } = useDeleteSession();
+  const isPending = isCreating || isUpdating || isDeleting;
 
   const clearFieldError = (field: keyof SessionFormErrors) => {
     setFormErrors((prev) => {
@@ -275,6 +280,25 @@ export function SessionCreateForm({
         },
       }
     );
+  };
+
+  // edit 모드 세션 삭제 (확인 다이얼로그 → DELETE)
+  const handleDelete = () => {
+    if (!sessionId) return;
+    setDeleteServerError(null);
+
+    deleteSession(sessionId, {
+      onSuccess: () => {
+        setShowDeleteDialog(false);
+        toast.success("세션이 삭제되었어요.");
+        router.push("/");
+      },
+      onError: (error) => {
+        const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+        setDeleteServerError(message);
+        toast.error(message);
+      },
+    });
   };
 
   return (
@@ -563,6 +587,35 @@ export function SessionCreateForm({
               : "세션 만들기"}
         </Button>
       </div>
+
+      {/* 세션 삭제 (edit 모드 전용) */}
+      {isEdit && (
+        <div className="mb-10 flex justify-center md:mb-20">
+          <Button
+            type="button"
+            variant="ghost"
+            colorScheme="secondary"
+            size="medium"
+            onClick={() => {
+              setDeleteServerError(null);
+              setShowDeleteDialog(true);
+            }}
+            disabled={isPending}
+            className="text-status-error"
+          >
+            세션 삭제하기
+          </Button>
+        </div>
+      )}
+
+      {showDeleteDialog && (
+        <SessionDeleteConfirmDialog
+          onClose={() => setShowDeleteDialog(false)}
+          onConfirm={handleDelete}
+          isPending={isDeleting}
+          serverError={deleteServerError}
+        />
+      )}
     </form>
   );
 }

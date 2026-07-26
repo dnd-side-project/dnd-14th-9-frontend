@@ -182,6 +182,9 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
     initialWaitingData?.result?.members?.find((m) => m.memberId === myMemberId)?.task ?? null;
   const maxParticipants = session.maxParticipants;
   const isHost = members.some((m) => m.memberId === myMemberId && m.role === "HOST");
+  // 호스트 외 참여자가 없어야 수정/삭제 가능 (백엔드 SESSION400_15/13 사전 차단)
+  const otherParticipantCount = members.filter((m) => m.role !== "HOST").length;
+  const canManageSession = isHost && otherParticipantCount === 0;
 
   return (
     <>
@@ -196,6 +199,9 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
           onCloseDialog={() => setShowLeaveDialog(false)}
           isLeavingRef={isLeavingRef}
           onLeavingChange={setIsLeaving}
+          isHost={isHost}
+          canManageSession={canManageSession}
+          sessionTransitionRef={isSessionTransitionRef}
         />
         <SessionInfoCard session={session} />
         <div className="gap-lg flex flex-col xl:flex-row">
