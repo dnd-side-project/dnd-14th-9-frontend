@@ -20,7 +20,12 @@ import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { ApiError } from "@/lib/api/api-client";
-import { ONBOARDING_CATEGORIES, CATEGORY_LABELS, type Category } from "@/lib/constants/category";
+import {
+  ONBOARDING_CATEGORIES,
+  CATEGORY_LABELS,
+  getCategoryValue,
+  type Category,
+} from "@/lib/constants/category";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { toast } from "@/lib/toast";
 import { formatDateTimeDisplay, formatDurationKorean, formatLocalDateTime } from "@/lib/utils/date";
@@ -35,27 +40,54 @@ import {
   SESSION_PARTICIPANTS_MAX,
   SESSION_PARTICIPANTS_MIN,
 } from "../constants/sessionLimits";
-import { useCreateSession } from "../hooks/useSessionHooks";
+import { useCreateSession, useUpdateSession } from "../hooks/useSessionHooks";
 import { validateSessionForm, type SessionFormErrors } from "../utils/validateSessionForm";
 
-import type { CreateSessionRequest } from "../types";
+import type { CreateSessionFormData } from "../schemas";
+import type { CreateSessionRequest, SessionDetailResponse, UpdateSessionRequest } from "../types";
 
-export function SessionCreateForm() {
+interface SessionCreateFormProps {
+  /** "create"(기본) 또는 "edit". edit이면 sessionId·initialValues 필수 */
+  mode?: "create" | "edit";
+  sessionId?: string;
+  initialValues?: SessionDetailResponse;
+}
+
+export function SessionCreateForm({
+  mode = "create",
+  sessionId,
+  initialValues,
+}: SessionCreateFormProps = {}) {
+  const isEdit = mode === "edit";
   const { data: meData } = useMe();
   const myProfile = meData?.result;
 
-  const [roomName, setRoomName] = useState("");
-  const [roomDescription, setRoomDescription] = useState("");
-  const [notice, setNotice] = useState("");
+  // edit 모드: initialValues로 초기값을 시드한다. (category는 한글 라벨→enum 역변환)
+  const [roomName, setRoomName] = useState(initialValues?.title ?? "");
+  const [roomDescription, setRoomDescription] = useState(initialValues?.summary ?? "");
+  const [notice, setNotice] = useState(initialValues?.notice ?? "");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [removedInitialImage, setRemovedInitialImage] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    initialValues ? getCategoryValue(initialValues.category) : null
+  );
 
   // 세부 설정 상태
-  const [startDateTime, setStartDateTime] = useState<Date | null>(null);
-  const [duration, setDuration] = useState(SESSION_DURATION_MINUTES_DEFAULT); // 기본값 1시간 30분
-  const [participants, setParticipants] = useState(SESSION_PARTICIPANTS_DEFAULT); // 기본값 5명
-  const [achievementRange, setAchievementRange] = useState(50); // To do 달성도 범위
-  const [focusRange, setFocusRange] = useState(50); // 집중도 범위
+  const [startDateTime, setStartDateTime] = useState<Date | null>(
+    initialValues ? new Date(initialValues.startTime) : null
+  );
+  const [duration, setDuration] = useState(
+    initialValues?.sessionDurationMinutes ?? SESSION_DURATION_MINUTES_DEFAULT
+  ); // 기본값 1시간 30분
+  const [participants, setParticipants] = useState(
+    initialValues?.maxParticipants ?? SESSION_PARTICIPANTS_DEFAULT
+  ); // 기본값 5명
+  const [achievementRange, setAchievementRange] = useState(
+    initialValues ? (initialValues.requiredAchievementRate ?? 0) : 50
+  ); // To do 달성도 범위
+  const [focusRange, setFocusRange] = useState(
+    initialValues ? (initialValues.requiredFocusRate ?? 0) : 50
+  ); // 집중도 범위
 
   // DatePicker 팝업 상태
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -65,27 +97,35 @@ export function SessionCreateForm() {
   const closeDatePicker = () => setIsDatePickerOpen(false);
   useClickOutside(datePickerContainerRef, closeDatePicker, isDatePickerOpen);
 
-  // 이미지 미리보기 URL 생성
-  const imagePreviewUrl = selectedImage ? URL.createObjectURL(selectedImage) : null;
+  // 새로 선택한 파일의 blob 미리보기 URL (정리 대상)
+  const selectedImageUrl = selectedImage ? URL.createObjectURL(selectedImage) : null;
 
-  // 이미지 미리보기 URL 정리 (메모리 누수 방지)
+  // edit 모드에서 기존 썸네일: 새 파일이 없고 삭제하지 않았을 때만 노출
+  const initialImageUrl = initialValues?.imageUrl || null;
+  const showInitialImage = !selectedImage && !removedInitialImage && !!initialImageUrl;
+  const imagePreviewUrl = selectedImageUrl ?? (showInitialImage ? initialImageUrl : null);
+
+  // blob 미리보기 URL 정리 (메모리 누수 방지) — 원격 URL은 정리 대상 아님
   useEffect(() => {
     return () => {
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
+      if (selectedImageUrl) {
+        URL.revokeObjectURL(selectedImageUrl);
       }
     };
-  }, [imagePreviewUrl]);
+  }, [selectedImageUrl]);
 
   const handleImageRemove = () => {
     setSelectedImage(null);
+    setRemovedInitialImage(true);
   };
 
   // validation / API 연동 상태
   const [formErrors, setFormErrors] = useState<SessionFormErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
-  const { mutate: createSession, isPending } = useCreateSession();
+  const { mutate: createSession, isPending: isCreating } = useCreateSession();
+  const { mutate: updateSession, isPending: isUpdating } = useUpdateSession();
+  const isPending = isCreating || isUpdating;
 
   const clearFieldError = (field: keyof SessionFormErrors) => {
     setFormErrors((prev) => {
@@ -96,7 +136,28 @@ export function SessionCreateForm() {
     });
   };
 
-  const hasUnsavedChanges =
+  // edit 모드: 초기값 대비 시작 시각 변경 여부 (검증·부분전송에 재사용)
+  const initialStartMs = initialValues ? new Date(initialValues.startTime).getTime() : null;
+  const startTimeChanged =
+    initialStartMs !== null ? (startDateTime?.getTime() ?? null) !== initialStartMs : false;
+
+  // edit 모드: 초기값 대비 변경 여부 (변경 없으면 저장 비활성)
+  const editDirty =
+    isEdit && initialValues
+      ? roomName !== initialValues.title ||
+        roomDescription !== initialValues.summary ||
+        notice !== initialValues.notice ||
+        selectedCategory !== getCategoryValue(initialValues.category) ||
+        startTimeChanged ||
+        duration !== initialValues.sessionDurationMinutes ||
+        participants !== initialValues.maxParticipants ||
+        achievementRange !== (initialValues.requiredAchievementRate ?? 0) ||
+        focusRange !== (initialValues.requiredFocusRate ?? 0) ||
+        selectedImage !== null ||
+        removedInitialImage
+      : false;
+
+  const createDirty =
     roomName.trim().length > 0 ||
     roomDescription.trim().length > 0 ||
     notice.trim().length > 0 ||
@@ -108,6 +169,8 @@ export function SessionCreateForm() {
     achievementRange !== 50 ||
     focusRange !== 50;
 
+  const hasUnsavedChanges = isEdit ? editDirty : createDirty;
+
   useUnsavedChangesWarning(hasUnsavedChanges && !isPending);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -115,40 +178,96 @@ export function SessionCreateForm() {
     setServerError(null);
 
     // useState 값 → zod 스키마 형태로 매핑
-    const validation = validateSessionForm({
-      title: roomName,
-      summary: roomDescription,
-      notice,
-      category: selectedCategory ?? undefined,
-      startTime: startDateTime ?? undefined,
-      sessionDurationMinutes: duration,
-      maxParticipants: participants,
-      requiredAchievementRate: achievementRange,
-      requiredFocusRate: focusRange,
-    });
+    // 수정 시 시작 시각을 바꾸지 않았다면 "현재+5분 이후" 미래 검증을 생략한다.
+    const validation = validateSessionForm(
+      {
+        title: roomName,
+        summary: roomDescription,
+        notice,
+        category: selectedCategory ?? undefined,
+        startTime: startDateTime ?? undefined,
+        sessionDurationMinutes: duration,
+        maxParticipants: participants,
+        requiredAchievementRate: achievementRange,
+        requiredFocusRate: focusRange,
+      },
+      { enforceFutureStartTime: isEdit ? startTimeChanged : true }
+    );
 
     if (!validation.success) {
       setFormErrors(validation.errors);
       return;
     }
 
+    const { data } = validation;
+
+    if (isEdit) {
+      handleUpdate(data);
+      return;
+    }
+
     // CreateSessionRequest 구성 (Date → ISO 문자열 변환)
     const body: CreateSessionRequest = {
-      title: validation.data.title,
-      summary: validation.data.summary,
-      notice: validation.data.notice,
-      category: validation.data.category,
-      startTime: formatLocalDateTime(validation.data.startTime),
-      sessionDurationMinutes: validation.data.sessionDurationMinutes,
-      maxParticipants: validation.data.maxParticipants,
-      requiredFocusRate: validation.data.requiredFocusRate,
-      requiredAchievementRate: validation.data.requiredAchievementRate,
+      title: data.title,
+      summary: data.summary,
+      notice: data.notice,
+      category: data.category,
+      startTime: formatLocalDateTime(data.startTime),
+      sessionDurationMinutes: data.sessionDurationMinutes,
+      maxParticipants: data.maxParticipants,
+      requiredFocusRate: data.requiredFocusRate,
+      requiredAchievementRate: data.requiredAchievementRate,
     };
 
     createSession(
       { body, image: selectedImage ?? undefined },
       {
         onSuccess: () => router.push("/"),
+        onError: (error) => {
+          const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
+          setServerError(message);
+          toast.error(message);
+        },
+      }
+    );
+  };
+
+  // edit 모드 제출: 변경된 필드만 담아 PATCH (부분 수정)
+  const handleUpdate = (data: CreateSessionFormData) => {
+    if (!sessionId || !initialValues) return;
+
+    const body: UpdateSessionRequest = {};
+    if (data.title !== initialValues.title) body.title = data.title;
+    if (data.summary !== initialValues.summary) body.summary = data.summary;
+    if (data.notice !== initialValues.notice) body.notice = data.notice;
+    if (data.category !== getCategoryValue(initialValues.category)) body.category = data.category;
+    if (startTimeChanged) body.startTime = formatLocalDateTime(data.startTime);
+    if (data.sessionDurationMinutes !== initialValues.sessionDurationMinutes) {
+      body.sessionDurationMinutes = data.sessionDurationMinutes;
+    }
+    if (data.maxParticipants !== initialValues.maxParticipants) {
+      body.maxParticipants = data.maxParticipants;
+    }
+    if (data.requiredFocusRate !== (initialValues.requiredFocusRate ?? 0)) {
+      body.requiredFocusRate = data.requiredFocusRate;
+    }
+    if (data.requiredAchievementRate !== (initialValues.requiredAchievementRate ?? 0)) {
+      body.requiredAchievementRate = data.requiredAchievementRate;
+    }
+
+    const image = selectedImage ?? undefined;
+    if (Object.keys(body).length === 0 && !image) {
+      toast.info("변경된 내용이 없어요.");
+      return;
+    }
+
+    updateSession(
+      { sessionId, body, image },
+      {
+        onSuccess: () => {
+          toast.success("세션을 수정했어요.");
+          router.push(`/session/${sessionId}/waiting`);
+        },
         onError: (error) => {
           const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
           setServerError(message);
@@ -433,9 +552,15 @@ export function SessionCreateForm() {
           colorScheme="primary"
           size="large"
           className="px-md py-sm md:px-xl md:py-md w-full text-xs md:max-w-70.5 md:text-base"
-          disabled={isPending}
+          disabled={isPending || (isEdit && !editDirty)}
         >
-          {isPending ? "생성 중..." : "세션 만들기"}
+          {isEdit
+            ? isPending
+              ? "수정 중..."
+              : "수정 완료"
+            : isPending
+              ? "생성 중..."
+              : "세션 만들기"}
         </Button>
       </div>
     </form>
