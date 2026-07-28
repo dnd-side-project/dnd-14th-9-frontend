@@ -125,6 +125,7 @@ export function ChatDialog({
               onChange={setInputValue}
               onSend={sendMessage}
               disabled={!isHost || status !== "connected"}
+              readOnly={selectedQuickAction !== null}
             />
           </div>
         </div>

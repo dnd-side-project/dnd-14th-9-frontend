@@ -42,15 +42,9 @@ export function useSessionChat(sessionId: string) {
   const selectQuickAction = (type: QuickActionType) => {
     const isDeselect = selectedQuickAction === type;
     setSelectedQuickAction(isDeselect ? null : type);
-
-    if (!isDeselect) {
-      // TODO: 디자이너가 퀵액션별 지정 문구를 확정하면 quickActionConfig의 message를
-      // 채운다. 현재는 전부 미정(undefined)이라 자동 입력이 동작하지 않는다.
-      const designatedMessage = QUICK_ACTION_CONFIG[type].message;
-      if (designatedMessage !== undefined) {
-        setInputValue(designatedMessage);
-      }
-    }
+    // 선택 중에는 입력창이 지정 문구로 잠기므로(readOnly), 해제할 때 입력값도
+    // 함께 비워야 문구가 일반 TEXT로 남아 전송되는 상태가 생기지 않는다
+    setInputValue(isDeselect ? "" : QUICK_ACTION_CONFIG[type].message);
   };
 
   // 퀵액션 선택 시 지정 문구(content)와 quickActionType을 한 메시지에 담아 보낸다
@@ -60,11 +54,10 @@ export function useSessionChat(sessionId: string) {
     if (!content && !selectedQuickAction) return;
 
     if (selectedQuickAction) {
-      // content가 비어 있으면 필드 자체를 생략한다 (JSON 직렬화 시 undefined는 제외됨)
       send({
         type: "QUICK_ACTION",
         quickActionType: selectedQuickAction,
-        content: content || undefined,
+        content,
       });
     } else {
       send({ type: "TEXT", content });

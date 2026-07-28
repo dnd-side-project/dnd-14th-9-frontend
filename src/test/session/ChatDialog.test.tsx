@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 
+import { QUICK_ACTION_CONFIG } from "@/features/session/components/ChatDialog/quickActionConfig";
 import { SessionParticipantListCard } from "@/features/session/components/SessionParticipantListCard/SessionParticipantListCard";
 import type { InProgressMember } from "@/features/session/types";
 import type {
@@ -180,60 +181,74 @@ describe("세션 채팅 (참여자 카드 + 다이얼로그)", () => {
       expect(mockSend).not.toHaveBeenCalled();
     });
 
-    it("퀵액션 선택 후 보내기를 누르면 QUICK_ACTION 메시지를 발행한다", () => {
+    it("퀵액션을 선택하면 지정 문구가 입력창에 채워지고, 보내기 시 content로 발행된다", () => {
       renderCard({ isHost: true });
       const dialog = openChat();
 
       fireEvent.click(dialog.getByRole("button", { name: /좋아요/ }));
-      fireEvent.click(dialog.getByRole("button", { name: /보내기/ }));
+      expect(dialog.getByPlaceholderText("텍스트를 입력해 주세요")).toHaveValue(
+        QUICK_ACTION_CONFIG.LIKE.message
+      );
 
-      expect(mockSend).toHaveBeenCalledTimes(1);
-      expect(mockSend).toHaveBeenCalledWith({ type: "QUICK_ACTION", quickActionType: "LIKE" });
-    });
-
-    it("텍스트+퀵액션을 함께 보내면 content를 포함한 QUICK_ACTION 한 건을 발행한다", () => {
-      // 백엔드 합의: 퀵액션은 지정 문구(content)와 quickActionType을 한 메시지에 담는다
-      renderCard({ isHost: true });
-      const dialog = openChat();
-
-      fireEvent.click(dialog.getByRole("button", { name: /핸드폰 금지/ }));
-      fireEvent.change(dialog.getByPlaceholderText("텍스트를 입력해 주세요"), {
-        target: { value: "핸드폰 내려놓고 집중!" },
-      });
       fireEvent.click(dialog.getByRole("button", { name: /보내기/ }));
 
       expect(mockSend).toHaveBeenCalledTimes(1);
       expect(mockSend).toHaveBeenCalledWith({
         type: "QUICK_ACTION",
-        quickActionType: "PHONE_BAN",
-        content: "핸드폰 내려놓고 집중!",
+        quickActionType: "LIKE",
+        content: QUICK_ACTION_CONFIG.LIKE.message,
       });
     });
 
-    it("전송 후 입력과 퀵액션 선택이 초기화된다", () => {
+    it("퀵액션 선택 중에는 입력창이 잠기고(readOnly) 보내기는 가능하다", () => {
+      // 디자이너 요구: 지정 문구는 변형 없이 그대로만 전송돼야 한다
+      renderCard({ isHost: true });
+      const dialog = openChat();
+
+      fireEvent.click(dialog.getByRole("button", { name: /핸드폰 금지/ }));
+
+      expect(dialog.getByPlaceholderText("텍스트를 입력해 주세요")).toHaveAttribute("readonly");
+      expect(dialog.getByRole("button", { name: /보내기/ })).toBeEnabled();
+    });
+
+    it("다른 퀵액션으로 전환하면 입력창이 새 지정 문구로 교체된다", () => {
       renderCard({ isHost: true });
       const dialog = openChat();
 
       fireEvent.click(dialog.getByRole("button", { name: /좋아요/ }));
-      fireEvent.change(dialog.getByPlaceholderText("텍스트를 입력해 주세요"), {
-        target: { value: "안녕" },
-      });
+      fireEvent.click(dialog.getByRole("button", { name: /투두 완료!/ }));
+
+      expect(dialog.getByPlaceholderText("텍스트를 입력해 주세요")).toHaveValue(
+        QUICK_ACTION_CONFIG.TODO_DONE.message
+      );
+    });
+
+    it("전송 후 입력이 비워지고 퀵액션 선택이 초기화된다", () => {
+      renderCard({ isHost: true });
+      const dialog = openChat();
+
+      fireEvent.click(dialog.getByRole("button", { name: /좋아요/ }));
       fireEvent.click(dialog.getByRole("button", { name: /보내기/ }));
       mockSend.mockClear();
 
+      expect(dialog.getByPlaceholderText("텍스트를 입력해 주세요")).toHaveValue("");
       fireEvent.click(dialog.getByRole("button", { name: /보내기/ }));
       expect(mockSend).not.toHaveBeenCalled();
     });
 
-    it("같은 퀵액션을 다시 누르면 선택이 해제된다", () => {
+    it("같은 퀵액션을 다시 누르면 선택이 해제되고 입력창이 비워진다", () => {
       renderCard({ isHost: true });
       const dialog = openChat();
+      const input = dialog.getByPlaceholderText("텍스트를 입력해 주세요");
 
       fireEvent.click(dialog.getByRole("button", { name: /좋아요/ }));
       fireEvent.click(dialog.getByRole("button", { name: /좋아요/ }));
-      fireEvent.change(dialog.getByPlaceholderText("텍스트를 입력해 주세요"), {
-        target: { value: "텍스트만" },
-      });
+
+      // 지정 문구가 일반 텍스트로 남지 않아야 하고, 잠금도 풀려야 한다
+      expect(input).toHaveValue("");
+      expect(input).not.toHaveAttribute("readonly");
+
+      fireEvent.change(input, { target: { value: "텍스트만" } });
       fireEvent.click(dialog.getByRole("button", { name: /보내기/ }));
 
       expect(mockSend).toHaveBeenCalledTimes(1);
