@@ -28,6 +28,9 @@ export function useLeaveOnUnmount({
 }: UseLeaveOnUnmountOptions) {
   const isKickedRef = useRef(false);
   const isSessionTransitionRef = useRef(false);
+  // cleanup에서 예약한 leave 타이머. StrictMode의 모의 언마운트(mount→cleanup→mount)나
+  // 빠른 재마운트 시 다음 effect에서 취소하기 위해 ref로 유지한다.
+  const pendingLeaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // isKicked 상태를 ref에 동기화 (cleanup에서 최신 값 참조용)
   useEffect(() => {
@@ -42,6 +45,14 @@ export function useLeaveOnUnmount({
   useEffect(() => {
     if (!enabled) return;
 
+    // 직전 cleanup이 예약한 leave가 있으면 취소한다.
+    // StrictMode 모의 언마운트/재마운트나 warm cache로 인한 즉시 재마운트 시,
+    // 실제 이탈이 아님에도 leave가 발사되어 호스트가 세션에서 빠지는 문제를 방지.
+    if (pendingLeaveTimerRef.current) {
+      clearTimeout(pendingLeaveTimerRef.current);
+      pendingLeaveTimerRef.current = null;
+    }
+
     const leaveUrl = `/api/sessions/${sessionId}/leave`;
 
     const shouldSkipLeave = () =>
@@ -49,10 +60,15 @@ export function useLeaveOnUnmount({
 
     return () => {
       if (shouldSkipLeave()) return;
-      // 이탈 경로 실패는 의도적으로 무시 (좀비 멤버는 서버 SSE disconnect/타임아웃으로 정리)
-      fetch(leaveUrl, { method: "DELETE", keepalive: true, credentials: "include" }).catch(
-        () => {}
-      );
+      // leave를 매크로태스크로 지연 예약한다. 곧바로 재마운트되면(StrictMode 등)
+      // 위의 clearTimeout으로 취소되고, 실제 언마운트에서만 발사된다.
+      pendingLeaveTimerRef.current = setTimeout(() => {
+        pendingLeaveTimerRef.current = null;
+        // 이탈 경로 실패는 의도적으로 무시 (좀비 멤버는 서버 SSE disconnect/타임아웃으로 정리)
+        fetch(leaveUrl, { method: "DELETE", keepalive: true, credentials: "include" }).catch(
+          () => {}
+        );
+      }, 0);
     };
   }, [enabled, sessionId, isLeavingRef]);
 

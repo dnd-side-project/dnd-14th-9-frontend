@@ -106,6 +106,7 @@ export function LobbyHeader({
               size="small"
               onClick={() => {
                 // 수정 페이지로 이동해도 대기방 이탈(leave)이 호출되지 않도록 전환 플래그 설정
+                // (leave가 발생하면 복귀 시 SSE/캐시 불일치로 강퇴 오판이 생김)
                 if (sessionTransitionRef) sessionTransitionRef.current = true;
                 router.push(`/session/${sessionId}/edit`);
               }}
@@ -113,7 +114,7 @@ export function LobbyHeader({
               leftIcon={<EditIcon size="xsmall" />}
               className="max-md:p-xs max-md:w-8 max-md:min-w-0"
             >
-              <span className="max-md:hidden">수정</span>
+              <span className="max-md:hidden">수정하기</span>
             </Button>
             {!canManageSession && (
               <div className="pointer-events-none absolute top-full right-0 z-10 mt-1 opacity-0 transition-opacity group-hover:opacity-100">

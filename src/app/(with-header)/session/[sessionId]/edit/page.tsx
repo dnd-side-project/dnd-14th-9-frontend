@@ -18,12 +18,6 @@ export default async function SessionEditPage({ params }: SessionEditPageProps) 
 
   return (
     <main className="p-md md:p-xl xl:p-3xl mx-auto w-full max-w-7xl">
-      {/* 제목 섹션 */}
-      <header className="mb-xl md:mb-2xl">
-        <h1 className="text-lg leading-[140%] font-bold text-gray-50 md:text-2xl">세션 수정하기</h1>
-        <p className="mt-2xs text-[13px] text-gray-500 md:text-base">세션 정보를 수정해보세요</p>
-      </header>
-
       <HydrationBoundary state={dehydrate(queryClient)}>
         <SessionEditContent sessionId={sessionId} />
       </HydrationBoundary>

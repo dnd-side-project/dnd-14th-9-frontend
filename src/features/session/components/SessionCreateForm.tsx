@@ -40,10 +40,10 @@ import {
   SESSION_PARTICIPANTS_MAX,
   SESSION_PARTICIPANTS_MIN,
 } from "../constants/sessionLimits";
-import { useCreateSession, useDeleteSession, useUpdateSession } from "../hooks/useSessionHooks";
+import { useCreateSession, useUpdateSession } from "../hooks/useSessionHooks";
 import { validateSessionForm, type SessionFormErrors } from "../utils/validateSessionForm";
 
-import { SessionDeleteConfirmDialog } from "./SessionDeleteConfirmDialog";
+import { SessionCreateConfirmDialog } from "./SessionCreateConfirmDialog";
 
 import type { CreateSessionFormData } from "../schemas";
 import type { CreateSessionRequest, SessionDetailResponse, UpdateSessionRequest } from "../types";
@@ -124,13 +124,11 @@ export function SessionCreateForm({
   // validation / API 연동 상태
   const [formErrors, setFormErrors] = useState<SessionFormErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleteServerError, setDeleteServerError] = useState<string | null>(null);
+  const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const router = useRouter();
   const { mutate: createSession, isPending: isCreating } = useCreateSession();
   const { mutate: updateSession, isPending: isUpdating } = useUpdateSession();
-  const { mutate: deleteSession, isPending: isDeleting } = useDeleteSession();
-  const isPending = isCreating || isUpdating || isDeleting;
+  const isPending = isCreating || isUpdating;
 
   const clearFieldError = (field: keyof SessionFormErrors) => {
     setFormErrors((prev) => {
@@ -178,13 +176,10 @@ export function SessionCreateForm({
 
   useUnsavedChangesWarning(hasUnsavedChanges && !isPending);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setServerError(null);
-
-    // useState 값 → zod 스키마 형태로 매핑
-    // 수정 시 시작 시각을 바꾸지 않았다면 "현재+5분 이후" 미래 검증을 생략한다.
-    const validation = validateSessionForm(
+  // useState 값 → zod 스키마 형태로 매핑
+  // 수정 시 시작 시각을 바꾸지 않았다면 "현재+5분 이후" 미래 검증을 생략한다.
+  const validateForm = () =>
+    validateSessionForm(
       {
         title: roomName,
         summary: roomDescription,
@@ -199,17 +194,38 @@ export function SessionCreateForm({
       { enforceFutureStartTime: isEdit ? startTimeChanged : true }
     );
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setServerError(null);
+
+    const validation = validateForm();
+
     if (!validation.success) {
       setFormErrors(validation.errors);
       return;
     }
 
-    const { data } = validation;
-
     if (isEdit) {
-      handleUpdate(data);
+      handleUpdate(validation.data);
       return;
     }
+
+    // 생성은 확인 모달을 거친 뒤 제출한다.
+    setShowCreateConfirm(true);
+  };
+
+  // 생성 확인 모달의 "세션 만들기" 클릭: 재검증 후 제출
+  // (모달이 열려 있는 동안 시간이 지나 startTime 검증이 어긋날 수 있으므로 재검증)
+  const handleConfirmCreate = () => {
+    const validation = validateForm();
+
+    if (!validation.success) {
+      setShowCreateConfirm(false);
+      setFormErrors(validation.errors);
+      return;
+    }
+
+    const { data } = validation;
 
     // CreateSessionRequest 구성 (Date → ISO 문자열 변환)
     const body: CreateSessionRequest = {
@@ -229,6 +245,7 @@ export function SessionCreateForm({
       {
         onSuccess: () => router.push("/"),
         onError: (error) => {
+          setShowCreateConfirm(false);
           const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
           setServerError(message);
           toast.error(message);
@@ -280,25 +297,6 @@ export function SessionCreateForm({
         },
       }
     );
-  };
-
-  // edit 모드 세션 삭제 (확인 다이얼로그 → DELETE)
-  const handleDelete = () => {
-    if (!sessionId) return;
-    setDeleteServerError(null);
-
-    deleteSession(sessionId, {
-      onSuccess: () => {
-        setShowDeleteDialog(false);
-        toast.success("세션이 삭제되었어요.");
-        router.push("/");
-      },
-      onError: (error) => {
-        const message = error instanceof ApiError ? error.message : DEFAULT_API_ERROR_MESSAGE;
-        setDeleteServerError(message);
-        toast.error(message);
-      },
-    });
   };
 
   return (
@@ -588,32 +586,11 @@ export function SessionCreateForm({
         </Button>
       </div>
 
-      {/* 세션 삭제 (edit 모드 전용) */}
-      {isEdit && (
-        <div className="mb-10 flex justify-center md:mb-20">
-          <Button
-            type="button"
-            variant="ghost"
-            colorScheme="secondary"
-            size="medium"
-            onClick={() => {
-              setDeleteServerError(null);
-              setShowDeleteDialog(true);
-            }}
-            disabled={isPending}
-            className="text-status-error"
-          >
-            세션 삭제하기
-          </Button>
-        </div>
-      )}
-
-      {showDeleteDialog && (
-        <SessionDeleteConfirmDialog
-          onClose={() => setShowDeleteDialog(false)}
-          onConfirm={handleDelete}
-          isPending={isDeleting}
-          serverError={deleteServerError}
+      {showCreateConfirm && (
+        <SessionCreateConfirmDialog
+          onClose={() => setShowCreateConfirm(false)}
+          onConfirm={handleConfirmCreate}
+          isPending={isCreating}
         />
       )}
     </form>
