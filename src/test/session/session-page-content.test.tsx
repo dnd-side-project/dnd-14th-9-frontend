@@ -68,9 +68,12 @@ jest.mock("@/features/session/components/SessionGoalAndTodoCard/SessionGoalAndTo
   SessionGoalAndTodoCard: () => <div data-testid="session-goal-card" />,
 }));
 
-jest.mock("@/features/session/components/SessionParticipantListCard", () => ({
-  SessionParticipantListCard: () => <div data-testid="session-participant-card" />,
-}));
+jest.mock(
+  "@/features/session/components/SessionParticipantListCard/SessionParticipantListCard",
+  () => ({
+    SessionParticipantListCard: () => <div data-testid="session-participant-card" />,
+  })
+);
 
 describe("SessionPageContent", () => {
   beforeEach(() => {

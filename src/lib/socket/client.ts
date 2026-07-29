@@ -2,15 +2,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Client, type IFrame, type IMessage } from "@stomp/stompjs";
 
-import type {
-  SessionEvent,
-  SessionCommand,
-  SessionEventType,
-  EventData,
-  ConnectionStatus,
-} from "./types";
+import type { ChatError, ChatReceivedMessage, ChatSendPayload, ConnectionStatus } from "./types";
 
-type EventCallback<T extends SessionEventType> = (data: EventData<T>) => void;
+type ChatEventMap = {
+  message: ChatReceivedMessage;
+  error: ChatError;
+  status: ConnectionStatus;
+};
+
+type ChatEventCallback<T extends keyof ChatEventMap> = (data: ChatEventMap[T]) => void;
 
 interface SocketOptions {
   maxReconnectAttempts?: number;
@@ -26,14 +26,14 @@ const DEFAULT_OPTIONS: Required<SocketOptions> = {
   debug: process.env.NODE_ENV === "development",
 };
 
-class SessionSocket {
+class ChatSocket {
   private client: Client | null = null;
-  private listeners = new Map<string, Set<EventCallback<any>>>();
+  private listeners = new Map<keyof ChatEventMap, Set<ChatEventCallback<any>>>();
   private reconnectAttempts = 0;
+  private reconnectTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private options: Required<SocketOptions>;
   private sessionId: string | null = null;
   private token: string | null = null;
-  private intentionalDisconnect = false;
 
   private _status: ConnectionStatus = "idle";
 
@@ -58,11 +58,16 @@ class SessionSocket {
 
   private log(message: string, level: "log" | "warn" | "error" = "log"): void {
     if (!this.options.debug) return;
-    const prefix = "[SessionSocket]";
+    const prefix = "[ChatSocket]";
     console[level](`${prefix} ${message}`);
   }
 
-  private emit<T extends SessionEventType>(event: T | "disconnected", data: any): void {
+  private setStatus(status: ConnectionStatus): void {
+    this._status = status;
+    this.emit("status", status);
+  }
+
+  private emit<T extends keyof ChatEventMap>(event: T, data: ChatEventMap[T]): void {
     this.listeners.get(event)?.forEach((callback) => {
       try {
         callback(data);
@@ -81,10 +86,13 @@ class SessionSocket {
 
     const brokerURL = this.buildBrokerURL();
 
-    this.client = new Client({
+    // 이 콜백들이 속한 client 인스턴스를 클로저에 캡처한다. deactivate()는 비동기라
+    // 폐기된 client의 close 이벤트가 뒤늦게 도착하는데, this.client와 비교해 "지금
+    // 살아있는 client의 이벤트"만 처리하기 위함이다.
+    const client = new Client({
       brokerURL,
       connectHeaders: {
-        token: this.token,
+        Authorization: `Bearer ${this.token}`,
       },
       debug: (str: string) => {
         if (this.options.debug) {
@@ -96,40 +104,59 @@ class SessionSocket {
 
       onConnect: () => {
         this.log("Connected");
-        this._status = "connected";
+        this.setStatus("connected");
         this.reconnectAttempts = 0;
 
-        // 세션 토픽 구독
-        if (this.client && this.sessionId) {
-          this.client.subscribe(`/topic/session/${this.sessionId}`, (message: IMessage) => {
-            try {
-              const event: SessionEvent = JSON.parse(message.body);
-              this.log(`Received ${event.type}`);
-              this.emit(event.type, event.data);
-            } catch (error) {
-              const errorMessage = error instanceof Error ? error.message : "Unknown error";
-              this.log(errorMessage, "error");
-              this.log(`Failed to parse message: ${message.body}`, "error");
-            }
-          });
-        }
-      },
+        if (!this.sessionId) return;
 
-      onStompError: (frame: IFrame) => {
-        this.log(`STOMP error: ${frame.headers["message"]}`, "error");
-        this.log(`Details: ${frame.body}`, "error");
-        this.emit("error", {
-          code: "UNKNOWN",
-          message: frame.headers["message"] || "STOMP error occurred",
+        // 채팅 메시지 구독
+        client.subscribe(`/sub/chat/${this.sessionId}`, (message: IMessage) => {
+          try {
+            const chatMessage: ChatReceivedMessage = JSON.parse(message.body);
+            this.log(`Received message from ${chatMessage.memberId}`);
+            this.emit("message", chatMessage);
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            this.log(errorMessage, "error");
+            this.log(`Failed to parse message: ${message.body}`, "error");
+          }
+        });
+
+        // 채팅 에러 구독
+        client.subscribe(`/user/queue/chat/error`, (message: IMessage) => {
+          try {
+            const chatError: ChatError = JSON.parse(message.body);
+            this.log(`Received error: ${chatError.code}`, "error");
+            this.emit("error", chatError);
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            this.log(errorMessage, "error");
+            this.log(`Failed to parse error message: ${message.body}`, "error");
+          }
         });
       },
 
+      onStompError: (frame: IFrame) => {
+        // 이미 교체·폐기된 client가 뒤늦게 쏜 error는 무시한다 (onWebSocketClose와 대칭)
+        if (this.client !== client) return;
+
+        this.log(`STOMP error: ${frame.headers["message"]}`, "error");
+        this.log(`Details: ${frame.body}`, "error");
+        // STOMP CONNECT 거부(토큰 없음/만료 등)는 연결 실패이지 /user/queue/chat/error
+        // 계약(CHAT400/SESSION400_5/SESSION403_01)에 속하지 않으므로 error 이벤트로
+        // 위조해 emit하지 않고, 연결 실패로 취급해 재연결 로직을 태운다.
+        this.setStatus("disconnected");
+        this.discardClient();
+        this.tryReconnect();
+      },
+
       onWebSocketClose: () => {
-        if (this.intentionalDisconnect) return;
+        // 이미 교체·폐기된 client가 뒤늦게 쏜 close는 무시한다
+        if (this.client !== client) return;
 
         this.log("WebSocket closed");
-        this._status = "disconnected";
-        this.emit("disconnected", { code: 1006, reason: "Connection lost" });
+        this.setStatus("disconnected");
+        this.discardClient();
         this.tryReconnect();
       },
 
@@ -138,6 +165,8 @@ class SessionSocket {
         console.error(event);
       },
     });
+
+    this.client = client;
   }
 
   private tryReconnect(): void {
@@ -151,7 +180,7 @@ class SessionSocket {
     }
 
     this.reconnectAttempts++;
-    this._status = "reconnecting";
+    this.setStatus("reconnecting");
 
     // 지수백오프 알고리즘: 1초 -> 2초 -> 4초 -> 8초 -> 16초 -> 최대 30초
     const exponentialDelay =
@@ -159,27 +188,37 @@ class SessionSocket {
     const delay = Math.min(exponentialDelay, this.options.maxReconnectDelay);
     this.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
 
-    setTimeout(() => {
+    this.reconnectTimeoutId = setTimeout(() => {
       if (this.sessionId && this.token) {
         this.connect(this.sessionId, this.token);
       }
     }, delay);
   }
 
-  private cleanup(): void {
-    this.intentionalDisconnect = true;
+  // stomp.js의 client.active는 activate() 이후 deactivate()를 호출하기 전까지 true로
+  // 유지된다 — 네트워크가 끊겨 onWebSocketClose/onStompError가 발생해도 자동으로
+  // false가 되지 않는다. 그대로 두면 connect()의 "이미 활성 연결"(active) 가드가
+  // 재연결 시도를 막아버리므로, 재연결 전에 반드시 기존 client를 명시적으로
+  // 정리(deactivate + null)해야 한다. this.client를 null로 비우면 폐기된 client의
+  // 뒤늦은 onWebSocketClose가 신원 비교(this.client !== client)에서 걸러진다.
+  private discardClient(): void {
+    if (!this.client) return;
 
-    if (this.client) {
-      this.client.deactivate();
-    }
-
+    this.client.deactivate();
     this.client = null;
+  }
+
+  private cleanup(): void {
+    if (this.reconnectTimeoutId) {
+      clearTimeout(this.reconnectTimeoutId);
+      this.reconnectTimeoutId = null;
+    }
+    this.discardClient();
     this.sessionId = null;
     this.token = null;
-    this._status = "idle";
     this.reconnectAttempts = 0;
-    this.intentionalDisconnect = false;
     this.removeAllListeners();
+    this.setStatus("idle");
   }
 
   connect(sessionId: string, token: string): void {
@@ -189,16 +228,11 @@ class SessionSocket {
     }
 
     // 기존 클라이언트 정리
-    if (this.client) {
-      this.intentionalDisconnect = true;
-      this.client.deactivate();
-      this.intentionalDisconnect = false;
-      this.client = null;
-    }
+    this.discardClient();
 
     this.sessionId = sessionId;
     this.token = token;
-    this._status = "connecting";
+    this.setStatus("connecting");
 
     this.log(`Connecting to session: ${sessionId}`);
 
@@ -213,23 +247,21 @@ class SessionSocket {
     this.cleanup();
   }
 
-  send(command: SessionCommand): void {
-    if (!this.client?.connected) {
+  send(payload: ChatSendPayload): void {
+    if (!this.client?.connected || !this.sessionId) {
       this.log("Cannot send: STOMP client not connected", "warn");
       return;
     }
 
-    this.log(`Sending: ${command.type}`);
+    this.log(`Sending: ${payload.type}`);
 
-    // destination: /app/{commandType}
-    const payload = "data" in command ? command.data : {};
     this.client.publish({
-      destination: `/app/${command.type}`,
+      destination: `/pub/chat/${this.sessionId}`,
       body: JSON.stringify(payload),
     });
   }
 
-  on<T extends SessionEventType>(event: T, callback: EventCallback<T>): () => void {
+  on<T extends keyof ChatEventMap>(event: T, callback: ChatEventCallback<T>): () => void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
     }
@@ -239,69 +271,14 @@ class SessionSocket {
     return () => this.listeners.get(event)?.delete(callback);
   }
 
-  off<T extends SessionEventType>(event: T, callback?: EventCallback<T>): void {
-    if (callback) {
-      this.listeners.get(event)?.delete(callback);
-    } else {
-      this.listeners.delete(event);
-    }
-  }
-
   removeAllListeners(): void {
     this.listeners.clear();
   }
 }
 
-// 싱글톤 인스턴스
-export const sessionSocket = new SessionSocket();
-
-// 새 인스턴스 생성용 (테스트 등)
-export function createSessionSocket(options?: SocketOptions): SessionSocket {
-  return new SessionSocket(options);
+// 채팅 다이얼로그 마운트마다 새 인스턴스를 만들어 쓴다 (컴포넌트 언마운트 시 disconnect)
+export function createChatSocket(options?: SocketOptions): ChatSocket {
+  return new ChatSocket(options);
 }
 
-// 사용 예시
-/**
- * import { sessionSocket } from '@/lib/socket/client';
- *
- * // 1. 연결 전 이벤트 리스너 등록
- * const unsubJoin = sessionSocket.on('participant:join', (participant) => {
- *   console.log('New participant:', participant);
- * });
- *
- * const unsubError = sessionSocket.on('error', (error) => {
- *   console.error('Session error:', error.message);
- * });
- *
- * // 2. 연결
- * sessionSocket.connect(sessionId, token);
- *
- * // 3. 연결 상태 확인
- * console.log(sessionSocket.status); // 'connecting' -> 'connected'
- *
- * // 4. 커맨드 전송
- * sessionSocket.send({ type: 'ready' });
- * sessionSocket.send({ type: 'goal:set', data: { goal: '오늘의 목표' } });
- * sessionSocket.send({ type: 'session:start' }); // 호스트 전용
- *
- * // 5. 연결 해제 시 정리 (컴포넌트 언마운트 시)
- * sessionSocket.disconnect();
- * unsubJoin();
- * unsubError();
- *
- * // React 컴포넌트 예시:
- * useEffect(() => {
- *   const unsubscribes = [
- *     sessionSocket.on('participant:join', handleJoin),
- *     sessionSocket.on('participant:leave', handleLeave),
- *     sessionSocket.on('error', handleError),
- *   ];
- *
- *   sessionSocket.connect(sessionId, token);
- *
- *   return () => {
- *     sessionSocket.disconnect();
- *     unsubscribes.forEach(unsub => unsub());
- *   };
- * }, [sessionId, token]);
- */
+export type { ChatSocket };

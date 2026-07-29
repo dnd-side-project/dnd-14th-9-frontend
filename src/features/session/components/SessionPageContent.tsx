@@ -27,7 +27,7 @@ import { SessionDetailSection } from "./SessionDetailSection";
 import { SessionGoalAndTodoCard } from "./SessionGoalAndTodoCard/SessionGoalAndTodoCard";
 import { SessionHeader } from "./SessionHeader";
 import { SessionPageContentSkeleton } from "./SessionPageContentSkeleton";
-import { SessionParticipantListCard } from "./SessionParticipantListCard";
+import { SessionParticipantListCard } from "./SessionParticipantListCard/SessionParticipantListCard";
 import { SessionTimerSection } from "./SessionTimerSection";
 
 interface SessionPageContentProps {
@@ -178,6 +178,13 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
           members={inProgressData?.members}
           participantCount={inProgressData?.participantCount}
           averageAchievementRate={inProgressData?.averageAchievementRate}
+          sessionId={sessionId}
+          isHost={myMember?.role === "HOST"}
+          myMemberId={myMemberId}
+          category={session.category}
+          title={session.title}
+          description={session.summary}
+          notice={session.notice}
         />
       </div>
     </div>
