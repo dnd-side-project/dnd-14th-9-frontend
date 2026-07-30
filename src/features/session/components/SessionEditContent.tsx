@@ -72,7 +72,7 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
             }}
             disabled={isDeleting}
             leftIcon={<TrashIcon size="xsmall" />}
-            className="text-text-status-negative-default border-border-error-subtler shrink-0"
+            className="text-text-status-negative-default border-border-error-subtler hover:text-text-status-negative-subtle active:text-text-status-negative-default active:border-border-error-default shrink-0"
           >
             삭제하기
           </Button>
