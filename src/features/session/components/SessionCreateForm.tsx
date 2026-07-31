@@ -157,7 +157,7 @@ export function SessionCreateForm({
         achievementRange !== (initialValues.requiredAchievementRate ?? 0) ||
         focusRange !== (initialValues.requiredFocusRate ?? 0) ||
         selectedImage !== null ||
-        removedInitialImage
+        (removedInitialImage && !!initialImageUrl)
       : false;
 
   const createDirty =
@@ -278,6 +278,12 @@ export function SessionCreateForm({
     }
 
     const image = selectedImage ?? undefined;
+    // 기존 썸네일을 삭제한 채 새 이미지를 올리지 않았다면 삭제 의도를 전달한다.
+    // (image 파트가 있으면 서버가 deleteImage를 무시하고 교체하므로 교체 시에는 보내지 않는다)
+    if (!image && removedInitialImage && initialImageUrl) {
+      body.deleteImage = true;
+    }
+
     if (Object.keys(body).length === 0 && !image) {
       toast.info("변경된 내용이 없어요.");
       return;

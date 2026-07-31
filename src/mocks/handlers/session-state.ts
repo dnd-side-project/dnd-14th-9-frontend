@@ -406,6 +406,9 @@ export function updateMockSession(sessionId: number, body: UpdateSessionRequest)
   if (body.requiredAchievementRate !== undefined) {
     session.requiredAchievementRate = body.requiredAchievementRate;
   }
+  // 실제 서버는 image 파트가 있으면 deleteImage를 무시하지만,
+  // mock은 image 파트를 저장하지 않으므로 deleteImage만 반영한다.
+  if (body.deleteImage) session.imageUrl = "";
 }
 
 export function deleteMockSession(sessionId: number): void {
