@@ -99,15 +99,11 @@ export function SessionCreateForm({
   const closeDatePicker = () => setIsDatePickerOpen(false);
   useClickOutside(datePickerContainerRef, closeDatePicker, isDatePickerOpen);
 
-  // 새로 선택한 파일의 blob 미리보기 URL (정리 대상)
-  const selectedImageUrl = selectedImage ? URL.createObjectURL(selectedImage) : null;
+  // 새로 선택한 파일의 blob 미리보기 URL.
+  // 렌더 중 URL.createObjectURL을 호출하면 무관한 리렌더마다 새 URL이 생성되어
+  // 이미지가 재로딩되므로, 파일 선택/삭제 이벤트에서만 생성하고 effect는 해제만 담당한다.
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
 
-  // edit 모드에서 기존 썸네일: 새 파일이 없고 삭제하지 않았을 때만 노출
-  const initialImageUrl = initialValues?.imageUrl || null;
-  const showInitialImage = !selectedImage && !removedInitialImage && !!initialImageUrl;
-  const imagePreviewUrl = selectedImageUrl ?? (showInitialImage ? initialImageUrl : null);
-
-  // blob 미리보기 URL 정리 (메모리 누수 방지) — 원격 URL은 정리 대상 아님
   useEffect(() => {
     return () => {
       if (selectedImageUrl) {
@@ -116,8 +112,19 @@ export function SessionCreateForm({
     };
   }, [selectedImageUrl]);
 
+  const handleImageSelect = (file: File | null) => {
+    setSelectedImage(file);
+    setSelectedImageUrl(file ? URL.createObjectURL(file) : null);
+  };
+
+  // edit 모드에서 기존 썸네일: 새 파일이 없고 삭제하지 않았을 때만 노출
+  const initialImageUrl = initialValues?.imageUrl || null;
+  const showInitialImage = !selectedImage && !removedInitialImage && !!initialImageUrl;
+  const imagePreviewUrl = selectedImageUrl ?? (showInitialImage ? initialImageUrl : null);
+
   const handleImageRemove = () => {
     setSelectedImage(null);
+    setSelectedImageUrl(null);
     setRemovedInitialImage(true);
   };
 
@@ -390,7 +397,7 @@ export function SessionCreateForm({
             <ImageUploader
               hintText="최대 5MB 파일만 업로드 가능해요"
               accept="image/jpeg,image/png"
-              onFileSelect={setSelectedImage}
+              onFileSelect={handleImageSelect}
             />
           )}
           <span className="text-text-secondary text-sm">* .jpg, .png 파일만 가능해요</span>
