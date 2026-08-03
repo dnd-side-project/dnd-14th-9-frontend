@@ -15,6 +15,7 @@ import type {
   SubmitSessionResultRequest,
   SubmitSessionResultResponse,
   ToggleMyStatusResponse,
+  UpdateSessionRequest,
   WaitingRoomResponse,
 } from "@/features/session/types";
 import type { CreateSubtaskItem, CreateSubtaskResponse } from "@/features/task/api";
@@ -366,7 +367,7 @@ export function resetMockSessions(): void {
   sessions = createInitialSessions();
 }
 
-export function createMockSession(body: CreateSessionRequest): CreateSessionResponse {
+export function createMockSession(body: CreateSessionRequest, image?: Blob): CreateSessionResponse {
   const sessionId = nextSessionId++;
   sessions.unshift({
     sessionId,
@@ -377,7 +378,7 @@ export function createMockSession(body: CreateSessionRequest): CreateSessionResp
     maxParticipants: body.maxParticipants,
     sessionDurationMinutes: body.sessionDurationMinutes,
     startTime: body.startTime,
-    imageUrl: "",
+    imageUrl: image ? toMockImageUrl(sessionId, image) : "",
     summary: body.summary,
     notice: body.notice,
     requiredFocusRate: body.requiredFocusRate,
@@ -386,6 +387,61 @@ export function createMockSession(body: CreateSessionRequest): CreateSessionResp
   });
 
   return { createdSessionId: sessionId };
+}
+
+/**
+ * 업로드된 이미지 파트를 미리보기 가능한 URL로 변환한다.
+ * 브라우저(mock 모드)에서는 blob URL로 실제 렌더링이 되고,
+ * URL.createObjectURL이 없는 환경(jsdom 등)에서는 식별 가능한 가짜 URL을 반환한다.
+ */
+function toMockImageUrl(sessionId: number, image: Blob): string {
+  if (typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
+    return URL.createObjectURL(image);
+  }
+  return `mock://sessions/${sessionId}/thumbnail`;
+}
+
+function releaseMockImageUrl(imageUrl: string): void {
+  if (imageUrl.startsWith("blob:") && typeof URL.revokeObjectURL === "function") {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
+export function updateMockSession(
+  sessionId: number,
+  body: UpdateSessionRequest,
+  image?: Blob
+): void {
+  const session = getSessionOrThrow(sessionId);
+
+  // 부분 수정: 정의된 필드만 덮어쓴다.
+  if (body.title !== undefined) session.title = body.title;
+  if (body.summary !== undefined) session.summary = body.summary;
+  if (body.notice !== undefined) session.notice = body.notice;
+  if (body.category !== undefined) session.category = body.category;
+  if (body.startTime !== undefined) session.startTime = body.startTime;
+  if (body.sessionDurationMinutes !== undefined) {
+    session.sessionDurationMinutes = body.sessionDurationMinutes;
+  }
+  if (body.maxParticipants !== undefined) session.maxParticipants = body.maxParticipants;
+  if (body.requiredFocusRate !== undefined) session.requiredFocusRate = body.requiredFocusRate;
+  if (body.requiredAchievementRate !== undefined) {
+    session.requiredAchievementRate = body.requiredAchievementRate;
+  }
+  // 이미지 우선순위 (실서버 명세와 동일):
+  // image 파트가 있으면 deleteImage와 무관하게 교체, 없고 deleteImage=true면 삭제, 둘 다 없으면 유지
+  if (image) {
+    releaseMockImageUrl(session.imageUrl);
+    session.imageUrl = toMockImageUrl(sessionId, image);
+  } else if (body.deleteImage) {
+    releaseMockImageUrl(session.imageUrl);
+    session.imageUrl = "";
+  }
+}
+
+export function deleteMockSession(sessionId: number): void {
+  getSessionOrThrow(sessionId); // 미존재 시 MockSessionNotFoundError
+  sessions = sessions.filter((session) => session.sessionId !== sessionId);
 }
 
 export function getMockSessionList(params: SessionListParams = {}): SessionListResponse {

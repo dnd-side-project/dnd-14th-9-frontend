@@ -18,6 +18,7 @@ import type {
   SubmitSessionResultRequest,
   SubmitSessionResultResponse,
   ToggleMyStatusResponse,
+  UpdateSessionRequest,
   WaitingRoomResponse,
 } from "./types";
 
@@ -45,6 +46,23 @@ export const sessionApi = {
       formData.append("image", image);
     }
     return api.post<ApiSuccessResponse<CreateSessionResponse>>("/api/sessions/create", formData);
+  },
+
+  updateSession: async (
+    sessionId: string,
+    body: UpdateSessionRequest,
+    image?: File
+  ): Promise<ApiSuccessResponse<null>> => {
+    const formData = new FormData();
+    formData.append("request", new Blob([JSON.stringify(body)], { type: "application/json" }));
+    if (image) {
+      formData.append("image", image);
+    }
+    return api.patch<ApiSuccessResponse<null>>(`/api/sessions/${sessionId}`, formData);
+  },
+
+  deleteSession: async (sessionId: string): Promise<ApiSuccessResponse<null>> => {
+    return api.delete<ApiSuccessResponse<null>>(`/api/sessions/${sessionId}`);
   },
 
   join: async (

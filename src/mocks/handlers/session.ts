@@ -6,11 +6,13 @@ import type {
   SendReactionRequest,
   SessionListParams,
   SubmitSessionResultRequest,
+  UpdateSessionRequest,
 } from "@/features/session/types";
 
-import { MockJsonParseError, readRequiredJson, readRequiredMultipartJsonPart } from "./json";
+import { MockJsonParseError, parseRequiredMultipartJsonPart, readRequiredJson } from "./json";
 import {
   createMockSession,
+  deleteMockSession,
   getMockInProgress,
   getMockMyReport,
   getMockSessionDetail,
@@ -23,6 +25,7 @@ import {
   sendMockReaction,
   submitMockSessionResult,
   toggleMockMyStatus,
+  updateMockSession,
   MockMemberNotFoundError,
   MockSessionNotFoundError,
 } from "./session-state";
@@ -73,19 +76,45 @@ export const sessionHandlers = [
   }),
 
   http.post("*/api/sessions/create", ({ request }) => {
-    return sessionJson(async () =>
-      createMockSession(
-        await readRequiredMultipartJsonPart<CreateSessionRequest>(
-          request,
-          "request",
-          "session create"
-        )
-      )
-    );
+    return sessionJson(async () => {
+      // formData()는 body를 소비하므로 한 번만 읽고 request/image 파트를 함께 추출한다.
+      const formData = await request.formData();
+      const body = await parseRequiredMultipartJsonPart<CreateSessionRequest>(
+        formData,
+        "request",
+        "session create"
+      );
+      const imagePart = formData.get("image");
+      const image = imagePart instanceof Blob ? imagePart : undefined;
+      return createMockSession(body, image);
+    });
   }),
 
   http.get("*/api/sessions/:sessionId", ({ params }) => {
     return sessionJson(() => getMockSessionDetail(toSessionId(params.sessionId)));
+  }),
+
+  http.patch("*/api/sessions/:sessionId", async ({ request, params }) => {
+    return sessionJson(async () => {
+      // formData()는 body를 소비하므로 한 번만 읽고 request/image 파트를 함께 추출한다.
+      const formData = await request.formData();
+      const body = await parseRequiredMultipartJsonPart<UpdateSessionRequest>(
+        formData,
+        "request",
+        "session update"
+      );
+      const imagePart = formData.get("image");
+      const image = imagePart instanceof Blob ? imagePart : undefined;
+      updateMockSession(toSessionId(params.sessionId), body, image);
+      return null;
+    });
+  }),
+
+  http.delete("*/api/sessions/:sessionId", ({ params }) => {
+    return sessionJson(() => {
+      deleteMockSession(toSessionId(params.sessionId));
+      return null;
+    });
   }),
 
   http.get("*/api/sessions/:sessionId/report", ({ params }) => {

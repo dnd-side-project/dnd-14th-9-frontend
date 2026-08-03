@@ -29,3 +29,14 @@ export const CATEGORY_LABELS: Record<CategoryFilter, string> = {
 export function getCategoryLabel(category: CategoryFilter): string {
   return CATEGORY_LABELS[category];
 }
+
+/**
+ * 한글 카테고리 라벨을 Category enum 값으로 역변환합니다.
+ *
+ * 세션 상세 응답의 category는 한글 라벨("개발")로 오지만,
+ * 수정 요청·폼 상태는 enum 값("DEVELOPMENT")을 요구하므로 프리필 시 사용합니다.
+ * "전체"(ALL)는 선택 대상이 아니므로 제외하며, 매칭되는 값이 없으면 null을 반환합니다.
+ */
+export function getCategoryValue(label: string): Category | null {
+  return ONBOARDING_CATEGORIES.find((category) => CATEGORY_LABELS[category] === label) ?? null;
+}

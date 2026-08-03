@@ -15,3 +15,32 @@ export async function GET(
     forwardRequestCookies: true,
   });
 }
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ sessionId: string }> }
+) {
+  const { sessionId } = await params;
+
+  return forwardToBackend({
+    request,
+    method: "PATCH",
+    pathWithQuery: `/sessions/${sessionId}`,
+    includeRequestBody: "formData",
+    forwardRequestCookies: true,
+  });
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ sessionId: string }> }
+) {
+  const { sessionId } = await params;
+
+  return forwardToBackend({
+    request,
+    method: "DELETE",
+    pathWithQuery: `/sessions/${sessionId}`,
+    forwardRequestCookies: true,
+  });
+}

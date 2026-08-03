@@ -127,6 +127,18 @@ export interface CreateSessionResponse {
   createdSessionId: number;
 }
 
+// 세션 수정 요청
+// PATCH /sessions/{sessionId} - 수정하려는 필드만 포함 (부분 수정)
+// 응답은 result가 없는 void(ApiSuccessResponse<null>)이므로 별도 응답 타입 없음
+export type UpdateSessionRequest = Partial<CreateSessionRequest> & {
+  /**
+   * 썸네일 삭제 유무.
+   * - image 파트가 있으면 서버가 무시하고 교체를 수행하므로, 교체 시에는 보내지 않는다.
+   * - image 파트 없이 true면 기존 이미지만 삭제 (썸네일 없음 상태)
+   */
+  deleteImage?: boolean;
+};
+
 // ============================================
 // 세션 참여 API 관련 타입
 // ============================================

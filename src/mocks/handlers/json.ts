@@ -21,18 +21,25 @@ export async function readRequiredJson<T>(request: Request, context: string): Pr
   return parseRequiredJsonText<T>(await request.text(), context);
 }
 
-export async function readRequiredMultipartJsonPart<T>(
-  request: Request,
+export async function parseRequiredMultipartJsonPart<T>(
+  formData: FormData,
   key: string,
   context: string
 ): Promise<T> {
-  const formData = await request.formData();
   const part = formData.get(key);
   if (!(part instanceof Blob)) {
     throw new MockJsonParseError(`${context} ${key} part is required`);
   }
 
   return parseRequiredJsonText<T>(await part.text(), context);
+}
+
+export async function readRequiredMultipartJsonPart<T>(
+  request: Request,
+  key: string,
+  context: string
+): Promise<T> {
+  return parseRequiredMultipartJsonPart<T>(await request.formData(), key, context);
 }
 
 export async function requireMultipartPart(
