@@ -19,7 +19,7 @@ export default function ActivitySummaryCard({
   focusedTimeLabel = "총 집중 시간",
   participationTimeLabel = "전체 참여 시간",
   achievementRate,
-  achievementRateLabel = "목표 달성율",
+  achievementRateLabel = "목표 달성률",
 }: ActivitySummaryCardProps) {
   return (
     <ReportCard>
