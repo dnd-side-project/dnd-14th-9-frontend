@@ -1,6 +1,7 @@
 import ActivitySummaryCard from "@/features/member/components/Profile/Report/ActivitySummaryCard";
 import { sessionApi } from "@/features/session/api";
 import { SessionDetailSection } from "@/features/session/components/SessionDetailSection";
+import { handleSessionNotFound } from "@/features/session/utils/handleSessionNotFound";
 import {
   mapEmojiResultToItems,
   mapMemberResultToActivitySummary,
@@ -17,10 +18,21 @@ interface SessionResultContentProps {
 }
 
 export async function SessionResultContent({ sessionId }: SessionResultContentProps) {
-  const [myReportData, sessionDetailData] = await Promise.all([
+  const [myReportResult, sessionDetailResult] = await Promise.allSettled([
     sessionApi.getMyReport(sessionId),
     sessionApi.getDetail(sessionId),
   ]);
+
+  // 세션 상세의 404(삭제/미존재)를 먼저 판정해 not-found 페이지로 안내한다.
+  if (sessionDetailResult.status === "rejected") {
+    handleSessionNotFound(sessionDetailResult.reason);
+  }
+  if (myReportResult.status === "rejected") {
+    throw myReportResult.reason;
+  }
+
+  const myReportData = myReportResult.value;
+  const sessionDetailData = sessionDetailResult.value;
 
   const memberResult = myReportData?.result?.sessionMemberResult;
   const sessionDetail = sessionDetailData?.result;
@@ -56,7 +68,6 @@ export async function SessionResultContent({ sessionId }: SessionResultContentPr
           title="나의 활동 요약"
           participationTimeLabel="전체 참여 시간"
           achievementRate={memberResult.achievementRate}
-          achievementRateLabel="목표 달성율"
         />
         <RealtimeMemberEmojiCard
           sessionId={sessionId}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 
 import { Button } from "@/components/Button/Button";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
@@ -60,6 +60,10 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
     ) ??
       false);
   const canManage = isEditable && isHost;
+  // 삭제되었거나 존재하지 않는 세션이면 세션 not-found 페이지로 안내
+  if (error instanceof ApiError && error.status === 404) {
+    notFound();
+  }
 
   const handleDelete = () => {
     setDeleteServerError(null);
