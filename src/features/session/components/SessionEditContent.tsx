@@ -8,7 +8,6 @@ import { Button } from "@/components/Button/Button";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { TrashIcon } from "@/components/Icon/TrashIcon";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
-import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
@@ -29,8 +28,12 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
   const authState = useAuthState();
   const isAuthenticated = authState.status === "authenticated";
   const { data, isLoading, error, refetch } = useSessionDetail(sessionId);
-  const { data: meData, isLoading: isMeLoading } = useMe({ enabled: isAuthenticated });
-  const { data: waitingRoomData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
+  const {
+    data: waitingRoomData,
+    isLoading: isWaitingRoomLoading,
+    error: waitingRoomError,
+    refetch: refetchWaitingRoom,
+  } = useWaitingRoom(sessionId, {
     enabled: isAuthenticated,
   });
 
@@ -39,17 +42,19 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
   const { mutate: deleteSession, isPending: isDeleting } = useDeleteSession();
 
   const isAuthDataLoading =
-    authState.status === "recovering" || (isAuthenticated && (isMeLoading || isWaitingRoomLoading));
+    authState.status === "recovering" || (isAuthenticated && isWaitingRoomLoading);
 
   const session = data?.result;
   // 대기 중인 세션만 수정/삭제 가능 (백엔드 SESSION400_12/14 사전 차단)
   const isEditable = !!session && isWaitingStatus(session.status);
 
   // 호스트만 수정/삭제 가능 — 세션 상세 API에는 호스트 식별자가 없어 대기방 멤버의 role로 판별한다.
-  // 대기방 조회 실패·미참여 시에는 isHost=false로 남아 폼이 열리지 않는다(fail-closed).
-  const myMemberId = meData?.result?.id;
+  // 대기방 조회 실패는 "권한 없음"과 구분해야 한다. 실패를 그대로 fail-closed 처리하면
+  // 실제 호스트에게도 권한 안내가 뜨므로, 재시도 가능한 오류 화면으로 분기한다.
+  const myMemberId = isAuthenticated ? authState.profile.id : undefined;
   const isHost =
-    !!myMemberId &&
+    !waitingRoomError &&
+    myMemberId !== undefined &&
     (waitingRoomData?.result?.members?.some(
       (member) => member.memberId === myMemberId && member.role === "HOST"
     ) ??
@@ -127,6 +132,14 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
           description="세션을 수정하려면 로그인이 필요합니다."
           buttonLabel="로그인하기"
           href={LOGIN_ROUTE}
+        />
+      ) : waitingRoomError ? (
+        <ErrorFallbackUI
+          className="py-20"
+          title="수정 권한을 확인할 수 없어요"
+          description="권한 정보를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요."
+          buttonLabel="다시 시도하기"
+          onRetry={() => void refetchWaitingRoom()}
         />
       ) : !isHost ? (
         <ErrorFallbackUI

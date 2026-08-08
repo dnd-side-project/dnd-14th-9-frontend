@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { SessionEditContent } from "@/features/session/components/SessionEditContent";
 
 const mockUseAuthState = jest.fn();
 const mockUseSessionDetail = jest.fn();
 const mockUseWaitingRoom = jest.fn();
-const mockUseMe = jest.fn();
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn() }),
@@ -13,10 +13,6 @@ jest.mock("next/navigation", () => ({
 
 jest.mock("@/features/auth/hooks/useAuthState", () => ({
   useAuthState: () => mockUseAuthState(),
-}));
-
-jest.mock("@/features/member/hooks/useMemberHooks", () => ({
-  useMe: () => mockUseMe(),
 }));
 
 jest.mock("@/features/session/hooks/useSessionHooks", () => ({
@@ -55,11 +51,6 @@ describe("SessionEditContent", () => {
       refetch: jest.fn(),
     });
 
-    mockUseMe.mockReturnValue({
-      data: { result: { id: 7 } },
-      isLoading: false,
-    });
-
     mockUseWaitingRoom.mockReturnValue({
       data: {
         result: {
@@ -70,6 +61,8 @@ describe("SessionEditContent", () => {
         },
       },
       isLoading: false,
+      error: null,
+      refetch: jest.fn(),
     });
   });
 
@@ -81,9 +74,9 @@ describe("SessionEditContent", () => {
   });
 
   it("로그인한 비호스트(참여자)면 수정 폼 대신 권한 안내를 표시해야 한다", () => {
-    mockUseMe.mockReturnValue({
-      data: { result: { id: 8 } },
-      isLoading: false,
+    mockUseAuthState.mockReturnValue({
+      status: "authenticated",
+      profile: { id: 8 },
     });
 
     render(<SessionEditContent sessionId="1" />);
@@ -94,9 +87,9 @@ describe("SessionEditContent", () => {
   });
 
   it("로그인한 미참여자면 수정 폼 대신 권한 안내를 표시해야 한다", () => {
-    mockUseMe.mockReturnValue({
-      data: { result: { id: 99 } },
-      isLoading: false,
+    mockUseAuthState.mockReturnValue({
+      status: "authenticated",
+      profile: { id: 99 },
     });
 
     render(<SessionEditContent sessionId="1" />);
@@ -105,21 +98,42 @@ describe("SessionEditContent", () => {
     expect(screen.getByText("수정 권한이 없어요")).toBeInTheDocument();
   });
 
-  it("대기방 조회에 실패하면 수정 폼을 열지 않아야 한다 (fail-closed)", () => {
+  it("대기방 응답에 데이터가 없으면 수정 폼을 열지 않아야 한다 (fail-closed)", () => {
     mockUseWaitingRoom.mockReturnValue({
       data: undefined,
       isLoading: false,
+      error: null,
+      refetch: jest.fn(),
     });
 
     render(<SessionEditContent sessionId="1" />);
 
     expect(screen.queryByTestId("session-edit-form")).not.toBeInTheDocument();
     expect(screen.getByText("수정 권한이 없어요")).toBeInTheDocument();
+  });
+
+  it("대기방 조회가 실패하면 권한 안내 대신 재시도 가능한 오류 화면을 표시해야 한다", async () => {
+    const refetchWaitingRoom = jest.fn();
+    mockUseWaitingRoom.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new Error("waiting room failed"),
+      refetch: refetchWaitingRoom,
+    });
+
+    render(<SessionEditContent sessionId="1" />);
+
+    expect(screen.queryByTestId("session-edit-form")).not.toBeInTheDocument();
+    expect(screen.queryByText("수정 권한이 없어요")).not.toBeInTheDocument();
+    expect(screen.getByText("수정 권한을 확인할 수 없어요")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /삭제하기/ })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "다시 시도하기" }));
+    expect(refetchWaitingRoom).toHaveBeenCalledTimes(1);
   });
 
   it("비로그인 사용자면 로그인 안내를 표시해야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "guest" });
-    mockUseMe.mockReturnValue({ data: undefined, isLoading: false });
     mockUseWaitingRoom.mockReturnValue({ data: undefined, isLoading: false });
 
     render(<SessionEditContent sessionId="1" />);
@@ -130,7 +144,6 @@ describe("SessionEditContent", () => {
 
   it("인증 정보 복구 중이면 수정 폼을 렌더링하지 않아야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "recovering" });
-    mockUseMe.mockReturnValue({ data: undefined, isLoading: true });
     mockUseWaitingRoom.mockReturnValue({ data: undefined, isLoading: true });
 
     render(<SessionEditContent sessionId="1" />);
