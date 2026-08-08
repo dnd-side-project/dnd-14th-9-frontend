@@ -11,6 +11,7 @@ import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useDialog } from "@/hooks/useDialog";
+import { ApiError } from "@/lib/api/api-client";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
 import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
 
@@ -55,6 +56,7 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
   });
 
   const session = data?.result;
+  const isSessionNotFound = sessionError instanceof ApiError && sessionError.status === 404;
   const myMemberId = meData?.result?.id;
   const hasParticipationCheckError = Boolean(meError || waitingRoomError);
 
@@ -200,7 +202,11 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
           {sessionError ? (
             <div className="flex animate-[fadeIn_0.2s_ease-out] flex-col items-center gap-3 rounded-lg border border-gray-800 py-10">
               <AlertIcon className="text-text-muted h-8 w-8" />
-              <p className="text-text-secondary text-sm">세션 정보를 불러오지 못했어요</p>
+              <p className="text-text-secondary text-sm">
+                {isSessionNotFound
+                  ? "존재하지 않는 세션입니다. 삭제되었거나 잘못된 주소일 수 있어요."
+                  : "세션 정보를 불러오지 못했어요"}
+              </p>
             </div>
           ) : session ? (
             <Card

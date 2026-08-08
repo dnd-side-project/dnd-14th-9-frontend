@@ -10,6 +10,7 @@ import { sessionApi } from "@/features/session/api";
 import { SessionPageContent } from "@/features/session/components/SessionPageContent";
 import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
 import { isWaitingStatus } from "@/features/session/types";
+import { handleSessionNotFound } from "@/features/session/utils/handleSessionNotFound";
 import { getQueryClient } from "@/lib/getQueryClient";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
@@ -43,7 +44,9 @@ export default async function SessionPage({ params }: SessionPageProps) {
   const { sessionId } = await params;
   const queryClient = getQueryClient();
 
-  const sessionData = await queryClient.fetchQuery(sessionQueries.detail(sessionId));
+  const sessionData = await queryClient
+    .fetchQuery(sessionQueries.detail(sessionId))
+    .catch(handleSessionNotFound);
 
   // mock mode에서는 UI 확인을 위해 세션 화면에 직접 접근할 수 있도록 상태 기반 redirect를 제한한다.
   if (!isMockModeEnabled() && isWaitingStatus(sessionData.result.status)) {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 
 import { Button } from "@/components/Button/Button";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
@@ -32,6 +32,11 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
   const session = data?.result;
   // 대기 중인 세션만 수정/삭제 가능 (백엔드 SESSION400_12/14 사전 차단)
   const isEditable = !!session && isWaitingStatus(session.status);
+
+  // 삭제되었거나 존재하지 않는 세션이면 세션 not-found 페이지로 안내
+  if (error instanceof ApiError && error.status === 404) {
+    notFound();
+  }
 
   const handleDelete = () => {
     setDeleteServerError(null);
