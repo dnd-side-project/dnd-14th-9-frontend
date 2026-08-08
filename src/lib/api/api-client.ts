@@ -103,8 +103,10 @@ function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
 }
 
 function getApiErrorMessage(value: unknown, status: number): string {
-  if (isApiErrorResponse(value)) {
-    return getApiErrorMessageByCode(value.code) ?? value.message;
+  // 백엔드가 같은 에러 코드를 여러 의미로 재사용하는 경우가 있어(예: SESSION400_15가
+  // 세션 생성 제한/수정 불가 양쪽에 쓰임) 서버 메시지를 우선 노출하고, 없을 때만 코드 매핑으로 폴백
+  if (isApiErrorResponse(value) && value.message.trim() !== "") {
+    return value.message;
   }
 
   if (isRecord(value) && typeof value.code === "string") {
