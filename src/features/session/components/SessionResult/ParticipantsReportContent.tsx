@@ -62,7 +62,7 @@ export async function ParticipantsReportContent({ sessionId }: ParticipantsRepor
           focusedTimeLabel="평균 집중 시간"
           participationTimeLabel="평균 참여 시간"
           achievementRate={sessionReport?.averageAchievementRate ?? 0}
-          achievementRateLabel="평균 목표 달성율"
+          achievementRateLabel="평균 목표 달성률"
         />
         <RealtimeSessionEmojiCard sessionId={sessionId} initialEmojis={initialEmojis} />
       </div>

@@ -17,8 +17,8 @@ export default function PrivacyPage() {
 
       <p className="text-text-secondary mt-6 leading-7">
         GAK (DND 9팀, 이하 &quot;운영팀&quot;)은 이용자의 개인정보를 중요시하며, 「개인정보 보호법」
-        등 등 관련 법령을 준수합니다. 이 방침은 운영팀이 수집한 개인정보가 어떻게 이용되고
-        보호되는지 설명합니다.
+        등 관련 법령을 준수합니다. 이 방침은 운영팀이 수집한 개인정보가 어떻게 이용되고 보호되는지
+        설명합니다.
       </p>
 
       <div className="mt-10 flex flex-col gap-10">
