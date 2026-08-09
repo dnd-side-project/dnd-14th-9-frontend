@@ -28,6 +28,9 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
   const authState = useAuthState();
   const isAuthenticated = authState.status === "authenticated";
   const { data, isLoading, error, refetch } = useSessionDetail(sessionId);
+
+  // 세션 상세와 병렬로 조회한다. isEditable에 연동해 지연시키면 정상 경로(호스트의 수정 진입)에
+  // 왕복이 하나 늘어난다. 조회 지연이 세션 오류 화면을 가리는 문제는 아래 렌더 분기 순서로 처리한다.
   const {
     data: waitingRoomData,
     isLoading: isWaitingRoomLoading,
@@ -41,8 +44,14 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
   const [deleteServerError, setDeleteServerError] = useState<string | null>(null);
   const { mutate: deleteSession, isPending: isDeleting } = useDeleteSession();
 
+  // isLoading(= isPending && isFetching)만으로는 부족하다. SSR(서버에서 fetch 미실행)이나
+  // 오프라인(fetchStatus "paused")에서는 데이터가 없어도 isLoading이 false라 로딩 분기를 통과하고,
+  // isHost가 false로 떨어져 호스트에게 "수정 권한이 없어요"가 표시된다.
+  // 응답이 도착했는지(데이터 유무)를 기준으로 판정한다.
+  const isWaitingRoomUnresolved = !waitingRoomError && waitingRoomData === undefined;
   const isAuthDataLoading =
-    authState.status === "recovering" || (isAuthenticated && isWaitingRoomLoading);
+    authState.status === "recovering" ||
+    (isAuthenticated && (isWaitingRoomLoading || isWaitingRoomUnresolved));
 
   const session = data?.result;
   // 대기 중인 세션만 수정/삭제 가능 (백엔드 SESSION400_12/14 사전 차단)
@@ -82,6 +91,18 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
     });
   };
 
+  // 세션 상세 조회 실패는 로딩보다 먼저 처리한다. 대기방 조회나 인증 복구가 지연되는 동안
+  // 로딩 화면이 먼저 걸리면 사용자가 재시도 버튼에 도달하지 못한다.
+  const sessionErrorFallback = (
+    <ErrorFallbackUI
+      className="py-20"
+      title="세션 정보를 불러올 수 없어요"
+      description="데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요."
+      buttonLabel="다시 시도하기"
+      onRetry={() => void refetch()}
+    />
+  );
+
   return (
     <>
       <header className="mb-xl md:mb-2xl flex items-start justify-between gap-4">
@@ -111,16 +132,12 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
         )}
       </header>
 
-      {isLoading || isAuthDataLoading ? (
+      {error ? (
+        sessionErrorFallback
+      ) : isLoading || isAuthDataLoading ? (
         <p className="text-text-secondary py-20 text-center text-sm">불러오는 중...</p>
-      ) : error || !session ? (
-        <ErrorFallbackUI
-          className="py-20"
-          title="세션 정보를 불러올 수 없어요"
-          description="데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요."
-          buttonLabel="다시 시도하기"
-          onRetry={() => void refetch()}
-        />
+      ) : !session ? (
+        sessionErrorFallback
       ) : !isEditable ? (
         <ErrorFallbackUI
           className="py-20"

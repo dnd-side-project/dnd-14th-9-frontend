@@ -98,9 +98,26 @@ describe("SessionEditContent", () => {
     expect(screen.getByText("수정 권한이 없어요")).toBeInTheDocument();
   });
 
-  it("대기방 응답에 데이터가 없으면 수정 폼을 열지 않아야 한다 (fail-closed)", () => {
+  // SSR과 오프라인(fetchStatus "paused")에서는 응답 전에도 isLoading이 false다.
+  // 이때 권한 안내로 떨어지면 호스트에게 "수정 권한이 없어요"가 표시된다.
+  it("대기방 응답 전이면 isLoading이 false여도 권한 안내 대신 로딩을 표시해야 한다", () => {
     mockUseWaitingRoom.mockReturnValue({
       data: undefined,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+
+    render(<SessionEditContent sessionId="1" />);
+
+    expect(screen.queryByTestId("session-edit-form")).not.toBeInTheDocument();
+    expect(screen.queryByText("수정 권한이 없어요")).not.toBeInTheDocument();
+    expect(screen.getByText("불러오는 중...")).toBeInTheDocument();
+  });
+
+  it("대기방 응답에 참여자 정보가 없으면 수정 폼을 열지 않아야 한다 (fail-closed)", () => {
+    mockUseWaitingRoom.mockReturnValue({
+      data: { result: { members: [] } },
       isLoading: false,
       error: null,
       refetch: jest.fn(),
@@ -130,6 +147,67 @@ describe("SessionEditContent", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "다시 시도하기" }));
     expect(refetchWaitingRoom).toHaveBeenCalledTimes(1);
+  });
+
+  it("세션 상세 조회 실패와 대기방 조회 지연이 겹쳐도 세션 오류 화면을 표시해야 한다", async () => {
+    const refetchSession = jest.fn();
+    mockUseSessionDetail.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new Error("session detail failed"),
+      refetch: refetchSession,
+    });
+    // 대기방 조회가 아직 응답하지 않은 상태
+    mockUseWaitingRoom.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: null,
+      refetch: jest.fn(),
+    });
+
+    render(<SessionEditContent sessionId="1" />);
+
+    expect(screen.queryByText("불러오는 중...")).not.toBeInTheDocument();
+    expect(screen.getByText("세션 정보를 불러올 수 없어요")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "다시 시도하기" }));
+    expect(refetchSession).toHaveBeenCalledTimes(1);
+  });
+
+  it("세션 상세 조회 실패와 인증 복구 지연이 겹쳐도 세션 오류 화면을 표시해야 한다", () => {
+    mockUseAuthState.mockReturnValue({ status: "recovering" });
+    mockUseSessionDetail.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new Error("session detail failed"),
+      refetch: jest.fn(),
+    });
+    mockUseWaitingRoom.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+
+    render(<SessionEditContent sessionId="1" />);
+
+    expect(screen.queryByText("불러오는 중...")).not.toBeInTheDocument();
+    expect(screen.getByText("세션 정보를 불러올 수 없어요")).toBeInTheDocument();
+  });
+
+  // 대기방 조회를 isEditable에 연동하면 정상 경로에 왕복이 하나 늘어나므로,
+  // 세션 상태와 무관하게 병렬로 조회하는 것이 의도된 동작이다.
+  it("세션 상태와 무관하게 대기방 조회를 세션 상세와 병렬로 시작해야 한다", () => {
+    mockUseSessionDetail.mockReturnValue({
+      data: { result: { sessionId: 1, title: "테스트 세션", status: "진행중" } },
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+
+    render(<SessionEditContent sessionId="1" />);
+
+    expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: true });
   });
 
   it("비로그인 사용자면 로그인 안내를 표시해야 한다", () => {

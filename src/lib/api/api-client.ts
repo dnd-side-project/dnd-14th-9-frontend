@@ -104,8 +104,10 @@ function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
 
 function getApiErrorMessage(value: unknown, status: number): string {
   // 백엔드가 같은 에러 코드를 여러 의미로 재사용하는 경우가 있어(예: SESSION400_15가
-  // 세션 생성 제한/수정 불가 양쪽에 쓰임) 서버 메시지를 우선 노출하고, 없을 때만 코드 매핑으로 폴백
-  if (isApiErrorResponse(value) && value.message.trim() !== "") {
+  // 세션 생성 제한/수정 불가 양쪽에 쓰임) 서버 메시지를 우선 노출하고, 없을 때만 코드 매핑으로 폴백.
+  // isApiErrorResponse는 isSuccess까지 요구하므로 게이트웨이 등에서 필드가 빠지면 코드 매핑으로
+  // 떨어져 엉뚱한 문구가 나온다. 판정 대신 message 유무만 본다.
+  if (isRecord(value) && typeof value.message === "string" && value.message.trim() !== "") {
     return value.message;
   }
 
