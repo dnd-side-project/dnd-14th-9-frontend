@@ -1,7 +1,12 @@
 import type { WaitingMembersSSEPayload } from "@/features/lobby/types";
 import type { InProgressEventData, SessionStatusEventData } from "@/features/session/types";
 
-import { getMockInProgress, getMockSessionStatus, getMockWaitingRoom } from "./session-state";
+import {
+  getMockInProgress,
+  getMockReactionSummary,
+  getMockSessionStatus,
+  getMockWaitingRoom,
+} from "./session-state";
 
 export function getMockWaitingMembersSSEPayload(sessionId: number): WaitingMembersSSEPayload {
   return {
@@ -41,4 +46,12 @@ export function getMockSessionRoomSSEEvents(sessionId: number): MockSSEEvent[] {
           data: getMockInProgressMembersSSEPayload(sessionId),
         },
   ];
+}
+
+/**
+ * 리액션 집계 채널의 구독 직후 초기 전송을 재현한다.
+ * 실서버와 동일하게 구독 시점의 최신 집계를 1회 내려준다.
+ */
+export function getMockReactionSummarySSEEvents(sessionId: number): MockSSEEvent[] {
+  return [{ event: "reaction-summary-updated", data: getMockReactionSummary(sessionId) }];
 }

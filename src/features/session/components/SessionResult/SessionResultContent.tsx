@@ -69,11 +69,7 @@ export async function SessionResultContent({ sessionId }: SessionResultContentPr
           participationTimeLabel="전체 참여 시간"
           achievementRate={memberResult.achievementRate}
         />
-        <RealtimeMemberEmojiCard
-          sessionId={sessionId}
-          memberId={memberResult.memberId}
-          initialEmojis={initialEmojis}
-        />
+        <RealtimeMemberEmojiCard sessionId={sessionId} initialEmojis={initialEmojis} />
       </div>
 
       {/* 나의 목표 달성 */}

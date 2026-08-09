@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { getSessionRoomSSEUrl, SESSION_ROOM_EVENT } from "@/lib/sse/session-room";
+import { getSessionRoomSSEUrl, SESSION_ROOM_EVENT } from "@/lib/sse/session-channels";
 import type { SSEConnectionStatus, SSEError } from "@/lib/sse/types";
 import { useSSE, type SSEEventMeta } from "@/lib/sse/useSSE";
 

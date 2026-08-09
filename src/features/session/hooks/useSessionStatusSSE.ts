@@ -1,6 +1,6 @@
 "use client";
 
-import { getSessionRoomSSEUrl, SESSION_ROOM_EVENT } from "@/lib/sse/session-room";
+import { getSessionRoomSSEUrl, SESSION_ROOM_EVENT } from "@/lib/sse/session-channels";
 import type { SSEError } from "@/lib/sse/types";
 import { useSSE } from "@/lib/sse/useSSE";
 

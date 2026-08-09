@@ -116,12 +116,7 @@ const expectedEndpoints: ExpectedEndpoint[] = [
     source: "src/features/session/api.ts",
   },
   { method: "get", pattern: "*/api/sse/room/:sessionId", source: "src/app/api/sse" },
-  { method: "get", pattern: "*/api/sse/reaction/:sessionId", source: "src/app/api/sse" },
-  {
-    method: "get",
-    pattern: "*/api/sse/reaction/:sessionId/members/:memberId",
-    source: "src/app/api/sse",
-  },
+  { method: "get", pattern: "*/api/sse/reactions/:sessionId", source: "src/app/api/sse" },
 ];
 
 describe("MSW backend API coverage", () => {
@@ -138,8 +133,7 @@ describe("MSW backend API coverage", () => {
       "waiting-members-updated",
       "in-progress-members-updated",
       "session-status-updated",
-      "reaction-updated",
-      "member-reaction-updated",
+      "reaction-summary-updated",
     ]) {
       expect(handlerSources).toMatch(new RegExp(`event:\\s*["\\\']${eventName}["\\\']`));
     }

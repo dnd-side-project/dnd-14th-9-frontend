@@ -24,6 +24,8 @@ export async function ParticipantsReportContent({ sessionId }: ParticipantsRepor
     sessionApi.getReport(sessionId),
   ]);
 
+  console.log(myReportResult, sessionDetailResult, sessionReportResult);
+
   // 세션 상세의 404(삭제/미존재)를 먼저 판정해 not-found 페이지로 안내한다.
   if (sessionDetailResult.status === "rejected") {
     handleSessionNotFound(sessionDetailResult.reason);

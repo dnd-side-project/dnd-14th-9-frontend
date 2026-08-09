@@ -1,6 +1,10 @@
 import { http, HttpResponse } from "msw";
 
-import { getMockSessionRoomSSEEvents, type MockSSEEvent } from "./sse-payloads";
+import {
+  getMockReactionSummarySSEEvents,
+  getMockSessionRoomSSEEvents,
+  type MockSSEEvent,
+} from "./sse-payloads";
 
 function sseStream(events: MockSSEEvent[]) {
   const body = events
@@ -26,21 +30,8 @@ export const sseHandlers = [
     return sseStream(getMockSessionRoomSSEEvents(toSessionId(params.sessionId)));
   }),
 
-  http.get("*/api/sse/reaction/:sessionId", () => {
-    return sseStream([
-      {
-        event: "reaction-updated",
-        data: { heartCount: 0, starCount: 0, thumbsUpCount: 0, thumbsDownCount: 0 },
-      },
-    ]);
-  }),
-
-  http.get("*/api/sse/reaction/:sessionId/members/:memberId", () => {
-    return sseStream([
-      {
-        event: "member-reaction-updated",
-        data: { heartCount: 0, starCount: 0, thumbsUpCount: 0, thumbsDownCount: 0 },
-      },
-    ]);
+  // 세션 전체/본인 리액션 집계 통합 채널
+  http.get("*/api/sse/reactions/:sessionId", ({ params }) => {
+    return sseStream(getMockReactionSummarySSEEvents(toSessionId(params.sessionId)));
   }),
 ];
