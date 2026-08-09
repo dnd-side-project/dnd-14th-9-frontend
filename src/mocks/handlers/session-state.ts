@@ -537,6 +537,10 @@ export function joinMockSession(sessionId: number, body: JoinSessionRequest): Jo
   };
 }
 
+export function getMockSessionStatus(sessionId: number): MockSessionStatus {
+  return getSessionOrThrow(sessionId).status;
+}
+
 export function getMockWaitingRoom(sessionId: number): WaitingRoomResponse {
   const session = getSessionOrThrow(sessionId);
   return {

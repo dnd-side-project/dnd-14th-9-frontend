@@ -1,5 +1,6 @@
 "use client";
 
+import { getSessionRoomSSEUrl, SESSION_ROOM_EVENT } from "@/lib/sse/session-room";
 import type { SSEError } from "@/lib/sse/types";
 import { useSSE } from "@/lib/sse/useSSE";
 
@@ -27,9 +28,11 @@ export function useSessionStatusSSE({
   onError,
 }: UseSessionStatusSSEOptions): UseSessionStatusSSEReturn {
   return useSSE<SessionStatusEventData>({
-    url: `/api/sse/session-status/${sessionId}`,
-    eventName: "session-status-updated",
+    url: getSessionRoomSSEUrl(sessionId),
+    eventName: SESSION_ROOM_EVENT.SESSION_STATUS,
     enabled: enabled && !!sessionId,
+    // 상태는 최신 값만 의미가 있으므로 늦게 합류해도 마지막 상태를 재생받는다.
+    replayLastEvent: true,
     onData: onStatusChange,
     onError,
   });

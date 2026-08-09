@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { getSessionRoomSSEUrl, SESSION_ROOM_EVENT } from "@/lib/sse/session-room";
 import type { SSEConnectionStatus, SSEError } from "@/lib/sse/types";
-import { useSSE } from "@/lib/sse/useSSE";
+import { useSSE, type SSEEventMeta } from "@/lib/sse/useSSE";
 
 import type { WaitingMembersEventData, WaitingMembersSSEPayload } from "../types";
 
@@ -42,19 +43,22 @@ export function useWaitingMembersSSE({
     onKickedRef.current = onKicked;
   }, [onKicked]);
 
-  const sseUrl = `/api/sse/waiting/${sessionId}`;
+  const sseUrl = getSessionRoomSSEUrl(sessionId);
 
   // 이전 sessionId의 in-flight SSE 이벤트가 새 sessionId 컨텍스트에서 setRoomData를
   // 호출해 stale 데이터로 덮어씌우는 race를 차단. useSSE가 이벤트 리스너 등록 시점의
   // url을 meta로 전달해주므로, 현재 sseUrl과 일치하지 않는 콜백은 모두 drop.
   const handleData = useCallback(
-    (payload: WaitingMembersSSEPayload, meta: { url: string }) => {
+    (payload: WaitingMembersSSEPayload, meta: SSEEventMeta) => {
       if (meta.url !== sseUrl) return;
       if (payload.eventType === "ROOM_UPDATE") {
         // members 필드가 누락된 비정상 payload는 무시 (런타임 가드)
         if (!payload.data || !Array.isArray(payload.data.members)) return;
         setRoomData(payload.data);
       } else if (payload.eventType === "KICKED") {
+        // KICKED는 1회성 명령이므로 캐시 재생분은 무시한다.
+        // (재생하면 이미 처리된 강퇴가 재구독마다 다시 발생한다)
+        if (meta.replayed) return;
         if (!Array.isArray(payload.data?.memberIds)) return;
         onKickedRef.current?.(payload.data.memberIds);
       }
@@ -64,8 +68,11 @@ export function useWaitingMembersSSE({
 
   const { status, error, reconnect, disconnect } = useSSE<WaitingMembersSSEPayload>({
     url: sseUrl,
-    eventName: "waiting-members-updated",
+    eventName: SESSION_ROOM_EVENT.WAITING_MEMBERS,
     enabled: enabled && !!sessionId,
+    // 통합 room 채널은 상태 훅이 먼저 붙어 있을 수 있어, 늦게 합류하면 초기
+    // ROOM_UPDATE를 놓친다. 마지막 스냅샷을 재생해 목록을 맞춘다.
+    replayLastEvent: true,
     onData: handleData,
     onError,
   });
