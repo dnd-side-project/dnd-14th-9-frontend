@@ -39,6 +39,7 @@ import {
   SESSION_PARTICIPANTS_DEFAULT,
   SESSION_PARTICIPANTS_MAX,
   SESSION_PARTICIPANTS_MIN,
+  SESSION_RATE_DEFAULT,
 } from "../constants/sessionLimits";
 import { useCreateSession, useUpdateSession } from "../hooks/useSessionHooks";
 import { validateSessionForm, type SessionFormErrors } from "../utils/validateSessionForm";
@@ -84,12 +85,28 @@ export function SessionCreateForm({
   const [participants, setParticipants] = useState(
     initialValues?.maxParticipants ?? SESSION_PARTICIPANTS_DEFAULT
   ); // 기본값 5명
-  const [achievementRange, setAchievementRange] = useState(
-    initialValues ? (initialValues.requiredAchievementRate ?? 0) : 50
+  const [achievementRangeInput, setAchievementRange] = useState(
+    initialValues ? (initialValues.requiredAchievementRate ?? 0) : SESSION_RATE_DEFAULT
   ); // To do 달성도 범위
-  const [focusRange, setFocusRange] = useState(
-    initialValues ? (initialValues.requiredFocusRate ?? 0) : 50
+  const [focusRangeInput, setFocusRange] = useState(
+    initialValues ? (initialValues.requiredFocusRate ?? 0) : SESSION_RATE_DEFAULT
   ); // 집중도 범위
+
+  // 참여 조건은 내 달성률·집중률을 넘을 수 없다. (안내 문구와 동일한 규칙)
+  // 소수점 비율이 와도 상한을 넘기지 않도록 내림한다.
+  const achievementLimit = myProfile?.todoCompletionRate;
+  const focusLimit = myProfile?.focusRate;
+  const clampToLimit = (rate: number, limit: number | undefined) =>
+    limit === undefined ? rate : Math.min(rate, Math.max(0, Math.floor(limit)));
+
+  // 생성 모드: 프로필 로딩 전에 잡힌 기본값(50)이 상한을 넘으면 상한으로 낮춰 사용한다.
+  // 수정 모드: 이미 저장된 값은 상한을 넘더라도 임의로 낮추지 않고, 상향 조작만 슬라이더에서 막는다.
+  const achievementRange = isEdit
+    ? achievementRangeInput
+    : clampToLimit(achievementRangeInput, achievementLimit);
+  const focusRange = isEdit ? focusRangeInput : clampToLimit(focusRangeInput, focusLimit);
+  const defaultAchievementRange = clampToLimit(SESSION_RATE_DEFAULT, achievementLimit);
+  const defaultFocusRange = clampToLimit(SESSION_RATE_DEFAULT, focusLimit);
 
   // DatePicker 팝업 상태
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -176,8 +193,8 @@ export function SessionCreateForm({
     startDateTime !== null ||
     duration !== SESSION_DURATION_MINUTES_DEFAULT ||
     participants !== SESSION_PARTICIPANTS_DEFAULT ||
-    achievementRange !== 50 ||
-    focusRange !== 50;
+    achievementRange !== defaultAchievementRange ||
+    focusRange !== defaultFocusRange;
 
   const hasUnsavedChanges = isEdit ? editDirty : createDirty;
 
@@ -532,6 +549,7 @@ export function SessionCreateForm({
               onChange={setAchievementRange}
               myFocusValue={myProfile?.todoCompletionRate}
               myFocusLabel="내 달성률"
+              limit={achievementLimit}
               className="w-[80%]"
             />
           </div>
@@ -555,6 +573,7 @@ export function SessionCreateForm({
               value={focusRange}
               onChange={setFocusRange}
               myFocusValue={myProfile?.focusRate}
+              limit={focusLimit}
               className="w-[80%]"
             />
           </div>

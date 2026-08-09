@@ -15,23 +15,36 @@ export function StepperSlide({
   onChange,
   myFocusValue,
   myFocusLabel = "내 집중도",
+  limit,
   min = 0,
   max = 100,
   disabled = false,
   className,
   ref,
 }: StepperSlideProps & { ref?: React.Ref<HTMLDivElement> }) {
-  const { isDragging, percentage, trackRef, handleMouseDown, handleTrackClick, handleKeyDown } =
-    useStepperSlide({
-      value,
-      onChange,
-      min,
-      max,
-      disabled,
-    });
+  const {
+    isDragging,
+    percentage,
+    selectableMax,
+    trackRef,
+    handleMouseDown,
+    handleTrackClick,
+    handleKeyDown,
+  } = useStepperSlide({
+    value,
+    onChange,
+    min,
+    max,
+    limit,
+    disabled,
+  });
 
   const myFocusPercentage =
     myFocusValue !== undefined ? ((myFocusValue - min) / (max - min)) * 100 : undefined;
+
+  // 선택할 수 없는 구간(상한 초과)을 트랙 위에 흐리게 표시한다.
+  const limitPercentage =
+    limit !== undefined ? ((selectableMax - min) / (max - min)) * 100 : undefined;
 
   return (
     <div
@@ -90,6 +103,14 @@ export function StepperSlide({
           style={{ width: `${percentage}%` }}
         />
 
+        {/* 선택 불가 구간 */}
+        {limitPercentage !== undefined && limitPercentage < 100 && (
+          <div
+            className="absolute top-0 h-full rounded-r-full bg-gray-800"
+            style={{ left: `${limitPercentage}%`, width: `${100 - limitPercentage}%` }}
+          />
+        )}
+
         {/* 내 집중도 마커 */}
         {myFocusPercentage !== undefined && (
           <div
@@ -114,7 +135,7 @@ export function StepperSlide({
           tabIndex={disabled ? -1 : 0}
           role="slider"
           aria-valuemin={min}
-          aria-valuemax={max}
+          aria-valuemax={selectableMax}
           aria-valuenow={value}
           aria-disabled={disabled}
         />
