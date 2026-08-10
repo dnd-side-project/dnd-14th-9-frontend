@@ -176,11 +176,15 @@ export function ProfileEditForm() {
                     onClick={() => {
                       if (isSelected) {
                         field.onChange(field.value.filter((k) => k !== catKey));
-                      } else {
-                        if (field.value.length < 3) {
-                          field.onChange([...field.value, catKey]);
-                        }
+                        return;
                       }
+
+                      if (field.value.length >= 3) {
+                        toast.info("관심 카테고리는 최대 3개까지 선택 가능합니다.");
+                        return;
+                      }
+
+                      field.onChange([...field.value, catKey]);
                     }}
                     className="w-[136px]"
                   >
