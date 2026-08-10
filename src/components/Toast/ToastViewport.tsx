@@ -21,13 +21,15 @@ export function ToastViewport() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed top-24 right-4 z-[60] flex flex-col gap-2">
+    <div className="pointer-events-none fixed top-24 right-4 left-4 z-[60] flex flex-col gap-2 sm:left-auto sm:w-[400px]">
       {toasts.map((toastItem) => (
         <Toast
           key={toastItem.id}
           id={toastItem.id}
           type={toastItem.type}
-          message={toastItem.message}
+          title={toastItem.title}
+          description={toastItem.description}
+          showClose={toastItem.showClose}
           duration={toastItem.duration}
           onClose={toast.hideToast}
         />
