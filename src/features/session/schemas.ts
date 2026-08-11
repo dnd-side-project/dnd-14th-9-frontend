@@ -69,3 +69,21 @@ export const editSessionFormSchema = z.object({
 
 // 두 스키마는 동일한 형태를 추론한다 (startTime 검증 여부만 차이).
 export type CreateSessionFormData = z.infer<typeof createSessionFormSchema>;
+
+const joinTodoSchema = z.string().trim().max(50, "할 일은 최대 50자까지 입력 가능합니다.");
+
+export const joinSessionFormSchema = z.object({
+  goal: z
+    .string()
+    .trim()
+    .min(1, "목표를 입력해주세요")
+    .max(50, "목표는 최대 50자까지 입력 가능합니다."),
+  todos: z
+    .array(joinTodoSchema)
+    .refine((todos) => todos.some((todo) => todo !== ""), {
+      message: "할 일을 1개 이상 입력해주세요",
+    })
+    .transform((todos) => todos.filter((todo) => todo !== "")),
+});
+
+export type JoinSessionFormData = z.infer<typeof joinSessionFormSchema>;
