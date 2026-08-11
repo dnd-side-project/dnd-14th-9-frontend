@@ -33,6 +33,7 @@ export function ChatMessageInput({
       <TextInput
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onClear={() => onChange("")}
         onKeyDown={handleKeyDown}
         placeholder="텍스트를 입력해 주세요"
         maxLength={200}
