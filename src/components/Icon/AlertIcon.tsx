@@ -19,17 +19,7 @@ export type AlertIconProps = Omit<IconProps, "svg">;
 
 export function AlertIcon({
   ref,
-  size = "xlarge",
-  className,
   ...props
 }: AlertIconProps & { ref?: React.Ref<HTMLSpanElement> }) {
-  return (
-    <Icon
-      ref={ref}
-      size={size}
-      svg={AlertSvg}
-      className={className ?? "text-text-primary"}
-      {...props}
-    />
-  );
+  return <Icon ref={ref} size="xlarge" svg={AlertSvg} {...props} />;
 }
