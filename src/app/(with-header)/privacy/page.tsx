@@ -13,7 +13,7 @@ export default function PrivacyPage() {
   return (
     <div className="p-3xl flex flex-col">
       <h1 className="text-text-primary text-3xl font-bold">개인정보 처리방침</h1>
-      <p className="text-text-disabled mt-2 text-sm">시행일: 2025년 7월 1일</p>
+      <p className="text-text-disabled mt-2 text-sm">시행일: 2026년 2월 28일</p>
 
       <p className="text-text-secondary mt-6 leading-7">
         GAK (DND 9팀, 이하 &quot;운영팀&quot;)은 이용자의 개인정보를 중요시하며, 「개인정보 보호법」

@@ -13,7 +13,7 @@ export default function CookiePolicyPage() {
   return (
     <div className="p-3xl flex flex-col">
       <h1 className="text-text-primary text-3xl font-bold">쿠키 정책</h1>
-      <p className="text-text-disabled mt-2 text-sm">시행일: 2025년 7월 1일</p>
+      <p className="text-text-disabled mt-2 text-sm">시행일: 2026년 2월 28일</p>
 
       <p className="text-text-secondary mt-6 leading-7">
         GAK (DND 9팀, 이하 &quot;운영팀&quot;)은 서비스 제공 및 이용자 편의를 위해 쿠키(Cookie)와
