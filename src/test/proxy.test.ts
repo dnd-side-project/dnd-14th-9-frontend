@@ -51,6 +51,19 @@ describe("Proxy Middleware", () => {
     };
   }
 
+  function createRefreshMismatchResponse() {
+    return {
+      ok: false,
+      status: 401,
+      json: jest.fn().mockResolvedValue({
+        code: "AUTH401_7",
+        message: "Refresh 토큰 정보가 일치하지 않습니다.",
+        isSuccess: false,
+        httpStatus: "UNAUTHORIZED",
+      }),
+    };
+  }
+
   beforeEach(() => {
     jest.clearAllMocks();
     consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
@@ -562,6 +575,43 @@ describe("Proxy Middleware", () => {
       expect(setCookieHeaders.some((cookie) => cookie.includes("accessToken="))).toBe(true);
     });
 
+    it("동일한 refreshToken 병렬 요청 중 하나가 AUTH401_7이어도 유효한 요청은 로그아웃하지 않아야 함", async () => {
+      const accessToken = createMockToken(3 * 60);
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const createRequest = () =>
+        new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
+          headers: {
+            cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}`,
+          },
+        });
+
+      mockFetch
+        .mockResolvedValueOnce(createRefreshSuccessResponse("new_access", "new_refresh"))
+        .mockResolvedValueOnce(createRefreshMismatchResponse());
+
+      const [successResponse, mismatchResponse] = await Promise.all([
+        proxy(createRequest()),
+        proxy(createRequest()),
+      ]);
+
+      expect(successResponse.status).toBe(200);
+      expect(hasSetCookie(successResponse, (cookie) => cookie.includes("new_access"))).toBe(true);
+      expect(mismatchResponse.status).toBe(200);
+      expect(mismatchResponse.headers.get("location")).toBeNull();
+      expect(hasSetCookie(mismatchResponse, (cookie) => cookie.startsWith("accessToken=;"))).toBe(
+        false
+      );
+      expect(hasSetCookie(mismatchResponse, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(
+        false
+      );
+      expectRefreshFailureLog({
+        reason: "http_error",
+        routeType: "protected",
+        status: 401,
+        cookieClear: false,
+      });
+    });
+
     it("토큰이 이미 만료되었으면 재발급을 시도해야 함", async () => {
       // Given: 1분 전에 만료된 토큰
       const accessToken = createMockToken(-60); // 1분 전 만료
@@ -786,9 +836,8 @@ describe("Proxy Middleware", () => {
   });
 
   describe("토큰 만료 임박 시 refreshToken 없음", () => {
-    it("토큰이 만료 임박했는데 refreshToken이 없으면 로그인 라우트로 리다이렉트해야 함", async () => {
-      // Given: 만료 임박한 accessToken만 있고 refreshToken 없음
-      const accessToken = createMockToken(2 * 60); // 2분
+    it("토큰이 만료 임박했어도 refreshToken이 없으면 유효한 accessToken으로 통과해야 함", async () => {
+      const accessToken = createMockToken(2 * 60);
 
       const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
         headers: {
@@ -796,14 +845,12 @@ describe("Proxy Middleware", () => {
         },
       });
 
-      // When
       const response = await proxy(request);
 
-      // Then: refreshToken 없으므로 재발급 불가 → 로그인 라우트
-      expectLoginRedirect(response, "auth_required");
-      expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
       expect(mockFetch).not.toHaveBeenCalled();
     });
   });
@@ -1021,6 +1068,29 @@ describe("Proxy Middleware", () => {
         expect.objectContaining({ method: "POST" })
       );
       expect(response.status).toBe(200);
+    });
+
+    it("/api/* 에서 유효한 토큰의 선제 재발급이 AUTH401_7이어도 원래 요청을 통과시켜야 함", async () => {
+      const accessToken = createMockToken(3 * 60);
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
+        headers: { cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}` },
+      });
+
+      mockFetch.mockResolvedValueOnce(createRefreshMismatchResponse());
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("location")).toBeNull();
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
+      expectRefreshFailureLog({
+        reason: "http_error",
+        routeType: "api",
+        status: 401,
+        cookieClear: false,
+      });
     });
 
     it("/api/* 에서 재발급 성공 시 response cookies와 request header 모두에 새 토큰을 설정해야 함", async () => {

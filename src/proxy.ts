@@ -44,6 +44,7 @@ interface AuthFailureResponseOptions {
 
 type RefreshFailureReason = "http_error" | "invalid_response" | "timeout" | "network_error";
 type RouteType = "public" | "protected" | "api";
+type AccessTokenState = "valid" | "expiring" | "expired_or_invalid";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -79,7 +80,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
-    if (!accessToken || isTokenExpiringSoon(accessToken)) {
+    if (!accessToken || getAccessTokenState(accessToken) !== "valid") {
       return await tryRefreshToken(request, refreshToken, {
         allowPassThroughOnFailure: true,
         timeoutMs: SOFT_REFRESH_TIMEOUT_MS,
@@ -101,11 +102,25 @@ export async function proxy(request: NextRequest) {
     return await tryRefreshToken(request, refreshToken);
   }
 
-  // 토큰 만료 임박 체크
-  if (isTokenExpiringSoon(accessToken)) {
+  // 토큰 만료 상태 체크
+  const accessTokenState = getAccessTokenState(accessToken);
+
+  if (accessTokenState === "expiring") {
+    if (!refreshToken) {
+      return NextResponse.next();
+    }
+
+    return await tryRefreshToken(request, refreshToken, {
+      allowPassThroughOnFailure: true,
+      timeoutMs: SOFT_REFRESH_TIMEOUT_MS,
+    });
+  }
+
+  if (accessTokenState === "expired_or_invalid") {
     if (refreshToken) {
       return await tryRefreshToken(request, refreshToken);
     }
+
     return buildAuthFailureResponse(request, {
       clearAuth: true,
       reason: LOGIN_INTERNAL_ERROR_CODES.AUTH_REQUIRED,
@@ -226,28 +241,29 @@ function decodeBase64Url(value: string): string {
 }
 
 /**
- * JWT 토큰 만료 임박 여부 확인
+ * JWT 토큰 만료 상태 확인
  * 주의: Base64 디코딩만 수행하며 서명 검증은 백엔드에서 수행됨
  */
-function isTokenExpiringSoon(token: string): boolean {
+function getAccessTokenState(token: string): AccessTokenState {
   try {
-    // JWT 형식 검증 (필수 버그 픽스)
     const parts = token.split(".");
     if (parts.length !== 3 || !parts[1]) {
-      return true;
+      return "expired_or_invalid";
     }
 
     const payload = JSON.parse(decodeBase64Url(parts[1]));
-
-    // payload.exp 검증 (필수 버그 픽스)
-    if (!payload?.exp || typeof payload.exp !== "number") {
-      return true;
+    if (typeof payload?.exp !== "number") {
+      return "expired_or_invalid";
     }
 
-    const expiresAt = payload.exp * 1000;
-    return expiresAt - Date.now() < REFRESH_THRESHOLD_MS;
+    const remainingMs = payload.exp * 1000 - Date.now();
+    if (remainingMs <= 0) {
+      return "expired_or_invalid";
+    }
+
+    return remainingMs < REFRESH_THRESHOLD_MS ? "expiring" : "valid";
   } catch {
-    return true;
+    return "expired_or_invalid";
   }
 }
 
