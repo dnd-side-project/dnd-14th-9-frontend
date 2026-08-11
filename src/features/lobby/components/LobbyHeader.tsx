@@ -1,12 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/Button/Button";
-import { BookmarkFillIcon } from "@/components/Icon/BookmarkFillIcon";
-import { BookmarkIcon } from "@/components/Icon/BookmarkIcon";
 import { ChevronLeftIcon } from "@/components/Icon/ChevronLeftIcon";
 import { EditIcon } from "@/components/Icon/EditIcon";
 import { ExternalLinkIcon } from "@/components/Icon/ExternalLinkIcon";
@@ -43,7 +41,6 @@ export function LobbyHeader({
 }: LobbyHeaderProps) {
   const router = useRouter();
   const leaveButtonRef = useRef<HTMLButtonElement>(null);
-  const [isBookmarked, setIsBookmarked] = useState(false);
   const { shareSession } = useShareSession();
   const { handleLeave, isPending, serverError } = useLeaveSessionHandler({
     sessionId,
@@ -84,18 +81,6 @@ export function LobbyHeader({
             onClick={() => shareSession(Number(sessionId))}
             aria-label="세션 링크 공유"
             leftIcon={<ExternalLinkIcon size="xsmall" />}
-          />
-          <Button
-            iconOnly
-            variant="ghost"
-            colorScheme="secondary"
-            size="small"
-            onClick={() => setIsBookmarked((prev) => !prev)}
-            aria-pressed={isBookmarked}
-            aria-label={isBookmarked ? "북마크 해제" : "북마크"}
-            leftIcon={
-              isBookmarked ? <BookmarkFillIcon size="xsmall" /> : <BookmarkIcon size="xsmall" />
-            }
           />
         </div>
         {isHost && (
