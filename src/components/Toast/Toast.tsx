@@ -28,10 +28,10 @@ const TOAST_ICONS: Record<ToastType, React.ReactNode> = {
 };
 
 const TOAST_STYLES: Record<ToastType, string> = {
-  info: "bg-[#1a2332] border-[#2a4a6b]",
-  success: "bg-[#1a2e1a] border-[#2b5a2b]",
-  warning: "bg-[#2e2a1a] border-[#5a4a2b]",
-  error: "bg-[#2e1a1a] border-[#5a2b2b]",
+  info: "bg-[#1a2332] ring-[#2a4a6b]",
+  success: "bg-[#1a2e1a] ring-[#2b5a2b]",
+  warning: "bg-[#2e2a1a] ring-[#5a4a2b]",
+  error: "bg-[#2e1a1a] ring-[#5a2b2b]",
 };
 
 export function Toast({
@@ -63,7 +63,7 @@ export function Toast({
   return (
     <div
       className={cn(
-        "pointer-events-auto flex w-full max-w-[400px] items-center gap-3 overflow-hidden rounded-lg border p-4 shadow-[0px_0px_2px_0px_#00000014,0px_16px_24px_0px_#0000001f] transition-[opacity,transform]",
+        "pointer-events-auto flex w-[400px] max-w-full items-center gap-3 overflow-hidden rounded-lg p-4 shadow-[0px_0px_2px_0px_#00000014,0px_16px_24px_0px_#0000001f] ring-1 transition-[opacity,transform] ring-inset",
         isClosing
           ? "animate-out fade-out slide-out-to-top-2 duration-200"
           : "animate-in slide-in-from-top-2 fade-in duration-300",
@@ -71,9 +71,9 @@ export function Toast({
       )}
       role="alert"
     >
-      <div className="flex-shrink-0">{TOAST_ICONS[type]}</div>
+      <div className="flex size-5 flex-shrink-0">{TOAST_ICONS[type]}</div>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <p className="w-full text-sm leading-normal font-semibold break-words text-white">
+        <p className="w-full text-sm leading-[17px] font-semibold break-words text-white">
           {title}
         </p>
         {description ? (
@@ -86,7 +86,7 @@ export function Toast({
         <button
           type="button"
           onClick={handleClose}
-          className="flex-shrink-0 transition-colors"
+          className="flex size-4 flex-shrink-0 transition-colors"
           aria-label="닫기"
         >
           <XIcon size="xsmall" className="text-[#999999]" />

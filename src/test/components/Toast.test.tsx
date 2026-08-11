@@ -55,6 +55,19 @@ describe("Toast", () => {
     expect(screen.queryByRole("button", { name: "닫기" })).not.toBeInTheDocument();
   });
 
+  it("matches the Figma toast dimensions and alignment", () => {
+    renderToast({ type: "info" });
+
+    const alert = screen.getByRole("alert");
+    const icon = alert.querySelector('[aria-hidden="true"]');
+    const closeButton = screen.getByRole("button", { name: "닫기" });
+
+    expect(alert).toHaveClass("w-[400px]", "max-w-full", "ring-1", "ring-inset");
+    expect(icon?.parentElement).toHaveClass("flex", "size-5");
+    expect(screen.getByText(TOAST_CONTENT.title)).toHaveClass("leading-[17px]");
+    expect(closeButton).toHaveClass("flex", "size-4");
+  });
+
   it("renders only the title and shows the close button by default", () => {
     renderToast({ type: "info", title: "제목만 표시합니다.", description: undefined });
 
@@ -64,37 +77,31 @@ describe("Toast", () => {
   });
 
   it.each([
-    [
-      "info",
-      "bg-[#1a2332]",
-      "border-[#2a4a6b]",
-      "text-[#6699ff]",
-      "M10 10L10 14.5M10 6.66455V6.625",
-    ],
+    ["info", "bg-[#1a2332]", "ring-[#2a4a6b]", "text-[#6699ff]", "M10 10L10 14.5M10 6.66455V6.625"],
     [
       "success",
       "bg-[#1a2e1a]",
-      "border-[#2b5a2b]",
+      "ring-[#2b5a2b]",
       "text-[#4dcc66]",
       "M13.142 7.98299L8.875 12.25L7.42049 10.7955",
     ],
     [
       "warning",
       "bg-[#2e2a1a]",
-      "border-[#5a4a2b]",
+      "ring-[#5a4a2b]",
       "text-[#ffcc4d]",
       "M10.0006 9.90003V5.41447M10.0006 13.2248V13.2642",
     ],
-    ["error", "bg-[#2e1a1a]", "border-[#5a2b2b]", "text-[#ff5959]", "M10 10V5.5M10 13.3354V13.375"],
+    ["error", "bg-[#2e1a1a]", "ring-[#5a2b2b]", "text-[#ff5959]", "M10 10V5.5M10 13.3354V13.375"],
   ] as const)(
     "applies the Figma %s visual state",
-    (type, backgroundClass, borderClass, iconColorClass, iconPath) => {
+    (type, backgroundClass, ringClass, iconColorClass, iconPath) => {
       renderToast({ type });
 
       const alert = screen.getByRole("alert");
       const icon = alert.querySelector('[aria-hidden="true"]');
 
-      expect(alert).toHaveClass(backgroundClass, borderClass);
+      expect(alert).toHaveClass(backgroundClass, ringClass);
       expect(icon).toHaveClass(iconColorClass);
       expect(icon?.querySelector("path")).toHaveAttribute("d", expect.stringContaining(iconPath));
     }
