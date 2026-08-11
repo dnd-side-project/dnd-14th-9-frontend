@@ -39,8 +39,10 @@ import {
   SESSION_PARTICIPANTS_DEFAULT,
   SESSION_PARTICIPANTS_MAX,
   SESSION_PARTICIPANTS_MIN,
+  SESSION_RATE_DEFAULT,
 } from "../constants/sessionLimits";
 import { useCreateSession, useUpdateSession } from "../hooks/useSessionHooks";
+import { clampToRateLimit, resolveSessionRateRange } from "../utils/sessionRateLimits";
 import { validateSessionForm, type SessionFormErrors } from "../utils/validateSessionForm";
 
 import { SessionCreateConfirmDialog } from "./SessionCreateConfirmDialog";
@@ -84,12 +86,31 @@ export function SessionCreateForm({
   const [participants, setParticipants] = useState(
     initialValues?.maxParticipants ?? SESSION_PARTICIPANTS_DEFAULT
   ); // 기본값 5명
-  const [achievementRange, setAchievementRange] = useState(
-    initialValues ? (initialValues.requiredAchievementRate ?? 0) : 50
+  const [achievementRangeInput, setAchievementRange] = useState(
+    initialValues ? (initialValues.requiredAchievementRate ?? 0) : SESSION_RATE_DEFAULT
   ); // To do 달성도 범위
-  const [focusRange, setFocusRange] = useState(
-    initialValues ? (initialValues.requiredFocusRate ?? 0) : 50
+  const [focusRangeInput, setFocusRange] = useState(
+    initialValues ? (initialValues.requiredFocusRate ?? 0) : SESSION_RATE_DEFAULT
   ); // 집중도 범위
+
+  // 참여 조건은 내 달성률·집중률을 넘을 수 없다. (안내 문구와 동일한 규칙)
+  const { value: achievementRange, limit: achievementLimit } = resolveSessionRateRange({
+    isEdit,
+    input: achievementRangeInput,
+    savedRate: initialValues?.requiredAchievementRate ?? 0,
+    profileRate: myProfile?.todoCompletionRate,
+  });
+  const { value: focusRange, limit: focusLimit } = resolveSessionRateRange({
+    isEdit,
+    input: focusRangeInput,
+    savedRate: initialValues?.requiredFocusRate ?? 0,
+    profileRate: myProfile?.focusRate,
+  });
+  const defaultAchievementRange = clampToRateLimit(
+    SESSION_RATE_DEFAULT,
+    myProfile?.todoCompletionRate
+  );
+  const defaultFocusRange = clampToRateLimit(SESSION_RATE_DEFAULT, myProfile?.focusRate);
 
   // DatePicker 팝업 상태
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -176,8 +197,8 @@ export function SessionCreateForm({
     startDateTime !== null ||
     duration !== SESSION_DURATION_MINUTES_DEFAULT ||
     participants !== SESSION_PARTICIPANTS_DEFAULT ||
-    achievementRange !== 50 ||
-    focusRange !== 50;
+    achievementRange !== defaultAchievementRange ||
+    focusRange !== defaultFocusRange;
 
   const hasUnsavedChanges = isEdit ? editDirty : createDirty;
 
@@ -532,6 +553,7 @@ export function SessionCreateForm({
               onChange={setAchievementRange}
               myFocusValue={myProfile?.todoCompletionRate}
               myFocusLabel="내 달성률"
+              limit={achievementLimit}
               className="w-[80%]"
             />
           </div>
@@ -555,6 +577,7 @@ export function SessionCreateForm({
               value={focusRange}
               onChange={setFocusRange}
               myFocusValue={myProfile?.focusRate}
+              limit={focusLimit}
               className="w-[80%]"
             />
           </div>

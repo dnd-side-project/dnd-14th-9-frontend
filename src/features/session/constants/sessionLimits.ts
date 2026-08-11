@@ -6,3 +6,6 @@ export const SESSION_DURATION_MINUTES_DEFAULT = 90;
 export const SESSION_PARTICIPANTS_MIN = 1;
 export const SESSION_PARTICIPANTS_MAX = 10;
 export const SESSION_PARTICIPANTS_DEFAULT = 5;
+
+/** 참여 조건(달성률·집중률) 슬라이더 기본값 */
+export const SESSION_RATE_DEFAULT = 50;
