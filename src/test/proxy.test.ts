@@ -658,6 +658,25 @@ describe("Proxy Middleware", () => {
       expect(mockFetch).toHaveBeenCalled();
       expect(response.status).toBe(200);
     });
+
+    it("잘못된 형식의 accessToken 재발급이 실패하면 로그인으로 리다이렉트하고 인증 쿠키를 삭제해야 함", async () => {
+      const invalidToken = "invalid.token.format";
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
+        headers: {
+          cookie: `accessToken=${invalidToken}; refreshToken=${refreshToken}`,
+        },
+      });
+
+      mockFetch.mockResolvedValueOnce(createRefreshMismatchResponse());
+
+      const response = await proxy(request);
+
+      expectLoginRedirect(response, "AUTH401_7");
+      expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
+    });
   });
 
   describe("토큰 재발급", () => {
@@ -874,8 +893,7 @@ describe("Proxy Middleware", () => {
       expect(response.status).toBe(200);
       expect(mockFetch).not.toHaveBeenCalled(); // 재발급 시도 안함
 
-      // 참고: 5분 후 만료 임박 시 refreshToken 없어서 재발급 실패할 것
-      // 이는 "토큰 만료 임박 시 refreshToken 없음" 테스트에서 검증됨
+      // 참고: accessToken이 유효한 동안에는 refreshToken이 없어도 통과함
     });
 
     it("보호된 라우트에서 accessToken만 있고 refreshToken이 없을 때 경고 로그를 남겨야 함", async () => {
