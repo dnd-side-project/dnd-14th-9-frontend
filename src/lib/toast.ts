@@ -1,10 +1,20 @@
-export type ToastType = "success" | "error" | "info";
+export type ToastType = "success" | "error" | "info" | "warning";
+
+export interface ToastOptions {
+  title: string;
+  description?: string;
+  showClose?: boolean;
+}
+
+export type ToastContent = string | ToastOptions;
 
 // 화면에 실제로 그려질 토스트 한 개의 데이터 형태
 export interface ToastItem {
   id: string;
   type: ToastType;
-  message: string;
+  title: string;
+  description?: string;
+  showClose: boolean;
   duration: number;
 }
 
@@ -35,13 +45,21 @@ const emit = (event: ToastEvent) => {
 };
 
 // 토스트 표시 이벤트 발행
-const showToast = (type: ToastType, message: string, duration = 3000) => {
+const normalizeToastContent = (content: ToastContent) => {
+  if (typeof content === "string") {
+    return { title: content, showClose: true };
+  }
+
+  return { ...content, showClose: content.showClose ?? true };
+};
+
+const showToast = (type: ToastType, content: ToastContent, duration = 3000) => {
   emit({
     type: "show",
     toast: {
       id: createToastId(),
       type,
-      message,
+      ...normalizeToastContent(content),
       duration,
     },
   });
@@ -66,7 +84,8 @@ export const toast = {
   subscribe,
   showToast,
   hideToast,
-  success: (message: string, duration?: number) => showToast("success", message, duration),
-  error: (message: string, duration?: number) => showToast("error", message, duration),
-  info: (message: string, duration?: number) => showToast("info", message, duration),
+  success: (content: ToastContent, duration?: number) => showToast("success", content, duration),
+  error: (content: ToastContent, duration?: number) => showToast("error", content, duration),
+  info: (content: ToastContent, duration?: number) => showToast("info", content, duration),
+  warning: (content: ToastContent, duration?: number) => showToast("warning", content, duration),
 };
