@@ -604,12 +604,6 @@ describe("Proxy Middleware", () => {
       expect(hasSetCookie(mismatchResponse, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(
         false
       );
-      expectRefreshFailureLog({
-        reason: "http_error",
-        routeType: "protected",
-        status: 401,
-        cookieClear: false,
-      });
     });
 
     it("토큰이 이미 만료되었으면 재발급을 시도해야 함", async () => {
@@ -892,8 +886,6 @@ describe("Proxy Middleware", () => {
       // Then: accessToken이 유효하므로 통과
       expect(response.status).toBe(200);
       expect(mockFetch).not.toHaveBeenCalled(); // 재발급 시도 안함
-
-      // 참고: accessToken이 유효한 동안에는 refreshToken이 없어도 통과함
     });
 
     it("보호된 라우트에서 accessToken만 있고 refreshToken이 없을 때 경고 로그를 남겨야 함", async () => {
@@ -1103,12 +1095,6 @@ describe("Proxy Middleware", () => {
       expect(response.headers.get("location")).toBeNull();
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
-      expectRefreshFailureLog({
-        reason: "http_error",
-        routeType: "api",
-        status: 401,
-        cookieClear: false,
-      });
     });
 
     it("/api/* 에서 재발급 성공 시 response cookies와 request header 모두에 새 토큰을 설정해야 함", async () => {

@@ -36,6 +36,11 @@ interface TryRefreshTokenOptions {
   timeoutMs?: number;
 }
 
+const SOFT_REFRESH_OPTIONS: TryRefreshTokenOptions = {
+  allowPassThroughOnFailure: true,
+  timeoutMs: SOFT_REFRESH_TIMEOUT_MS,
+};
+
 interface AuthFailureResponseOptions {
   clearAuth?: boolean;
   reason?: string;
@@ -81,10 +86,7 @@ export async function proxy(request: NextRequest) {
     }
 
     if (!accessToken || getAccessTokenState(accessToken) !== "valid") {
-      return await tryRefreshToken(request, refreshToken, {
-        allowPassThroughOnFailure: true,
-        timeoutMs: SOFT_REFRESH_TIMEOUT_MS,
-      });
+      return await tryRefreshToken(request, refreshToken, SOFT_REFRESH_OPTIONS);
     }
 
     return NextResponse.next();
@@ -110,10 +112,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
-    return await tryRefreshToken(request, refreshToken, {
-      allowPassThroughOnFailure: true,
-      timeoutMs: SOFT_REFRESH_TIMEOUT_MS,
-    });
+    return await tryRefreshToken(request, refreshToken, SOFT_REFRESH_OPTIONS);
   }
 
   if (accessTokenState === "expired_or_invalid") {
