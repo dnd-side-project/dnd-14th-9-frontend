@@ -39,7 +39,9 @@ interface UseSSEReturn<T> {
   data: T | null;
   status: SSEConnectionStatus;
   error: SSEError | null;
+  /** 이 훅의 구독을 재개한다. 공유 커넥션이 끊겨 있을 때만 물리 재연결을 요청한다. */
   reconnect: () => void;
+  /** 이 훅의 구독만 해제한다. 다른 구독자가 남아 있으면 공유 커넥션은 유지된다. */
   disconnect: () => void;
 }
 
@@ -59,6 +61,8 @@ export function useSSE<T>({
   const [data, setData] = useState<T | null>(null);
   const [status, setStatus] = useState<SSEConnectionStatus>("idle");
   const [error, setError] = useState<SSEError | null>(null);
+  // 이 훅만 구독을 쉬는 상태. 공유 커넥션의 물리 연결 상태와는 별개다.
+  const [paused, setPaused] = useState(false);
 
   const clientRef = useRef<SSEClient | null>(null);
   const onDataRef = useRef(onData);
@@ -76,24 +80,41 @@ export function useSSE<T>({
     onErrorRef.current = onError;
   }, [onError]);
 
-  const connect = () => {
-    if (!clientRef.current) return;
-
-    setError(null);
-    clientRef.current.connect(url);
-  };
-
+  /**
+   * 이 훅의 구독만 해제한다.
+   *
+   * 공유 커넥션(`acquireSSEClient`)을 직접 끊지 않는다. 같은 url을 구독하는 다른 훅이
+   * 남아 있으면 물리 연결은 그대로 유지되고, 마지막 구독자가 빠지는 시점에
+   * `releaseSSEClient`가 참조 카운트 0을 확인하고 실제로 끊는다.
+   */
   const disconnect = () => {
-    clientRef.current?.disconnect();
+    setPaused(true);
+    setStatus("idle");
   };
 
+  /**
+   * 이 훅의 구독을 재개한다.
+   *
+   * pause 상태였다면 effect가 다시 구독하면서 `acquireSSEClient`가 idle/disconnected인
+   * 공유 클라이언트를 되살린다. 구독 중인데 공유 커넥션만 끊긴 경우
+   * (재연결 시도 소진 등)에만 물리 재연결을 직접 요청한다.
+   */
   const reconnect = () => {
-    disconnect();
-    connect();
+    setError(null);
+
+    if (paused) {
+      setPaused(false);
+      return;
+    }
+
+    const client = clientRef.current;
+    if (client && (client.status === "idle" || client.status === "disconnected")) {
+      client.connect(url);
+    }
   };
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || paused) return;
 
     // 같은 url을 구독하는 훅끼리 커넥션 1개를 공유한다 (참조 카운트로 수명 관리).
     const client = acquireSSEClient(url);
@@ -142,7 +163,7 @@ export function useSSE<T>({
       clientRef.current = null;
       releaseSSEClient(url);
     };
-  }, [url, eventKey, enabled, replayLastEvent]);
+  }, [url, eventKey, enabled, paused, replayLastEvent]);
 
   return {
     data,

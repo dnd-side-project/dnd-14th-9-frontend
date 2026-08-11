@@ -336,7 +336,7 @@ describe("useWaitingMembersSSE", () => {
   });
 
   describe("disconnect", () => {
-    it("disconnect 호출 시 SSE 연결이 해제되어야 합니다", () => {
+    it("마지막 구독자가 disconnect하면 공유 커넥션이 해제되어야 합니다", () => {
       const { result } = renderHook(() =>
         useWaitingMembersSSE({
           sessionId: "test-session",
@@ -349,17 +349,48 @@ describe("useWaitingMembersSSE", () => {
       });
 
       expect(mockDisconnect).toHaveBeenCalled();
+      expect(result.current.status).toBe("idle");
+    });
+
+    it("다른 구독자가 남아 있으면 공유 커넥션을 끊지 않아야 합니다", () => {
+      const first = renderHook(() =>
+        useWaitingMembersSSE({ sessionId: "test-session", enabled: true })
+      );
+      const second = renderHook(() =>
+        useWaitingMembersSSE({ sessionId: "test-session", enabled: true })
+      );
+
+      mockDisconnect.mockClear();
+
+      act(() => {
+        first.result.current.disconnect();
+      });
+
+      // 참조 카운트가 아직 1이므로 물리 연결은 유지된다.
+      expect(mockDisconnect).not.toHaveBeenCalled();
+
+      // 남아 있는 구독자는 계속 이벤트를 받아야 한다.
+      const mockData: WaitingMembersEventData = { participantCount: 1, members: [] };
+      act(() => {
+        simulateSSEEvent("waiting-members-updated", { eventType: "ROOM_UPDATE", data: mockData });
+      });
+
+      expect(second.result.current.data).toEqual(mockData);
     });
   });
 
   describe("reconnect", () => {
-    it("reconnect 호출 시 disconnect 후 connect가 호출되어야 합니다", () => {
+    it("공유 커넥션이 살아 있으면 물리 재연결을 하지 않아야 합니다", () => {
       const { result } = renderHook(() =>
         useWaitingMembersSSE({
           sessionId: "test-session",
           enabled: true,
         })
       );
+
+      act(() => {
+        simulateStatusChange("connected");
+      });
 
       mockConnect.mockClear();
       mockDisconnect.mockClear();
@@ -368,8 +399,58 @@ describe("useWaitingMembersSSE", () => {
         result.current.reconnect();
       });
 
-      expect(mockDisconnect).toHaveBeenCalled();
-      expect(mockConnect).toHaveBeenCalled();
+      expect(mockDisconnect).not.toHaveBeenCalled();
+      expect(mockConnect).not.toHaveBeenCalled();
+    });
+
+    it("공유 커넥션이 끊겨 있으면 재연결을 요청해야 합니다", () => {
+      const { result } = renderHook(() =>
+        useWaitingMembersSSE({
+          sessionId: "test-session",
+          enabled: true,
+        })
+      );
+
+      act(() => {
+        simulateStatusChange("disconnected");
+      });
+
+      mockConnect.mockClear();
+
+      act(() => {
+        result.current.reconnect();
+      });
+
+      expect(mockConnect).toHaveBeenCalledWith("/api/sse/room/test-session");
+    });
+
+    it("disconnect 후 reconnect하면 구독이 재개되어야 합니다", () => {
+      const { result } = renderHook(() =>
+        useWaitingMembersSSE({
+          sessionId: "test-session",
+          enabled: true,
+        })
+      );
+
+      act(() => {
+        result.current.disconnect();
+      });
+
+      mockConnect.mockClear();
+
+      act(() => {
+        result.current.reconnect();
+      });
+
+      // 마지막 구독자였으므로 레지스트리에서 제거됐고, 재구독 시 다시 연결된다.
+      expect(mockConnect).toHaveBeenCalledWith("/api/sse/room/test-session");
+
+      const mockData: WaitingMembersEventData = { participantCount: 2, members: [] };
+      act(() => {
+        simulateSSEEvent("waiting-members-updated", { eventType: "ROOM_UPDATE", data: mockData });
+      });
+
+      expect(result.current.data).toEqual(mockData);
     });
   });
 

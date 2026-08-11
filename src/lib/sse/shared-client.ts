@@ -13,14 +13,14 @@ interface SharedClientEntry {
  * (백엔드는 같은 sessionId+memberId 재구독 시 이전 연결을 끊으므로 서로를 끊어먹는다.)
  * 참조 카운트로 커넥션 수명을 관리해 구독자가 모두 사라졌을 때만 실제로 연결을 끊는다.
  */
-const sharedClients = new Map<string, SharedClientEntry>();
+const SHARED_CLIENTS = new Map<string, SharedClientEntry>();
 
 export function acquireSSEClient(url: string): SSEClient {
-  let entry = sharedClients.get(url);
+  let entry = SHARED_CLIENTS.get(url);
 
   if (!entry) {
     entry = { client: new SSEClient(), refCount: 0 };
-    sharedClients.set(url, entry);
+    SHARED_CLIENTS.set(url, entry);
   }
 
   entry.refCount += 1;
@@ -36,22 +36,22 @@ export function acquireSSEClient(url: string): SSEClient {
 }
 
 export function releaseSSEClient(url: string): void {
-  const entry = sharedClients.get(url);
+  const entry = SHARED_CLIENTS.get(url);
   if (!entry) return;
 
   entry.refCount -= 1;
   if (entry.refCount > 0) return;
 
-  sharedClients.delete(url);
+  SHARED_CLIENTS.delete(url);
   entry.client.disconnect();
   entry.client.removeAllListeners();
 }
 
 /** 테스트 전용: 레지스트리에 남은 커넥션을 모두 정리한다. */
 export function resetSharedSSEClients(): void {
-  sharedClients.forEach((entry) => {
+  SHARED_CLIENTS.forEach((entry) => {
     entry.client.disconnect();
     entry.client.removeAllListeners();
   });
-  sharedClients.clear();
+  SHARED_CLIENTS.clear();
 }
