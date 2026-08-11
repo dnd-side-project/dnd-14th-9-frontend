@@ -35,7 +35,10 @@ export function useStepperSlide({
 
   // limit은 눈금 스케일(min~max)은 그대로 두고 선택 상한만 낮춘다.
   // 소수점 비율(예: 63.5)이 들어와도 상한을 넘기지 않도록 내림한다.
-  const selectableMax = limit === undefined ? max : Math.min(max, Math.max(min, Math.floor(limit)));
+  // 상한을 넘는 value가 들어와도 상한이 value 아래로 내려가지는 않는다.
+  // (그러면 aria-valuenow > aria-valuemax가 되고, 증가 키가 값을 상한까지 낮춘다.)
+  const selectableMax =
+    limit === undefined ? max : Math.min(max, Math.max(min, Math.floor(limit), value));
 
   const getValueFromPosition = (clientX: number) => {
     if (!trackRef.current) return min;

@@ -42,6 +42,7 @@ import {
   SESSION_RATE_DEFAULT,
 } from "../constants/sessionLimits";
 import { useCreateSession, useUpdateSession } from "../hooks/useSessionHooks";
+import { clampToRateLimit, resolveSessionRateRange } from "../utils/sessionRateLimits";
 import { validateSessionForm, type SessionFormErrors } from "../utils/validateSessionForm";
 
 import { SessionCreateConfirmDialog } from "./SessionCreateConfirmDialog";
@@ -93,20 +94,23 @@ export function SessionCreateForm({
   ); // 집중도 범위
 
   // 참여 조건은 내 달성률·집중률을 넘을 수 없다. (안내 문구와 동일한 규칙)
-  // 소수점 비율이 와도 상한을 넘기지 않도록 내림한다.
-  const achievementLimit = myProfile?.todoCompletionRate;
-  const focusLimit = myProfile?.focusRate;
-  const clampToLimit = (rate: number, limit: number | undefined) =>
-    limit === undefined ? rate : Math.min(rate, Math.max(0, Math.floor(limit)));
-
-  // 생성 모드: 프로필 로딩 전에 잡힌 기본값(50)이 상한을 넘으면 상한으로 낮춰 사용한다.
-  // 수정 모드: 이미 저장된 값은 상한을 넘더라도 임의로 낮추지 않고, 상향 조작만 슬라이더에서 막는다.
-  const achievementRange = isEdit
-    ? achievementRangeInput
-    : clampToLimit(achievementRangeInput, achievementLimit);
-  const focusRange = isEdit ? focusRangeInput : clampToLimit(focusRangeInput, focusLimit);
-  const defaultAchievementRange = clampToLimit(SESSION_RATE_DEFAULT, achievementLimit);
-  const defaultFocusRange = clampToLimit(SESSION_RATE_DEFAULT, focusLimit);
+  const { value: achievementRange, limit: achievementLimit } = resolveSessionRateRange({
+    isEdit,
+    input: achievementRangeInput,
+    savedRate: initialValues?.requiredAchievementRate ?? 0,
+    profileRate: myProfile?.todoCompletionRate,
+  });
+  const { value: focusRange, limit: focusLimit } = resolveSessionRateRange({
+    isEdit,
+    input: focusRangeInput,
+    savedRate: initialValues?.requiredFocusRate ?? 0,
+    profileRate: myProfile?.focusRate,
+  });
+  const defaultAchievementRange = clampToRateLimit(
+    SESSION_RATE_DEFAULT,
+    myProfile?.todoCompletionRate
+  );
+  const defaultFocusRange = clampToRateLimit(SESSION_RATE_DEFAULT, myProfile?.focusRate);
 
   // DatePicker 팝업 상태
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);

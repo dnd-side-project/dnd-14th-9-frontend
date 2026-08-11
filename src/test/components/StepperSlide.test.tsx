@@ -248,6 +248,44 @@ describe("StepperSlide", () => {
     });
   });
 
+  describe("limit보다 큰 value (수정 모드의 기존 값)", () => {
+    it("aria-valuemax가 value보다 작아지지 않아야 합니다", () => {
+      const onChange = jest.fn();
+      render(<StepperSlide value={80} onChange={onChange} limit={60} />);
+
+      const slider = screen.getByRole("slider");
+      expect(slider).toHaveAttribute("aria-valuenow", "80");
+      expect(slider).toHaveAttribute("aria-valuemax", "80");
+    });
+
+    it("증가 키가 값을 상한까지 낮추지 않아야 합니다", () => {
+      const onChange = jest.fn();
+      render(<StepperSlide value={80} onChange={onChange} limit={60} />);
+
+      fireEvent.keyDown(screen.getByRole("slider"), { key: "ArrowRight" });
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it("End 키가 값을 상한까지 낮추지 않아야 합니다", () => {
+      const onChange = jest.fn();
+      render(<StepperSlide value={80} onChange={onChange} limit={60} />);
+
+      fireEvent.keyDown(screen.getByRole("slider"), { key: "End" });
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it("하향 조작은 그대로 열려 있어야 합니다", () => {
+      const onChange = jest.fn();
+      render(<StepperSlide value={80} onChange={onChange} limit={60} />);
+
+      fireEvent.keyDown(screen.getByRole("slider"), { key: "ArrowLeft" });
+
+      expect(onChange).toHaveBeenCalledWith(79);
+    });
+  });
+
   describe("커스텀 min/max", () => {
     it("커스텀 min/max 범위에서 올바르게 동작해야 합니다", () => {
       const onChange = jest.fn();
