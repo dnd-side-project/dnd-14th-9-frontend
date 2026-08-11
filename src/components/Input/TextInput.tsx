@@ -148,7 +148,7 @@ export function TextInput({
     onClear?.();
   };
 
-  const showClearButton = hasValue && isFocused && !disabled && !error;
+  const showClearButton = Boolean(onClear) && hasValue && isFocused && !disabled && !error;
 
   return (
     <div className={cn("flex w-full flex-col gap-2", !fullWidth && "max-w-95", containerClassName)}>
