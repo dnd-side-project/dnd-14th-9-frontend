@@ -53,10 +53,14 @@ describe("login-page-policy", () => {
       expect(getLoginReasonMessage("OAUTH500_1")).toBe("예상치 못한 오류가 발생했습니다.");
     });
 
-    it("백엔드 인증 에러 코드도 사용자 메시지로 변환해야 함", () => {
-      expect(getLoginReasonMessage("AUTH401_4")).toBe("기한이 만료된 Refresh 토큰입니다.");
-      expect(getLoginReasonMessage("AUTH401_6")).toBe("Refresh 토큰이 전달되지 않았습니다.");
-    });
+    it.each(["AUTH401_4", "AUTH401_5", "AUTH401_6", "AUTH401_7"])(
+      "Refresh 토큰 실패 코드 %s를 사용자용 세션 만료 문구로 변환해야 함",
+      (reason) => {
+        expect(getLoginReasonMessage(reason)).toBe(
+          "로그인 정보가 만료되었습니다. 다시 로그인해 주세요."
+        );
+      }
+    );
 
     it("알 수 없는 코드/빈 값은 null을 반환해야 함", () => {
       expect(getLoginReasonMessage("OAUTH999_1")).toBeNull();
