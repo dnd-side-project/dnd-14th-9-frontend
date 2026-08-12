@@ -63,6 +63,9 @@ export function useSSE<T>({
   const [error, setError] = useState<SSEError | null>(null);
   // 이 훅만 구독을 쉬는 상태. 공유 커넥션의 물리 연결 상태와는 별개다.
   const [paused, setPaused] = useState(false);
+  // paused의 동기 미러. 같은 배치에서 disconnect() 직후 reconnect()가 호출되면
+  // state는 아직 이전 값이므로, ref로 최신 pause 여부를 판단한다.
+  const pausedRef = useRef(false);
 
   const clientRef = useRef<SSEClient | null>(null);
   const onDataRef = useRef(onData);
@@ -88,6 +91,7 @@ export function useSSE<T>({
    * `releaseSSEClient`가 참조 카운트 0을 확인하고 실제로 끊는다.
    */
   const disconnect = () => {
+    pausedRef.current = true;
     setPaused(true);
     setStatus("idle");
   };
@@ -102,8 +106,16 @@ export function useSSE<T>({
   const reconnect = () => {
     setError(null);
 
-    if (paused) {
+    if (pausedRef.current) {
+      pausedRef.current = false;
       setPaused(false);
+      // 같은 배치에서 disconnect() 직후 호출되면 paused state가 실제로 바뀌지 않아
+      // effect가 재실행되지 않는다. 이때는 구독이 살아 있으므로 클라이언트의
+      // 현재 상태로 status만 되돌린다. (진짜 pause였다면 clientRef는 null이다)
+      const client = clientRef.current;
+      if (client) {
+        setStatus(client.status);
+      }
       return;
     }
 
