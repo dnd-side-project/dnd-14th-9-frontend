@@ -197,7 +197,9 @@ describe("Proxy Middleware", () => {
       disposition: RefreshDisposition;
     }>
   ) {
-    const matchingCall = consoleErrorSpy.mock.calls.find(([message, context]) => {
+    const logCalls =
+      details.mode === "soft" ? consoleWarnSpy.mock.calls : consoleErrorSpy.mock.calls;
+    const matchingCall = logCalls.find(([message, context]) => {
       if (message !== "Proxy: Token refresh failed") {
         return false;
       }
@@ -806,6 +808,10 @@ describe("Proxy Middleware", () => {
     });
 
     it("지문 계산 실패 경고는 정적 필드만 사용해 warm module당 한 번만 남겨야 함", async () => {
+      let isolatedProxy!: typeof proxy;
+      await jest.isolateModulesAsync(async () => {
+        ({ proxy: isolatedProxy } = await import("@/proxy"));
+      });
       const createRequest = () =>
         new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
           headers: {
@@ -817,8 +823,8 @@ describe("Proxy Middleware", () => {
         .mockResolvedValueOnce(createRefreshSuccessResponse())
         .mockResolvedValueOnce(createRefreshSuccessResponse());
 
-      await proxy(createRequest());
-      await proxy(createRequest());
+      await isolatedProxy(createRequest());
+      await isolatedProxy(createRequest());
 
       const bypassCalls = consoleWarnSpy.mock.calls.filter(
         ([message]) => message === "Proxy: Token refresh fingerprint bypass"

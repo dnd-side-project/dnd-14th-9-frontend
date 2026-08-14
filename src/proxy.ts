@@ -214,6 +214,11 @@ function logRefreshFailure(
     disposition: details.disposition,
   };
 
+  if (details.mode === "soft") {
+    console.warn("Proxy: Token refresh failed", context);
+    return;
+  }
+
   console.error("Proxy: Token refresh failed", context);
 }
 

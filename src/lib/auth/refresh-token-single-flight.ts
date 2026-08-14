@@ -54,6 +54,7 @@ interface SuccessEntry {
 
 type RefreshFlightEntry = InFlightEntry | SuccessEntry;
 
+// 이 Map은 같은 warm instance의 중복만 줄이며, 인스턴스 간 멱등성은 백엔드가 보장한다.
 const refreshFlights = new Map<string, RefreshFlightEntry>();
 
 function deleteEntryIfCurrent(fingerprint: string, entry: RefreshFlightEntry) {
@@ -292,6 +293,7 @@ export async function joinSoftRefreshSingleFlight(
 ): Promise<SoftRefreshResult> {
   const deadlineAt = Date.now() + SOFT_REFRESH_TOTAL_TIMEOUT_MS;
   let callerTimedOut = false;
+  const hasCallerTimedOut = () => callerTimedOut || Date.now() >= deadlineAt;
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeoutPromise = new Promise<SoftRefreshResult>((resolve) => {
     timeoutId = setTimeout(() => {
@@ -307,12 +309,10 @@ export async function joinSoftRefreshSingleFlight(
     try {
       fingerprint = await createRefreshTokenFingerprint(refreshToken);
     } catch {
-      return callerTimedOut || Date.now() >= deadlineAt
-        ? { kind: "caller_timeout" }
-        : { kind: "miss" };
+      return hasCallerTimedOut() ? { kind: "caller_timeout" } : { kind: "miss" };
     }
 
-    if (callerTimedOut || Date.now() >= deadlineAt) {
+    if (hasCallerTimedOut()) {
       return { kind: "caller_timeout" };
     }
 
@@ -321,6 +321,10 @@ export async function joinSoftRefreshSingleFlight(
       return { kind: "miss" };
     }
     if (entry.kind === "success") {
+      if (hasCallerTimedOut()) {
+        return { kind: "caller_timeout" };
+      }
+
       return {
         kind: "outcome",
         disposition: "reused",
@@ -328,13 +332,12 @@ export async function joinSoftRefreshSingleFlight(
       };
     }
 
-    const remainingMs = deadlineAt - Date.now();
-    if (remainingMs <= 0) {
+    if (hasCallerTimedOut()) {
       return { kind: "caller_timeout" };
     }
 
     const outcome = await entry.promise;
-    if (callerTimedOut || Date.now() >= deadlineAt) {
+    if (hasCallerTimedOut()) {
       return { kind: "caller_timeout" };
     }
 

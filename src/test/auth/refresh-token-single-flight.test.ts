@@ -57,9 +57,15 @@ function uniqueRefreshToken(label: string) {
   return `${label}-${tokenSequence}`;
 }
 
-function mockSingleTokenDigest() {
+function createUniqueDigest() {
   digestSequence += 1;
-  const digest = new Uint8Array(32).fill(digestSequence).buffer;
+  const digest = new ArrayBuffer(32);
+  new DataView(digest).setUint32(0, digestSequence);
+  return digest;
+}
+
+function mockSingleTokenDigest() {
+  const digest = createUniqueDigest();
   return jest.spyOn(crypto.subtle, "digest").mockResolvedValue(digest);
 }
 
@@ -176,8 +182,7 @@ describe("refresh-token-single-flight", () => {
 
   it("soft 지문 계산이 1,499ms에 끝나면 남은 예산 안에서 기존 성공 결과를 재사용해야 함", async () => {
     const refreshToken = uniqueRefreshToken("soft-delayed-reuse");
-    digestSequence += 1;
-    const fingerprint = new Uint8Array(32).fill(digestSequence).buffer;
+    const fingerprint = createUniqueDigest();
     const delayedDigest = deferred<ArrayBuffer>();
     jest
       .spyOn(crypto.subtle, "digest")
@@ -200,8 +205,7 @@ describe("refresh-token-single-flight", () => {
 
   it("soft shared wait는 지문 계산 뒤 남은 총 예산만 사용해야 함", async () => {
     const refreshToken = uniqueRefreshToken("soft-remaining-budget");
-    digestSequence += 1;
-    const fingerprint = new Uint8Array(32).fill(digestSequence).buffer;
+    const fingerprint = createUniqueDigest();
     const delayedDigest = deferred<ArrayBuffer>();
     const backendResponse = deferred<Response>();
     const fetchStarted = deferred<void>();
