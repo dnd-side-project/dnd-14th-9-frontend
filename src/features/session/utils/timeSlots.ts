@@ -1,6 +1,6 @@
 import type { TimeSlot } from "../types";
 
-export const TIME_SLOT_ORDER: TimeSlot[] = ["MORNING", "AFTERNOON", "EVENING"];
+export const TIME_SLOT_ORDER: TimeSlot[] = ["DAWN", "MORNING", "AFTERNOON", "EVENING"];
 
 const TIME_SLOT_SET = new Set<TimeSlot>(TIME_SLOT_ORDER);
 
