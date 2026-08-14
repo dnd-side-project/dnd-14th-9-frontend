@@ -5,7 +5,11 @@ import type {
   SSEEventCallback,
   SSEError,
   SSEErrorCode,
+  SSESubscribeOptions,
 } from "./types";
+
+const LIVE_DELIVERY = { replayed: false } as const;
+const REPLAY_DELIVERY = { replayed: true } as const;
 
 const DEFAULT_OPTIONS: Required<SSEClientOptions> = {
   maxReconnectAttempts: 5,
@@ -19,6 +23,7 @@ export class SSEClient<TEventType extends string = string> {
   private listeners = new Map<string, Set<SSEEventCallback<unknown>>>();
   private statusListeners = new Set<(status: SSEConnectionStatus) => void>();
   private registeredEvents = new Set<string>(); // EventSource에 등록된 이벤트 타입 추적
+  private lastEvents = new Map<string, unknown>(); // 이벤트명별 마지막 payload (늦은 구독자 재생용)
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private stableConnectionTimer: ReturnType<typeof setTimeout> | null = null;
@@ -57,7 +62,7 @@ export class SSEClient<TEventType extends string = string> {
   private emit<T>(event: string, data: T): void {
     this.listeners.get(event)?.forEach((callback) => {
       try {
-        (callback as SSEEventCallback<T>)(data);
+        (callback as SSEEventCallback<T>)(data, LIVE_DELIVERY);
       } catch (error) {
         this.log(`Error in event handler for ${event}`, "error");
         console.error(error);
@@ -166,6 +171,7 @@ export class SSEClient<TEventType extends string = string> {
       try {
         const data = JSON.parse(messageEvent.data);
         this.log(`Received ${eventName}: ${JSON.stringify(data)}`);
+        this.lastEvents.set(eventName, data);
         this.emit(eventName, data);
       } catch {
         this.log(`Failed to parse ${eventName} event: ${messageEvent.data}`, "error");
@@ -209,6 +215,12 @@ export class SSEClient<TEventType extends string = string> {
     }
     this.clearStableConnectionTimer();
 
+    // 다른 방(URL)으로 옮겨갈 때만 캐시를 비운다.
+    // 같은 URL 재연결에서는 늦게 합류한 구독자가 마지막 상태를 재생할 수 있어야 한다.
+    if (this.url !== url) {
+      this.lastEvents.clear();
+    }
+
     this.url = url;
     this.reconnectAttempts = 0;
     this.setStatus("connecting");
@@ -234,12 +246,17 @@ export class SSEClient<TEventType extends string = string> {
     }
 
     this.url = null;
+    this.lastEvents.clear();
     this.setStatus("idle");
     this.reconnectAttempts = 0;
     this.intentionalDisconnect = false;
   }
 
-  on<T>(eventName: TEventType | "error" | "message", callback: SSEEventCallback<T>): () => void {
+  on<T>(
+    eventName: TEventType | "error" | "message",
+    callback: SSEEventCallback<T>,
+    options?: SSESubscribeOptions
+  ): () => void {
     if (!this.listeners.has(eventName)) {
       this.listeners.set(eventName, new Set());
     }
@@ -249,6 +266,11 @@ export class SSEClient<TEventType extends string = string> {
     // 이미 연결된 상태라면 EventSource에 리스너 등록 (중복 등록 방지)
     if (this.eventSource && eventName !== "error" && eventName !== "message") {
       this.registerEventOnSource(eventName);
+    }
+
+    // 공유 커넥션에 늦게 합류해 초기 이벤트를 놓친 구독자에게 마지막 payload를 재생한다.
+    if (options?.replayLast && this.lastEvents.has(eventName)) {
+      callback(this.lastEvents.get(eventName) as T, REPLAY_DELIVERY);
     }
 
     return () => this.listeners.get(eventName)?.delete(callback as SSEEventCallback<unknown>);
@@ -268,8 +290,15 @@ export class SSEClient<TEventType extends string = string> {
     }
   }
 
+  /**
+   * 연결 상태 변경을 구독한다.
+   *
+   * 구독 즉시 현재 상태로 한 번 호출된다. 공유 클라이언트에 나중에 합류한 구독자는
+   * 이미 지나간 상태 전이를 받을 수 없으므로, 이 초기 호출로 상태를 맞춘다.
+   */
   onStatusChange(callback: (status: SSEConnectionStatus) => void): () => void {
     this.statusListeners.add(callback);
+    callback(this._status);
     return () => this.statusListeners.delete(callback);
   }
 
@@ -277,6 +306,7 @@ export class SSEClient<TEventType extends string = string> {
     this.listeners.clear();
     this.statusListeners.clear();
     this.registeredEvents.clear();
+    this.lastEvents.clear();
   }
 }
 

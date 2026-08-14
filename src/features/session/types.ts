@@ -337,12 +337,15 @@ export interface ReportTodoItem {
 export type EmojiType = "HEART" | "STAR" | "THUMBS_UP" | "THUMBS_DOWN";
 
 // 이모지 결과 (멤버별 카운트)
-export interface MemberEmojiResult {
+// 리액션 집계 (하트/별/좋아요/싫어요)
+export interface ReactionCounts {
   heartCount: number;
   starCount: number;
   thumbsUpCount: number;
   thumbsDownCount: number;
 }
+
+export type MemberEmojiResult = ReactionCounts;
 
 // ============================================
 // 나의 리포트 조회 API 관련 타입
@@ -421,20 +424,11 @@ export interface SendReactionResponse {
 // 리액션 SSE 이벤트 타입
 // ============================================
 
-// 특정 사용자 리액션 SSE 이벤트 데이터
-export interface MemberReactionEventData {
-  heartCount: number;
-  starCount: number;
-  thumbsUpCount: number;
-  thumbsDownCount: number;
-}
-
-// 전체 참여자 리액션 SSE 이벤트 데이터
-export interface SessionReactionEventData {
-  heartCount: number;
-  starCount: number;
-  thumbsUpCount: number;
-  thumbsDownCount: number;
+// 리액션 집계 SSE 이벤트 데이터 (reaction-summary-updated)
+// 세션 전체 합계와 요청자 본인이 받은 합계를 함께 내려준다.
+export interface ReactionSummaryEventData {
+  total: ReactionCounts;
+  my: ReactionCounts;
 }
 
 // ============================================

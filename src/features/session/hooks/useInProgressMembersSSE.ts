@@ -1,5 +1,6 @@
 "use client";
 
+import { getSessionRoomSSEUrl, SESSION_ROOM_EVENT } from "@/lib/sse/session-channels";
 import type { SSEError } from "@/lib/sse/types";
 import { useSSE } from "@/lib/sse/useSSE";
 
@@ -25,9 +26,11 @@ export function useInProgressMembersSSE({
   onError,
 }: UseInProgressMembersSSEOptions): UseInProgressMembersSSEReturn {
   return useSSE<InProgressEventData>({
-    url: `/api/sse/in-progress/${sessionId}`,
-    eventName: "in-progress-members-updated",
+    url: getSessionRoomSSEUrl(sessionId),
+    eventName: SESSION_ROOM_EVENT.IN_PROGRESS_MEMBERS,
     enabled: enabled && !!sessionId,
+    // 참여자 목록은 전체 스냅샷이므로 늦게 합류해도 마지막 목록을 재생받는다.
+    replayLastEvent: true,
     onError,
   });
 }

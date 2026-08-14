@@ -167,10 +167,13 @@ describe("SSEClient", () => {
         members: [],
       });
 
-      expect(callback).toHaveBeenCalledWith({
-        participantCount: 3,
-        members: [],
-      });
+      expect(callback).toHaveBeenCalledWith(
+        {
+          participantCount: 3,
+          members: [],
+        },
+        { replayed: false }
+      );
     });
 
     it("on은 unsubscribe 함수를 반환해야 합니다", () => {
@@ -222,7 +225,7 @@ describe("SSEClient", () => {
       mockEventSourceInstance!.simulateOpen();
       mockEventSourceInstance!.simulateMessage({ type: "test" });
 
-      expect(callback).toHaveBeenCalledWith({ type: "test" });
+      expect(callback).toHaveBeenCalledWith({ type: "test" }, { replayed: false });
     });
   });
 
@@ -237,6 +240,19 @@ describe("SSEClient", () => {
       expect(statusCallback).toHaveBeenCalledWith("connecting");
     });
 
+    it("구독 즉시 현재 상태로 한 번 호출되어야 합니다", () => {
+      const client = new SSEClient();
+      const statusCallback = jest.fn();
+
+      client.connect("/api/sse/test");
+      mockEventSourceInstance!.simulateOpen();
+
+      // 이미 연결된 클라이언트에 나중에 합류한 구독자
+      client.onStatusChange(statusCallback);
+
+      expect(statusCallback).toHaveBeenCalledWith("connected");
+    });
+
     it("여러 상태 변경을 추적할 수 있어야 합니다", () => {
       const client = new SSEClient();
       const statuses: SSEConnectionStatus[] = [];
@@ -246,15 +262,16 @@ describe("SSEClient", () => {
       mockEventSourceInstance!.simulateOpen();
       client.disconnect();
 
-      expect(statuses).toEqual(["connecting", "connected", "idle"]);
+      expect(statuses).toEqual(["idle", "connecting", "connected", "idle"]);
     });
 
-    it("unsubscribe 후 콜백이 호출되지 않아야 합니다", () => {
+    it("unsubscribe 후에는 상태 변경 콜백이 호출되지 않아야 합니다", () => {
       const client = new SSEClient();
       const statusCallback = jest.fn();
 
       const unsubscribe = client.onStatusChange(statusCallback);
       unsubscribe();
+      statusCallback.mockClear(); // 구독 시점의 초기 호출 제외
       client.connect("/api/sse/test");
 
       expect(statusCallback).not.toHaveBeenCalled();
@@ -273,7 +290,8 @@ describe("SSEClient", () => {
       expect(errorCallback).toHaveBeenCalledWith(
         expect.objectContaining({
           code: "CONNECTION_FAILED",
-        })
+        }),
+        { replayed: false }
       );
     });
 
@@ -341,7 +359,8 @@ describe("SSEClient", () => {
       expect(errorCallback).toHaveBeenCalledWith(
         expect.objectContaining({
           code: "MAX_RECONNECT_REACHED",
-        })
+        }),
+        { replayed: false }
       );
     });
   });
@@ -356,6 +375,7 @@ describe("SSEClient", () => {
       client.on("event1", callback1);
       client.on("event2", callback2);
       client.onStatusChange(statusCallback);
+      statusCallback.mockClear(); // 구독 시점의 초기 호출 제외
 
       client.removeAllListeners();
       client.connect("/api/sse/test");
@@ -365,6 +385,63 @@ describe("SSEClient", () => {
       expect(callback1).not.toHaveBeenCalled();
       expect(callback2).not.toHaveBeenCalled();
       expect(statusCallback).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("마지막 이벤트 재생 (replayLast)", () => {
+    it("늦게 구독해도 마지막 payload를 replayed 표시와 함께 받아야 합니다", () => {
+      const client = new SSEClient();
+      const callback = jest.fn();
+
+      client.on("room-update", jest.fn()); // EventSource에 이벤트 등록용 선행 구독
+      client.connect("/api/sse/test");
+      mockEventSourceInstance!.simulateOpen();
+      mockEventSourceInstance!.simulateNamedEvent("room-update", { participantCount: 2 });
+
+      client.on("room-update", callback, { replayLast: true });
+
+      expect(callback).toHaveBeenCalledWith({ participantCount: 2 }, { replayed: true });
+    });
+
+    it("replayLast를 켜지 않으면 재생하지 않아야 합니다", () => {
+      const client = new SSEClient();
+      const callback = jest.fn();
+
+      client.on("room-update", jest.fn());
+      client.connect("/api/sse/test");
+      mockEventSourceInstance!.simulateOpen();
+      mockEventSourceInstance!.simulateNamedEvent("room-update", { participantCount: 2 });
+
+      client.on("room-update", callback);
+
+      expect(callback).not.toHaveBeenCalled();
+    });
+
+    it("실시간 수신은 replayed=false로 전달되어야 합니다", () => {
+      const client = new SSEClient();
+      const callback = jest.fn();
+
+      client.on("room-update", callback, { replayLast: true });
+      client.connect("/api/sse/test");
+      mockEventSourceInstance!.simulateOpen();
+      mockEventSourceInstance!.simulateNamedEvent("room-update", { participantCount: 2 });
+
+      expect(callback).toHaveBeenCalledWith({ participantCount: 2 }, { replayed: false });
+    });
+
+    it("disconnect 후에는 재생할 캐시가 남아 있지 않아야 합니다", () => {
+      const client = new SSEClient();
+      const callback = jest.fn();
+
+      client.on("room-update", jest.fn());
+      client.connect("/api/sse/test");
+      mockEventSourceInstance!.simulateOpen();
+      mockEventSourceInstance!.simulateNamedEvent("room-update", { participantCount: 2 });
+      client.disconnect();
+
+      client.on("room-update", callback, { replayLast: true });
+
+      expect(callback).not.toHaveBeenCalled();
     });
   });
 
