@@ -57,12 +57,14 @@ type RefreshFlightEntry = InFlightEntry | SuccessEntry;
 // 이 Map은 같은 warm instance의 중복만 줄이며, 인스턴스 간 멱등성은 백엔드가 보장한다.
 const refreshFlights = new Map<string, RefreshFlightEntry>();
 
+/** 전달받은 entry가 현재 Map 값일 때만 삭제해 늦은 cleanup이 새 작업을 지우지 않게 한다. */
 function deleteEntryIfCurrent(fingerprint: string, entry: RefreshFlightEntry) {
   if (refreshFlights.get(fingerprint) === entry) {
     refreshFlights.delete(fingerprint);
   }
 }
 
+/** 성공 entry의 논리적 TTL을 확인하고 만료된 현재 entry를 정리한다. */
 function deleteExpiredSuccessEntry(fingerprint: string, entry: SuccessEntry) {
   if (Date.now() < entry.expiresAt) {
     return false;
@@ -75,6 +77,7 @@ function deleteExpiredSuccessEntry(fingerprint: string, entry: SuccessEntry) {
   return true;
 }
 
+/** Map 전체에서 논리적 TTL이 지난 성공 entry를 기회적으로 정리한다. */
 function sweepExpiredSuccessEntries() {
   for (const [fingerprint, entry] of refreshFlights) {
     if (entry.kind === "success") {
@@ -83,6 +86,7 @@ function sweepExpiredSuccessEntries() {
   }
 }
 
+/** fingerprint의 현재 entry를 조회하되 만료된 성공 결과는 miss로 처리한다. */
 function getCurrentEntry(fingerprint: string): RefreshFlightEntry | null {
   const entry = refreshFlights.get(fingerprint);
   if (!entry) {
@@ -96,16 +100,19 @@ function getCurrentEntry(fingerprint: string): RefreshFlightEntry | null {
   return entry;
 }
 
+/** 원본 Refresh Token 대신 Map key로 사용할 SHA-256 fingerprint를 생성한다. */
 async function createRefreshTokenFingerprint(refreshToken: string): Promise<string> {
   const bytes = new TextEncoder().encode(refreshToken);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+/** 브라우저와 Node 런타임에서 발생한 AbortError를 공통 판별한다. */
 function isAbortError(error: unknown): boolean {
   return error instanceof Error && error.name === "AbortError";
 }
 
+/** Refresh 응답 body를 읽고 성공 응답의 파싱 실패만 명시적인 invalid response로 변환한다. */
 async function readResponseBody(response: Response, signal: AbortSignal): Promise<unknown> {
   try {
     return await response.json();
@@ -122,6 +129,7 @@ async function readResponseBody(response: Response, signal: AbortSignal): Promis
   }
 }
 
+/** 성공 상태의 body가 유효한 JSON이 아닐 때 HTTP status를 보존해 전달한다. */
 class InvalidRefreshResponseError extends Error {
   constructor(readonly status: number) {
     super("Invalid refresh response");
@@ -129,6 +137,7 @@ class InvalidRefreshResponseError extends Error {
   }
 }
 
+/** backend Refresh API를 호출하고 HTTP/body 결과를 요청 비종속 RefreshOutcome으로 변환한다. */
 async function executeRefreshExchange(
   backendUrl: string,
   refreshToken: string,
@@ -174,6 +183,7 @@ async function executeRefreshExchange(
   };
 }
 
+/** Refresh exchange 전체에 10초 deadline을 적용하고 예외를 정규화된 실패 outcome으로 바꾼다. */
 async function performRefreshExchange(
   backendUrl: string,
   refreshToken: string
@@ -224,6 +234,7 @@ async function performRefreshExchange(
   }
 }
 
+/** 새 hard exchange를 Map에 등록하고 성공만 2초 동안 재사용 가능한 entry로 교체한다. */
 function startHardRefreshFlight(
   fingerprint: string,
   refreshToken: string,
@@ -260,6 +271,7 @@ function startHardRefreshFlight(
   return entry;
 }
 
+/** hard caller가 기존 작업·성공 결과를 공유하거나, 없으면 새 Refresh exchange를 시작한다. */
 export async function runHardRefreshSingleFlight(
   refreshToken: string,
   backendUrl: string
@@ -288,11 +300,13 @@ export async function runHardRefreshSingleFlight(
   return { disposition: "created", outcome: await createdEntry.promise };
 }
 
+/** soft caller가 새 작업을 만들지 않고 1.5초 예산 안에서 기존 작업이나 성공 결과에만 합류한다. */
 export async function joinSoftRefreshSingleFlight(
   refreshToken: string
 ): Promise<SoftRefreshResult> {
   const deadlineAt = Date.now() + SOFT_REFRESH_TOTAL_TIMEOUT_MS;
   let callerTimedOut = false;
+  /** timer callback과 절대 시각을 함께 확인해 정확한 deadline 경계를 판별한다. */
   const hasCallerTimedOut = () => callerTimedOut || Date.now() >= deadlineAt;
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeoutPromise = new Promise<SoftRefreshResult>((resolve) => {
