@@ -91,6 +91,7 @@ export function TextInput({
   helperText,
   helperTextType = "default",
   disabled = false,
+  readOnly = false,
   value,
   defaultValue,
   size = "md",
@@ -148,7 +149,7 @@ export function TextInput({
     onClear?.();
   };
 
-  const showClearButton = hasValue && isFocused && !disabled && !error;
+  const showClearButton = hasValue && isFocused && !disabled && !readOnly && !error;
 
   return (
     <div className={cn("flex w-full flex-col gap-2", !fullWidth && "max-w-95", containerClassName)}>
@@ -168,6 +169,7 @@ export function TextInput({
             className
           )}
           disabled={disabled}
+          readOnly={readOnly}
           value={currentValue}
           maxLength={maxLength}
           onFocus={handleFocus}

@@ -50,10 +50,9 @@ export function getTimeSlotFilterLabel(selectedTimeSlots: TimeSlot[]) {
 }
 
 const DURATION_TRIGGER_LABEL_MAP: Record<DurationRange, string> = {
-  HALF_TO_ONE_HOUR: "30분-1시간",
-  TWO_TO_FOUR_HOURS: "2시간-4시간",
-  FIVE_TO_EIGHT_HOURS: "5시간-8시간",
-  TEN_PLUS_HOURS: "10시간 이상",
+  ONE_HOUR_OR_LESS: "1시간 이하",
+  ONE_TO_TWO_HOURS: "1시간-2시간",
+  TWO_TO_THREE_HOURS: "2시간-3시간",
 };
 
 export function getDurationFilterLabel(durationRange: DurationRange | null) {

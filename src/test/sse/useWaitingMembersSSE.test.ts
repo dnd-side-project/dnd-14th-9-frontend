@@ -3,10 +3,11 @@ import { renderHook, act } from "@testing-library/react";
 
 import { useWaitingMembersSSE } from "@/features/lobby/hooks/useWaitingMembersSSE";
 import type { WaitingMembersEventData } from "@/features/lobby/types";
+import { resetSharedSSEClients } from "@/lib/sse/shared-client";
 import type { SSEConnectionStatus, SSEError } from "@/lib/sse/types";
 
 // SSEClient Mock
-type EventCallback = (data: any) => void;
+type EventCallback = (data: any, delivery?: { replayed: boolean }) => void;
 type StatusCallback = (status: SSEConnectionStatus) => void;
 
 const mockConnect = jest.fn();
@@ -16,12 +17,14 @@ const mockOnStatusChange = jest.fn();
 
 let eventListeners: Map<string, Set<EventCallback>>;
 let statusListeners: Set<StatusCallback>;
+let lastEvents: Map<string, unknown>;
 let currentStatus: SSEConnectionStatus;
 
 jest.mock("@/lib/sse/client", () => ({
   SSEClient: jest.fn().mockImplementation(() => {
     eventListeners = new Map();
     statusListeners = new Set();
+    lastEvents = new Map();
     currentStatus = "idle";
 
     return {
@@ -37,22 +40,35 @@ jest.mock("@/lib/sse/client", () => ({
       }),
       disconnect: mockDisconnect.mockImplementation(() => {
         currentStatus = "idle";
+        lastEvents.clear();
         statusListeners.forEach((cb) => cb("idle"));
       }),
-      on: mockOn.mockImplementation((eventName: string, callback: EventCallback) => {
-        if (!eventListeners.has(eventName)) {
-          eventListeners.set(eventName, new Set());
-        }
-        eventListeners.get(eventName)!.add(callback);
+      on: mockOn.mockImplementation(
+        (eventName: string, callback: EventCallback, options?: { replayLast?: boolean }) => {
+          if (!eventListeners.has(eventName)) {
+            eventListeners.set(eventName, new Set());
+          }
+          eventListeners.get(eventName)!.add(callback);
 
-        return () => {
-          eventListeners.get(eventName)?.delete(callback);
-        };
-      }),
+          if (options?.replayLast && lastEvents.has(eventName)) {
+            callback(lastEvents.get(eventName), { replayed: true });
+          }
+
+          return () => {
+            eventListeners.get(eventName)?.delete(callback);
+          };
+        }
+      ),
       onStatusChange: mockOnStatusChange.mockImplementation((callback: StatusCallback) => {
         statusListeners.add(callback);
+        callback(currentStatus); // 실제 SSEClient와 동일하게 구독 즉시 현재 상태 전달
         return () => statusListeners.delete(callback);
       }),
+      removeAllListeners: () => {
+        eventListeners.clear();
+        statusListeners.clear();
+        lastEvents.clear();
+      },
       get status() {
         return currentStatus;
       },
@@ -62,7 +78,9 @@ jest.mock("@/lib/sse/client", () => ({
 
 // 테스트 헬퍼 함수
 function simulateSSEEvent(eventName: string, data: unknown) {
-  eventListeners.get(eventName)?.forEach((callback) => callback(data));
+  // 실제 SSEClient와 동일하게 named 이벤트는 마지막 payload를 캐시한다.
+  if (eventName !== "error") lastEvents.set(eventName, data);
+  eventListeners.get(eventName)?.forEach((callback) => callback(data, { replayed: false }));
 }
 
 function simulateStatusChange(status: SSEConnectionStatus) {
@@ -71,9 +89,11 @@ function simulateStatusChange(status: SSEConnectionStatus) {
 }
 
 beforeEach(() => {
+  resetSharedSSEClients();
   jest.clearAllMocks();
   eventListeners = new Map();
   statusListeners = new Set();
+  lastEvents = new Map();
   currentStatus = "idle";
 });
 
@@ -122,7 +142,7 @@ describe("useWaitingMembersSSE", () => {
         })
       );
 
-      expect(mockConnect).toHaveBeenCalledWith("/api/sse/waiting/test-session");
+      expect(mockConnect).toHaveBeenCalledWith("/api/sse/room/test-session");
     });
 
     it("enabled가 false일 때 SSE에 연결하지 않아야 합니다", () => {
@@ -155,7 +175,9 @@ describe("useWaitingMembersSSE", () => {
         })
       );
 
-      expect(mockOn).toHaveBeenCalledWith("waiting-members-updated", expect.any(Function));
+      expect(mockOn).toHaveBeenCalledWith("waiting-members-updated", expect.any(Function), {
+        replayLast: true,
+      });
       expect(mockOn).toHaveBeenCalledWith("error", expect.any(Function));
       expect(mockOnStatusChange).toHaveBeenCalledWith(expect.any(Function));
     });
@@ -314,7 +336,7 @@ describe("useWaitingMembersSSE", () => {
   });
 
   describe("disconnect", () => {
-    it("disconnect 호출 시 SSE 연결이 해제되어야 합니다", () => {
+    it("마지막 구독자가 disconnect하면 공유 커넥션이 해제되어야 합니다", () => {
       const { result } = renderHook(() =>
         useWaitingMembersSSE({
           sessionId: "test-session",
@@ -327,17 +349,48 @@ describe("useWaitingMembersSSE", () => {
       });
 
       expect(mockDisconnect).toHaveBeenCalled();
+      expect(result.current.status).toBe("idle");
+    });
+
+    it("다른 구독자가 남아 있으면 공유 커넥션을 끊지 않아야 합니다", () => {
+      const first = renderHook(() =>
+        useWaitingMembersSSE({ sessionId: "test-session", enabled: true })
+      );
+      const second = renderHook(() =>
+        useWaitingMembersSSE({ sessionId: "test-session", enabled: true })
+      );
+
+      mockDisconnect.mockClear();
+
+      act(() => {
+        first.result.current.disconnect();
+      });
+
+      // 참조 카운트가 아직 1이므로 물리 연결은 유지된다.
+      expect(mockDisconnect).not.toHaveBeenCalled();
+
+      // 남아 있는 구독자는 계속 이벤트를 받아야 한다.
+      const mockData: WaitingMembersEventData = { participantCount: 1, members: [] };
+      act(() => {
+        simulateSSEEvent("waiting-members-updated", { eventType: "ROOM_UPDATE", data: mockData });
+      });
+
+      expect(second.result.current.data).toEqual(mockData);
     });
   });
 
   describe("reconnect", () => {
-    it("reconnect 호출 시 disconnect 후 connect가 호출되어야 합니다", () => {
+    it("공유 커넥션이 살아 있으면 물리 재연결을 하지 않아야 합니다", () => {
       const { result } = renderHook(() =>
         useWaitingMembersSSE({
           sessionId: "test-session",
           enabled: true,
         })
       );
+
+      act(() => {
+        simulateStatusChange("connected");
+      });
 
       mockConnect.mockClear();
       mockDisconnect.mockClear();
@@ -346,8 +399,58 @@ describe("useWaitingMembersSSE", () => {
         result.current.reconnect();
       });
 
-      expect(mockDisconnect).toHaveBeenCalled();
-      expect(mockConnect).toHaveBeenCalled();
+      expect(mockDisconnect).not.toHaveBeenCalled();
+      expect(mockConnect).not.toHaveBeenCalled();
+    });
+
+    it("공유 커넥션이 끊겨 있으면 재연결을 요청해야 합니다", () => {
+      const { result } = renderHook(() =>
+        useWaitingMembersSSE({
+          sessionId: "test-session",
+          enabled: true,
+        })
+      );
+
+      act(() => {
+        simulateStatusChange("disconnected");
+      });
+
+      mockConnect.mockClear();
+
+      act(() => {
+        result.current.reconnect();
+      });
+
+      expect(mockConnect).toHaveBeenCalledWith("/api/sse/room/test-session");
+    });
+
+    it("disconnect 후 reconnect하면 구독이 재개되어야 합니다", () => {
+      const { result } = renderHook(() =>
+        useWaitingMembersSSE({
+          sessionId: "test-session",
+          enabled: true,
+        })
+      );
+
+      act(() => {
+        result.current.disconnect();
+      });
+
+      mockConnect.mockClear();
+
+      act(() => {
+        result.current.reconnect();
+      });
+
+      // 마지막 구독자였으므로 레지스트리에서 제거됐고, 재구독 시 다시 연결된다.
+      expect(mockConnect).toHaveBeenCalledWith("/api/sse/room/test-session");
+
+      const mockData: WaitingMembersEventData = { participantCount: 2, members: [] };
+      act(() => {
+        simulateSSEEvent("waiting-members-updated", { eventType: "ROOM_UPDATE", data: mockData });
+      });
+
+      expect(result.current.data).toEqual(mockData);
     });
   });
 
@@ -379,14 +482,14 @@ describe("useWaitingMembersSSE", () => {
         }
       );
 
-      expect(mockConnect).toHaveBeenCalledWith("/api/sse/waiting/session-1");
+      expect(mockConnect).toHaveBeenCalledWith("/api/sse/room/session-1");
 
       mockConnect.mockClear();
 
       rerender({ sessionId: "session-2" });
 
       expect(mockDisconnect).toHaveBeenCalled();
-      expect(mockConnect).toHaveBeenCalledWith("/api/sse/waiting/session-2");
+      expect(mockConnect).toHaveBeenCalledWith("/api/sse/room/session-2");
     });
   });
 
@@ -407,7 +510,7 @@ describe("useWaitingMembersSSE", () => {
 
       rerender({ enabled: true });
 
-      expect(mockConnect).toHaveBeenCalledWith("/api/sse/waiting/test-session");
+      expect(mockConnect).toHaveBeenCalledWith("/api/sse/room/test-session");
     });
 
     it("enabled가 true에서 false로 변경되면 연결을 해제해야 합니다", () => {
@@ -497,6 +600,91 @@ describe("useWaitingMembersSSE", () => {
       });
 
       expect(result.current.error).toBeNull();
+    });
+  });
+
+  describe("통합 room 채널 공유", () => {
+    it("같은 세션을 구독하는 훅이 여러 개여도 커넥션은 1개만 열려야 합니다", () => {
+      renderHook(() => {
+        useWaitingMembersSSE({ sessionId: "test-session", enabled: true });
+        useWaitingMembersSSE({ sessionId: "test-session", enabled: true });
+      });
+
+      expect(mockConnect).toHaveBeenCalledTimes(1);
+      expect(mockConnect).toHaveBeenCalledWith("/api/sse/room/test-session");
+    });
+
+    it("구독자가 남아 있으면 하나가 언마운트돼도 연결을 끊지 않아야 합니다", () => {
+      const { rerender } = renderHook(
+        ({ showSecond }: { showSecond: boolean }) => {
+          useWaitingMembersSSE({ sessionId: "test-session", enabled: true });
+          useWaitingMembersSSE({ sessionId: "test-session", enabled: showSecond });
+        },
+        { initialProps: { showSecond: true } }
+      );
+
+      mockDisconnect.mockClear();
+      rerender({ showSecond: false });
+
+      expect(mockDisconnect).not.toHaveBeenCalled();
+    });
+
+    it("늦게 구독한 훅은 캐시된 마지막 ROOM_UPDATE를 재생받아야 합니다", () => {
+      const mockData: WaitingMembersEventData = {
+        participantCount: 1,
+        members: [
+          {
+            memberId: 1,
+            nickname: "테스터",
+            profileImageUrl: "https://example.com/image.jpg",
+            focusRate: 80,
+            achievementRate: 90,
+            role: "HOST",
+            task: null,
+          },
+        ],
+      };
+
+      const { result, rerender } = renderHook(
+        ({ lateEnabled }: { lateEnabled: boolean }) => {
+          useWaitingMembersSSE({ sessionId: "test-session", enabled: true });
+          return useWaitingMembersSSE({ sessionId: "test-session", enabled: lateEnabled });
+        },
+        { initialProps: { lateEnabled: false } }
+      );
+
+      act(() => {
+        simulateSSEEvent("waiting-members-updated", { eventType: "ROOM_UPDATE", data: mockData });
+      });
+
+      expect(result.current.data).toBeNull();
+
+      rerender({ lateEnabled: true });
+
+      expect(result.current.data).toEqual(mockData);
+    });
+
+    it("재생된 KICKED 이벤트로는 onKicked가 호출되지 않아야 합니다", () => {
+      const onKicked = jest.fn();
+
+      const { rerender } = renderHook(
+        ({ lateEnabled }: { lateEnabled: boolean }) => {
+          useWaitingMembersSSE({ sessionId: "test-session", enabled: true });
+          useWaitingMembersSSE({ sessionId: "test-session", enabled: lateEnabled, onKicked });
+        },
+        { initialProps: { lateEnabled: false } }
+      );
+
+      act(() => {
+        simulateSSEEvent("waiting-members-updated", {
+          eventType: "KICKED",
+          data: { memberIds: [1] },
+        });
+      });
+
+      rerender({ lateEnabled: true });
+
+      expect(onKicked).not.toHaveBeenCalled();
     });
   });
 });

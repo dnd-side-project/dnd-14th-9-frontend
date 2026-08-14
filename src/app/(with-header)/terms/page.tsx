@@ -13,7 +13,7 @@ export default function TermsPage() {
   return (
     <div className="p-3xl flex flex-col">
       <h1 className="text-text-primary text-3xl font-bold">이용약관</h1>
-      <p className="text-text-disabled mt-2 text-sm">시행일: 2025년 7월 1일</p>
+      <p className="text-text-disabled mt-2 text-sm">시행일: 2026년 2월 28일</p>
 
       <div className="mt-10 flex flex-col gap-10">
         <section>

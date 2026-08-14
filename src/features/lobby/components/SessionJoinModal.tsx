@@ -10,6 +10,7 @@ import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { TextInput } from "@/components/Input/TextInput";
 import { Portal } from "@/components/Portal/Portal";
 import { useJoinSession } from "@/features/session/hooks/useSessionHooks";
+import { joinSessionFormSchema } from "@/features/session/schemas";
 import type { ReportTodoItem } from "@/features/session/types";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { ApiError } from "@/lib/api/api-client";
@@ -43,6 +44,11 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
   const [serverError, setServerError] = useState<string | null>(null);
 
   const joinSessionMutation = useJoinSession();
+  const formValidation = joinSessionFormSchema.safeParse({
+    goal,
+    todos: todos.map((todo) => todo.content),
+  });
+  const isFormValid = formValidation.success;
 
   const setDialogRef = useCallback((node: HTMLDialogElement | null) => {
     if (node) {
@@ -61,11 +67,14 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
   };
 
   const handleTodoChange = (index: number, content: string) => {
+    const normalizedContent = content.trim() === "" ? "" : content;
     const target = todos[index];
-    if (target && content.trim().length <= TODO_MAX_LENGTH) {
+    if (target && normalizedContent.trim().length <= TODO_MAX_LENGTH) {
       setTodoLengthErrorIds((prev) => prev.filter((id) => id !== target.todoId));
     }
-    setTodos((prev) => prev.map((todo, i) => (i === index ? { ...todo, content } : todo)));
+    setTodos((prev) =>
+      prev.map((todo, i) => (i === index ? { ...todo, content: normalizedContent } : todo))
+    );
   };
 
   const handleRemoveTodo = (index: number) => {
@@ -100,14 +109,17 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
       return;
     }
 
-    const validTodos = todos
-      .filter((todo) => todo.content.trim() !== "")
-      .map((todo) => todo.content.trim());
+    if (!formValidation.success) {
+      return;
+    }
+
+    setGoalError(false);
+    setTodoError(false);
 
     try {
       await joinSessionMutation.mutateAsync({
         sessionRoomId: sessionId,
-        body: { goal: goal.trim(), todos: validTodos },
+        body: formValidation.data,
       });
 
       // 성공 시: 모달 닫고 세션 페이지로 이동
@@ -255,7 +267,7 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
             size="medium"
             className="text-sm"
             onClick={handleJoin}
-            disabled={joinSessionMutation.isPending}
+            disabled={joinSessionMutation.isPending || !isFormValid}
           >
             {joinSessionMutation.isPending ? "참여 중..." : "작성 완료"}
           </Button>

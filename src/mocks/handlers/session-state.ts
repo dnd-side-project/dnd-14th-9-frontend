@@ -8,6 +8,7 @@ import type {
   JoinSessionResponse,
   MemberEmojiResult,
   MyReportResponse,
+  ReactionSummaryEventData,
   SessionDetailResponse,
   SessionListParams,
   SessionListResponse,
@@ -139,7 +140,8 @@ function createInitialSessions(): MockSessionRecord[] {
               { subtaskId: 5, content: "세션 종료 후 리포트 확인", isCompleted: false },
             ],
           },
-          emojiResult: emptyEmojiResult(),
+          // 리액션 집계 채널/받은 이모지 카드를 mock 모드에서도 확인할 수 있도록 초기값을 넣어둔다.
+          emojiResult: { heartCount: 3, starCount: 1, thumbsUpCount: 2, thumbsDownCount: 0 },
         },
         {
           memberId: 2,
@@ -156,7 +158,7 @@ function createInitialSessions(): MockSessionRecord[] {
               { subtaskId: 7, content: "세션 생성 플로우 정리", isCompleted: false },
             ],
           },
-          emojiResult: emptyEmojiResult(),
+          emojiResult: { heartCount: 1, starCount: 4, thumbsUpCount: 0, thumbsDownCount: 1 },
         },
         {
           memberId: 3,
@@ -535,6 +537,27 @@ export function joinMockSession(sessionId: number, body: JoinSessionRequest): Jo
     memberId: joinedMember.memberId,
     role: joinedMember.role,
   };
+}
+
+export function getMockReactionSummary(sessionId: number): ReactionSummaryEventData {
+  const session = getSessionOrThrow(sessionId);
+
+  return {
+    total: session.members.reduce(
+      (acc, member) => ({
+        heartCount: acc.heartCount + member.emojiResult.heartCount,
+        starCount: acc.starCount + member.emojiResult.starCount,
+        thumbsUpCount: acc.thumbsUpCount + member.emojiResult.thumbsUpCount,
+        thumbsDownCount: acc.thumbsDownCount + member.emojiResult.thumbsDownCount,
+      }),
+      emptyEmojiResult()
+    ),
+    my: { ...getMemberOrDefault(session).emojiResult },
+  };
+}
+
+export function getMockSessionStatus(sessionId: number): MockSessionStatus {
+  return getSessionOrThrow(sessionId).status;
 }
 
 export function getMockWaitingRoom(sessionId: number): WaitingRoomResponse {

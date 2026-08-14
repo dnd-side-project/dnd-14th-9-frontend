@@ -167,13 +167,13 @@ describe("SessionList", () => {
   it("모바일 viewport에서는 세션 목록 요청 size를 5로 설정하고 기존 필터 값을 유지한다", async () => {
     setViewportLayout("mobile", true);
     setSearchParams(
-      "q=react&category=DEVELOPMENT&page=2&sort=LATEST&startDate=2026-02-01&endDate=2026-02-28&timeSlots=MORNING,EVENING&durationRange=TWO_TO_FOUR_HOURS&participants=6"
+      "q=react&category=DEVELOPMENT&page=2&sort=LATEST&startDate=2026-02-01&endDate=2026-02-28&timeSlots=MORNING,EVENING&durationRange=ONE_TO_TWO_HOURS&participants=6"
     );
     setupFilters({
       startDate: "2026-02-01",
       endDate: "2026-02-28",
       timeSlots: ["MORNING", "EVENING"],
-      durationRange: "TWO_TO_FOUR_HOURS",
+      durationRange: "ONE_TO_TWO_HOURS",
       participants: "6",
       sort: "LATEST",
     });
@@ -191,7 +191,7 @@ describe("SessionList", () => {
           startDate: "2026-02-01",
           endDate: "2026-02-28",
           timeSlots: ["MORNING", "EVENING"],
-          durationRange: "TWO_TO_FOUR_HOURS",
+          durationRange: "ONE_TO_TWO_HOURS",
           participants: 6,
         })
       );

@@ -3,5 +3,5 @@ import { createSSEProxyHandler } from "@/lib/sse/create-sse-proxy";
 export const dynamic = "force-dynamic";
 
 export const GET = createSSEProxyHandler<{ sessionId: string }>({
-  buildBackendUrl: (baseUrl, { sessionId }) => `${baseUrl}/sessions/${sessionId}/status/events`,
+  buildBackendUrl: (baseUrl, { sessionId }) => `${baseUrl}/sessions/${sessionId}/events/room`,
 });
