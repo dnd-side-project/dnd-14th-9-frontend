@@ -41,14 +41,10 @@ export function parseRefreshTokenPair(data: unknown): RefreshTokenPair | null {
   return data.result;
 }
 
-export async function getErrorCodeFromResponse(response: Response): Promise<string | null> {
-  try {
-    const data: unknown = await response.json();
-    if (!isErrorCodeResponseBody(data)) {
-      return null;
-    }
-    return data.code;
-  } catch {
+export function parseRefreshErrorCode(data: unknown): string | null {
+  if (!isErrorCodeResponseBody(data)) {
     return null;
   }
+
+  return data.code;
 }

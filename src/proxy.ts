@@ -3,14 +3,16 @@ import { NextResponse } from "next/server";
 
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
-import {
-  buildRefreshCookieHeader,
-  mergeCookieHeaderWithAuthTokens,
-} from "@/lib/auth/cookie-header-utils";
+import { mergeCookieHeaderWithAuthTokens } from "@/lib/auth/cookie-header-utils";
 import { buildLoginRedirectUrl } from "@/lib/auth/login-redirect-utils";
 import { setRedirectAfterLoginCookie } from "@/lib/auth/redirect-after-login-cookie";
+import {
+  joinSoftRefreshSingleFlight,
+  runHardRefreshSingleFlight,
+  type HardRefreshResult,
+  type RefreshOutcome,
+} from "@/lib/auth/refresh-token-single-flight";
 import { isKnownPublicPageRoute, isProtectedPageRoute } from "@/lib/auth/route-access-policy";
-import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
 import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
@@ -26,30 +28,19 @@ const PUBLIC_API_ROUTE_PATTERNS = [
 // 토큰 갱신 임계값 (5분)
 const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
 
-// 토큰 갱신 API 타임아웃 (10초)
-const REFRESH_TIMEOUT_MS = 10000;
-// 공개 페이지에서 사용하는 소프트 갱신 타임아웃 (짧게 제한)
-const SOFT_REFRESH_TIMEOUT_MS = 1500;
-
-interface TryRefreshTokenOptions {
-  allowPassThroughOnFailure?: boolean;
-  timeoutMs?: number;
-}
-
-const SOFT_REFRESH_OPTIONS: TryRefreshTokenOptions = {
-  allowPassThroughOnFailure: true,
-  timeoutMs: SOFT_REFRESH_TIMEOUT_MS,
-};
-
 interface AuthFailureResponseOptions {
   clearAuth?: boolean;
   reason?: string;
   status?: number;
 }
 
-type RefreshFailureReason = "http_error" | "invalid_response" | "timeout" | "network_error";
 type RouteType = "public" | "protected" | "api";
 type AccessTokenState = "valid" | "expiring" | "expired_or_invalid";
+type RefreshMode = "soft" | "hard";
+type RefreshFailureReason = Extract<RefreshOutcome, { kind: "failure" }>["reason"];
+type RefreshDisposition = HardRefreshResult["disposition"];
+
+let fingerprintBypassLogged = false;
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -86,7 +77,7 @@ export async function proxy(request: NextRequest) {
     }
 
     if (!accessToken || getAccessTokenState(accessToken) !== "valid") {
-      return await tryRefreshToken(request, refreshToken, SOFT_REFRESH_OPTIONS);
+      return await trySoftRefreshToken(request, refreshToken);
     }
 
     return NextResponse.next();
@@ -101,7 +92,7 @@ export async function proxy(request: NextRequest) {
         status: 401,
       });
     }
-    return await tryRefreshToken(request, refreshToken);
+    return await tryHardRefreshToken(request, refreshToken);
   }
 
   // 토큰 만료 상태 체크
@@ -112,12 +103,12 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
-    return await tryRefreshToken(request, refreshToken, SOFT_REFRESH_OPTIONS);
+    return await trySoftRefreshToken(request, refreshToken);
   }
 
   if (accessTokenState === "expired_or_invalid") {
     if (refreshToken) {
-      return await tryRefreshToken(request, refreshToken);
+      return await tryHardRefreshToken(request, refreshToken);
     }
 
     return buildAuthFailureResponse(request, {
@@ -210,23 +201,31 @@ function logRefreshFailure(
     reason: RefreshFailureReason;
     status: number;
     cookieClear: boolean;
-    error?: unknown;
+    mode: RefreshMode;
+    disposition: RefreshDisposition;
   }
 ) {
   const context = {
     reason: details.reason,
     status: details.status,
-    path: request.nextUrl.pathname,
     routeType: getRouteType(request.nextUrl.pathname),
     cookieClear: details.cookieClear,
+    mode: details.mode,
+    disposition: details.disposition,
   };
 
-  if (details.error) {
-    console.error("Proxy: Token refresh failed", context, details.error);
+  console.error("Proxy: Token refresh failed", context);
+}
+
+function logFingerprintBypassOnce() {
+  if (fingerprintBypassLogged) {
     return;
   }
 
-  console.error("Proxy: Token refresh failed", context);
+  fingerprintBypassLogged = true;
+  console.warn("Proxy: Token refresh fingerprint bypass", {
+    mode: "hard",
+  });
 }
 
 /**
@@ -266,139 +265,128 @@ function getAccessTokenState(token: string): AccessTokenState {
   }
 }
 
-/**
- * 백엔드에 토큰 갱신 요청
- */
-async function tryRefreshToken(
+function buildRefreshSuccessResponse(
   request: NextRequest,
-  refreshToken: string,
-  options?: TryRefreshTokenOptions
-): Promise<NextResponse> {
-  const allowPassThroughOnFailure = options?.allowPassThroughOnFailure ?? false;
-  const refreshTimeoutMs = options?.timeoutMs ?? REFRESH_TIMEOUT_MS;
+  outcome: Extract<RefreshOutcome, { kind: "success" }>,
+  mode: RefreshMode,
+  disposition: RefreshDisposition
+): NextResponse {
+  const tokens = {
+    accessToken: outcome.tokens.accessToken,
+    refreshToken: outcome.tokens.refreshToken,
+  };
+  const requestHeaders = new Headers(request.headers);
+  const updatedCookieHeader = mergeCookieHeaderWithAuthTokens(
+    request.headers.get("cookie"),
+    tokens
+  );
+  if (updatedCookieHeader) {
+    requestHeaders.set("cookie", updatedCookieHeader);
+  }
 
-  try {
-    const backendUrl = process.env.BACKEND_API_BASE;
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+  setAuthCookies(response.cookies, tokens);
 
-    if (!backendUrl) {
-      console.error("Proxy: BACKEND_API_BASE is not configured");
-      if (allowPassThroughOnFailure) {
-        return NextResponse.next();
-      }
-      return buildAuthFailureResponse(request, {
-        clearAuth: true,
-        reason: LOGIN_INTERNAL_ERROR_CODES.CONFIG_ERROR,
-        status: 500,
-      });
-    }
-
-    // fetch 타임아웃 설정 (필수 버그 픽스)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), refreshTimeoutMs);
-
-    let reissueResponse: Response;
-    try {
-      reissueResponse = await fetch(`${backendUrl}/auth/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: buildRefreshCookieHeader(refreshToken),
-        },
-        credentials: "include",
-        signal: controller.signal,
-      });
-    } finally {
-      clearTimeout(timeoutId);
-    }
-
-    if (!reissueResponse.ok) {
-      logRefreshFailure(request, {
-        reason: "http_error",
-        status: reissueResponse.status,
-        cookieClear: !allowPassThroughOnFailure,
-      });
-      if (allowPassThroughOnFailure) {
-        return NextResponse.next();
-      }
-
-      const errorCode = await getErrorCodeFromResponse(reissueResponse);
-      const status =
-        reissueResponse.status === 401 || reissueResponse.status === 403
-          ? 401
-          : reissueResponse.status >= 500
-            ? 500
-            : 400;
-      return buildAuthFailureResponse(request, {
-        clearAuth: true,
-        reason: errorCode ?? BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
-        status,
-      });
-    }
-
-    const data: unknown = await reissueResponse.json();
-    const tokens = parseRefreshTokenPair(data);
-
-    // API 응답 검증 (필수 버그 픽스)
-    if (!tokens) {
-      logRefreshFailure(request, {
-        reason: "invalid_response",
-        status: reissueResponse.status,
-        cookieClear: !allowPassThroughOnFailure,
-      });
-      if (allowPassThroughOnFailure) {
-        return NextResponse.next();
-      }
-      return buildAuthFailureResponse(request, {
-        clearAuth: true,
-        reason: BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
-        status: 500,
-      });
-    }
-
-    // 현재 요청의 쿠키 헤더를 갱신해서 다운스트림(RSC, Route Handler)에 새 토큰을 전달한다.
-    const requestHeaders = new Headers(request.headers);
-    const updatedCookieHeader = mergeCookieHeaderWithAuthTokens(
-      request.headers.get("cookie"),
-      tokens
-    );
-    if (updatedCookieHeader) {
-      requestHeaders.set("cookie", updatedCookieHeader);
-    }
-
-    const response = NextResponse.next({
-      request: { headers: requestHeaders },
-    });
-    setAuthCookies(response.cookies, {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-    });
-
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("Proxy: Token refresh succeeded", {
-        status: reissueResponse.status,
-        path: request.nextUrl.pathname,
-      });
-    }
-
-    return response;
-  } catch (error) {
-    const isTimeout = error instanceof Error && error.name === "AbortError";
-    logRefreshFailure(request, {
-      reason: isTimeout ? "timeout" : "network_error",
-      status: isTimeout ? 504 : 500,
-      cookieClear: !allowPassThroughOnFailure,
-      error,
-    });
-
-    if (allowPassThroughOnFailure) {
-      return NextResponse.next();
-    }
-    return buildAuthFailureResponse(request, {
-      clearAuth: true,
-      reason: LOGIN_INTERNAL_ERROR_CODES.NETWORK_ERROR,
-      status: isTimeout ? 504 : 500,
+  if (process.env.NODE_ENV !== "production") {
+    console.warn("Proxy: Token refresh succeeded", {
+      status: outcome.status,
+      routeType: getRouteType(request.nextUrl.pathname),
+      mode,
+      disposition,
     });
   }
+
+  return response;
+}
+
+function buildHardRefreshFailureResponse(
+  request: NextRequest,
+  outcome: Extract<RefreshOutcome, { kind: "failure" }>
+): NextResponse {
+  if (outcome.reason === "http_error") {
+    const status =
+      outcome.status === 401 || outcome.status === 403 ? 401 : outcome.status >= 500 ? 500 : 400;
+    return buildAuthFailureResponse(request, {
+      clearAuth: true,
+      reason: outcome.errorCode ?? BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
+      status,
+    });
+  }
+
+  if (outcome.reason === "invalid_response") {
+    return buildAuthFailureResponse(request, {
+      clearAuth: true,
+      reason: BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
+      status: 500,
+    });
+  }
+
+  return buildAuthFailureResponse(request, {
+    clearAuth: true,
+    reason: LOGIN_INTERNAL_ERROR_CODES.NETWORK_ERROR,
+    status: outcome.status,
+  });
+}
+
+function buildResponseFromRefreshOutcome(
+  request: NextRequest,
+  outcome: RefreshOutcome,
+  mode: RefreshMode,
+  disposition: RefreshDisposition
+): NextResponse {
+  if (outcome.kind === "success") {
+    return buildRefreshSuccessResponse(request, outcome, mode, disposition);
+  }
+
+  logRefreshFailure(request, {
+    reason: outcome.reason,
+    status: outcome.status,
+    cookieClear: mode === "hard",
+    mode,
+    disposition,
+  });
+
+  if (mode === "soft") {
+    return NextResponse.next();
+  }
+
+  return buildHardRefreshFailureResponse(request, outcome);
+}
+
+async function trySoftRefreshToken(
+  request: NextRequest,
+  refreshToken: string
+): Promise<NextResponse> {
+  const result = await joinSoftRefreshSingleFlight(refreshToken);
+  if (result.kind === "miss" || result.kind === "caller_timeout") {
+    return NextResponse.next();
+  }
+
+  return buildResponseFromRefreshOutcome(request, result.outcome, "soft", result.disposition);
+}
+
+async function tryHardRefreshToken(
+  request: NextRequest,
+  refreshToken: string
+): Promise<NextResponse> {
+  const backendUrl = process.env.BACKEND_API_BASE;
+  if (!backendUrl) {
+    console.error("Proxy: BACKEND_API_BASE is not configured");
+    return buildAuthFailureResponse(request, {
+      clearAuth: true,
+      reason: LOGIN_INTERNAL_ERROR_CODES.CONFIG_ERROR,
+      status: 500,
+    });
+  }
+
+  const result = await runHardRefreshSingleFlight(refreshToken, backendUrl);
+  if (result.disposition === "bypass") {
+    logFingerprintBypassOnce();
+  }
+
+  return buildResponseFromRefreshOutcome(request, result.outcome, "hard", result.disposition);
 }
 
 // Matcher: 불필요한 요청 제외 (정적 파일, 이미지, prefetch 등)
