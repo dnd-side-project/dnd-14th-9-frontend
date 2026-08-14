@@ -105,9 +105,9 @@ describe("SessionListFilterBar", () => {
     const { props } = renderFilterBar();
 
     fireEvent.click(screen.getByRole("button", { name: /진행시간/ }));
-    fireEvent.click(screen.getByRole("radio", { name: "30분 ~1시간" }));
+    fireEvent.click(screen.getByRole("radio", { name: "1시간 이하" }));
 
-    expect(props.onSetDurationRange).toHaveBeenCalledWith("HALF_TO_ONE_HOUR");
+    expect(props.onSetDurationRange).toHaveBeenCalledWith("ONE_HOUR_OR_LESS");
   });
 
   it("closes a non-sort panel on Escape and removes the reserved panel space", () => {

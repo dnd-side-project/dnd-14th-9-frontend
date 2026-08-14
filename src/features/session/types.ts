@@ -57,11 +57,7 @@ export type SessionSort = "POPULAR" | "LATEST" | "DEADLINE_APPROACHING";
 
 export type TimeSlot = "MORNING" | "AFTERNOON" | "EVENING";
 
-export type DurationRange =
-  | "HALF_TO_ONE_HOUR"
-  | "TWO_TO_FOUR_HOURS"
-  | "FIVE_TO_EIGHT_HOURS"
-  | "TEN_PLUS_HOURS";
+export type DurationRange = "ONE_HOUR_OR_LESS" | "ONE_TO_TWO_HOURS" | "TWO_TO_THREE_HOURS";
 
 export type SessionListStatus = "WAITING" | "IN_PROGRESS";
 
