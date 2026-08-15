@@ -121,7 +121,7 @@ export function ParticipantListCard({
       </span>
 
       {/* 참여자 목록 */}
-      <ul className="scrollbar-hide flex flex-col gap-2 overflow-y-auto xl:flex-1">
+      <ul className="flex flex-col gap-2 overflow-y-auto xl:flex-1">
         {members.map((participant) => {
           const memberIdStr = String(participant.memberId);
           const isExpanded = expandedId === memberIdStr;

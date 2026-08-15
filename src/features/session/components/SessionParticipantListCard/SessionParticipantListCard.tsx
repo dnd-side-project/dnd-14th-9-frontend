@@ -86,7 +86,7 @@ export function SessionParticipantListCard({
         </div>
 
         {/* 참여자 목록 */}
-        <ul className="scrollbar-hide flex flex-1 flex-col gap-2 overflow-y-auto">
+        <ul className="flex flex-1 flex-col gap-2 overflow-y-auto">
           {members.map((member) => {
             const isExpanded = expandedId === member.memberId;
             const todos = member.task?.todos ?? [];
