@@ -25,6 +25,23 @@ export type RefreshOutcome =
       readonly errorCode: string | null;
     };
 
+/** RefreshOutcome 중 실패일 때 항상 함께 전달하는 필드를 나타낸다. */
+type RefreshFailure = Extract<RefreshOutcome, { kind: "failure" }>;
+
+/**
+ * HTTP 오류, 잘못된 응답, timeout, 네트워크 오류를 같은 실패 결과 형태로 만든다.
+ *
+ * 호출자는 reason으로 실패 종류를 구분하고, status와 errorCode로 현재 요청에 맞는 응답을 만든다.
+ * 실패 결과의 필드를 매번 직접 작성하지 않아도 되어 각 분기의 반환 형태가 달라지는 일을 막는다.
+ */
+function createRefreshFailure(
+  reason: RefreshFailureReason,
+  status: number,
+  errorCode: string | null = null
+): RefreshFailure {
+  return { kind: "failure", reason, status, errorCode };
+}
+
 /**
  * 같은 Refresh Token으로 들어온 요청들이 하나의 갱신 작업을 공유하도록 보관한다.
  *
@@ -42,7 +59,13 @@ function isAbortError(error: unknown): boolean {
   return error instanceof Error && error.name === "AbortError";
 }
 
-/** Refresh 응답 body를 읽고 성공 응답의 파싱 실패만 명시적인 invalid response로 변환한다. */
+/**
+ * Refresh 응답의 JSON body를 읽는다.
+ *
+ * 요청이 중단되어 발생한 AbortError는 timeout 처리로 이어져야 하므로 다시 던진다. 그 외 JSON
+ * 파싱 실패는 body가 없는 것처럼 undefined로 돌려보낸다. 호출한 함수가 이미 가진 HTTP status를
+ * 사용해 오류 응답은 http_error로, 성공 응답의 잘못된 body는 invalid_response로 구분한다.
+ */
 async function readResponseBody(response: Response, signal: AbortSignal): Promise<unknown> {
   try {
     return await response.json();
@@ -51,23 +74,17 @@ async function readResponseBody(response: Response, signal: AbortSignal): Promis
       throw error;
     }
 
-    if (response.ok) {
-      throw new InvalidRefreshResponseError(response.status);
-    }
-
     return undefined;
   }
 }
 
-/** 성공 상태의 body가 유효한 JSON이 아닐 때 HTTP status를 보존해 전달한다. */
-class InvalidRefreshResponseError extends Error {
-  constructor(readonly status: number) {
-    super("Invalid refresh response");
-    this.name = "InvalidRefreshResponseError";
-  }
-}
-
-/** backend Refresh API를 호출하고 HTTP/body 결과를 요청 비종속 RefreshOutcome으로 변환한다. */
+/**
+ * backend Refresh API를 호출하고 HTTP/body 결과를 요청 비종속 RefreshOutcome으로 바꾼다.
+ *
+ * response.ok가 false인 것은 네트워크 예외가 아니라 백엔드가 반환한 정상적인 HTTP 응답이다.
+ * 그래서 if 분기에서 http_error로 반환한다. 성공 응답은 access/refresh token 쌍이 모두 있어야
+ * 성공이며, JSON이 깨졌거나 필요한 값이 없으면 원래 HTTP status를 보존한 invalid_response가 된다.
+ */
 async function executeRefreshExchange(
   backendUrl: string,
   refreshToken: string,
@@ -85,22 +102,12 @@ async function executeRefreshExchange(
   const body = await readResponseBody(response, signal);
 
   if (!response.ok) {
-    return {
-      kind: "failure",
-      reason: "http_error",
-      status: response.status,
-      errorCode: parseRefreshErrorCode(body),
-    };
+    return createRefreshFailure("http_error", response.status, parseRefreshErrorCode(body));
   }
 
   const tokens = parseRefreshTokenPair(body);
   if (!tokens) {
-    return {
-      kind: "failure",
-      reason: "invalid_response",
-      status: response.status,
-      errorCode: null,
-    };
+    return createRefreshFailure("invalid_response", response.status);
   }
 
   return {
@@ -113,54 +120,31 @@ async function executeRefreshExchange(
   };
 }
 
-/** Refresh exchange 전체에 10초 deadline을 적용하고 예외를 정규화된 실패 outcome으로 바꾼다. */
+/**
+ * Refresh exchange 전체에 10초 제한을 적용하고 예외를 정규화된 실패 outcome으로 바꾼다.
+ *
+ * timer가 끝나면 AbortController가 fetch와 body 읽기에 전달한 signal을 중단한다. Next.js의 기본
+ * fetch처럼 AbortSignal을 따르는 구현에서는 현재 작업이 AbortError로 끝나고 timeout 결과가 된다.
+ * signal을 무시하는 별도 fetch 구현은 이 deadline을 보장할 수 없으므로 사용하지 않는다. 요청이
+ * 먼저 끝나면 finally에서 timer를 지워 남은 timer가 다음 작업에 영향을 주지 않게 한다.
+ */
 async function performRefreshExchange(
   backendUrl: string,
   refreshToken: string
 ): Promise<RefreshOutcome> {
   const controller = new AbortController();
-  let timeoutId: ReturnType<typeof setTimeout> | undefined;
-  const timeoutPromise = new Promise<never>((_resolve, reject) => {
-    timeoutId = setTimeout(() => {
-      controller.abort();
-      reject(new DOMException("Refresh request timed out", "AbortError"));
-    }, REFRESH_EXCHANGE_TIMEOUT_MS);
-  });
+  const timeoutId = setTimeout(() => controller.abort(), REFRESH_EXCHANGE_TIMEOUT_MS);
 
   try {
-    return await Promise.race([
-      executeRefreshExchange(backendUrl, refreshToken, controller.signal),
-      timeoutPromise,
-    ]);
+    return await executeRefreshExchange(backendUrl, refreshToken, controller.signal);
   } catch (error) {
     if (controller.signal.aborted || isAbortError(error)) {
-      return {
-        kind: "failure",
-        reason: "timeout",
-        status: 504,
-        errorCode: null,
-      };
+      return createRefreshFailure("timeout", 504);
     }
 
-    if (error instanceof InvalidRefreshResponseError) {
-      return {
-        kind: "failure",
-        reason: "invalid_response",
-        status: error.status,
-        errorCode: null,
-      };
-    }
-
-    return {
-      kind: "failure",
-      reason: "network_error",
-      status: 500,
-      errorCode: null,
-    };
+    return createRefreshFailure("network_error", 500);
   } finally {
-    if (timeoutId !== undefined) {
-      clearTimeout(timeoutId);
-    }
+    clearTimeout(timeoutId);
   }
 }
 
@@ -190,11 +174,14 @@ export function runHardRefreshSingleFlight(
       return outcome;
     }
 
-    // 재사용 시간은 대략적이며 정확한 TTL이 필요할 때 expiresAt 검사를 추가한다
-    const timer = setTimeout(() => {
+    // 성공 결과를 잠시 재사용한 뒤 cleanupTimer가 Map에서 정리한다.
+    // ponytail: 정리 시점은 대략적이다. 정확한 TTL이 실제 요구사항이 될 때만 expiresAt 검사를 추가한다.
+    const cleanupTimer = setTimeout(() => {
       refreshFlights.delete(refreshToken);
     }, REFRESH_SUCCESS_REUSE_MS);
-    (timer as ReturnType<typeof setTimeout> & { unref?: () => void }).unref?.();
+    // `as ... & { unref?: ... }`는 기본 timer 타입에 Node 전용 unref가 있을 수 있음을 TypeScript에 알린다.
+    // `?.`는 unref가 있는 Node에서만 호출한다. unref는 timer를 취소하지 않고 이 timer가 서버 종료를 막지 않게 한다.
+    (cleanupTimer as ReturnType<typeof setTimeout> & { unref?: () => void }).unref?.();
 
     return outcome;
   });

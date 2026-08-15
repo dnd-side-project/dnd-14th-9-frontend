@@ -461,8 +461,8 @@ describe("Proxy Middleware", () => {
     });
   });
 
-  describe("토큰 만료 검증", () => {
-    it("토큰이 5분 이상 남았으면 그대로 통과해야 함", async () => {
+  describe("Access Token 갱신 필요 상태 판단", () => {
+    it("만료까지 5분 이상 남은 usable Token은 그대로 통과해야 함", async () => {
       // Given: 10분 후 만료되는 토큰
       const accessToken = createMockToken(10 * 60); // 10분
       const refreshToken = createMockToken(30 * 24 * 60 * 60); // 30일
@@ -481,7 +481,7 @@ describe("Proxy Middleware", () => {
       expect(mockFetch).not.toHaveBeenCalled(); // 재발급 호출 안함
     });
 
-    it("base64url 형식 토큰도 만료 시간을 정상 판별해야 함", async () => {
+    it("base64url 형식 usable Token도 갱신 없이 통과해야 함", async () => {
       // Given: base64url 형식 + 10분 후 만료
       const accessToken = createBase64UrlMockToken(10 * 60);
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
@@ -500,7 +500,7 @@ describe("Proxy Middleware", () => {
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
-    it("토큰이 5분 이내로 남아도 기존 hard 작업이 없으면 재발급을 시작하지 않아야 함", async () => {
+    it("만료가 임박한 expiring Token도 기존 hard 작업이 없으면 재발급을 시작하지 않아야 함", async () => {
       // Given: 3분 후 만료되는 토큰
       const accessToken = createMockToken(3 * 60); // 3분
       const refreshToken = createMockToken(30 * 24 * 60 * 60);

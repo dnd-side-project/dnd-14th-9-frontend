@@ -34,7 +34,7 @@ interface AuthFailureResponseOptions {
 }
 
 type RouteType = "public" | "protected" | "api";
-type AccessTokenState = "valid" | "expiring" | "expired_or_invalid";
+type AccessTokenRefreshState = "usable" | "expiring" | "expired_or_invalid";
 type RefreshMode = "soft" | "hard";
 type RefreshFailureReason = Extract<RefreshOutcome, { kind: "failure" }>["reason"];
 
@@ -82,14 +82,14 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
-    if (!accessToken || getAccessTokenState(accessToken) !== "valid") {
+    if (!accessToken || getAccessTokenRefreshState(accessToken) !== "usable") {
       return await trySoftRefreshToken(request, refreshToken);
     }
 
     return NextResponse.next();
   }
 
-  // 토큰 없으면 로그인 라우트로 리다이렉트
+  // Access Token이 없으면 Refresh Token으로 복구를 시도하거나 인증 실패 응답을 만든다.
   if (!accessToken) {
     if (!refreshToken) {
       return buildAuthFailureResponse(request, {
@@ -101,10 +101,10 @@ export async function proxy(request: NextRequest) {
     return await tryHardRefreshToken(request, refreshToken);
   }
 
-  // 토큰 만료 상태 체크
-  const accessTokenState = getAccessTokenState(accessToken);
+  // 서명 검증이 아닌 만료 시간 기반 Refresh 필요 상태를 확인한다.
+  const accessTokenRefreshState = getAccessTokenRefreshState(accessToken);
 
-  if (accessTokenState === "expiring") {
+  if (accessTokenRefreshState === "expiring") {
     if (!refreshToken) {
       return NextResponse.next();
     }
@@ -112,7 +112,7 @@ export async function proxy(request: NextRequest) {
     return await trySoftRefreshToken(request, refreshToken);
   }
 
-  if (accessTokenState === "expired_or_invalid") {
+  if (accessTokenRefreshState === "expired_or_invalid") {
     if (refreshToken) {
       return await tryHardRefreshToken(request, refreshToken);
     }
@@ -245,10 +245,10 @@ function decodeBase64Url(value: string): string {
 }
 
 /**
- * JWT 토큰 만료 상태 확인
- * 주의: Base64 디코딩만 수행하며 서명 검증은 백엔드에서 수행됨
+ * JWT payload의 exp만 base64url decode해 Refresh 필요 상태를 판단한다.
+ * 서명 검증은 수행하지 않으므로 이 결과만으로 토큰의 진위나 인증·인가를 보장하지 않는다.
  */
-function getAccessTokenState(token: string): AccessTokenState {
+function getAccessTokenRefreshState(token: string): AccessTokenRefreshState {
   try {
     const parts = token.split(".");
     if (parts.length !== 3 || !parts[1]) {
@@ -265,7 +265,7 @@ function getAccessTokenState(token: string): AccessTokenState {
       return "expired_or_invalid";
     }
 
-    return remainingMs < REFRESH_THRESHOLD_MS ? "expiring" : "valid";
+    return remainingMs < REFRESH_THRESHOLD_MS ? "expiring" : "usable";
   } catch {
     return "expired_or_invalid";
   }

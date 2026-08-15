@@ -240,8 +240,10 @@ describe("refresh-token-single-flight", () => {
   it("hard response headers가 오지 않아도 10초에 timeout되고 다음 요청이 재시도해야 함", async () => {
     const refreshToken = uniqueRefreshToken("headers-timeout");
     const fetchStarted = deferred<void>();
+    let requestSignal: AbortSignal | undefined;
     mockFetch
       .mockImplementationOnce((_url, init) => {
+        requestSignal = init?.signal;
         fetchStarted.resolve();
         return new Promise((_resolve, reject) => {
           init?.signal?.addEventListener("abort", () => {
@@ -255,6 +257,7 @@ describe("refresh-token-single-flight", () => {
     await fetchStarted.promise;
     await jest.advanceTimersByTimeAsync(10000);
 
+    expect(requestSignal?.aborted).toBe(true);
     await expect(resultPromise).resolves.toEqual({
       kind: "failure",
       reason: "timeout",
@@ -294,9 +297,10 @@ describe("refresh-token-single-flight", () => {
       "malformed JSON",
       {
         ok: true,
-        status: 200,
+        status: 201,
         json: jest.fn().mockRejectedValue(new SyntaxError("invalid json")),
       },
+      201,
     ],
     [
       "invalid shape",
@@ -307,10 +311,11 @@ describe("refresh-token-single-flight", () => {
           result: { accessToken: "access", refreshToken: null },
         }),
       },
+      200,
     ],
   ])(
     "성공 응답의 %s는 invalid_response이고 즉시 재시도할 수 있어야 함",
-    async (_label, response) => {
+    async (_label, response, status) => {
       const refreshToken = uniqueRefreshToken(`invalid-${_label}`);
       mockFetch
         .mockResolvedValueOnce(response as unknown as Response)
@@ -319,7 +324,7 @@ describe("refresh-token-single-flight", () => {
       await expect(runHardRefreshSingleFlight(refreshToken, BACKEND_URL)).resolves.toEqual({
         kind: "failure",
         reason: "invalid_response",
-        status: 200,
+        status,
         errorCode: null,
       });
       await expect(runHardRefreshSingleFlight(refreshToken, BACKEND_URL)).resolves.toEqual({
