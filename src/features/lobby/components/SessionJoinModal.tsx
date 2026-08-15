@@ -19,6 +19,10 @@ import { toast } from "@/lib/toast";
 
 const MAX_TODOS = 5;
 
+// input의 maxLength 속성은 한글 IME 조합 중 초과 입력을 막지 못하므로 참여 시점에 다시 검증한다.
+const GOAL_MAX_LENGTH = 50;
+const TODO_MAX_LENGTH = 50;
+
 interface SessionJoinModalProps {
   sessionId: string;
   onClose: () => void;
@@ -34,7 +38,9 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
     { todoId: "0", content: "", isCompleted: false },
   ]);
   const [goalError, setGoalError] = useState(false);
+  const [goalLengthError, setGoalLengthError] = useState(false);
   const [todoError, setTodoError] = useState(false);
+  const [todoLengthErrorIds, setTodoLengthErrorIds] = useState<string[]>([]);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const joinSessionMutation = useJoinSession();
@@ -52,14 +58,30 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
     dialogRef.current = node;
   }, []);
 
+  const handleGoalChange = (content: string) => {
+    setGoal(content);
+    if (goalError) setGoalError(false);
+    if (content.trim().length <= GOAL_MAX_LENGTH) {
+      setGoalLengthError(false);
+    }
+  };
+
   const handleTodoChange = (index: number, content: string) => {
     const normalizedContent = content.trim() === "" ? "" : content;
+    const target = todos[index];
+    if (target && normalizedContent.trim().length <= TODO_MAX_LENGTH) {
+      setTodoLengthErrorIds((prev) => prev.filter((id) => id !== target.todoId));
+    }
     setTodos((prev) =>
       prev.map((todo, i) => (i === index ? { ...todo, content: normalizedContent } : todo))
     );
   };
 
   const handleRemoveTodo = (index: number) => {
+    const todoToRemove = todos[index];
+    if (todoToRemove) {
+      setTodoLengthErrorIds((prev) => prev.filter((id) => id !== todoToRemove.todoId));
+    }
     setTodos((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -69,12 +91,25 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
   };
 
   const handleJoin = async () => {
+    const trimmedGoal = goal.trim();
+    const isGoalEmpty = trimmedGoal === "";
+    const isGoalTooLong = trimmedGoal.length > GOAL_MAX_LENGTH;
+    const hasValidTodo = todos.some((todo) => todo.content.trim() !== "");
+    const tooLongTodoIds = todos
+      .filter((todo) => todo.content.trim().length > TODO_MAX_LENGTH)
+      .map((todo) => todo.todoId);
+
+    setGoalError(isGoalEmpty);
+    setGoalLengthError(isGoalTooLong);
+    setTodoError(!hasValidTodo);
+    setTodoLengthErrorIds(tooLongTodoIds);
     setServerError(null);
 
+    if (isGoalEmpty || isGoalTooLong || !hasValidTodo || tooLongTodoIds.length > 0) {
+      return;
+    }
+
     if (!formValidation.success) {
-      const invalidFields = new Set(formValidation.error.issues.map((issue) => issue.path[0]));
-      setGoalError(invalidFields.has("goal"));
-      setTodoError(invalidFields.has("todos"));
       return;
     }
 
@@ -126,18 +161,19 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
           </span>
           <TextInput
             value={goal}
-            onChange={(e) => {
-              setGoal(e.target.value);
-              if (goalError) setGoalError(false);
-            }}
-            onClear={() => setGoal("")}
+            onChange={(e) => handleGoalChange(e.target.value)}
+            onClear={() => handleGoalChange("")}
             placeholder="목표를 입력하세요"
             className="h-13.5 focus:bg-transparent"
             fullWidth
             showCharacterCount
-            maxLength={50}
-            error={goalError}
-            errorMessage="목표를 입력해주세요"
+            maxLength={GOAL_MAX_LENGTH}
+            error={goalError || goalLengthError}
+            errorMessage={
+              goalError
+                ? "목표를 입력해주세요"
+                : `목표는 최대 ${GOAL_MAX_LENGTH}자까지 입력 가능합니다`
+            }
           />
         </div>
 
@@ -176,7 +212,9 @@ export function SessionJoinModal({ sessionId, onClose, onJoinSuccess }: SessionJ
                   fullWidth
                   containerClassName="flex-1"
                   showCharacterCount
-                  maxLength={50}
+                  maxLength={TODO_MAX_LENGTH}
+                  error={todoLengthErrorIds.includes(todo.todoId)}
+                  errorMessage={`할 일은 최대 ${TODO_MAX_LENGTH}자까지 입력 가능합니다`}
                 />
                 {todos.length > 1 && (
                   <Button

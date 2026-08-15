@@ -30,6 +30,10 @@ interface GoalAndTodoCardProps {
   task: WaitingMemberTask | null;
 }
 
+// input의 maxLength 속성은 한글 IME 조합 중 초과 입력을 막지 못하므로 저장 시점에 다시 검증한다.
+const GOAL_MAX_LENGTH = 50;
+const TODO_MAX_LENGTH = 50;
+
 interface DraftTodo {
   subtaskId: number;
   content: string;
@@ -56,6 +60,8 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
   const [draftGoal, setDraftGoal] = useState("");
   const [draftTodos, setDraftTodos] = useState<DraftTodo[]>([]);
   const [deletedTodoIds, setDeletedTodoIds] = useState<number[]>([]);
+  const [goalLengthError, setGoalLengthError] = useState(false);
+  const [todoLengthErrorIds, setTodoLengthErrorIds] = useState<number[]>([]);
 
   // 표시할 값
   const goal = taskGoal;
@@ -70,16 +76,30 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
       }))
     );
     setDeletedTodoIds([]);
+    setGoalLengthError(false);
+    setTodoLengthErrorIds([]);
     setIsEditing(true);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
     setDeletedTodoIds([]);
+    setGoalLengthError(false);
+    setTodoLengthErrorIds([]);
   };
 
   const handleSave = async () => {
     if (!taskId) return;
+
+    const isGoalTooLong = draftGoal.trim().length > GOAL_MAX_LENGTH;
+    const tooLongTodoIds = draftTodos
+      .filter((draft) => draft.content.trim().length > TODO_MAX_LENGTH)
+      .map((draft) => draft.subtaskId);
+
+    setGoalLengthError(isGoalTooLong);
+    setTodoLengthErrorIds(tooLongTodoIds);
+
+    if (isGoalTooLong || tooLongTodoIds.length > 0) return;
 
     setIsSaving(true);
 
@@ -150,7 +170,18 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
     }
   };
 
+  const handleGoalChange = (content: string) => {
+    setDraftGoal(content);
+    if (content.trim().length <= GOAL_MAX_LENGTH) {
+      setGoalLengthError(false);
+    }
+  };
+
   const handleTodoChange = (index: number, content: string) => {
+    const target = draftTodos[index];
+    if (target && content.trim().length <= TODO_MAX_LENGTH) {
+      setTodoLengthErrorIds((prev) => prev.filter((id) => id !== target.subtaskId));
+    }
     setDraftTodos((prev) => prev.map((todo, i) => (i === index ? { ...todo, content } : todo)));
   };
 
@@ -159,6 +190,9 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
     // 기존 todo만 삭제 목록에 추가 (새로 추가된 것은 제외)
     if (todoToRemove && !todoToRemove.isNew) {
       setDeletedTodoIds((prev) => [...prev, todoToRemove.subtaskId]);
+    }
+    if (todoToRemove) {
+      setTodoLengthErrorIds((prev) => prev.filter((id) => id !== todoToRemove.subtaskId));
     }
     setDraftTodos((prev) => prev.filter((_, i) => i !== index));
   };
@@ -226,13 +260,15 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
         {isEditing ? (
           <TextInput
             value={draftGoal}
-            onChange={(e) => setDraftGoal(e.target.value)}
-            onClear={() => setDraftGoal("")}
+            onChange={(e) => handleGoalChange(e.target.value)}
+            onClear={() => handleGoalChange("")}
             placeholder="목표를 입력하세요"
             className="h-13.5 focus:bg-transparent"
             fullWidth
             showCharacterCount
-            maxLength={50}
+            maxLength={GOAL_MAX_LENGTH}
+            error={goalLengthError}
+            errorMessage={`목표는 최대 ${GOAL_MAX_LENGTH}자까지 입력 가능합니다`}
           />
         ) : (
           <div className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-base">
@@ -273,7 +309,9 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
                   fullWidth
                   containerClassName="flex-1"
                   showCharacterCount
-                  maxLength={50}
+                  maxLength={TODO_MAX_LENGTH}
+                  error={todoLengthErrorIds.includes(todo.subtaskId)}
+                  errorMessage={`할 일은 최대 ${TODO_MAX_LENGTH}자까지 입력 가능합니다`}
                 />
                 {draftTodos.length > 1 && (
                   <Button
