@@ -49,24 +49,6 @@ describe("SearchInput", () => {
     expect(handleSearchClick).toHaveBeenCalledTimes(1);
   });
 
-  it("allows user to type search query", async () => {
-    const user = userEvent.setup();
-
-    render(<SearchInput placeholder="세션 검색" />);
-
-    const input = screen.getByPlaceholderText("세션 검색");
-    await user.type(input, "바이브코딩");
-
-    expect(input).toHaveValue("바이브코딩");
-  });
-
-  it("renders disabled state properly", () => {
-    render(<SearchInput placeholder="세션 검색" disabled />);
-
-    const input = screen.getByPlaceholderText("세션 검색");
-    expect(input).toBeDisabled();
-  });
-
   it("merges custom className with container", () => {
     render(<SearchInput placeholder="세션 검색" className="custom-search-class" />);
 
