@@ -78,8 +78,6 @@ export function SearchInput({
   ref,
   ...props
 }: SearchInputProps) {
-  const iconSize = size === "sm" ? "small" : size === "md" ? "medium" : "small";
-
   return (
     <div className={cn(searchInputContainerVariants({ size }), className)}>
       <input
@@ -96,7 +94,7 @@ export function SearchInput({
         className="p-xs flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors hover:bg-gray-800"
       >
         <SearchIcon
-          size={iconSize}
+          size={size === "md" ? "medium" : "small"}
           className={cn(
             "group-focus-within:text-text-primary text-gray-300 transition-colors",
             size === "responsive" && "md:h-6 md:w-6"
