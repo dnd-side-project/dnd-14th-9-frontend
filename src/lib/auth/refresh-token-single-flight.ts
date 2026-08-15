@@ -11,6 +11,7 @@ const REFRESH_SUCCESS_REUSE_MS = 2_000;
 
 type RefreshFailureReason = "http_error" | "invalid_response" | "timeout" | "network_error";
 
+/** 백엔드 갱신 결과에서 요청별 응답 정보를 제외하고 모든 caller가 함께 사용할 값만 나타낸다. */
 export type RefreshOutcome =
   | {
       readonly kind: "success";
@@ -24,88 +25,17 @@ export type RefreshOutcome =
       readonly errorCode: string | null;
     };
 
-type HardRefreshDisposition = "created" | "joined" | "reused" | "bypass";
-
-export type HardRefreshResult = {
-  readonly disposition: HardRefreshDisposition;
-  readonly outcome: RefreshOutcome;
-};
-
-export type SoftRefreshResult =
-  | { readonly kind: "miss" }
-  | { readonly kind: "caller_timeout" }
-  | {
-      readonly kind: "outcome";
-      readonly disposition: "joined" | "reused";
-      readonly outcome: RefreshOutcome;
-    };
-
-interface InFlightEntry {
-  readonly kind: "in_flight";
-  readonly promise: Promise<RefreshOutcome>;
-}
-
-interface SuccessEntry {
-  readonly kind: "success";
-  readonly outcome: Extract<RefreshOutcome, { kind: "success" }>;
-  readonly expiresAt: number;
-  cleanupTimer?: ReturnType<typeof setTimeout>;
-}
-
-type RefreshFlightEntry = InFlightEntry | SuccessEntry;
-
-// 이 Map은 같은 warm instance의 중복만 줄이며, 인스턴스 간 멱등성은 백엔드가 보장한다.
-const refreshFlights = new Map<string, RefreshFlightEntry>();
-
-/** 전달받은 entry가 현재 Map 값일 때만 삭제해 늦은 cleanup이 새 작업을 지우지 않게 한다. */
-function deleteEntryIfCurrent(fingerprint: string, entry: RefreshFlightEntry) {
-  if (refreshFlights.get(fingerprint) === entry) {
-    refreshFlights.delete(fingerprint);
-  }
-}
-
-/** 성공 entry의 논리적 TTL을 확인하고 만료된 현재 entry를 정리한다. */
-function deleteExpiredSuccessEntry(fingerprint: string, entry: SuccessEntry) {
-  if (Date.now() < entry.expiresAt) {
-    return false;
-  }
-
-  if (entry.cleanupTimer !== undefined) {
-    clearTimeout(entry.cleanupTimer);
-  }
-  deleteEntryIfCurrent(fingerprint, entry);
-  return true;
-}
-
-/** Map 전체에서 논리적 TTL이 지난 성공 entry를 기회적으로 정리한다. */
-function sweepExpiredSuccessEntries() {
-  for (const [fingerprint, entry] of refreshFlights) {
-    if (entry.kind === "success") {
-      deleteExpiredSuccessEntry(fingerprint, entry);
-    }
-  }
-}
-
-/** fingerprint의 현재 entry를 조회하되 만료된 성공 결과는 miss로 처리한다. */
-function getCurrentEntry(fingerprint: string): RefreshFlightEntry | null {
-  const entry = refreshFlights.get(fingerprint);
-  if (!entry) {
-    return null;
-  }
-
-  if (entry.kind === "success" && deleteExpiredSuccessEntry(fingerprint, entry)) {
-    return null;
-  }
-
-  return entry;
-}
-
-/** 원본 Refresh Token 대신 Map key로 사용할 SHA-256 fingerprint를 생성한다. */
-async function createRefreshTokenFingerprint(refreshToken: string): Promise<string> {
-  const bytes = new TextEncoder().encode(refreshToken);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
+/**
+ * 같은 Refresh Token으로 들어온 요청들이 하나의 갱신 작업을 공유하도록 보관한다.
+ *
+ * key는 요청에 포함된 Refresh Token이고, value는 백엔드 갱신 결과를 기다리는 Promise다.
+ * 성공한 Promise는 바로 뒤따라오는 중복 요청도 재사용할 수 있도록 잠시 남겨두고,
+ * 실패한 Promise는 다음 요청이 다시 시도할 수 있도록 즉시 제거한다.
+ *
+ * 이 Map은 현재 서버 인스턴스의 메모리에만 존재한다. 따라서 같은 인스턴스 안의 중복만
+ * 줄일 수 있으며, 서로 다른 서버 인스턴스에서 발생한 중복 처리는 백엔드가 담당해야 한다.
+ */
+const refreshFlights = new Map<string, Promise<RefreshOutcome>>();
 
 /** 브라우저와 Node 런타임에서 발생한 AbortError를 공통 판별한다. */
 function isAbortError(error: unknown): boolean {
@@ -234,136 +164,73 @@ async function performRefreshExchange(
   }
 }
 
-/** 새 hard exchange를 Map에 등록하고 성공만 2초 동안 재사용 가능한 entry로 교체한다. */
-function startHardRefreshFlight(
-  fingerprint: string,
+/**
+ * 새 Access Token이 없으면 요청을 계속할 수 없는 hard 요청의 Refresh 갱신을 처리한다.
+ *
+ * 같은 Refresh Token의 Promise가 Map에 있으면 새 백엔드 요청을 만들지 않고 그 Promise를
+ * 그대로 반환한다. Promise가 없을 때만 백엔드 Refresh API를 한 번 호출하고 Map에 저장한다.
+ * 성공 결과는 짧은 시간 동안 재사용한 뒤 timer로 삭제하며, 실패 결과는 바로 삭제한다.
+ *
+ * @param refreshToken 브라우저가 보낸 Refresh Token. Map의 key와 백엔드 Cookie에만 사용한다.
+ * @param backendUrl Refresh API를 제공하는 백엔드 서버 주소.
+ * @returns 성공 또는 실패로 정리된 하나의 Refresh 결과 Promise.
+ */
+export function runHardRefreshSingleFlight(
   refreshToken: string,
   backendUrl: string
-): InFlightEntry {
-  const entry: InFlightEntry = {
-    kind: "in_flight",
-    promise: performRefreshExchange(backendUrl, refreshToken).then((outcome) => {
-      if (outcome.kind === "failure") {
-        deleteEntryIfCurrent(fingerprint, entry);
-        return outcome;
-      }
+): Promise<RefreshOutcome> {
+  const existingFlight = refreshFlights.get(refreshToken);
+  if (existingFlight) {
+    return existingFlight;
+  }
 
-      if (refreshFlights.get(fingerprint) !== entry) {
-        return outcome;
-      }
-
-      const successEntry: SuccessEntry = {
-        kind: "success",
-        outcome,
-        expiresAt: Date.now() + REFRESH_SUCCESS_REUSE_MS,
-      };
-      successEntry.cleanupTimer = setTimeout(() => {
-        deleteEntryIfCurrent(fingerprint, successEntry);
-      }, REFRESH_SUCCESS_REUSE_MS);
-      (
-        successEntry.cleanupTimer as ReturnType<typeof setTimeout> & { unref?: () => void }
-      ).unref?.();
-      refreshFlights.set(fingerprint, successEntry);
+  const promise = performRefreshExchange(backendUrl, refreshToken).then((outcome) => {
+    if (outcome.kind === "failure") {
+      refreshFlights.delete(refreshToken);
       return outcome;
-    }),
-  };
-  refreshFlights.set(fingerprint, entry);
-  return entry;
+    }
+
+    // 재사용 시간은 대략적이며 정확한 TTL이 필요할 때 expiresAt 검사를 추가한다
+    const timer = setTimeout(() => {
+      refreshFlights.delete(refreshToken);
+    }, REFRESH_SUCCESS_REUSE_MS);
+    (timer as ReturnType<typeof setTimeout> & { unref?: () => void }).unref?.();
+
+    return outcome;
+  });
+
+  refreshFlights.set(refreshToken, promise);
+  return promise;
 }
 
-/** hard caller가 기존 작업·성공 결과를 공유하거나, 없으면 새 Refresh exchange를 시작한다. */
-export async function runHardRefreshSingleFlight(
-  refreshToken: string,
-  backendUrl: string
-): Promise<HardRefreshResult> {
-  sweepExpiredSuccessEntries();
-
-  let fingerprint: string;
-  try {
-    fingerprint = await createRefreshTokenFingerprint(refreshToken);
-  } catch {
-    return {
-      disposition: "bypass",
-      outcome: await performRefreshExchange(backendUrl, refreshToken),
-    };
-  }
-
-  const existingEntry = getCurrentEntry(fingerprint);
-  if (existingEntry?.kind === "success") {
-    return { disposition: "reused", outcome: existingEntry.outcome };
-  }
-  if (existingEntry?.kind === "in_flight") {
-    return { disposition: "joined", outcome: await existingEntry.promise };
-  }
-
-  const createdEntry = startHardRefreshFlight(fingerprint, refreshToken, backendUrl);
-  return { disposition: "created", outcome: await createdEntry.promise };
-}
-
-/** soft caller가 새 작업을 만들지 않고 1.5초 예산 안에서 기존 작업이나 성공 결과에만 합류한다. */
+/**
+ * 현재 Access Token으로 요청을 계속할 수 있는 soft 요청이 기존 Refresh 작업에만 합류한다.
+ *
+ * 이 함수는 백엔드 갱신을 새로 시작하지 않는다. 같은 Refresh Token의 진행 중인 Promise나
+ * 잠시 보관 중인 성공 Promise가 없으면 즉시 null을 반환한다. Promise가 있으면 약 1.5초만
+ * 기다리며, 그 안에 결과가 나오지 않아도 원래 hard 작업은 취소하지 않고 이 caller만 null을
+ * 반환해 기존 Access Token으로 요청을 계속하게 한다.
+ *
+ * @param refreshToken 브라우저가 보낸 Refresh Token. 기존 Promise를 찾는 key로만 사용한다.
+ * @returns 시간 안에 받은 Refresh 결과. 작업이 없거나 대기 시간이 지나면 null.
+ */
 export async function joinSoftRefreshSingleFlight(
   refreshToken: string
-): Promise<SoftRefreshResult> {
-  const deadlineAt = Date.now() + SOFT_REFRESH_TOTAL_TIMEOUT_MS;
-  let callerTimedOut = false;
-  /** timer callback과 절대 시각을 함께 확인해 정확한 deadline 경계를 판별한다. */
-  const hasCallerTimedOut = () => callerTimedOut || Date.now() >= deadlineAt;
+): Promise<RefreshOutcome | null> {
+  const flight = refreshFlights.get(refreshToken);
+  if (!flight) {
+    return null;
+  }
+
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
-  const timeoutPromise = new Promise<SoftRefreshResult>((resolve) => {
+  const timeoutPromise = new Promise<null>((resolve) => {
     timeoutId = setTimeout(() => {
-      callerTimedOut = true;
-      resolve({ kind: "caller_timeout" });
+      resolve(null);
     }, SOFT_REFRESH_TOTAL_TIMEOUT_MS);
   });
 
-  const lookupPromise = (async (): Promise<SoftRefreshResult> => {
-    sweepExpiredSuccessEntries();
-
-    let fingerprint: string;
-    try {
-      fingerprint = await createRefreshTokenFingerprint(refreshToken);
-    } catch {
-      return hasCallerTimedOut() ? { kind: "caller_timeout" } : { kind: "miss" };
-    }
-
-    if (hasCallerTimedOut()) {
-      return { kind: "caller_timeout" };
-    }
-
-    const entry = getCurrentEntry(fingerprint);
-    if (!entry) {
-      return { kind: "miss" };
-    }
-    if (entry.kind === "success") {
-      if (hasCallerTimedOut()) {
-        return { kind: "caller_timeout" };
-      }
-
-      return {
-        kind: "outcome",
-        disposition: "reused",
-        outcome: entry.outcome,
-      };
-    }
-
-    if (hasCallerTimedOut()) {
-      return { kind: "caller_timeout" };
-    }
-
-    const outcome = await entry.promise;
-    if (hasCallerTimedOut()) {
-      return { kind: "caller_timeout" };
-    }
-
-    return {
-      kind: "outcome",
-      disposition: "joined",
-      outcome,
-    };
-  })();
-
   try {
-    return await Promise.race([lookupPromise, timeoutPromise]);
+    return await Promise.race([flight, timeoutPromise]);
   } finally {
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId);

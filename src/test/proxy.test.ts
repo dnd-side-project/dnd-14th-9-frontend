@@ -49,7 +49,6 @@ describe("Proxy Middleware", () => {
   type RefreshFailureReason = "http_error" | "invalid_response" | "timeout" | "network_error";
   type RouteType = "public" | "protected" | "api";
   type RefreshMode = "soft" | "hard";
-  type RefreshDisposition = "created" | "joined" | "reused" | "bypass";
 
   function createRefreshSuccessResponse(
     accessToken: string = "new_access",
@@ -194,7 +193,6 @@ describe("Proxy Middleware", () => {
       status: number;
       cookieClear: boolean;
       mode: RefreshMode;
-      disposition: RefreshDisposition;
     }>
   ) {
     const logCalls =
@@ -210,7 +208,7 @@ describe("Proxy Middleware", () => {
     expect(matchingCall).toBeDefined();
     expect(matchingCall).toHaveLength(2);
     expect(Object.keys(matchingCall?.[1] as Record<string, unknown>).sort()).toEqual(
-      ["cookieClear", "disposition", "mode", "reason", "routeType", "status"].sort()
+      ["cookieClear", "mode", "reason", "routeType", "status"].sort()
     );
   }
 
@@ -571,7 +569,6 @@ describe("Proxy Middleware", () => {
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const backendResponse = deferred<ReturnType<typeof createRefreshSuccessResponse>>();
       const fetchStarted = deferred<void>();
-      jest.spyOn(crypto.subtle, "digest").mockResolvedValue(new Uint8Array(32).fill(249).buffer);
       mockFetch.mockImplementation(() => {
         fetchStarted.resolve();
         return backendResponse.promise;
@@ -801,38 +798,12 @@ describe("Proxy Middleware", () => {
             status: 200,
             routeType: "protected",
             mode: "hard",
-            disposition: "created",
           },
         ],
       ]);
     });
 
-    it("지문 계산 실패 경고는 정적 필드만 사용해 warm module당 한 번만 남겨야 함", async () => {
-      let isolatedProxy!: typeof proxy;
-      await jest.isolateModulesAsync(async () => {
-        ({ proxy: isolatedProxy } = await import("@/proxy"));
-      });
-      const createRequest = () =>
-        new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
-          headers: {
-            cookie: `refreshToken=${createMockToken(30 * 24 * 60 * 60)}`,
-          },
-        });
-      jest.spyOn(crypto.subtle, "digest").mockRejectedValue(new Error("digest unavailable"));
-      mockFetch
-        .mockResolvedValueOnce(createRefreshSuccessResponse())
-        .mockResolvedValueOnce(createRefreshSuccessResponse());
-
-      await isolatedProxy(createRequest());
-      await isolatedProxy(createRequest());
-
-      const bypassCalls = consoleWarnSpy.mock.calls.filter(
-        ([message]) => message === "Proxy: Token refresh fingerprint bypass"
-      );
-      expect(bypassCalls).toEqual([["Proxy: Token refresh fingerprint bypass", { mode: "hard" }]]);
-    });
-
-    it("성공한 hard 갱신 결과는 2초 미만에 재사용하고 2초부터 새로 호출해야 함", async () => {
+    it("성공한 hard 갱신 결과는 timer 전까지 재사용하고 timer 이후 새로 호출해야 함", async () => {
       jest.useFakeTimers();
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const createRequest = () =>
@@ -844,14 +815,13 @@ describe("Proxy Middleware", () => {
         .mockResolvedValueOnce(createRefreshSuccessResponse("access-2", "refresh-2"));
 
       const firstResponse = await proxy(createRequest());
-      await jest.advanceTimersByTimeAsync(1999);
       const reusedResponse = await proxy(createRequest());
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(firstResponse).not.toBe(reusedResponse);
       expect(hasSetCookie(reusedResponse, (cookie) => cookie.includes("access-1"))).toBe(true);
 
-      await jest.advanceTimersByTimeAsync(1);
+      await jest.runOnlyPendingTimersAsync();
       const refreshedResponse = await proxy(createRequest());
       expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(hasSetCookie(refreshedResponse, (cookie) => cookie.includes("access-2"))).toBe(true);
@@ -1336,7 +1306,6 @@ describe("Proxy Middleware", () => {
       });
       const backendResponse = deferred<ReturnType<typeof createRefreshMismatchResponse>>();
       const fetchStarted = deferred<void>();
-      jest.spyOn(crypto.subtle, "digest").mockResolvedValue(new Uint8Array(32).fill(250).buffer);
       mockFetch.mockImplementation(() => {
         fetchStarted.resolve();
         return backendResponse.promise;
@@ -1365,7 +1334,6 @@ describe("Proxy Middleware", () => {
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const backendResponse = deferred<ReturnType<typeof createRefreshMismatchResponse>>();
       const fetchStarted = deferred<void>();
-      jest.spyOn(crypto.subtle, "digest").mockResolvedValue(new Uint8Array(32).fill(248).buffer);
       mockFetch.mockImplementation(() => {
         fetchStarted.resolve();
         return backendResponse.promise;
@@ -1405,7 +1373,6 @@ describe("Proxy Middleware", () => {
         status: 401,
         cookieClear: false,
         mode: "soft",
-        disposition: "joined",
       });
     });
 
