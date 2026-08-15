@@ -1,11 +1,7 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
-import { SearchInput } from "@/components/SearchInput/SearchInput";
 import { SearchFilterSection } from "@/features/session/components/SearchFilterSection/SearchFilterSection";
-import { CATEGORIES, getCategoryLabel, type CategoryFilter } from "@/lib/constants/category";
-import { cn } from "@/lib/utils";
+import { CATEGORIES, getCategoryLabel } from "@/lib/constants/category";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
@@ -102,176 +98,6 @@ export const WithSearchKeyword: Story = {
     docs: {
       description: {
         story: "검색어와 카테고리가 모두 지정된 상태입니다.",
-      },
-    },
-  },
-};
-
-// ---------------------------------------------------------------------------
-// 2. 피그마 인터랙티브 플레이그라운드 (클릭/입력/토글 실시간 상태 확인)
-// ---------------------------------------------------------------------------
-
-function InteractiveFilterSectionSimulator({
-  initialCategory = "ALL",
-  initialQuery = "",
-}: {
-  initialCategory?: CategoryFilter;
-  initialQuery?: string;
-}) {
-  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>(initialCategory);
-  const [query, setQuery] = useState(initialQuery);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [displayExpanded, setDisplayExpanded] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const updateScrollState = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 1);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
-  }, []);
-
-  useEffect(() => {
-    updateScrollState();
-    const el = scrollRef.current;
-    el?.addEventListener("scroll", updateScrollState, { passive: true });
-    window.addEventListener("resize", updateScrollState);
-    return () => {
-      el?.removeEventListener("scroll", updateScrollState);
-      window.removeEventListener("resize", updateScrollState);
-    };
-  }, [updateScrollState]);
-
-  useEffect(() => {
-    if (!isExpanded) {
-      if (scrollRef.current) scrollRef.current.scrollLeft = 0;
-      const timer = setTimeout(() => {
-        setDisplayExpanded(false);
-        updateScrollState();
-      }, 200);
-      return () => clearTimeout(timer);
-    }
-  }, [isExpanded, updateScrollState]);
-
-  const scrollMaskImage =
-    !isExpanded && (canScrollLeft || canScrollRight)
-      ? canScrollLeft && canScrollRight
-        ? "linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)"
-        : canScrollLeft
-          ? "linear-gradient(to right, transparent, black 40px)"
-          : "linear-gradient(to right, black calc(100% - 40px), transparent)"
-      : undefined;
-
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="bg-surface-strong border-border-default flex flex-wrap items-center justify-between gap-4 rounded-lg border p-4 text-xs">
-        <div className="flex items-center gap-2">
-          <span className="text-text-muted">선택된 카테고리:</span>
-          <span className="font-semibold text-green-600">{getCategoryLabel(selectedCategory)}</span>
-          <span className="text-text-disabled">({selectedCategory})</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-text-muted">검색어:</span>
-          <span className="text-text-primary font-medium">{query || "(없음)"}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-text-muted">모바일 확장 상태:</span>
-          <span className={cn("font-medium", isExpanded ? "text-green-600" : "text-text-muted")}>
-            {isExpanded ? "펼침 (Expanded)" : "접힘 (Collapsed)"}
-          </span>
-        </div>
-      </div>
-
-      <section className="md:gap-xl gap-md flex w-full flex-col items-start md:items-center">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-            setQuery((formData.get("q") as string) || "");
-          }}
-          className="flex w-full justify-center"
-        >
-          <SearchInput
-            name="q"
-            defaultValue={query}
-            placeholder="관심 분야의 세션을 검색해 보세요"
-            onSearchClick={() => {}}
-            className="h-11 md:h-14"
-          />
-        </form>
-
-        <div
-          className={cn(
-            "flex w-full md:justify-center",
-            isExpanded ? "gap-sm items-start" : "gap-xs items-center"
-          )}
-        >
-          <div
-            className={cn(
-              "min-w-0 flex-1 transition-[max-height] duration-200 ease-in-out",
-              isExpanded
-                ? "max-md:max-h-[139px] max-md:overflow-hidden"
-                : "max-md:max-h-[41px] max-md:overflow-hidden"
-            )}
-          >
-            <div
-              ref={scrollRef}
-              style={{ maskImage: scrollMaskImage }}
-              className={cn(
-                "gap-xs md:gap-sm flex w-full flex-wrap items-center md:justify-center",
-                "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-                !displayExpanded && "max-md:flex-nowrap max-md:overflow-x-auto"
-              )}
-            >
-              {CATEGORIES.map((category) => {
-                const isSelected = selectedCategory === category;
-                return (
-                  <CategoryFilterButton
-                    key={category}
-                    isSelected={isSelected}
-                    onClick={() => setSelectedCategory(category)}
-                    className="text-xs md:text-sm"
-                  >
-                    {getCategoryLabel(category)}
-                  </CategoryFilterButton>
-                );
-              })}
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className={cn(
-              "border-alpha-white-16 border-sm px-xs py-2xs hover:bg-surface-subtle rounded-max flex shrink-0 cursor-pointer items-center justify-center transition-colors md:hidden",
-              isExpanded ? "bg-surface-strong" : "bg-surface-default"
-            )}
-            onClick={() => {
-              const next = !isExpanded;
-              setIsExpanded(next);
-              if (next) setDisplayExpanded(true);
-            }}
-            aria-expanded={isExpanded}
-            aria-label={isExpanded ? "카테고리 접기" : "카테고리 펼치기"}
-          >
-            <ChevronDownIcon
-              className={cn("transition-transform duration-300", isExpanded ? "rotate-180" : "")}
-            />
-          </button>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-export const InteractivePlayground: Story = {
-  render: () => <InteractiveFilterSectionSimulator />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "카테고리 클릭 선택, 검색어 입력, 모바일 확장/접기 토글을 실시간으로 조작하며 피그마 스펙의 동작을 확인할 수 있는 인터랙티브 플레이그라운드입니다.",
       },
     },
   },
@@ -420,7 +246,7 @@ export const ResponsiveBreakpointsComparison: Story = {
           📱 Mobile View (375px) — 스크롤 및 접기/펼치기 토글 지원
         </h4>
         <div className="border-border-default bg-background-default w-[375px] rounded-xl border p-4">
-          <InteractiveFilterSectionSimulator initialCategory="DEVELOPMENT" />
+          <SearchFilterSection />
         </div>
       </div>
 
@@ -429,7 +255,7 @@ export const ResponsiveBreakpointsComparison: Story = {
           💻 Desktop View (1024px+) — 중앙 정렬 및 전체 카테고리 항시 노출
         </h4>
         <div className="border-border-default bg-background-default w-full rounded-xl border p-6">
-          <InteractiveFilterSectionSimulator initialCategory="ALL" />
+          <SearchFilterSection />
         </div>
       </div>
     </div>
