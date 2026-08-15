@@ -146,58 +146,6 @@ export const InteractiveSingleSelect: Story = {
 };
 
 // ---------------------------------------------------------------------------
-// 인터랙티브 다중 선택 (Multi Select - 온보딩/프로필 설정용)
-// ---------------------------------------------------------------------------
-
-export const InteractiveMultiSelect: Story = {
-  render: () => {
-    const [selectedList, setSelectedList] = useState<CategoryFilter[]>(["DEVELOPMENT", "DESIGN"]);
-
-    const toggle = (cat: CategoryFilter) => {
-      if (selectedList.includes(cat)) {
-        setSelectedList(selectedList.filter((c) => c !== cat));
-      } else {
-        if (selectedList.length >= 3) {
-          alert("최대 3개까지 선택 가능합니다.");
-          return;
-        }
-        setSelectedList([...selectedList, cat]);
-      }
-    };
-
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="text-text-muted text-xs">
-          선택된 항목 ({selectedList.length}/3):{" "}
-          <span className="font-semibold text-green-600">
-            {selectedList.map(getCategoryLabel).join(", ") || "(없음)"}
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.filter((c) => c !== "ALL").map((cat) => (
-            <CategoryFilterButton
-              key={cat}
-              isSelected={selectedList.includes(cat)}
-              onClick={() => toggle(cat)}
-            >
-              {getCategoryLabel(cat)}
-            </CategoryFilterButton>
-          ))}
-        </div>
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "프로필 설정이나 온보딩에서 사용되는 최대 3개 다중 선택(Multi Select) 인터랙션입니다.",
-      },
-    },
-  },
-};
-
-// ---------------------------------------------------------------------------
 // 피그마 Chip/Filter (토글 칩) 컴포넌트 셋
 // ---------------------------------------------------------------------------
 
