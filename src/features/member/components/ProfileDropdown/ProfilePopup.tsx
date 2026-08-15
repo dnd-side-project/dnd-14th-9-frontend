@@ -65,7 +65,7 @@ export function ProfilePopup({
   return (
     <div
       className={cn(
-        "px-lg py-md gap-sm border-border-default bg-surface-default flex w-107 flex-col rounded-lg border",
+        "px-lg py-md gap-sm border-border-default bg-surface-default flex w-107 max-w-full flex-col rounded-lg border",
         className
       )}
     >

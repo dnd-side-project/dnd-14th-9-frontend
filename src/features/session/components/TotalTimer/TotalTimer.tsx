@@ -28,7 +28,7 @@ export function TotalTimer({
   const progress = (remainingSeconds / totalSeconds) * 100;
 
   return (
-    <div className="gap-xl p-xl bg-surface-strong flex h-full rounded-2xl">
+    <div className="gap-xl p-xl bg-surface-strong flex h-full flex-col rounded-2xl sm:flex-row">
       {/* 왼쪽: 정보 영역 */}
       <div className="flex flex-1 flex-col gap-3">
         {/* 제목 + 시간 */}
@@ -47,7 +47,7 @@ export function TotalTimer({
       </div>
 
       {/* 오른쪽: Progress Ring with Time (가운데 정렬) */}
-      <div className="flex items-center">
+      <div className="flex items-center justify-center">
         <ProgressRing
           progress={progress}
           size={200}

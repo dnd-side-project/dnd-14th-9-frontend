@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils/utils";
 
@@ -9,6 +9,9 @@ import { useStepperSlide } from "./useStepperSlide";
 import type { StepperSlideProps } from "./StepperSlide.types";
 
 const TICK_VALUES = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] as const;
+
+// 값 말풍선(w-13)과 내 집중도 말풍선(w-14)이 겹치기 시작하는 중심 간 거리(px)
+const BUBBLE_OVERLAP_THRESHOLD_PX = 58;
 
 export function StepperSlide({
   value,
@@ -42,6 +45,26 @@ export function StepperSlide({
   const myFocusPercentage =
     myFocusValue !== undefined ? ((myFocusValue - min) / (max - min)) * 100 : undefined;
 
+  const [trackWidth, setTrackWidth] = useState<number | null>(null);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const updateWidth = () => setTrackWidth(track.offsetWidth);
+    updateWidth();
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(track);
+    return () => observer.disconnect();
+  }, [trackRef]);
+
+  // 좁은 화면에서 값 말풍선과 겹치면 내 집중도 말풍선을 숨긴다(트랙 마커는 유지).
+  const isMyFocusBubbleHidden =
+    myFocusPercentage !== undefined &&
+    trackWidth !== null &&
+    (Math.abs(myFocusPercentage - percentage) / 100) * trackWidth < BUBBLE_OVERLAP_THRESHOLD_PX;
+
   // 선택할 수 없는 구간(상한 초과)을 트랙 위에 흐리게 표시한다.
   const limitPercentage =
     limit !== undefined ? ((selectableMax - min) / (max - min)) * 100 : undefined;
@@ -59,7 +82,13 @@ export function StepperSlide({
       <div className="relative mb-3 h-9.5">
         {/* 내 집중도 말풍선 */}
         {myFocusPercentage !== undefined && (
-          <div className="absolute top-0" style={{ left: `${myFocusPercentage}%` }}>
+          <div
+            className={cn(
+              "absolute top-0 transition-opacity",
+              isMyFocusBubbleHidden && "opacity-0"
+            )}
+            style={{ left: `${myFocusPercentage}%` }}
+          >
             <div
               className={cn(
                 "relative -translate-x-1/2",

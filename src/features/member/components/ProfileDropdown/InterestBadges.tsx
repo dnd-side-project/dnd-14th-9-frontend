@@ -15,7 +15,7 @@ export function InterestBadges({ profile }: { profile: MemberProfileView }) {
   if (badges.length === 0) return null;
 
   return (
-    <div className="gap-xs flex">
+    <div className="gap-xs flex flex-wrap">
       {badges.map(({ rank, label }) => (
         <div key={rank} className="gap-xs flex items-center">
           <p className="text-text-primary text-xs font-semibold">{rank}</p>

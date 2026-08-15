@@ -65,7 +65,7 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
   };
 
   return (
-    <div className="gap-xl p-xl bg-surface-strong flex h-full rounded-2xl">
+    <div className="gap-xl p-xl bg-surface-strong flex h-full flex-col rounded-2xl sm:flex-row">
       {/* 왼쪽: 정보 영역 */}
       <div className="flex flex-1 flex-col gap-3">
         {/* 제목 + 시간 */}
@@ -77,14 +77,14 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
         {/* 상태 + 집중도 */}
         <div className="gap-md flex items-center">
           <span
-            className={`flex items-center gap-1 text-sm ${isFocusing ? "text-text-status-positive-default" : "text-text-tertiary"}`}
+            className={`flex shrink-0 items-center gap-1 text-sm whitespace-nowrap ${isFocusing ? "text-text-status-positive-default" : "text-text-tertiary"}`}
           >
             <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
               <circle cx="3" cy="3" r="3" />
             </svg>
             {isFocusing ? "집중 중" : "자리 비움"}
           </span>
-          <span className="inline-flex gap-2 text-[13px] font-semibold">
+          <span className="inline-flex gap-2 text-[13px] font-semibold whitespace-nowrap">
             <span className="text-text-disabled">전체 시간 대비</span>
             <span className="text-text-primary">{focusRate}% 집중</span>
           </span>
@@ -116,7 +116,7 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
       </div>
 
       {/* 오른쪽: Progress Ring with Time (가운데 정렬) */}
-      <div className="flex items-center">
+      <div className="flex items-center justify-center">
         <ProgressRing
           progress={progress}
           size={200}

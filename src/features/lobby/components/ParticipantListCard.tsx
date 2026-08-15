@@ -100,7 +100,9 @@ export function ParticipantListCard({
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
           <h2 className="text-text-primary text-2xl font-bold">참여자 목록</h2>
-          <p className="text-text-secondary text-base">이번 세션에서 함께할 참여자들이에요</p>
+          <p className="text-text-secondary text-base break-keep">
+            이번 세션에서 함께할 참여자들이에요
+          </p>
         </div>
         {isHost && !isKicking && (
           <Button variant="outlined" colorScheme="primary" size="medium" onClick={handleStartKick}>
@@ -167,11 +169,11 @@ export function ParticipantListCard({
                     {participant.task?.goal ?? ""}
                   </span>
                   <div className="mt-md flex items-center gap-2">
-                    <span className="text-xs text-gray-500">달성도</span>
+                    <span className="shrink-0 text-xs whitespace-nowrap text-gray-500">달성도</span>
                     <ChipBadge status="recruiting" radius="max">
                       {participant.achievementRate}%
                     </ChipBadge>
-                    <span className="text-xs text-gray-500">집중도</span>
+                    <span className="shrink-0 text-xs whitespace-nowrap text-gray-500">집중도</span>
                     <ChipBadge status="closing" radius="max">
                       {participant.focusRate}%
                     </ChipBadge>

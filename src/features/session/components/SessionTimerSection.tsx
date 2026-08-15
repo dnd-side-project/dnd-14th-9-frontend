@@ -32,12 +32,12 @@ export function SessionTimerSection({
   );
 
   return (
-    <section className={`gap-lg flex flex-col items-stretch md:flex-row ${className ?? ""}`}>
-      <div className="md:flex-6">
+    <section className={`gap-lg flex flex-col items-stretch xl:flex-row ${className ?? ""}`}>
+      <div className="xl:flex-6">
         <MyTimer sessionId={sessionId} sessionDurationMinutes={sessionDurationMinutes} />
       </div>
 
-      <div className="md:flex-4">
+      <div className="xl:flex-4">
         <TotalTimer
           sessionEndTime={sessionEndTime}
           sessionDurationMinutes={sessionDurationMinutes}

@@ -59,7 +59,9 @@ export function SessionDetailSection({
 
         {/* 공지사항 */}
         <div className="px-lg py-lg gap-md mt-auto flex flex-row rounded-lg bg-gray-900">
-          <p className="text-common-white text-base font-semibold">공지사항</p>
+          <p className="text-common-white shrink-0 text-base font-semibold whitespace-nowrap">
+            공지사항
+          </p>
           <p className="text-base text-gray-400">{notice}</p>
         </div>
       </div>
