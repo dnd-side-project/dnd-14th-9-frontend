@@ -117,7 +117,6 @@ export function SearchFilterSection() {
           defaultValue={currentQuery}
           placeholder="관심 분야의 세션을 검색해 보세요"
           onSearchClick={handleSearchClick}
-          className="h-11 md:h-14"
         />
       </form>
 
