@@ -55,7 +55,7 @@ export type SessionCategoryFilter = CategoryFilter;
 
 export type SessionSort = "POPULAR" | "LATEST" | "DEADLINE_APPROACHING";
 
-export type TimeSlot = "MORNING" | "AFTERNOON" | "EVENING";
+export type TimeSlot = "DAWN" | "MORNING" | "AFTERNOON" | "EVENING";
 
 export type DurationRange = "ONE_HOUR_OR_LESS" | "ONE_TO_TWO_HOURS" | "TWO_TO_THREE_HOURS";
 
