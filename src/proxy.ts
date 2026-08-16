@@ -3,14 +3,15 @@ import { NextResponse } from "next/server";
 
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
-import {
-  buildRefreshCookieHeader,
-  mergeCookieHeaderWithAuthTokens,
-} from "@/lib/auth/cookie-header-utils";
+import { mergeCookieHeaderWithAuthTokens } from "@/lib/auth/cookie-header-utils";
 import { buildLoginRedirectUrl } from "@/lib/auth/login-redirect-utils";
 import { setRedirectAfterLoginCookie } from "@/lib/auth/redirect-after-login-cookie";
+import {
+  joinSoftRefreshSingleFlight,
+  runHardRefreshSingleFlight,
+  type RefreshOutcome,
+} from "@/lib/auth/refresh-token-single-flight";
 import { isKnownPublicPageRoute, isProtectedPageRoute } from "@/lib/auth/route-access-policy";
-import { getErrorCodeFromResponse, parseRefreshTokenPair } from "@/lib/auth/token-refresh-utils";
 import { BACKEND_ERROR_CODES, LOGIN_INTERNAL_ERROR_CODES } from "@/lib/error/error-codes";
 import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
 import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
@@ -26,31 +27,27 @@ const PUBLIC_API_ROUTE_PATTERNS = [
 // 토큰 갱신 임계값 (5분)
 const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
 
-// 토큰 갱신 API 타임아웃 (10초)
-const REFRESH_TIMEOUT_MS = 10000;
-// 공개 페이지에서 사용하는 소프트 갱신 타임아웃 (짧게 제한)
-const SOFT_REFRESH_TIMEOUT_MS = 1500;
-
-interface TryRefreshTokenOptions {
-  allowPassThroughOnFailure?: boolean;
-  timeoutMs?: number;
-}
-
-const SOFT_REFRESH_OPTIONS: TryRefreshTokenOptions = {
-  allowPassThroughOnFailure: true,
-  timeoutMs: SOFT_REFRESH_TIMEOUT_MS,
-};
-
 interface AuthFailureResponseOptions {
   clearAuth?: boolean;
   reason?: string;
   status?: number;
 }
 
-type RefreshFailureReason = "http_error" | "invalid_response" | "timeout" | "network_error";
 type RouteType = "public" | "protected" | "api";
-type AccessTokenState = "valid" | "expiring" | "expired_or_invalid";
+type AccessTokenRefreshState = "usable" | "expiring" | "expired_or_invalid";
+type RefreshMode = "soft" | "hard";
+type RefreshFailureReason = Extract<RefreshOutcome, { kind: "failure" }>["reason"];
 
+/**
+ * 실제 페이지나 API가 실행되기 전에 인증 상태를 확인하는 공통 진입점이다.
+ *
+ * 공개 경로인지 보호 경로인지 구분하고 Access Token 상태에 따라 요청을 그대로 통과시키거나,
+ * 기존 Refresh 작업에만 합류하는 soft 갱신 또는 새 작업을 만들 수 있는 hard 갱신을 선택한다.
+ * 각 갱신 결과는 현재 요청만을 위한 응답과 Cookie로 변환한다.
+ *
+ * @param request 브라우저 또는 API client가 보낸 현재 Next.js 요청.
+ * @returns 인증 상태에 따라 통과, 새 Cookie, redirect 또는 API 오류가 적용된 응답.
+ */
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublicPageRoute = isKnownPublicPageRoute(pathname);
@@ -85,14 +82,14 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
-    if (!accessToken || getAccessTokenState(accessToken) !== "valid") {
-      return await tryRefreshToken(request, refreshToken, SOFT_REFRESH_OPTIONS);
+    if (!accessToken || getAccessTokenRefreshState(accessToken) !== "usable") {
+      return await trySoftRefreshToken(request, refreshToken);
     }
 
     return NextResponse.next();
   }
 
-  // 토큰 없으면 로그인 라우트로 리다이렉트
+  // Access Token이 없으면 Refresh Token으로 복구를 시도하거나 인증 실패 응답을 만든다.
   if (!accessToken) {
     if (!refreshToken) {
       return buildAuthFailureResponse(request, {
@@ -101,23 +98,23 @@ export async function proxy(request: NextRequest) {
         status: 401,
       });
     }
-    return await tryRefreshToken(request, refreshToken);
+    return await tryHardRefreshToken(request, refreshToken);
   }
 
-  // 토큰 만료 상태 체크
-  const accessTokenState = getAccessTokenState(accessToken);
+  // 서명 검증이 아닌 만료 시간 기반 Refresh 필요 상태를 확인한다.
+  const accessTokenRefreshState = getAccessTokenRefreshState(accessToken);
 
-  if (accessTokenState === "expiring") {
+  if (accessTokenRefreshState === "expiring") {
     if (!refreshToken) {
       return NextResponse.next();
     }
 
-    return await tryRefreshToken(request, refreshToken, SOFT_REFRESH_OPTIONS);
+    return await trySoftRefreshToken(request, refreshToken);
   }
 
-  if (accessTokenState === "expired_or_invalid") {
+  if (accessTokenRefreshState === "expired_or_invalid") {
     if (refreshToken) {
-      return await tryRefreshToken(request, refreshToken);
+      return await tryHardRefreshToken(request, refreshToken);
     }
 
     return buildAuthFailureResponse(request, {
@@ -204,25 +201,33 @@ function getRouteType(pathname: string): RouteType {
   return matched?.type ?? "public";
 }
 
+/**
+ * Refresh 실패 원인을 토큰 같은 민감정보 없이 정해진 필드만 사용해 기록한다.
+ * soft 실패는 현재 Access Token으로 계속 진행할 수 있어 warn으로 남기고,
+ * hard 실패는 인증이 필요한 요청을 완료하지 못한 상황이므로 error로 남긴다.
+ *
+ * @param request 실패가 발생한 현재 요청. 경로 종류를 구하는 데만 사용한다.
+ * @param details 실패 종류, 상태 코드, Cookie 삭제 여부와 갱신 모드.
+ */
 function logRefreshFailure(
   request: NextRequest,
   details: {
     reason: RefreshFailureReason;
     status: number;
     cookieClear: boolean;
-    error?: unknown;
+    mode: RefreshMode;
   }
 ) {
   const context = {
     reason: details.reason,
     status: details.status,
-    path: request.nextUrl.pathname,
     routeType: getRouteType(request.nextUrl.pathname),
     cookieClear: details.cookieClear,
+    mode: details.mode,
   };
 
-  if (details.error) {
-    console.error("Proxy: Token refresh failed", context, details.error);
+  if (details.mode === "soft") {
+    console.warn("Proxy: Token refresh failed", context);
     return;
   }
 
@@ -240,10 +245,10 @@ function decodeBase64Url(value: string): string {
 }
 
 /**
- * JWT 토큰 만료 상태 확인
- * 주의: Base64 디코딩만 수행하며 서명 검증은 백엔드에서 수행됨
+ * JWT payload의 exp만 base64url decode해 Refresh 필요 상태를 판단한다.
+ * 서명 검증은 수행하지 않으므로 이 결과만으로 토큰의 진위나 인증·인가를 보장하지 않는다.
  */
-function getAccessTokenState(token: string): AccessTokenState {
+function getAccessTokenRefreshState(token: string): AccessTokenRefreshState {
   try {
     const parts = token.split(".");
     if (parts.length !== 3 || !parts[1]) {
@@ -260,145 +265,174 @@ function getAccessTokenState(token: string): AccessTokenState {
       return "expired_or_invalid";
     }
 
-    return remainingMs < REFRESH_THRESHOLD_MS ? "expiring" : "valid";
+    return remainingMs < REFRESH_THRESHOLD_MS ? "expiring" : "usable";
   } catch {
     return "expired_or_invalid";
   }
 }
 
 /**
- * 백엔드에 토큰 갱신 요청
+ * 공유된 Refresh 성공 결과를 현재 caller만의 NextResponse로 변환한다.
+ *
+ * 갱신된 토큰을 현재 요청의 Cookie header에 넣어 뒤의 route handler가 바로 사용할 수 있게 하고,
+ * 응답 Cookie에도 넣어 브라우저가 다음 요청부터 새 토큰을 보내도록 한다. Refresh 결과만 공유하고
+ * 응답 객체는 요청마다 새로 만들기 때문에 동시에 들어온 caller들의 응답이 서로 섞이지 않는다.
+ *
+ * @param request 새 토큰을 전달받아야 하는 현재 요청.
+ * @param outcome 백엔드가 반환한 새 Access Token과 Refresh Token.
+ * @param mode 결과를 받은 경로가 soft인지 hard인지 나타내는 값.
+ * @returns 새 토큰이 요청 header와 응답 Cookie에 적용된 응답.
  */
-async function tryRefreshToken(
+function buildRefreshSuccessResponse(
   request: NextRequest,
-  refreshToken: string,
-  options?: TryRefreshTokenOptions
-): Promise<NextResponse> {
-  const allowPassThroughOnFailure = options?.allowPassThroughOnFailure ?? false;
-  const refreshTimeoutMs = options?.timeoutMs ?? REFRESH_TIMEOUT_MS;
+  outcome: Extract<RefreshOutcome, { kind: "success" }>,
+  mode: RefreshMode
+): NextResponse {
+  const tokens = {
+    accessToken: outcome.tokens.accessToken,
+    refreshToken: outcome.tokens.refreshToken,
+  };
+  const requestHeaders = new Headers(request.headers);
+  const updatedCookieHeader = mergeCookieHeaderWithAuthTokens(
+    request.headers.get("cookie"),
+    tokens
+  );
+  if (updatedCookieHeader) {
+    requestHeaders.set("cookie", updatedCookieHeader);
+  }
 
-  try {
-    const backendUrl = process.env.BACKEND_API_BASE;
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+  setAuthCookies(response.cookies, tokens);
 
-    if (!backendUrl) {
-      console.error("Proxy: BACKEND_API_BASE is not configured");
-      if (allowPassThroughOnFailure) {
-        return NextResponse.next();
-      }
-      return buildAuthFailureResponse(request, {
-        clearAuth: true,
-        reason: LOGIN_INTERNAL_ERROR_CODES.CONFIG_ERROR,
-        status: 500,
-      });
-    }
-
-    // fetch 타임아웃 설정 (필수 버그 픽스)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), refreshTimeoutMs);
-
-    let reissueResponse: Response;
-    try {
-      reissueResponse = await fetch(`${backendUrl}/auth/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: buildRefreshCookieHeader(refreshToken),
-        },
-        credentials: "include",
-        signal: controller.signal,
-      });
-    } finally {
-      clearTimeout(timeoutId);
-    }
-
-    if (!reissueResponse.ok) {
-      logRefreshFailure(request, {
-        reason: "http_error",
-        status: reissueResponse.status,
-        cookieClear: !allowPassThroughOnFailure,
-      });
-      if (allowPassThroughOnFailure) {
-        return NextResponse.next();
-      }
-
-      const errorCode = await getErrorCodeFromResponse(reissueResponse);
-      const status =
-        reissueResponse.status === 401 || reissueResponse.status === 403
-          ? 401
-          : reissueResponse.status >= 500
-            ? 500
-            : 400;
-      return buildAuthFailureResponse(request, {
-        clearAuth: true,
-        reason: errorCode ?? BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
-        status,
-      });
-    }
-
-    const data: unknown = await reissueResponse.json();
-    const tokens = parseRefreshTokenPair(data);
-
-    // API 응답 검증 (필수 버그 픽스)
-    if (!tokens) {
-      logRefreshFailure(request, {
-        reason: "invalid_response",
-        status: reissueResponse.status,
-        cookieClear: !allowPassThroughOnFailure,
-      });
-      if (allowPassThroughOnFailure) {
-        return NextResponse.next();
-      }
-      return buildAuthFailureResponse(request, {
-        clearAuth: true,
-        reason: BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
-        status: 500,
-      });
-    }
-
-    // 현재 요청의 쿠키 헤더를 갱신해서 다운스트림(RSC, Route Handler)에 새 토큰을 전달한다.
-    const requestHeaders = new Headers(request.headers);
-    const updatedCookieHeader = mergeCookieHeaderWithAuthTokens(
-      request.headers.get("cookie"),
-      tokens
-    );
-    if (updatedCookieHeader) {
-      requestHeaders.set("cookie", updatedCookieHeader);
-    }
-
-    const response = NextResponse.next({
-      request: { headers: requestHeaders },
-    });
-    setAuthCookies(response.cookies, {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-    });
-
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("Proxy: Token refresh succeeded", {
-        status: reissueResponse.status,
-        path: request.nextUrl.pathname,
-      });
-    }
-
-    return response;
-  } catch (error) {
-    const isTimeout = error instanceof Error && error.name === "AbortError";
-    logRefreshFailure(request, {
-      reason: isTimeout ? "timeout" : "network_error",
-      status: isTimeout ? 504 : 500,
-      cookieClear: !allowPassThroughOnFailure,
-      error,
-    });
-
-    if (allowPassThroughOnFailure) {
-      return NextResponse.next();
-    }
-    return buildAuthFailureResponse(request, {
-      clearAuth: true,
-      reason: LOGIN_INTERNAL_ERROR_CODES.NETWORK_ERROR,
-      status: isTimeout ? 504 : 500,
+  if (process.env.NODE_ENV !== "production") {
+    console.warn("Proxy: Token refresh succeeded", {
+      status: outcome.status,
+      routeType: getRouteType(request.nextUrl.pathname),
+      mode,
     });
   }
+
+  return response;
+}
+
+/**
+ * hard 갱신 실패를 보호 페이지의 로그인 이동 또는 보호 API의 JSON 오류 응답으로 바꾼다.
+ * hard 요청은 유효한 Access Token 없이 진행할 수 없으므로 인증 Cookie도 함께 삭제한다.
+ *
+ * @param request 페이지 요청인지 API 요청인지 판단할 현재 요청.
+ * @param outcome 백엔드 HTTP 오류, 잘못된 응답, timeout 또는 network 오류 정보.
+ * @returns 요청 종류와 실패 원인에 맞는 인증 실패 응답.
+ */
+function buildHardRefreshFailureResponse(
+  request: NextRequest,
+  outcome: Extract<RefreshOutcome, { kind: "failure" }>
+): NextResponse {
+  if (outcome.reason === "http_error") {
+    const status =
+      outcome.status === 401 || outcome.status === 403 ? 401 : outcome.status >= 500 ? 500 : 400;
+    return buildAuthFailureResponse(request, {
+      clearAuth: true,
+      reason: outcome.errorCode ?? BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
+      status,
+    });
+  }
+
+  if (outcome.reason === "invalid_response") {
+    return buildAuthFailureResponse(request, {
+      clearAuth: true,
+      reason: BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
+      status: 500,
+    });
+  }
+
+  return buildAuthFailureResponse(request, {
+    clearAuth: true,
+    reason: LOGIN_INTERNAL_ERROR_CODES.NETWORK_ERROR,
+    status: outcome.status,
+  });
+}
+
+/**
+ * coordinator가 돌려준 Refresh 결과와 갱신 모드에 맞는 최종 응답을 선택한다.
+ * 성공이면 두 모드 모두 새 토큰을 전달한다. 실패이면 로그를 남긴 뒤 soft 요청은 기존 토큰으로
+ * 계속 진행시키고, hard 요청은 로그인 이동 또는 API 오류 응답으로 변환한다.
+ *
+ * @param request 최종 응답을 받아야 하는 현재 요청.
+ * @param outcome coordinator가 정리한 성공 또는 실패 결과.
+ * @param mode 실패했을 때 통과할지 차단할지를 결정하는 soft 또는 hard 모드.
+ * @returns 현재 caller에게 전달할 NextResponse.
+ */
+function buildResponseFromRefreshOutcome(
+  request: NextRequest,
+  outcome: RefreshOutcome,
+  mode: RefreshMode
+): NextResponse {
+  if (outcome.kind === "success") {
+    return buildRefreshSuccessResponse(request, outcome, mode);
+  }
+
+  logRefreshFailure(request, {
+    reason: outcome.reason,
+    status: outcome.status,
+    cookieClear: mode === "hard",
+    mode,
+  });
+
+  if (mode === "soft") {
+    return NextResponse.next();
+  }
+
+  return buildHardRefreshFailureResponse(request, outcome);
+}
+
+/**
+ * 새 Refresh를 시작하지 않고 같은 Refresh Token의 기존 작업에만 합류한다.
+ * 작업이 없거나 대기 시간이 지나 null을 받으면 현재 요청을 그대로 통과시킨다.
+ * 결과를 받았을 때만 성공 Cookie 또는 soft 실패 정책을 현재 응답에 적용한다.
+ *
+ * @param request 기존 Access Token으로 계속 진행할 수 있는 현재 요청.
+ * @param refreshToken 기존 Refresh 작업을 찾을 때 사용할 Refresh Token.
+ * @returns 그대로 통과하거나 기존 Refresh 결과가 적용된 응답.
+ */
+async function trySoftRefreshToken(
+  request: NextRequest,
+  refreshToken: string
+): Promise<NextResponse> {
+  const outcome = await joinSoftRefreshSingleFlight(refreshToken);
+  if (!outcome) {
+    return NextResponse.next();
+  }
+
+  return buildResponseFromRefreshOutcome(request, outcome, "soft");
+}
+
+/**
+ * 유효한 Access Token이 없어 반드시 갱신 결과가 필요한 요청을 처리한다.
+ * 백엔드 주소가 없으면 설정 오류 응답을 만들고, 주소가 있으면 같은 Refresh Token의 hard 작업을
+ * 공유하거나 새로 시작한 뒤 그 결과를 현재 요청의 성공 또는 실패 응답으로 변환한다.
+ *
+ * @param request 새 Access Token이 있어야 계속 진행할 수 있는 현재 요청.
+ * @param refreshToken 기존 작업을 찾거나 새 백엔드 갱신에 사용할 Refresh Token.
+ * @returns Refresh 성공 또는 hard 실패 정책이 적용된 응답.
+ */
+async function tryHardRefreshToken(
+  request: NextRequest,
+  refreshToken: string
+): Promise<NextResponse> {
+  const backendUrl = process.env.BACKEND_API_BASE;
+  if (!backendUrl) {
+    console.error("Proxy: BACKEND_API_BASE is not configured");
+    return buildAuthFailureResponse(request, {
+      clearAuth: true,
+      reason: LOGIN_INTERNAL_ERROR_CODES.CONFIG_ERROR,
+      status: 500,
+    });
+  }
+
+  const outcome = await runHardRefreshSingleFlight(refreshToken, backendUrl);
+  return buildResponseFromRefreshOutcome(request, outcome, "hard");
 }
 
 // Matcher: 불필요한 요청 제외 (정적 파일, 이미지, prefetch 등)
