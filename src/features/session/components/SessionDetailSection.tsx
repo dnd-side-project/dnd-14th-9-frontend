@@ -1,4 +1,5 @@
 import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
+import { AnnouncementIcon } from "@/components/Icon/AnnouncementIcon";
 import { Thumbnail } from "@/components/Thumbnail/Thumbnail";
 
 import { CardMeta } from "./Card/CardMeta";
@@ -59,7 +60,8 @@ export function SessionDetailSection({
 
         {/* 공지사항 */}
         <div className="px-lg py-lg gap-md mt-auto flex flex-row rounded-lg bg-gray-900">
-          <p className="text-common-white shrink-0 text-base font-semibold whitespace-nowrap">
+          <p className="text-common-white flex shrink-0 items-center gap-1 text-base font-semibold whitespace-nowrap">
+            <AnnouncementIcon size="small" className="shrink-0 text-gray-400" />
             공지사항
           </p>
           <p className="text-base text-gray-400">{notice}</p>

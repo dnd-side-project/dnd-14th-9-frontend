@@ -231,12 +231,12 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
   const displayTodos = isEditing ? draftTodos : todos;
 
   return (
-    <div className="gap-lg border-gray p-lg flex h-auto w-full flex-col rounded-lg border xl:h-157 xl:flex-6">
-      {/* 헤더 */}
-      <div className="flex items-end justify-between">
-        <div className="flex flex-col gap-1">
+    <div className="flex h-auto w-full flex-col xl:h-157 xl:flex-6">
+      {/* 헤더 (테두리 없음) */}
+      <div className="mb-md flex items-end justify-between gap-2">
+        <div className="flex flex-col gap-2">
           <h2 className="text-text-primary text-2xl font-bold">나의 목표</h2>
-          <p className="text-text-secondary text-base font-normal">
+          <p className="text-text-disabled text-[15px] font-normal">
             이번 세션에서 해야할 일을 작성해 주세요
           </p>
         </div>
@@ -254,120 +254,123 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
         )}
       </div>
 
-      {/* 목표 */}
-      <div className="flex w-full flex-col gap-2">
-        <span className="text-text-secondary text-sm font-semibold">목표</span>
-        {isEditing ? (
-          <TextInput
-            value={draftGoal}
-            onChange={(e) => handleGoalChange(e.target.value)}
-            onClear={() => handleGoalChange("")}
-            placeholder="목표를 입력하세요"
-            className="h-13.5 focus:bg-transparent"
-            fullWidth
-            showCharacterCount
-            maxLength={GOAL_MAX_LENGTH}
-            error={goalLengthError}
-            errorMessage={`목표는 최대 ${GOAL_MAX_LENGTH}자까지 입력 가능합니다`}
-          />
-        ) : (
-          <div className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-base">
-            {goal}
-          </div>
-        )}
-      </div>
-
-      {/* Todo */}
-      <div className="gap-sm mt-sm flex min-h-0 flex-col xl:flex-1">
-        <div className="flex items-center justify-between">
-          <span className="text-text-secondary text-sm font-semibold">
-            투두리스트 <span className="text-green-600">{displayTodos.length}</span>
-          </span>
-          {isEditing && draftTodos.length < 5 && (
-            <Button
-              variant="outlined"
-              colorScheme="secondary"
-              size="small"
-              leftIcon={<PlusIcon size="xsmall" />}
-              onClick={handleAddTodo}
-            >
-              추가하기
-            </Button>
+      {/* 본문 (테두리) */}
+      <div className="gap-lg border-gray p-lg flex min-h-0 flex-1 flex-col rounded-lg border">
+        {/* 목표 */}
+        <div className="flex w-full flex-col gap-2">
+          <span className="text-text-secondary text-sm font-semibold">목표</span>
+          {isEditing ? (
+            <TextInput
+              value={draftGoal}
+              onChange={(e) => handleGoalChange(e.target.value)}
+              onClear={() => handleGoalChange("")}
+              placeholder="목표를 입력하세요"
+              className="h-13.5 focus:bg-transparent"
+              fullWidth
+              showCharacterCount
+              maxLength={GOAL_MAX_LENGTH}
+              error={goalLengthError}
+              errorMessage={`목표는 최대 ${GOAL_MAX_LENGTH}자까지 입력 가능합니다`}
+            />
+          ) : (
+            <div className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-base">
+              {goal}
+            </div>
           )}
         </div>
 
-        {isEditing ? (
-          <ul className="scrollbar-hide flex min-h-0 flex-col gap-2 overflow-y-auto xl:flex-1">
-            {draftTodos.map((todo, index) => (
-              <li key={todo.subtaskId} className="flex shrink-0 items-start gap-2">
-                <TextInput
-                  value={todo.content}
-                  onChange={(e) => handleTodoChange(index, e.target.value)}
-                  onClear={() => handleTodoChange(index, "")}
-                  placeholder="할 일을 입력하세요"
-                  className="h-13.5 focus:bg-transparent"
-                  fullWidth
-                  containerClassName="flex-1"
-                  showCharacterCount
-                  maxLength={TODO_MAX_LENGTH}
-                  error={todoLengthErrorIds.includes(todo.subtaskId)}
-                  errorMessage={`할 일은 최대 ${TODO_MAX_LENGTH}자까지 입력 가능합니다`}
-                />
-                {draftTodos.length > 1 && (
-                  <Button
-                    iconOnly
-                    variant="ghost"
-                    colorScheme="secondary"
-                    className="mt-1.25 h-11 w-11 min-w-0 p-0"
-                    leftIcon={<MinusIcon size="small" />}
-                    onClick={() => handleRemoveTodo(index)}
-                    aria-label={`할 일 ${index + 1} 삭제`}
-                  />
-                )}
-              </li>
-            ))}
-          </ul>
-        ) : displayTodos.length === 0 ? (
-          <p className="text-text-muted py-md text-center text-sm">등록된 할 일이 없습니다</p>
-        ) : (
-          <ul className="scrollbar-hide flex min-h-0 flex-col gap-2 overflow-y-auto xl:flex-1">
-            {todos.map((todo) => (
-              <li
-                key={todo.subtaskId}
-                className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 shrink-0 items-center rounded-sm border text-base"
+        {/* Todo */}
+        <div className="gap-sm mt-sm flex min-h-0 flex-col xl:flex-1">
+          <div className="flex items-center justify-between">
+            <span className="text-text-secondary text-sm font-semibold">
+              투두리스트 <span className="text-green-600">{displayTodos.length}</span>
+            </span>
+            {isEditing && draftTodos.length < 5 && (
+              <Button
+                variant="outlined"
+                colorScheme="secondary"
+                size="small"
+                leftIcon={<PlusIcon size="xsmall" />}
+                onClick={handleAddTodo}
               >
-                {todo.content}
-              </li>
-            ))}
-          </ul>
+                추가하기
+              </Button>
+            )}
+          </div>
+
+          {isEditing ? (
+            <ul className="scrollbar-hide flex min-h-0 flex-col gap-2 overflow-y-auto xl:flex-1">
+              {draftTodos.map((todo, index) => (
+                <li key={todo.subtaskId} className="flex shrink-0 items-start gap-2">
+                  <TextInput
+                    value={todo.content}
+                    onChange={(e) => handleTodoChange(index, e.target.value)}
+                    onClear={() => handleTodoChange(index, "")}
+                    placeholder="할 일을 입력하세요"
+                    className="h-13.5 focus:bg-transparent"
+                    fullWidth
+                    containerClassName="flex-1"
+                    showCharacterCount
+                    maxLength={TODO_MAX_LENGTH}
+                    error={todoLengthErrorIds.includes(todo.subtaskId)}
+                    errorMessage={`할 일은 최대 ${TODO_MAX_LENGTH}자까지 입력 가능합니다`}
+                  />
+                  {draftTodos.length > 1 && (
+                    <Button
+                      iconOnly
+                      variant="ghost"
+                      colorScheme="secondary"
+                      className="mt-1.25 h-11 w-11 min-w-0 p-0"
+                      leftIcon={<MinusIcon size="small" />}
+                      onClick={() => handleRemoveTodo(index)}
+                      aria-label={`할 일 ${index + 1} 삭제`}
+                    />
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : displayTodos.length === 0 ? (
+            <p className="text-text-muted py-md text-center text-sm">등록된 할 일이 없습니다</p>
+          ) : (
+            <ul className="scrollbar-hide flex min-h-0 flex-col gap-2 overflow-y-auto xl:flex-1">
+              {todos.map((todo) => (
+                <li
+                  key={todo.subtaskId}
+                  className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 shrink-0 items-center rounded-sm border text-base"
+                >
+                  {todo.content}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* 하단 버튼 (수정 모드) */}
+        {isEditing && (
+          <ButtonGroup layout="dual" horizontal className="self-end">
+            <Button
+              variant="solid"
+              colorScheme="tertiary"
+              size="medium"
+              className="text-sm"
+              onClick={handleCancel}
+              disabled={isSaving}
+            >
+              그만두기
+            </Button>
+            <Button
+              variant="solid"
+              colorScheme="primary"
+              size="medium"
+              className="text-sm"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? "저장 중..." : "저장하기"}
+            </Button>
+          </ButtonGroup>
         )}
       </div>
-
-      {/* 하단 버튼 (수정 모드) */}
-      {isEditing && (
-        <ButtonGroup layout="dual" horizontal className="self-end">
-          <Button
-            variant="solid"
-            colorScheme="tertiary"
-            size="medium"
-            className="text-sm"
-            onClick={handleCancel}
-            disabled={isSaving}
-          >
-            그만두기
-          </Button>
-          <Button
-            variant="solid"
-            colorScheme="primary"
-            size="medium"
-            className="text-sm"
-            onClick={handleSave}
-            disabled={isSaving}
-          >
-            {isSaving ? "저장 중..." : "저장하기"}
-          </Button>
-        </ButtonGroup>
-      )}
     </div>
   );
 }
