@@ -86,6 +86,7 @@ export function TextInput({
   containerClassName,
   fullWidth = false,
   label,
+  required = false,
   error = false,
   errorMessage,
   helperText,
@@ -156,6 +157,11 @@ export function TextInput({
       {label && (
         <label htmlFor={inputId} className="text-text-secondary text-base">
           {label}
+          {required && (
+            <span className="text-text-status-negative-default ml-1" aria-hidden="true">
+              *
+            </span>
+          )}
         </label>
       )}
 
@@ -176,6 +182,7 @@ export function TextInput({
           onBlur={handleBlur}
           onChange={handleChange}
           aria-invalid={error}
+          aria-required={required || undefined}
           aria-describedby={error && errorMessage ? errorMessageId : undefined}
           {...(props as Omit<InputHTMLAttributes<HTMLInputElement>, "size">)}
         />

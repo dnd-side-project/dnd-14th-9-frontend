@@ -32,16 +32,16 @@ describe("StepperSlide", () => {
       expect(screen.queryByText("내 집중도")).not.toBeInTheDocument();
     });
 
-    it("격자 숫자(0, 20, 40, 60, 80, 100)가 표시되어야 합니다", () => {
+    it("최소/최대 라벨(0, 100)만 표시되어야 합니다", () => {
       const onChange = jest.fn();
       render(<StepperSlide value={50} onChange={onChange} />);
 
       expect(screen.getByText("0")).toBeInTheDocument();
-      expect(screen.getByText("20")).toBeInTheDocument();
-      expect(screen.getByText("40")).toBeInTheDocument();
-      expect(screen.getByText("60")).toBeInTheDocument();
-      expect(screen.getByText("80")).toBeInTheDocument();
       expect(screen.getByText("100")).toBeInTheDocument();
+      expect(screen.queryByText("20")).not.toBeInTheDocument();
+      expect(screen.queryByText("40")).not.toBeInTheDocument();
+      expect(screen.queryByText("60")).not.toBeInTheDocument();
+      expect(screen.queryByText("80")).not.toBeInTheDocument();
     });
   });
 

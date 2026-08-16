@@ -86,6 +86,7 @@ export function Textarea({
   className,
   containerClassName,
   label,
+  required = false,
   error = false,
   errorMessage,
   helperText,
@@ -143,6 +144,11 @@ export function Textarea({
       {label && (
         <label htmlFor={textareaId} className="text-text-secondary text-base">
           {label}
+          {required && (
+            <span className="text-text-status-negative-default ml-1" aria-hidden="true">
+              *
+            </span>
+          )}
         </label>
       )}
 
@@ -158,6 +164,7 @@ export function Textarea({
         onBlur={handleBlur}
         onChange={handleChange}
         aria-invalid={error}
+        aria-required={required || undefined}
         aria-describedby={error && errorMessage ? errorMessageId : undefined}
         {...props}
       />
