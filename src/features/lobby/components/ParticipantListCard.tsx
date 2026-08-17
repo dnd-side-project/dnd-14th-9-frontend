@@ -137,7 +137,7 @@ export function ParticipantListCard({
                 key={participant.memberId}
                 className="bg-surface-default border-border-default rounded-sm border"
               >
-                <div className="p-sm flex items-start gap-3">
+                <div className="p-sm flex items-start gap-2">
                   {/* 강퇴 모드: 체크박스 */}
                   {isKicking && (
                     <button
@@ -172,7 +172,7 @@ export function ParticipantListCard({
                     <span className="truncate text-xs font-bold text-gray-500">
                       {participant.task?.goal ?? ""}
                     </span>
-                    <div className="mt-md flex items-center gap-2">
+                    <div className="mt-md flex items-center gap-1.5">
                       <span className="shrink-0 text-xs whitespace-nowrap text-gray-500">
                         달성도
                       </span>
