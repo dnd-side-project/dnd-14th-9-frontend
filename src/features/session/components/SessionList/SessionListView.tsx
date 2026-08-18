@@ -36,9 +36,9 @@ export function SessionListView({
 
   return (
     <section className="gap-lg flex flex-col">
-      <div className="flex flex-col gap-2.5">
+      <div className="gap-xs md:gap-2xs xl:gap-xs flex flex-col">
         <h2 className="text-text-primary text-lg font-bold md:text-2xl">지금 모집 중인 세션</h2>
-        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-5">
+        <div className="gap-sm md:gap-lg xl:gap-lg flex flex-col xl:flex-row xl:items-start xl:justify-between">
           <p className="text-text-muted text-[13px] md:text-base">
             현재 모집 중인 세션에 바로 참여해 보세요
           </p>

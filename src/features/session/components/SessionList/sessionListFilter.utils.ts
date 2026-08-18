@@ -56,7 +56,7 @@ const DURATION_TRIGGER_LABEL_MAP: Record<DurationRange, string> = {
 };
 
 export function getDurationFilterLabel(durationRange: DurationRange | null) {
-  if (!durationRange) return "진행시간";
+  if (!durationRange) return "진행 시간";
   return DURATION_TRIGGER_LABEL_MAP[durationRange];
 }
 
@@ -74,6 +74,6 @@ export function parseParticipantsFilterValue(value: string | null) {
 }
 
 export function getParticipantsFilterLabel(participants: string | null) {
-  if (!participants) return "인원";
+  if (!participants) return "참여 인원";
   return `${participants}명`;
 }
