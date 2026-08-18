@@ -86,7 +86,7 @@ export function SessionParticipantListCard({
         </div>
 
         {/* 참여자 목록 */}
-        <ul className="scrollbar-hide flex flex-1 flex-col gap-2 overflow-y-auto">
+        <ul className="flex flex-1 flex-col gap-2 overflow-y-auto">
           {members.map((member) => {
             const isExpanded = expandedId === member.memberId;
             const todos = member.task?.todos ?? [];
@@ -119,7 +119,7 @@ export function SessionParticipantListCard({
                     <div className="mt-md flex items-center gap-2">
                       {/* 현재 상태 (집중 중 / 자리 비움) */}
                       <span
-                        className={`flex items-center gap-1 text-xs ${
+                        className={`flex shrink-0 items-center gap-1 text-xs whitespace-nowrap ${
                           isFocusing ? "text-text-status-positive-default" : "text-text-tertiary"
                         }`}
                       >
@@ -131,7 +131,9 @@ export function SessionParticipantListCard({
 
                       {/* 목표 달성률 */}
                       <span className="text-text-disabled text-xs">|</span>
-                      <span className="text-text-secondary text-xs">달성률</span>
+                      <span className="text-text-secondary shrink-0 text-xs whitespace-nowrap">
+                        달성률
+                      </span>
                       <span className="px-xs py-2xs text-text-secondary rounded-xs bg-white/8 text-xs">
                         {member.achievementRate}%
                       </span>

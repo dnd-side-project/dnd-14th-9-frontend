@@ -23,7 +23,9 @@ export function ChatSessionInfo({
         </ChipBadge>
         <div className="flex items-center gap-3">
           <h2 className="text-text-primary text-2xl font-bold">{title}</h2>
-          <span className="text-text-disabled text-base">{participantCount}명</span>
+          <span className="text-text-disabled shrink-0 text-base whitespace-nowrap">
+            {participantCount}명
+          </span>
         </div>
         <p className="text-text-tertiary text-[15px]">{description}</p>
       </div>

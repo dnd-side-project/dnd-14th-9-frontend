@@ -49,7 +49,7 @@ export function GoalAchievementSection({
         {/* 목표 섹션 */}
         <div className="mt-lg flex flex-col gap-2">
           <span className="text-text-secondary text-base font-semibold">목표</span>
-          <div className="bg-surface-strong rounded-sm p-3">
+          <div className="bg-surface-strong border-border-default rounded-sm border p-3">
             <span className="text-text-primary text-base">{goal}</span>
           </div>
         </div>
@@ -68,7 +68,7 @@ export function GoalAchievementSection({
               {todoList.map((todo) => (
                 <li
                   key={todo.todoId}
-                  className="p-sm flex items-center gap-3 rounded-sm bg-gray-800"
+                  className="p-sm bg-surface-default border-border-subtle flex items-center gap-3 rounded-sm border"
                 >
                   {/* 체크 표시 */}
                   <span
