@@ -117,7 +117,6 @@ export function SearchFilterSection() {
           defaultValue={currentQuery}
           placeholder="관심 분야의 세션을 검색해 보세요"
           onSearchClick={handleSearchClick}
-          className="h-11 md:h-14"
         />
       </form>
 
@@ -164,7 +163,7 @@ export function SearchFilterSection() {
         <button
           type="button"
           className={cn(
-            "border-alpha-white-16 border-sm p-xs hover:bg-surface-strong flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors md:hidden",
+            "border-alpha-white-16 border-sm px-xs py-2xs hover:bg-surface-subtle rounded-max flex shrink-0 cursor-pointer items-center justify-center transition-colors md:hidden",
             isCategoryExpanded ? "bg-surface-strong" : "bg-surface-default"
           )}
           onClick={() => {

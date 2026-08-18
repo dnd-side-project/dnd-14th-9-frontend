@@ -10,7 +10,7 @@ const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
     "inline-flex items-center justify-center shrink-0",
     "bg-surface-strong",
     "text-text-muted",
-    "text-sm font-semibold",
+    "text-xs font-semibold",
     "py-sm px-md",
     "rounded-sm",
     "cursor-pointer",
@@ -22,7 +22,7 @@ const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
       isSelected: {
         true: "bg-[#52EE8533] text-green-600 gap-2xs",
         false:
-          "hover:bg-[#52EE8533] hover:text-green-600 active:bg-[#52EE8533] active:text-green-600 gap-xs",
+          "hover:bg-surface-subtle hover:text-text-primary active:bg-surface-subtle active:text-text-primary gap-xs",
       },
     },
     defaultVariants: {

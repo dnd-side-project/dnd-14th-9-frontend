@@ -11,27 +11,31 @@ const searchInputContainerVariants = cva(
     "flex",
     "items-center",
     "w-full",
-    "max-w-[580px]",
-    "h-14",
-    "pl-lg",
-    "md:pl-xl",
-    "pr-xs",
-    "md:pr-sm",
-    "py-3xs",
-    "md:py-xs",
-    "gap-xs",
     "border",
     "border-border-gray-default",
     "rounded-md",
     "bg-surface-strong",
     "transition-all",
     "duration-300",
-    "has-[:not(:placeholder-shown)]:border-border-gray-strong",
-    "has-[:not(:placeholder-shown)]:bg-surface-default",
+    "has-[input:not(:placeholder-shown)]:border-border-gray-strong",
+    "has-[input:not(:placeholder-shown)]:bg-surface-default",
     "focus-within:!border-text-brand-default",
     "focus-within:!bg-surface-default",
     "focus-within:!shadow-[0_0_16px_0_rgba(39,234,103,0.30)]",
-  ].join(" ")
+  ].join(" "),
+  {
+    variants: {
+      size: {
+        responsive:
+          "h-11 pl-lg pr-xs py-3xs gap-xs md:h-14 md:max-w-[580px] md:pl-xl md:pr-sm md:py-xs",
+        md: "h-14 max-w-[580px] pl-xl pr-sm py-xs gap-xs",
+        sm: "h-11 max-w-[375px] pl-lg pr-xs py-3xs gap-xs",
+      },
+    },
+    defaultVariants: {
+      size: "responsive",
+    },
+  }
 );
 
 const searchInputVariants = cva(
@@ -40,40 +44,61 @@ const searchInputVariants = cva(
     "h-full",
     "bg-transparent",
     "text-gray-50",
-    "text-base",
-    "font-weight-semibold",
-    "placeholder:text-gray-300",
+    "font-semibold",
+    "placeholder:text-gray-400",
     "focus:outline-none",
     "min-w-0",
-  ].join(" ")
+  ].join(" "),
+  {
+    variants: {
+      size: {
+        responsive: "text-[13px] leading-[1.4] md:text-base",
+        md: "text-base",
+        sm: "text-[13px] leading-[1.4]",
+      },
+    },
+    defaultVariants: {
+      size: "responsive",
+    },
+  }
 );
 
 export interface SearchInputProps
   extends
-    Omit<InputHTMLAttributes<HTMLInputElement>, "type">,
+    Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size">,
     VariantProps<typeof searchInputContainerVariants> {
   onSearchClick?: () => void;
   ref?: React.Ref<HTMLInputElement>;
 }
 
-export function SearchInput({ className, onSearchClick, ref, ...props }: SearchInputProps) {
+export function SearchInput({
+  className,
+  size = "responsive",
+  onSearchClick,
+  ref,
+  ...props
+}: SearchInputProps) {
   return (
-    <div className={cn(searchInputContainerVariants(), className)}>
+    <div className={cn(searchInputContainerVariants({ size }), className)}>
       <input
         ref={ref}
         type="text"
-        className={searchInputVariants()}
+        className={searchInputVariants({ size })}
         placeholder={props.placeholder ?? " "}
         {...props}
       />
       <button
         type="button"
         onClick={onSearchClick}
+        aria-label="검색"
         className="p-xs flex shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors hover:bg-gray-800"
       >
         <SearchIcon
-          size="small"
-          className="group-focus-within:text-text-primary text-gray-300 transition-colors"
+          size={size === "md" ? "medium" : "small"}
+          className={cn(
+            "group-focus-within:text-text-primary text-gray-300 transition-colors",
+            size === "responsive" && "md:h-6 md:w-6"
+          )}
         />
       </button>
     </div>
