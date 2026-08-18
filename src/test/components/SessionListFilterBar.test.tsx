@@ -104,7 +104,7 @@ describe("SessionListFilterBar", () => {
   it("keeps filter callbacks wired through the existing selection handlers", () => {
     const { props } = renderFilterBar();
 
-    fireEvent.click(screen.getByRole("button", { name: /진행시간/ }));
+    fireEvent.click(screen.getByRole("button", { name: /진행 시간/ }));
     fireEvent.click(screen.getByRole("radio", { name: "1시간 이하" }));
 
     expect(props.onSetDurationRange).toHaveBeenCalledWith("ONE_HOUR_OR_LESS");
@@ -112,7 +112,7 @@ describe("SessionListFilterBar", () => {
 
   it("closes a non-sort panel on Escape and removes the reserved panel space", () => {
     const { container } = renderFilterBar();
-    const trigger = screen.getByRole("button", { name: /인원/ });
+    const trigger = screen.getByRole("button", { name: /참여 인원/ });
 
     fireEvent.click(trigger);
     expect(screen.getByRole("dialog", { name: "참여 인원 선택" })).toBeInTheDocument();

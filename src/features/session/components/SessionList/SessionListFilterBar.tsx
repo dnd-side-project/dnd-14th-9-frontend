@@ -101,7 +101,7 @@ export function SessionListFilterBar({
         {/* 좁은 화면에서 필터 조작 공간을 확보하기 위해 정렬까지 같은 스크롤 영역에 둡니다. */}
         <div
           className={cn(
-            "scrollbar-hide flex w-full items-center gap-[16px] overflow-x-auto xl:w-auto xl:overflow-visible",
+            "scrollbar-hide gap-md flex w-full items-center overflow-x-auto xl:w-auto xl:overflow-visible",
             shouldReserveFilterPanelSpace && FILTER_PANEL_SPACE_CLASS
           )}
         >
