@@ -1,6 +1,6 @@
 import { SessionCreateForm } from "@/features/session/components/SessionCreateForm";
 
-export const metadata = { title: "세션 만들기" };
+export const metadata = { title: "새로운 세션 만들기" };
 
 export default function SessionCreatePage() {
   return (
@@ -9,7 +9,7 @@ export default function SessionCreatePage() {
       <header className="mb-xl md:mb-2xl">
         <h1 className="text-lg leading-[140%] font-bold text-gray-50 md:text-2xl">세션 만들기</h1>
         <p className="mt-2xs text-[13px] text-gray-500 md:text-base">
-          함께 집중할 공간을 만들어보세요
+          함께 집중할 세션을 만들어 볼까요?
         </p>
       </header>
 

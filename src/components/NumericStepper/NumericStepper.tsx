@@ -87,9 +87,11 @@ export function NumericStepper({
     <div className={cn("p-md border-border-default shrink-0 rounded-sm border", className)}>
       <div className="flex h-full flex-col gap-[20px]">
         {!hideHeader && (
-          <div className="flex items-center justify-between">
-            <span className="text-text-secondary text-base">{label}</span>
-            <span className="text-text-muted text-[10px]">{hint}</span>
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-text-secondary shrink-0 text-base whitespace-nowrap">
+              {label}
+            </span>
+            <span className="text-text-muted text-right text-[10px] break-keep">{hint}</span>
           </div>
         )}
         <div className="flex items-center justify-center gap-3">
@@ -117,7 +119,9 @@ export function NumericStepper({
               <span className="text-text-secondary text-sm select-none">명</span>
             </div>
           ) : (
-            <span className="text-text-secondary text-center text-sm">{displayValue}</span>
+            <span className="text-text-secondary text-center text-sm break-keep">
+              {displayValue}
+            </span>
           )}
           <Button
             type="button"

@@ -8,8 +8,8 @@ import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { cn } from "@/lib/utils/utils";
 
 import { Button } from "../Button/Button";
-import { CloudUploadIcon } from "../Icon/CloudUploadIcon";
 import { FileIcon } from "../Icon/FileIcon";
+import { ImageIcon } from "../Icon/ImageIcon";
 import { ProgressRing } from "../ProgressRing/ProgressRing";
 
 const DEFAULT_MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -38,7 +38,7 @@ const imageUploaderVariants = cva(
   {
     variants: {
       state: {
-        default: ["border-dashed", "border-green-600", "bg-transparent", "hover:bg-green-950"],
+        default: ["border-dashed", "border-border-default", "bg-transparent", "hover:bg-green-950"],
         dragging: ["border-solid", "border-green-600", "bg-green-950"],
         uploading: ["border-solid", "border-green-600", "bg-transparent", "cursor-default"],
       },
@@ -72,6 +72,8 @@ export interface ImageUploaderProps
   onFileSizeError?: (file: File, maxSize: number) => void;
   /** 비활성화 상태 */
   disabled?: boolean;
+  /** 메인 안내 텍스트 (기본값: "커버 사진을 등록해주세요") */
+  mainText?: string;
   /** 힌트 텍스트 (기본값: "최대 5MB 파일만 허용 가능") */
   hintText?: string;
   /** 업로드 중 텍스트 (기본값: "업로드 중...") */
@@ -92,6 +94,7 @@ export function ImageUploader({
   maxFileSize = DEFAULT_MAX_FILE_SIZE,
   onFileSizeError,
   disabled = false,
+  mainText = "커버 사진을 등록해주세요",
   hintText = "최대 5MB 파일만 허용 가능",
   uploadingText = "업로드 중...",
   onCancel,
@@ -217,8 +220,8 @@ export function ImageUploader({
           </div>
         ) : (
           <>
-            <CloudUploadIcon size="xlarge" className="text-green-600" />
-            <span className="text-sm text-gray-50">커버 사진을 등록해주세요</span>
+            <ImageIcon size="large" className="text-gray-400" />
+            <span className="text-sm text-gray-50">{mainText}</span>
             <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
               {hintText}
             </span>

@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
 import { DatePicker } from "@/components/DatePicker/DatePicker";
-import { Filter } from "@/components/Filter/Filter";
 import { CalendarIcon } from "@/components/Icon/CalendarIcon";
 import { InfoIcon } from "@/components/Icon/InfoIcon";
 import { ImageUploader } from "@/components/ImageUploader/ImageUploader";
@@ -337,8 +336,9 @@ export function SessionCreateForm({
     <form className="gap-xl flex w-full flex-col" onSubmit={handleSubmit}>
       {/* 방 이름 */}
       <TextInput
-        label="방 이름*"
-        placeholder="예) 아침코딩모각작"
+        label="세션 이름"
+        required
+        placeholder="예) 아침 코딩 모각작"
         maxLength={20}
         showCharacterCount
         value={roomName}
@@ -355,7 +355,8 @@ export function SessionCreateForm({
 
       {/* 방 한줄 소개 */}
       <TextInput
-        label="방 한줄 소개*"
+        label="방 한줄 소개"
+        required
         placeholder="예) 1일 1목표를 달성하는 방이에요"
         maxLength={50}
         showCharacterCount
@@ -373,7 +374,8 @@ export function SessionCreateForm({
 
       {/* 공지사항 */}
       <Textarea
-        label="공지사항*"
+        label="공지사항"
+        required
         placeholder="예) 세션의 규칙, 공지사항을 작성해주세요"
         maxLength={100}
         showCharacterCount
@@ -388,20 +390,20 @@ export function SessionCreateForm({
         className="h-[260px] max-w-full"
       />
 
-      {/* 대표 이미지 + 카테고리 (태블릿에서만 가로 정렬, 모바일·PC는 세로) */}
-      <div className="gap-xl xl:gap-xl flex flex-col md:flex-row md:items-start md:gap-5 xl:flex-col xl:items-stretch">
-        {/* 대표 이미지 */}
-        <div className="flex flex-col gap-2 md:w-95 md:shrink-0">
+      {/* 대표 이미지 + 카테고리 (모바일은 세로, md 이상 가로 정렬) */}
+      <div className="gap-xl flex flex-col md:flex-row md:items-start md:gap-5">
+        {/* 대표 이미지 (디자인 기준 574x228) */}
+        <div className="flex flex-col gap-2 md:w-95 md:shrink-0 xl:w-143.5">
           <span className="text-text-secondary text-base">대표 이미지</span>
           {imagePreviewUrl ? (
             <div className="relative w-full">
               <Image
                 src={imagePreviewUrl}
                 alt="대표 이미지 미리보기"
-                width={380}
-                height={144}
+                width={574}
+                height={228}
                 unoptimized
-                className="h-36 w-full rounded-lg object-cover"
+                className="h-57 w-full rounded-lg object-cover"
               />
               <Button
                 type="button"
@@ -416,17 +418,23 @@ export function SessionCreateForm({
             </div>
           ) : (
             <ImageUploader
-              hintText="최대 5MB 파일만 업로드 가능해요"
+              mainText="대표 이미지를 등록해 주세요"
+              hintText="최대 5MB의 jpg/png만 가능해요"
               accept="image/jpeg,image/png"
               onFileSelect={handleImageSelect}
+              className="h-57 justify-center gap-1"
             />
           )}
-          <span className="text-text-secondary text-sm">* .jpg, .png 파일만 가능해요</span>
         </div>
 
         {/* 카테고리 */}
-        <div className="flex flex-col gap-2 md:flex-1 xl:flex-none">
-          <span className="text-text-secondary text-base">카테고리</span>
+        <div className="flex flex-col gap-2 md:flex-1">
+          <span className="text-text-secondary text-base">
+            카테고리
+            <span className="text-text-status-negative-default ml-1" aria-hidden="true">
+              *
+            </span>
+          </span>
           <div className="flex flex-wrap gap-3">
             {ONBOARDING_CATEGORIES.map((category) => (
               <CategoryFilterButton
@@ -448,36 +456,35 @@ export function SessionCreateForm({
         </div>
       </div>
 
-      {/* 세션 세부 설정 */}
+      {/* 세션 세부사항 */}
       <div className="flex flex-col gap-2">
-        <span className="text-text-secondary text-base">세션 세부 설정</span>
-        <div className="flex flex-col gap-3 xl:flex-row xl:gap-5">
-          {/* 시작일시 */}
-          <div
-            ref={datePickerContainerRef}
-            className="relative w-full rounded-sm border border-gray-700 px-3 py-4 xl:flex-1"
-          >
-            <div className="flex flex-col gap-3">
-              <span className="text-text-secondary text-sm">시작일시</span>
-              <Filter
-                size="full"
-                radius="sm"
-                isOpen={isDatePickerOpen}
+        <span className="text-text-secondary text-base">
+          세션 세부 사항
+          <span className="text-text-status-negative-default ml-1" aria-hidden="true">
+            *
+          </span>
+        </span>
+        <div className="gap-xl border-border-default flex flex-col rounded-sm border p-4 md:flex-row md:items-center md:gap-5">
+          {/* 시작 일시 */}
+          <div ref={datePickerContainerRef} className="relative w-full md:flex-1">
+            <div className="flex flex-col gap-2">
+              <span className="text-text-secondary text-sm">시작 일시</span>
+              <button
+                type="button"
                 onClick={() => setIsDatePickerOpen((prev) => !prev)}
-                className="border-gray-500 bg-transparent"
+                aria-expanded={isDatePickerOpen}
+                className="flex h-14 w-full cursor-pointer items-center justify-between gap-2 rounded-sm bg-gray-900 px-3 text-left focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:outline-none"
               >
-                <div className="flex items-center gap-2">
-                  <CalendarIcon size="xsmall" className="text-text-muted" />
-                  <span
-                    className={cn(
-                      "text-sm",
-                      startDateTime ? "text-text-secondary" : "text-text-muted"
-                    )}
-                  >
-                    {startDateTime ? formatDateTimeDisplay(startDateTime) : "날짜/시간 선택"}
-                  </span>
-                </div>
-              </Filter>
+                <span
+                  className={cn(
+                    "text-sm",
+                    startDateTime ? "text-text-secondary" : "text-text-muted"
+                  )}
+                >
+                  {startDateTime ? formatDateTimeDisplay(startDateTime) : "YYYY.MM.DD 00:00"}
+                </span>
+                <CalendarIcon size="xsmall" className="text-text-muted shrink-0" />
+              </button>
             </div>
 
             {isDatePickerOpen && (
@@ -499,86 +506,138 @@ export function SessionCreateForm({
             )}
           </div>
 
-          {/* 진행시간 + 참여인원 (모바일·태블릿에서 가로 정렬) */}
-          <div className="grid grid-cols-2 gap-3 xl:contents">
-            {/* 진행시간 */}
+          {/* 진행 시간 (md 이상: 시작 일시와 같은 카드에 가로 배치) */}
+          <div className="hidden w-full items-center justify-between gap-3 md:flex md:flex-1">
+            <div className="flex flex-col gap-1">
+              <span className="text-text-secondary text-sm">진행 시간</span>
+              <span className="text-text-muted text-xs break-keep">5분 단위로 설정이 가능해요</span>
+            </div>
             <NumericStepper
-              label="진행시간"
-              hint="5분 단위로 설정"
+              label="진행 시간"
+              hint="5분 단위로 설정이 가능해요"
+              hideHeader
               value={duration}
               displayValue={formatDurationKorean(duration)}
               min={SESSION_DURATION_MINUTES_MIN}
               max={SESSION_DURATION_MINUTES_MAX}
               step={SESSION_DURATION_MINUTES_STEP}
               onChange={setDuration}
-              className="w-full xl:w-45"
+              className="border-none p-0"
             />
+          </div>
+        </div>
 
-            {/* 참여인원 */}
+        {/* 모바일: 진행 시간 + 참여 인원 2열 카드 */}
+        <div className="grid grid-cols-2 gap-3 md:hidden">
+          <div className="border-border-default flex flex-col gap-3 rounded-sm border p-3">
+            <div className="flex flex-col gap-1">
+              <span className="text-text-secondary text-sm">진행 시간</span>
+              <span className="text-text-muted text-xs break-keep">5분 단위로 설정이 가능해요</span>
+            </div>
             <NumericStepper
-              label="참여인원"
-              hint="최대 10명까지 가능"
+              label="진행 시간"
+              hint="5분 단위로 설정이 가능해요"
+              hideHeader
+              value={duration}
+              displayValue={formatDurationKorean(duration)}
+              min={SESSION_DURATION_MINUTES_MIN}
+              max={SESSION_DURATION_MINUTES_MAX}
+              step={SESSION_DURATION_MINUTES_STEP}
+              onChange={setDuration}
+              className="mt-auto border-none p-0"
+            />
+          </div>
+          <div className="border-border-default flex flex-col gap-3 rounded-sm border p-3">
+            <div className="flex flex-col gap-1">
+              <span className="text-text-secondary text-sm">참여 인원</span>
+              <span className="text-text-muted text-xs break-keep">최대 10명까지 가능해요</span>
+            </div>
+            <NumericStepper
+              label="참여 인원"
+              hint="최대 10명까지 가능해요"
+              hideHeader
               value={participants}
               displayValue={`${participants}명`}
               min={SESSION_PARTICIPANTS_MIN}
               max={SESSION_PARTICIPANTS_MAX}
               step={1}
               onChange={setParticipants}
-              className="w-full xl:w-45"
+              className="mt-auto border-none p-0"
             />
           </div>
         </div>
       </div>
 
-      {/* To do 달성도 범위 설정 */}
+      {/* 참여 인원 (md 이상: 테두리 카드) */}
+      <div className="border-border-default hidden w-full items-center justify-between gap-3 rounded-sm border p-4 md:flex">
+        <div className="flex flex-col gap-1">
+          <span className="text-text-secondary text-sm">참여 인원</span>
+          <span className="text-text-muted text-xs break-keep">최대 10명까지 가능해요</span>
+        </div>
+        <NumericStepper
+          label="참여 인원"
+          hint="최대 10명까지 가능해요"
+          hideHeader
+          value={participants}
+          displayValue={`${participants}명`}
+          min={SESSION_PARTICIPANTS_MIN}
+          max={SESSION_PARTICIPANTS_MAX}
+          step={1}
+          onChange={setParticipants}
+          className="border-none p-0"
+        />
+      </div>
+
+      {/* 투두 달성률 범위 + 집중률 범위 */}
       <div className="flex flex-col gap-3 xl:flex-row xl:gap-5">
         <div className="flex w-full flex-col gap-2 xl:flex-1">
-          <div className="flex items-center gap-1">
-            <span className="text-text-secondary text-base leading-none">
-              To do 달성도 범위 설정
-            </span>
-            <div className="group relative flex items-center">
+          <div className="group flex w-fit items-center gap-1">
+            <span className="text-text-secondary text-base leading-none">투두 달성률 범위</span>
+            <span className="relative flex items-center">
               <InfoIcon size="xsmall" className="text-text-muted cursor-pointer" />
-              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-100">
-                <div className="rounded-sm bg-gray-700 px-3 py-2 text-xs whitespace-nowrap text-gray-200">
-                  내 달성도보다 높은 범위는 설정할 수 없어요.
+              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-2.5 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="w-max max-w-[min(240px,calc(100vw-3rem))] rounded-sm bg-gray-700 px-3 py-2 text-xs break-keep text-gray-200">
+                  참여 가능한 투두 달성률 범위를 설정해요. 단, 내 투두 달성률보다 높은 범위는 설정할
+                  수 없어요.
                 </div>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700" />
+                <div className="absolute top-full left-1.5 border-4 border-transparent border-t-gray-700" />
               </div>
-            </div>
+            </span>
           </div>
-          <div className="flex items-center justify-center rounded-sm border border-gray-700 p-4">
+          <div className="px-2">
             <StepperSlide
               value={achievementRange}
               onChange={setAchievementRange}
               myFocusValue={myProfile?.todoCompletionRate}
               myFocusLabel="내 달성률"
               limit={achievementLimit}
-              className="w-[80%]"
+              className="w-full"
             />
           </div>
         </div>
-        {/* 집중도 범위 설정 */}
+        {/* 집중률 범위 */}
         <div className="flex w-full flex-col gap-2 xl:flex-1">
-          <div className="flex items-center gap-1">
-            <span className="text-text-secondary text-base leading-none">집중도 범위 설정</span>
-            <div className="group relative flex items-center">
+          <div className="group flex w-fit items-center gap-1">
+            <span className="text-text-secondary text-base leading-none">집중률 범위</span>
+            <span className="relative flex items-center">
               <InfoIcon size="xsmall" className="text-text-muted cursor-pointer" />
-              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-100">
-                <div className="rounded-sm bg-gray-700 px-3 py-2 text-xs whitespace-nowrap text-gray-200">
-                  내 집중도보다 높은 범위는 설정할 수 없어요.
+              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-2.5 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="w-max max-w-[min(240px,calc(100vw-3rem))] rounded-sm bg-gray-700 px-3 py-2 text-xs break-keep text-gray-200">
+                  참여 가능한 집중률 범위를 설정해요. 단, 내 집중률보다 높은 범위는 설정할 수
+                  없어요.
                 </div>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700" />
+                <div className="absolute top-full left-1.5 border-4 border-transparent border-t-gray-700" />
               </div>
-            </div>
+            </span>
           </div>
-          <div className="flex items-center justify-center rounded-sm border border-gray-700 p-4">
+          <div className="px-2">
             <StepperSlide
               value={focusRange}
               onChange={setFocusRange}
               myFocusValue={myProfile?.focusRate}
+              myFocusLabel="내 집중률"
               limit={focusLimit}
-              className="w-[80%]"
+              className="w-full"
             />
           </div>
         </div>
@@ -598,7 +657,7 @@ export function SessionCreateForm({
           variant="solid"
           colorScheme="tertiary"
           size="large"
-          className="px-md py-sm md:px-xl md:py-md w-full text-xs md:max-w-70.5 md:text-base"
+          className="px-lg py-xs h-13.5 w-full md:w-28.25"
           disabled={isPending}
           onClick={() => router.back()}
         >
@@ -609,7 +668,7 @@ export function SessionCreateForm({
           variant="solid"
           colorScheme="primary"
           size="large"
-          className="px-md py-sm md:px-xl md:py-md w-full text-xs md:max-w-70.5 md:text-base"
+          className="px-lg py-xs h-13.5 w-full md:w-28.25"
           disabled={isPending || (isEdit && !editDirty)}
         >
           {isEdit
