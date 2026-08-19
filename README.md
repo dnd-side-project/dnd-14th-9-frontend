@@ -107,19 +107,20 @@ pnpm dev
 
 ### 주요 스크립트
 
-| 명령어                 | 설명                                   |
-| ---------------------- | -------------------------------------- |
-| `pnpm dev`             | 토큰 watch + Next 개발 서버 실행       |
-| `pnpm build`           | 디자인 토큰 생성 후 프로덕션 빌드      |
-| `pnpm start`           | 프로덕션 서버 실행                     |
-| `pnpm storybook`       | Storybook 로컬 실행 (`:6006`)          |
-| `pnpm build-storybook` | Storybook 정적 빌드                    |
-| `pnpm test`            | Jest 테스트 실행                       |
-| `pnpm test:coverage`   | 커버리지 포함 테스트                   |
-| `pnpm lint`            | ESLint 검사                            |
-| `pnpm typecheck`       | TypeScript 타입 검사                   |
-| `pnpm codegen`         | Orval 기반 API 클라이언트 코드 생성    |
-| `pnpm tokens`          | Style Dictionary 기반 디자인 토큰 생성 |
+| 명령어                       | 설명                                          |
+| ---------------------------- | --------------------------------------------- |
+| `pnpm dev`                   | 토큰 watch + Next 개발 서버 실행              |
+| `pnpm build`                 | 디자인 토큰 생성 후 프로덕션 빌드             |
+| `pnpm start`                 | 프로덕션 서버 실행                            |
+| `pnpm storybook`             | Storybook 로컬 실행 (`:6006`)                 |
+| `pnpm build-storybook`       | Storybook 정적 빌드                           |
+| `pnpm test`                  | Jest 테스트 실행                              |
+| `pnpm test:auth-concurrency` | 빌드 후 Refresh Token 다중 인스턴스 통합 검증 |
+| `pnpm test:coverage`         | 커버리지 포함 테스트                          |
+| `pnpm lint`                  | ESLint 검사                                   |
+| `pnpm typecheck`             | TypeScript 타입 검사                          |
+| `pnpm codegen`               | Orval 기반 API 클라이언트 코드 생성           |
+| `pnpm tokens`                | Style Dictionary 기반 디자인 토큰 생성        |
 
 ## 환경 변수 계약 (`.env.local`)
 
@@ -153,7 +154,10 @@ pnpm dev
 ## 품질 보증 현황 (2026-03-06 기준)
 
 - **CI 파이프라인** (`.github/workflows/ci.yml`)
-  - `main` push 시 `lint` -> `test --ci --coverage` -> `build` -> `docker build` 실행
+  - `main` push 시 `lint` -> `test --ci --coverage` -> `build` -> 인증 동시성 통합 검증 -> `docker build` 실행
+- **인증 동시성 통합 검증** (`scripts/auth-refresh-concurrency.mjs`)
+  - 독립된 Next.js 프로세스 2개에서 회전형 Refresh Token 경합과 백엔드 멱등 계약을 로컬 가짜 백엔드로 검증
+  - 실제 백엔드 구현이 아니라 동일 Refresh Token에 동일 결과를 반환하는 계약의 프론트엔드 호환성을 검증
 - **UI 변경 검증** (`.github/workflows/chromatic.yml`)
   - 스토리/디자인 토큰/스토리북 설정 변경 시 Chromatic 자동 실행
 - **테스트 및 스토리 자산 규모**
