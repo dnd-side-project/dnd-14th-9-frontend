@@ -86,24 +86,6 @@ export function Banner() {
           <FeedbackBanner isHovered={!isDefault && isHovered} />
         </motion.div>
       </div>
-
-      {/* 인디케이터 */}
-      {/* <div className="mt-md gap-xs flex justify-center">
-        {[0, 1].map((index) => (
-          <button
-            key={index}
-            type="button"
-            aria-label={`배너 ${index + 1}로 이동`}
-            className={`h-[6px] rounded-full transition-all duration-300 ${
-              index === activeIndex ? "bg-text-secondary w-[24px]" : "bg-surface-subtle w-[6px]"
-            }`}
-            onClick={() => {
-              goTo(index);
-              if (!isHovered) startAutoRoll();
-            }}
-          />
-        ))}
-      </div> */}
     </div>
   );
 }
