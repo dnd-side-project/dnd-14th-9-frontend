@@ -154,7 +154,7 @@ pnpm dev
 ## 품질 보증 현황 (2026-03-06 기준)
 
 - **CI 파이프라인** (`.github/workflows/ci.yml`)
-  - `main` push 시 `lint` -> `test --ci --coverage` -> `build` -> 인증 동시성 통합 검증 -> `docker build` 실행
+  - `main` 대상 PR 생성 및 업데이트 시 `lint` -> `test --ci --coverage` -> `build` -> 인증 동시성 통합 검증 -> `docker build` 실행
 - **인증 동시성 통합 검증** (`scripts/auth-refresh-concurrency.mjs`)
   - 독립된 Next.js 프로세스 2개에서 회전형 Refresh Token 경합과 백엔드 멱등 계약을 로컬 가짜 백엔드로 검증
   - 실제 백엔드 구현이 아니라 동일 Refresh Token에 동일 결과를 반환하는 계약의 프론트엔드 호환성을 검증
