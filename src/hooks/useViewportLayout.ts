@@ -39,17 +39,15 @@ export function useViewportLayout(): ViewportLayoutState {
     isResolved: false,
   });
 
-  const currentLayoutRef = useRef<ViewportLayout>("desktop");
-  const isResolvedRef = useRef(false);
+  const currentLayoutRef = useRef<ViewportLayout | null>(null);
 
   useEffect(() => {
     const observer = new ResizeObserver(([entry]) => {
       const nextLayout = getViewportLayout(entry.contentRect.width);
-      if (isResolvedRef.current && currentLayoutRef.current === nextLayout) {
+      if (currentLayoutRef.current === nextLayout) {
         return;
       }
       currentLayoutRef.current = nextLayout;
-      isResolvedRef.current = true;
       setState({
         layout: nextLayout,
         isResolved: true,
