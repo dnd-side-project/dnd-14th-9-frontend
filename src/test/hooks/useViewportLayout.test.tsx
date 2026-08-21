@@ -60,4 +60,40 @@ describe("useViewportLayout", () => {
 
     expect(screen.getByText("mobile:resolved")).toBeInTheDocument();
   });
+
+  it("동일한 레이아웃 범위 내에서는 리렌더링을 유발하지 않는다", () => {
+    const renderSpy = jest.fn();
+    function RenderCountProbe() {
+      const { layout } = useViewportLayout();
+      renderSpy(layout);
+      return <div>{layout}</div>;
+    }
+
+    render(<RenderCountProbe />);
+
+    // 초기 마운트 시 renderSpy 호출 (desktop)
+    expect(renderSpy).toHaveBeenCalledTimes(1);
+
+    // 1024px (tablet)으로 변경 -> 1회 리렌더
+    act(() => {
+      observerCallback(
+        [{ contentRect: { width: 1024 } } as ResizeObserverEntry],
+        {} as ResizeObserver
+      );
+    });
+    expect(renderSpy).toHaveBeenCalledTimes(2);
+
+    // 동일 tablet 구간(1100px)으로 10회 변경
+    act(() => {
+      for (let w = 1025; w <= 1034; w++) {
+        observerCallback(
+          [{ contentRect: { width: w } } as ResizeObserverEntry],
+          {} as ResizeObserver
+        );
+      }
+    });
+
+    // 레이아웃이 변하지 않았으므로 리렌더링 횟수는 2회 유지
+    expect(renderSpy).toHaveBeenCalledTimes(2);
+  });
 });

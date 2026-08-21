@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { BREAKPOINT_MD_PX, BREAKPOINT_XL_PX } from "@/lib/constants/breakpoints";
 
@@ -34,11 +34,26 @@ function getViewportLayout(width: number | null): ViewportLayout {
  * 클라이언트에서 실제 너비를 읽은 뒤 `isResolved`를 true로 전환합니다.
  */
 export function useViewportLayout(): ViewportLayoutState {
-  const [width, setWidth] = useState<number | null>(null);
+  const [state, setState] = useState<ViewportLayoutState>({
+    layout: "desktop",
+    isResolved: false,
+  });
+
+  const currentLayoutRef = useRef<ViewportLayout>("desktop");
+  const isResolvedRef = useRef(false);
 
   useEffect(() => {
     const observer = new ResizeObserver(([entry]) => {
-      setWidth(entry.contentRect.width);
+      const nextLayout = getViewportLayout(entry.contentRect.width);
+      if (isResolvedRef.current && currentLayoutRef.current === nextLayout) {
+        return;
+      }
+      currentLayoutRef.current = nextLayout;
+      isResolvedRef.current = true;
+      setState({
+        layout: nextLayout,
+        isResolved: true,
+      });
     });
 
     observer.observe(document.documentElement);
@@ -48,8 +63,5 @@ export function useViewportLayout(): ViewportLayoutState {
     };
   }, []);
 
-  return {
-    layout: getViewportLayout(width),
-    isResolved: width !== null,
-  };
+  return state;
 }
