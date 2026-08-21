@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { motion } from "motion/react";
 
@@ -23,18 +23,10 @@ export function Banner() {
   const [isHovered, setIsHovered] = useState(false);
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
 
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
   useEffect(() => {
-    if (isHovered) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
-    }
+    if (isHovered) return;
 
-    intervalRef.current = setInterval(() => {
+    const id = setInterval(() => {
       setActiveIndex((prev) => {
         const next = (prev + 1) % 2;
         setDirection(next === 1 ? "forward" : "backward");
@@ -42,12 +34,7 @@ export function Banner() {
       });
     }, AUTO_ROLL_INTERVAL);
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
+    return () => clearInterval(id);
   }, [isHovered]);
 
   const isDefault = activeIndex === 0;
