@@ -25,15 +25,15 @@ export function Banner() {
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const clearAutoRoll = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+  useEffect(() => {
+    if (isHovered) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
     }
-  };
 
-  const startAutoRoll = () => {
-    clearAutoRoll();
     intervalRef.current = setInterval(() => {
       setActiveIndex((prev) => {
         const next = (prev + 1) % 2;
@@ -41,21 +41,14 @@ export function Banner() {
         return next;
       });
     }, AUTO_ROLL_INTERVAL);
-  };
 
-  useEffect(() => {
-    if (isHovered) {
-      clearAutoRoll();
-    } else {
-      startAutoRoll();
-    }
-    return clearAutoRoll;
-  }, [isHovered, startAutoRoll, clearAutoRoll]);
-
-  const goTo = (index: number) => {
-    setDirection(index === 1 ? "forward" : "backward");
-    setActiveIndex(index);
-  };
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isHovered]);
 
   const isDefault = activeIndex === 0;
 
