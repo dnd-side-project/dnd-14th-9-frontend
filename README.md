@@ -153,7 +153,7 @@ pnpm dev
 ## 품질 보증 현황 (2026-03-06 기준)
 
 - **CI 파이프라인** (`.github/workflows/ci.yml`)
-  - `main` push 시 `lint` -> `test --ci --coverage` -> `build` -> `docker build` 실행
+  - `main` 대상 PR 생성 및 업데이트 시 `lint` -> `test --ci --coverage` -> `build` -> `docker build` 실행
 - **UI 변경 검증** (`.github/workflows/chromatic.yml`)
   - 스토리/디자인 토큰/스토리북 설정 변경 시 Chromatic 자동 실행
 - **테스트 및 스토리 자산 규모**
