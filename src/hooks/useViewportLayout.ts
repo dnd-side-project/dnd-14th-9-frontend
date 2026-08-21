@@ -43,6 +43,7 @@ export function useViewportLayout(): ViewportLayoutState {
 
   useEffect(() => {
     const observer = new ResizeObserver(([entry]) => {
+      if (!entry) return;
       const nextLayout = getViewportLayout(entry.contentRect.width);
       if (currentLayoutRef.current === nextLayout) {
         return;
