@@ -45,11 +45,6 @@ export function SearchFilterSection() {
     const el = scrollRef.current;
     if (!el) return;
 
-    if (isCategoryExpanded) {
-      el.style.maskImage = "";
-      return;
-    }
-
     const canScrollLeft = el.scrollLeft > 1;
     const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 1;
 
@@ -63,7 +58,7 @@ export function SearchFilterSection() {
     } else {
       el.style.maskImage = "";
     }
-  }, [isCategoryExpanded]);
+  }, []);
 
   useEffect(() => {
     updateScrollMask();
@@ -76,18 +71,20 @@ export function SearchFilterSection() {
     };
   }, [updateScrollMask]);
 
-  // 열릴 때: flex-wrap 즉시 적용 / 닫힐 때: 애니메이션 후 flex-nowrap 전환 + 스크롤 초기화
+  // 열릴 때: flex-wrap 즉시 적용 및 마스크 제거 / 닫힐 때: 애니메이션 후 flex-nowrap 전환 + 마스크 갱신
   useEffect(() => {
-    if (!isCategoryExpanded) {
-      if (scrollRef.current) scrollRef.current.scrollLeft = 0;
-      const timer = setTimeout(() => {
-        setDisplayExpanded(false);
-        updateScrollMask();
-      }, 200);
-      return () => clearTimeout(timer);
-    } else {
-      updateScrollMask();
+    const el = scrollRef.current;
+    if (isCategoryExpanded) {
+      if (el) el.style.maskImage = "";
+      return;
     }
+
+    if (el) el.scrollLeft = 0;
+    const timer = setTimeout(() => {
+      setDisplayExpanded(false);
+      updateScrollMask();
+    }, 200);
+    return () => clearTimeout(timer);
   }, [isCategoryExpanded, updateScrollMask]);
 
   const currentCategory = parsedParams.category ?? "ALL";
