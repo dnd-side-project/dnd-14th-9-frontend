@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { motion } from "motion/react";
 
@@ -23,39 +23,19 @@ export function Banner() {
   const [isHovered, setIsHovered] = useState(false);
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
 
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (isHovered) return;
 
-  const clearAutoRoll = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  };
-
-  const startAutoRoll = () => {
-    clearAutoRoll();
-    intervalRef.current = setInterval(() => {
+    const id = setInterval(() => {
       setActiveIndex((prev) => {
         const next = (prev + 1) % 2;
         setDirection(next === 1 ? "forward" : "backward");
         return next;
       });
     }, AUTO_ROLL_INTERVAL);
-  };
 
-  useEffect(() => {
-    if (isHovered) {
-      clearAutoRoll();
-    } else {
-      startAutoRoll();
-    }
-    return clearAutoRoll;
-  }, [isHovered, startAutoRoll, clearAutoRoll]);
-
-  const goTo = (index: number) => {
-    setDirection(index === 1 ? "forward" : "backward");
-    setActiveIndex(index);
-  };
+    return () => clearInterval(id);
+  }, [isHovered]);
 
   const isDefault = activeIndex === 0;
 
@@ -106,24 +86,6 @@ export function Banner() {
           <FeedbackBanner isHovered={!isDefault && isHovered} />
         </motion.div>
       </div>
-
-      {/* 인디케이터 */}
-      {/* <div className="mt-md gap-xs flex justify-center">
-        {[0, 1].map((index) => (
-          <button
-            key={index}
-            type="button"
-            aria-label={`배너 ${index + 1}로 이동`}
-            className={`h-[6px] rounded-full transition-all duration-300 ${
-              index === activeIndex ? "bg-text-secondary w-[24px]" : "bg-surface-subtle w-[6px]"
-            }`}
-            onClick={() => {
-              goTo(index);
-              if (!isHovered) startAutoRoll();
-            }}
-          />
-        ))}
-      </div> */}
     </div>
   );
 }
