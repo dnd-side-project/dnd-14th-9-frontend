@@ -6,9 +6,9 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { memberKeys } from "@/features/member/hooks/useMemberHooks";
 import type { GetMeResponse } from "@/features/member/types";
-import { sessionApi } from "@/features/session/api";
 import { SessionPageContent } from "@/features/session/components/SessionPageContent";
 import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
+import { getSessionDetail } from "@/features/session/server/get-session-detail";
 import { isWaitingStatus } from "@/features/session/types";
 import { handleSessionNotFound } from "@/features/session/utils/handleSessionNotFound";
 import { getQueryClient } from "@/lib/getQueryClient";
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: SessionPageProps): Promise<Me
   const { sessionId } = await params;
 
   try {
-    const { result } = await sessionApi.getDetail(sessionId);
+    const { result } = await getSessionDetail(sessionId);
     return createPageMetadata({
       title: result.title,
       description: result.summary || `${result.category} 세션에 참여하세요.`,
@@ -45,7 +45,10 @@ export default async function SessionPage({ params }: SessionPageProps) {
   const queryClient = getQueryClient();
 
   const sessionData = await queryClient
-    .fetchQuery(sessionQueries.detail(sessionId))
+    .fetchQuery({
+      ...sessionQueries.detail(sessionId),
+      queryFn: () => getSessionDetail(sessionId),
+    })
     .catch(handleSessionNotFound);
 
   // mock mode에서는 UI 확인을 위해 세션 화면에 직접 접근할 수 있도록 상태 기반 redirect를 제한한다.
