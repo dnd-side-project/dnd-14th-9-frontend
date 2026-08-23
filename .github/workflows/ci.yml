@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  push:
+  pull_request:
     branches: [main]
 
 concurrency:
@@ -34,6 +34,9 @@ jobs:
 
       - name: Build Source
         run: pnpm build
+
+      - name: Test Auth Refresh Concurrency
+        run: node scripts/auth-refresh-concurrency.mjs
 
       - name: Build Docker Image
         run: docker build . --file Dockerfile
