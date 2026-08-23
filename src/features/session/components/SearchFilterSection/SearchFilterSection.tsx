@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -30,6 +30,24 @@ const CATEGORY_FILTERS: { value: SessionCategoryFilter; label: string }[] = [
   })),
 ];
 
+function updateScrollMask(el: HTMLDivElement | null) {
+  if (!el) return;
+
+  const canScrollLeft = el.scrollLeft > 1;
+  const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 1;
+
+  if (canScrollLeft && canScrollRight) {
+    el.style.maskImage =
+      "linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)";
+  } else if (canScrollLeft) {
+    el.style.maskImage = "linear-gradient(to right, transparent, black 40px)";
+  } else if (canScrollRight) {
+    el.style.maskImage = "linear-gradient(to right, black calc(100% - 40px), transparent)";
+  } else {
+    el.style.maskImage = "";
+  }
+}
+
 export function SearchFilterSection() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -40,47 +58,34 @@ export function SearchFilterSection() {
   // 닫기 애니메이션(200ms) 동안 flex-wrap 유지 — 즉시 flex-nowrap 전환 시 콘텐츠가
   // 먼저 1행으로 리플로우되어 max-height 트랜지션이 시각적으로 사라지는 문제 방지
   const [displayExpanded, setDisplayExpanded] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const updateScrollState = useCallback(() => {
+  useEffect(() => {
     const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 1);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+    updateScrollMask(el);
+    const handleScroll = () => updateScrollMask(el);
+    el?.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      el?.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, []);
 
+  // 열릴 때: flex-wrap 즉시 적용 및 마스크 제거 / 닫힐 때: 애니메이션 후 flex-nowrap 전환 + 마스크 갱신
   useEffect(() => {
-    updateScrollState();
     const el = scrollRef.current;
-    el?.addEventListener("scroll", updateScrollState, { passive: true });
-    window.addEventListener("resize", updateScrollState);
-    return () => {
-      el?.removeEventListener("scroll", updateScrollState);
-      window.removeEventListener("resize", updateScrollState);
-    };
-  }, [updateScrollState]);
-
-  // 열릴 때: flex-wrap 즉시 적용 / 닫힐 때: 애니메이션 후 flex-nowrap 전환 + 스크롤 초기화
-  useEffect(() => {
-    if (!isCategoryExpanded) {
-      if (scrollRef.current) scrollRef.current.scrollLeft = 0;
-      const timer = setTimeout(() => {
-        setDisplayExpanded(false);
-        updateScrollState();
-      }, 200);
-      return () => clearTimeout(timer);
+    if (isCategoryExpanded) {
+      if (el) el.style.maskImage = "";
+      return;
     }
-  }, [isCategoryExpanded, updateScrollState]);
 
-  const scrollMaskImage =
-    !isCategoryExpanded && (canScrollLeft || canScrollRight)
-      ? canScrollLeft && canScrollRight
-        ? "linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)"
-        : canScrollLeft
-          ? "linear-gradient(to right, transparent, black 40px)"
-          : "linear-gradient(to right, black calc(100% - 40px), transparent)"
-      : undefined;
+    if (el) el.scrollLeft = 0;
+    const timer = setTimeout(() => {
+      setDisplayExpanded(false);
+      updateScrollMask(el);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [isCategoryExpanded]);
 
   const currentCategory = parsedParams.category ?? "ALL";
   const currentQuery = parsedParams.keyword ?? "";
@@ -137,7 +142,6 @@ export function SearchFilterSection() {
         >
           <div
             ref={scrollRef}
-            style={{ maskImage: scrollMaskImage }}
             className={cn(
               "gap-xs md:gap-sm flex w-full flex-wrap items-center md:justify-center",
               "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",

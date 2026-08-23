@@ -5,6 +5,7 @@ import nextTs from "eslint-config-next/typescript";
 import prettierConfig from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
 import prettierPlugin from "eslint-plugin-prettier";
+import reactCompiler from "eslint-plugin-react-compiler";
 import storybook from "eslint-plugin-storybook";
 
 const eslintConfig = defineConfig([
@@ -18,8 +19,10 @@ const eslintConfig = defineConfig([
     plugins: {
       import: importPlugin,
       prettier: prettierPlugin,
+      "react-compiler": reactCompiler,
     },
     rules: {
+      "react-compiler/react-compiler": "warn",
       "import/first": "error",
       "import/newline-after-import": ["error", { count: 1 }],
       "import/order": [
