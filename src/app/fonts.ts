@@ -16,4 +16,6 @@ export const pretendard = localFont({
   display: "swap",
   weight: "45 920",
   variable: "--font-pretendard",
+  // 2.06MB variable 파일을 전 페이지 highest-priority preload 하지 않습니다.
+  preload: false,
 });

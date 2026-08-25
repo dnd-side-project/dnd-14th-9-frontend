@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/Button/Button";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { useViewportLayout } from "@/hooks/useViewportLayout";
+import { BREAKPOINT_MD_PX, BREAKPOINT_XL_PX } from "@/lib/constants/breakpoints";
 
 type Viewport = "mobile" | "tablet" | "desktop";
 type CardKey = "goals" | "datepicker" | "profile";
@@ -127,6 +128,14 @@ const CARD_STYLES: Record<Viewport, Record<"default" | "hover", Record<CardKey, 
   },
 };
 
+// CARD_STYLES image width (incl. hover max), not 100vw.
+// 100vw picked w=1200 at mobile 3x for a 167px card.
+const CARD_IMAGE_SIZES: Record<CardKey, string> = {
+  goals: `(max-width: ${BREAKPOINT_MD_PX - 1}px) 168px, (max-width: ${BREAKPOINT_XL_PX - 1}px) 247px, 335px`,
+  datepicker: `(max-width: ${BREAKPOINT_MD_PX - 1}px) 86px, (max-width: ${BREAKPOINT_XL_PX - 1}px) 127px, 172px`,
+  profile: `(max-width: ${BREAKPOINT_MD_PX - 1}px) 105px, (max-width: ${BREAKPOINT_XL_PX - 1}px) 169px, 232px`,
+};
+
 interface DefaultBannerProps {
   isHovered: boolean;
 }
@@ -218,8 +227,8 @@ export function DefaultBanner({ isHovered }: DefaultBannerProps) {
                 src="/images/banner/goals-section.png"
                 alt="목표 섹션 미리보기"
                 fill
+                sizes={CARD_IMAGE_SIZES.goals}
                 className="pointer-events-none object-cover"
-                priority
               />
             </div>
           </div>
@@ -239,8 +248,8 @@ export function DefaultBanner({ isHovered }: DefaultBannerProps) {
                 src="/images/banner/date-picker.png"
                 alt="달력 미리보기"
                 fill
+                sizes={CARD_IMAGE_SIZES.datepicker}
                 className="pointer-events-none object-cover"
-                priority
               />
             </div>
           </div>
@@ -263,8 +272,8 @@ export function DefaultBanner({ isHovered }: DefaultBannerProps) {
                 src="/images/banner/profile-card.png"
                 alt="프로필 카드 미리보기"
                 fill
+                sizes={CARD_IMAGE_SIZES.profile}
                 className="pointer-events-none object-cover"
-                priority
               />
             </div>
           </div>
