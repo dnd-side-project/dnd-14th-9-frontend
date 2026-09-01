@@ -11,10 +11,11 @@
  *   --warmup <n>          Warmup run count (default 2)
  *   --port <n>            Listen port (default 3010)
  *   --har                 Write unsanitized HAR files under private/ (gitignored)
+ *   --allow-dirty         Allow a dirty working tree (final baseline must be clean)
  */
 
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import http from "node:http";
 import path from "node:path";
 import process from "node:process";
@@ -23,7 +24,13 @@ import { setTimeout as delay } from "node:timers/promises";
 import { chromium } from "playwright";
 
 import { writeAggregates } from "./lib/aggregate.mjs";
-import { collectEnvironment } from "./lib/environment.mjs";
+import { INITIAL_RUN_CONTEXT, resetRunContextFile } from "./lib/context.mjs";
+import {
+  backendEnvironmentLabelFromEnv,
+  collectEnvironment,
+  collectGitProvenance,
+  isWorkingTreeDirty,
+} from "./lib/environment.mjs";
 import { appendJsonl, ensureDir, writeAtomicJson, writeJson, writeText } from "./lib/io.mjs";
 import { writeReport } from "./lib/report.mjs";
 
@@ -31,6 +38,7 @@ const ROOT = process.cwd();
 const OUTPUT_DIR = path.join(ROOT, "benchmarks/network-baseline");
 const PRIVATE_DIR = path.join(OUTPUT_DIR, "private");
 const CONTEXT_FILE = path.join(OUTPUT_DIR, ".run-context.json");
+const AUTH_UNAVAILABLE = "Not measured due to unavailable safe authenticated benchmark fixture";
 
 const argv = process.argv.slice(2).filter((value) => value !== "--");
 const args = new Set(argv);
@@ -42,6 +50,7 @@ function argValue(name, fallback) {
 
 const SKIP_BUILD = args.has("--skip-build");
 const WRITE_HAR = args.has("--har");
+const ALLOW_DIRTY = args.has("--allow-dirty");
 const WARMUP_RUNS = Number(argValue("--warmup", process.env.BENCHMARK_WARMUP_RUNS ?? 2));
 const RECORDED_RUNS = Number(argValue("--runs", process.env.BENCHMARK_RECORDED_RUNS ?? 10));
 const PORT = Number(argValue("--port", process.env.BENCHMARK_PORT ?? 3010));
@@ -51,6 +60,19 @@ const ORIGIN = `http://localhost:${PORT}`;
 const blockers = [];
 const notes = [];
 const fixtures = {};
+
+class BenchmarkFatalError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "BenchmarkFatalError";
+    this.fatal = true;
+  }
+}
+
+function hasEnv(name) {
+  const value = process.env[name];
+  return typeof value === "string" && value.length > 0;
+}
 
 function runCommand(command, commandArgs, env = {}) {
   return new Promise((resolve, reject) => {
@@ -132,6 +154,11 @@ function isOwnOrigin(rawUrl) {
 
 function attachNetworkCollector(page, meta) {
   const events = [];
+  const stepByRequest = new WeakMap();
+
+  page.on("request", (request) => {
+    stepByRequest.set(request, meta.step);
+  });
 
   const onFinished = async (request) => {
     try {
@@ -158,6 +185,7 @@ function attachNetworkCollector(page, meta) {
         scenario: meta.scenario,
         run: meta.run,
         phase: meta.phase,
+        step: stepByRequest.get(request) ?? meta.step,
         method: request.method(),
         path: sanitizeBrowserPath(rawUrl),
         resourceType: request.resourceType(),
@@ -228,7 +256,7 @@ async function jsonGet(url) {
 }
 
 async function discoverSessionId() {
-  if (process.env.BENCHMARK_SESSION_ID) {
+  if (hasEnv("BENCHMARK_SESSION_ID")) {
     return {
       sessionId: String(process.env.BENCHMARK_SESSION_ID),
       status: "env",
@@ -239,6 +267,7 @@ async function discoverSessionId() {
   const sessions = payload?.result?.sessions ?? [];
   const inProgress = sessions.find((session) => session.status === "IN_PROGRESS");
   const waiting = sessions.find((session) => session.status === "WAITING");
+  const completed = sessions.find((session) => session.status === "COMPLETED");
   const picked = inProgress ?? waiting ?? sessions[0];
   if (!picked) {
     throw new Error(`No session fixture available (HTTP ${status})`);
@@ -247,6 +276,7 @@ async function discoverSessionId() {
     sessionId: String(picked.sessionId),
     status: picked.status,
     source: "GET /api/sessions",
+    completedSessionId: completed ? String(completed.sessionId) : null,
   };
 }
 
@@ -290,8 +320,39 @@ function persistRunArtifacts({ browserEvents, tanstackEvents }) {
   }
 }
 
-async function withPage({ browser, scenario, run, phase, useAuth }, fn) {
-  writeContext({ scenario, run, phase });
+async function setPageStep(page, meta, step) {
+  meta.step = step;
+  writeContext({
+    scenario: meta.scenario,
+    run: meta.run,
+    phase: meta.phase,
+    step,
+  });
+  try {
+    await page.evaluate(
+      (ctx) => {
+        window.__GAK_BENCHMARK_CONTEXT__ = ctx;
+      },
+      {
+        scenario: meta.scenario,
+        run: meta.run,
+        phase: meta.phase,
+        step,
+      }
+    );
+  } catch {
+    // about:blank or a detached page must not fail the scenario.
+  }
+}
+
+async function withPage({ browser, scenario, run, phase, useAuth, initialStep }, fn) {
+  const meta = {
+    scenario,
+    run,
+    phase,
+    step: initialStep ?? "start",
+  };
+  writeContext(meta);
   const contextOptions = {
     viewport: { width: 1280, height: 800 },
     locale: "ko-KR",
@@ -307,7 +368,8 @@ async function withPage({ browser, scenario, run, phase, useAuth }, fn) {
   const cookies = useAuth ? authCookies() : null;
   if (cookies) await context.addCookies(cookies);
   const page = await context.newPage();
-  const browserEvents = attachNetworkCollector(page, { scenario, run, phase });
+  const browserEvents = attachNetworkCollector(page, meta);
+  await setPageStep(page, meta, meta.step);
   const persist = async (result = {}) => {
     await delay(300);
     const tanstackEvents = (result?.tanstackEvents ?? (await collectTanstack(page))).map(
@@ -315,13 +377,20 @@ async function withPage({ browser, scenario, run, phase, useAuth }, fn) {
         scenario,
         run,
         phase,
+        step: event.step ?? meta.step,
         ...event,
+        scenario,
+        run,
+        phase,
       })
     );
     persistRunArtifacts({ browserEvents, tanstackEvents });
   };
   try {
-    const result = await fn(page);
+    const result = await fn(page, {
+      setStep: (step) => setPageStep(page, meta, step),
+      meta,
+    });
     await persist(result);
     return { ...result, finalUrl: page.url() };
   } catch (error) {
@@ -343,11 +412,13 @@ function alternateNickname(current) {
   return `${value}z`;
 }
 
-async function runHomeCold(page) {
+async function runHomeCold(page, { setStep }) {
+  await setStep("home-initial");
   return gotoSettle(page, `${ORIGIN}/`, { waitSelector: 'a[href^="/session/"]', waitMs: 1200 });
 }
 
-async function runSessionDetailCold(page, sessionId) {
+async function runSessionDetailCold(page, sessionId, { setStep }) {
+  await setStep("detail-first");
   return gotoSettle(page, `${ORIGIN}/session/${sessionId}`, {
     waitSelector: "main",
     waitMs: 1500,
@@ -377,11 +448,14 @@ async function closeSessionDialogIfOpen(page) {
   await delay(400);
 }
 
-async function runSessionDetailWarm(page, sessionId) {
+async function runSessionDetailWarm(page, sessionId, { setStep }) {
+  await setStep("home-initial");
   await gotoSettle(page, `${ORIGIN}/`, { waitSelector: 'a[href^="/session/"]', waitMs: 800 });
+  await setStep("detail-first");
   await clickSessionFromHome(page, sessionId);
   await closeSessionDialogIfOpen(page);
 
+  await setStep("terms");
   const terms = page.locator('a[href="/terms"]').first();
   if ((await terms.count()) > 0) {
     await terms.click({ force: true });
@@ -391,6 +465,7 @@ async function runSessionDetailWarm(page, sessionId) {
     await delay(500);
   }
 
+  await setStep("home-return");
   const home = page.locator('a[aria-label="홈으로 이동"]').first();
   if ((await home.count()) > 0) {
     await home.click();
@@ -400,23 +475,35 @@ async function runSessionDetailWarm(page, sessionId) {
     await delay(800);
   }
 
+  await setStep("detail-revisit");
   await clickSessionFromHome(page, sessionId);
   await delay(400);
   return { finalUrl: page.url() };
 }
 
-async function runSsrHeavy(page, targetPath) {
+async function runSsrHeavy(page, targetPath, { setStep }, stepName) {
+  await setStep(stepName);
   return gotoSettle(page, `${ORIGIN}${targetPath}`, { waitSelector: "main", waitMs: 1500 });
 }
 
-async function runProfile(page) {
+async function runProfile(page, { setStep }) {
+  await setStep("profile-settings");
   return gotoSettle(page, `${ORIGIN}/profile/settings`, {
     waitSelector: "form, main",
     waitMs: 1500,
   });
 }
 
-async function runSimpleMutation(page) {
+async function restoreNickname(page, nicknameInput, original) {
+  await nicknameInput.fill(original);
+  await page.getByRole("button", { name: "저장하기" }).click();
+  await page.getByText("프로필 정보가 저장되었습니다.").waitFor({ timeout: 20_000 });
+  const restoredValue = await nicknameInput.inputValue();
+  return restoredValue === original;
+}
+
+async function runSimpleMutation(page, { setStep }) {
+  await setStep("profile-read");
   await gotoSettle(page, `${ORIGIN}/profile/settings`, {
     waitSelector: 'input, [name="nickname"], main',
     waitMs: 1500,
@@ -427,42 +514,68 @@ async function runSimpleMutation(page) {
   }
   const original = await nicknameInput.inputValue();
   const nextValue = alternateNickname(original);
+  await setStep("nickname-mutate");
   await nicknameInput.fill(nextValue);
   const started = Date.now();
   await page.getByRole("button", { name: "저장하기" }).click();
   await page.getByText("프로필 정보가 저장되었습니다.").waitFor({ timeout: 20_000 });
   const uiApplyMs = Date.now() - started;
   await delay(800);
-  await nicknameInput.fill(original);
-  await page.getByRole("button", { name: "저장하기" }).click();
-  await page.getByText("프로필 정보가 저장되었습니다.").waitFor({ timeout: 20_000 });
+  await setStep("nickname-restore");
+  let restored = false;
+  try {
+    restored = await restoreNickname(page, nicknameInput, original);
+    if (!restored) {
+      restored = await restoreNickname(page, nicknameInput, original);
+    }
+  } catch (error) {
+    throw new BenchmarkFatalError(
+      `Profile nickname restore failed (${error instanceof Error ? error.message : String(error)}). Benchmark aborted.`
+    );
+  }
+  if (!restored) {
+    throw new BenchmarkFatalError(
+      "Profile nickname restore failed. Benchmark aborted because restored is not true."
+    );
+  }
   await delay(500);
   return { uiApplyMs, restored: true };
 }
 
-async function runInteractiveMutation(page, sessionId, subtaskId) {
+async function runInteractiveMutation(page, sessionId, subtaskId, { setStep }) {
+  await setStep("session-open");
   await gotoSettle(page, `${ORIGIN}/session/${sessionId}`, { waitSelector: "main", waitMs: 1500 });
   const checkbox = page.locator(`[data-subtask-id="${subtaskId}"], input[type="checkbox"]`).first();
   if ((await checkbox.count()) === 0) {
     throw new Error("Interactive subtask control not found");
   }
+  await setStep("todo-toggle");
   await checkbox.click();
   await delay(2000);
+  await setStep("todo-restore");
   await checkbox.click();
   await delay(1500);
-  return { toggled: true };
+  return { toggled: true, restored: true };
 }
 
-async function runScenarioSeries({ browser, scenario, useAuth, fn }) {
+async function runScenarioSeries({ browser, scenario, useAuth, initialStep, fn }) {
   try {
     for (let run = 1; run <= WARMUP_RUNS; run += 1) {
-      await withPage({ browser, scenario, run, phase: "warmup", useAuth }, fn);
+      await withPage({ browser, scenario, run, phase: "warmup", useAuth, initialStep }, fn);
     }
+    let lastResult = null;
     for (let run = 1; run <= RECORDED_RUNS; run += 1) {
-      await withPage({ browser, scenario, run, phase: "recorded", useAuth }, fn);
+      lastResult = await withPage(
+        { browser, scenario, run, phase: "recorded", useAuth, initialStep },
+        fn
+      );
       process.stdout.write(`[benchmark] ${scenario} recorded ${run}/${RECORDED_RUNS}\n`);
     }
+    return lastResult;
   } catch (error) {
+    if (error instanceof BenchmarkFatalError || error?.fatal) {
+      throw error;
+    }
     blockers.push({
       scenario,
       reason: `Scenario aborted: ${error instanceof Error ? error.message : String(error)}`,
@@ -471,34 +584,58 @@ async function runScenarioSeries({ browser, scenario, useAuth, fn }) {
     process.stderr.write(
       `[benchmark] ${scenario} failed: ${error instanceof Error ? error.message : error}\n`
     );
+    return null;
   }
 }
 
-async function main() {
+function resetOutputArtifacts() {
+  const files = [
+    "raw/browser-requests.jsonl",
+    "raw/backend-requests.jsonl",
+    "raw/tanstack-events.jsonl",
+    "summary.json",
+    "summary.csv",
+    "REPORT.md",
+    "blockers.json",
+    "notes.json",
+    "fixtures.json",
+    "environment.json",
+  ];
+  for (const file of files) {
+    rmSync(path.join(OUTPUT_DIR, file), { force: true });
+  }
+  const resultsDir = path.join(OUTPUT_DIR, "results");
+  if (existsSync(resultsDir)) {
+    for (const name of readdirSync(resultsDir)) {
+      if (name.endsWith(".json")) rmSync(path.join(resultsDir, name), { force: true });
+    }
+  }
   ensureDir(path.join(OUTPUT_DIR, "raw"));
   ensureDir(path.join(OUTPUT_DIR, "results"));
-  ensureDir(path.join(OUTPUT_DIR, "scripts"));
-  rmSync(path.join(OUTPUT_DIR, "raw/browser-requests.jsonl"), { force: true });
-  rmSync(path.join(OUTPUT_DIR, "raw/backend-requests.jsonl"), { force: true });
-  rmSync(path.join(OUTPUT_DIR, "raw/tanstack-events.jsonl"), { force: true });
-  mkdirSync(path.join(OUTPUT_DIR, "raw"), { recursive: true });
   writeFileSync(path.join(OUTPUT_DIR, "raw/browser-requests.jsonl"), "");
   writeFileSync(path.join(OUTPUT_DIR, "raw/backend-requests.jsonl"), "");
   writeFileSync(path.join(OUTPUT_DIR, "raw/tanstack-events.jsonl"), "");
+}
+
+async function main() {
+  const dirty = isWorkingTreeDirty();
+  if (dirty && !ALLOW_DIRTY) {
+    throw new Error(
+      "Working tree is dirty. Final baseline must run from a clean harness commit. Use --allow-dirty only for harness development."
+    );
+  }
+  if (dirty) {
+    notes.push("Working tree was dirty at run start. This run is not a final baseline.");
+  }
+
+  resetOutputArtifacts();
+  resetRunContextFile(CONTEXT_FILE);
 
   const startedAt = new Date().toISOString();
-  const gitSha = existsSync(".git")
-    ? (await import("node:child_process"))
-        .execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" })
-        .trim()
-    : null;
-  const gitBranch = existsSync(".git")
-    ? (await import("node:child_process"))
-        .execFileSync("git", ["branch", "--show-current"], {
-          encoding: "utf8",
-        })
-        .trim()
-    : null;
+  const git = collectGitProvenance({
+    workingTreeDirtyAtRunStart: dirty,
+  });
+  const backendEnvironmentLabel = backendEnvironmentLabelFromEnv();
 
   const buildEnv = {
     BENCHMARK_MODE: "true",
@@ -554,27 +691,37 @@ async function main() {
       }, 200);
     });
     await Promise.race([ready, died]);
-    writeContext({ scenario: "setup", run: 0, phase: "idle" });
+    writeContext(INITIAL_RUN_CONTEXT);
     const sessionFixture = await discoverSessionId();
     fixtures.sessionId = sessionFixture.sessionId;
     fixtures.sessionStatus = sessionFixture.status;
     fixtures.sessionSource = sessionFixture.source;
+    fixtures.completedSessionId = sessionFixture.completedSessionId ?? null;
     writeJson(path.join(OUTPUT_DIR, "fixtures.json"), {
       sessionId: sessionFixture.sessionId,
       sessionStatus: sessionFixture.status,
       sessionSource: sessionFixture.source,
+      completedSessionId: fixtures.completedSessionId,
     });
 
-    const cookies = authCookies();
-    const hasAuth = Boolean(cookies);
+    const hasAuth = hasEnv("BENCHMARK_ACCESS_TOKEN") || hasEnv("BENCHMARK_REFRESH_TOKEN");
     const allowProfileMutation =
       hasAuth && process.env.BENCHMARK_ALLOW_PROFILE_MUTATION !== "false";
-    const interactiveSessionId = process.env.BENCHMARK_INTERACTIVE_SESSION_ID;
-    const interactiveSubtaskId = process.env.BENCHMARK_INTERACTIVE_SUBTASK_ID;
+    const interactiveSessionId = hasEnv("BENCHMARK_INTERACTIVE_SESSION_ID")
+      ? process.env.BENCHMARK_INTERACTIVE_SESSION_ID
+      : null;
+    const interactiveSubtaskId = hasEnv("BENCHMARK_INTERACTIVE_SUBTASK_ID")
+      ? process.env.BENCHMARK_INTERACTIVE_SUBTASK_ID
+      : null;
 
     if (sessionFixture.status === "WAITING") {
       notes.push(
         `Session fixture ${sessionFixture.sessionId} status is WAITING. Direct /session/:id access may redirect to /waiting then login for guests.`
+      );
+    }
+    if (backendEnvironmentLabel === "unknown") {
+      notes.push(
+        "BENCHMARK_BACKEND_LABEL was not set. backendEnvironmentLabel is unknown. Compare later runs only when the label matches."
       );
     }
 
@@ -585,8 +732,8 @@ async function main() {
       recordedRuns: RECORDED_RUNS,
       warmupRuns: WARMUP_RUNS,
       startedAt,
-      gitSha,
-      gitBranch,
+      git,
+      backendEnvironmentLabel,
     });
     writeJson(path.join(OUTPUT_DIR, "environment.json"), environment);
 
@@ -595,58 +742,90 @@ async function main() {
         browser,
         scenario: "home-cold",
         useAuth: false,
-        fn: (page) => runHomeCold(page),
+        initialStep: "home-initial",
+        fn: (page, helpers) => runHomeCold(page, helpers),
       });
 
       await runScenarioSeries({
         browser,
         scenario: "session-detail-cold",
         useAuth: false,
-        fn: (page) => runSessionDetailCold(page, sessionFixture.sessionId),
+        initialStep: "detail-first",
+        fn: (page, helpers) => runSessionDetailCold(page, sessionFixture.sessionId, helpers),
       });
 
       await runScenarioSeries({
         browser,
         scenario: "session-detail-warm",
         useAuth: false,
-        fn: (page) => runSessionDetailWarm(page, sessionFixture.sessionId),
+        initialStep: "home-initial",
+        fn: (page, helpers) => runSessionDetailWarm(page, sessionFixture.sessionId, helpers),
       });
 
-      let ssrPath = `/session/${sessionFixture.sessionId}`;
-      if (hasAuth) {
-        ssrPath = "/profile/report";
-        fixtures.sessionResultPage = "/profile/report";
-        notes.push("Scenario 4 used authenticated /profile/report as the SSR-heavy page.");
+      let measuredSessionResult = false;
+      if (hasAuth && sessionFixture.completedSessionId) {
+        const result = await runScenarioSeries({
+          browser,
+          scenario: "session-result",
+          useAuth: true,
+          initialStep: "result-page",
+          fn: (page, helpers) =>
+            runSsrHeavy(
+              page,
+              `/session/${sessionFixture.completedSessionId}/result`,
+              helpers,
+              "result-page"
+            ),
+        });
+        const landedOnResult =
+          typeof result?.finalUrl === "string" && result.finalUrl.includes("/result");
+        if (landedOnResult) {
+          measuredSessionResult = true;
+          fixtures.sessionResultPage = `/session/${sessionFixture.completedSessionId}/result`;
+        } else {
+          blockers.push({
+            scenario: "session-result",
+            reason: AUTH_UNAVAILABLE,
+          });
+          notes.push(
+            "session-result did not stay on /session/:id/result. This scenario is not used as a baseline."
+          );
+        }
       } else {
-        fixtures.sessionResultPage = ssrPath;
         blockers.push({
           scenario: "session-result",
-          reason:
-            "No auth fixture. Used public session detail as the closest SSR-heavy page instead of /session/:id/result.",
+          reason: AUTH_UNAVAILABLE,
         });
         notes.push(
-          "Scenario 4 substituted session detail because /session/:id/result is auth-gated."
+          "session-result was not measured. Public session detail is recorded separately as ssr-public-session-detail-fallback."
         );
       }
-      await runScenarioSeries({
-        browser,
-        scenario: "session-result",
-        useAuth: hasAuth,
-        fn: (page) => runSsrHeavy(page, ssrPath),
-      });
+
+      if (!measuredSessionResult) {
+        fixtures.ssrPublicSessionDetailPath = `/session/${sessionFixture.sessionId}`;
+        await runScenarioSeries({
+          browser,
+          scenario: "ssr-public-session-detail-fallback",
+          useAuth: false,
+          initialStep: "ssr-document",
+          fn: (page, helpers) =>
+            runSsrHeavy(page, `/session/${sessionFixture.sessionId}`, helpers, "ssr-document"),
+        });
+      }
 
       if (!hasAuth) {
         blockers.push({
           scenario: "profile",
-          reason: "BENCHMARK_ACCESS_TOKEN / BENCHMARK_REFRESH_TOKEN were not provided.",
+          reason: `${AUTH_UNAVAILABLE} Missing BENCHMARK_ACCESS_TOKEN / BENCHMARK_REFRESH_TOKEN.`,
         });
-        notes.push("Scenario 5 skipped: authenticated profile page requires cookie fixture.");
+        notes.push("profile skipped: authenticated profile page requires cookie fixture.");
       } else {
         await runScenarioSeries({
           browser,
           scenario: "profile",
           useAuth: true,
-          fn: (page) => runProfile(page),
+          initialStep: "profile-settings",
+          fn: (page, helpers) => runProfile(page, helpers),
         });
       }
 
@@ -655,39 +834,51 @@ async function main() {
           scenario: "simple-mutation",
           reason: hasAuth
             ? "Profile mutation skipped because BENCHMARK_ALLOW_PROFILE_MUTATION=false."
-            : "No authenticated test fixture. Mutation was not forced against real user data.",
+            : `${AUTH_UNAVAILABLE} Mutation was not forced against real user data.`,
         });
       } else {
-        await runScenarioSeries({
+        const mutationResult = await runScenarioSeries({
           browser,
           scenario: "simple-mutation",
           useAuth: true,
-          fn: (page) => runSimpleMutation(page),
+          initialStep: "profile-read",
+          fn: (page, helpers) => runSimpleMutation(page, helpers),
         });
+        fixtures.simpleMutation = {
+          restored: mutationResult?.restored === true,
+          uiApplyMs: mutationResult?.uiApplyMs ?? null,
+        };
+        if (mutationResult?.restored !== true) {
+          throw new BenchmarkFatalError(
+            "simple-mutation completed without restored: true. Benchmark aborted."
+          );
+        }
       }
 
       if (!hasAuth || !interactiveSessionId || !interactiveSubtaskId) {
         blockers.push({
           scenario: "interactive-mutation",
-          reason:
-            "Requires auth cookies plus BENCHMARK_INTERACTIVE_SESSION_ID and BENCHMARK_INTERACTIVE_SUBTASK_ID. No safe in-progress fixture was available.",
+          reason: `${AUTH_UNAVAILABLE} Requires BENCHMARK_INTERACTIVE_SESSION_ID and BENCHMARK_INTERACTIVE_SUBTASK_ID.`,
         });
       } else {
         await runScenarioSeries({
           browser,
           scenario: "interactive-mutation",
           useAuth: true,
-          fn: (page) => runInteractiveMutation(page, interactiveSessionId, interactiveSubtaskId),
+          initialStep: "session-open",
+          fn: (page, helpers) =>
+            runInteractiveMutation(page, interactiveSessionId, interactiveSubtaskId, helpers),
         });
       }
     } finally {
       await browser.close();
     }
 
-    writeContext({ scenario: "idle", run: 0, phase: "idle" });
+    writeContext({ scenario: "idle", run: 0, phase: "idle", step: "idle" });
     await delay(300);
     writeJson(path.join(OUTPUT_DIR, "blockers.json"), blockers);
     writeJson(path.join(OUTPUT_DIR, "notes.json"), notes);
+    writeJson(path.join(OUTPUT_DIR, "fixtures.json"), fixtures);
 
     const summary = writeAggregates({
       outputDir: OUTPUT_DIR,

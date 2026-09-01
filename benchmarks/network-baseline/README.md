@@ -19,6 +19,13 @@ pnpm benchmark:network-baseline
 - `next start` on `http://localhost:3010`
 - `BENCHMARK_MODE=true` / `NEXT_PUBLIC_BENCHMARK_MODE=true`
 
+최종 Baseline v1 권장 실행:
+
+```bash
+BENCHMARK_BACKEND_LABEL=<environment> \
+pnpm benchmark:network-baseline -- --warmup 2 --runs 20
+```
+
 옵션:
 
 ```bash
@@ -41,12 +48,23 @@ pnpm benchmark:network-baseline -- --har
 | `BENCHMARK_ALLOW_PROFILE_MUTATION` | `false`면 닉네임 mutation 생략        |
 | `BENCHMARK_INTERACTIVE_SESSION_ID` | 인터랙티브 mutation용 세션            |
 | `BENCHMARK_INTERACTIVE_SUBTASK_ID` | 인터랙티브 mutation용 subtask         |
+| `BENCHMARK_BACKEND_LABEL`          | backend 환경 라벨 (`staging` 등)      |
 
 값이 없으면 profile / simple-mutation / interactive-mutation은 억지로 실행하지 않고 REPORT에 blocker로 남긴다.
 
+토큰 값, cookie 값, request/response body는 파일·로그·REPORT에 쓰지 않는다. 환경 변수 이름만 기록한다.
+
+## Backend 환경 비교
+
+`environment.json`의 `backendEnvironmentLabel`이 Before / After 비교 키다.
+
+- 값이 없으면 `unknown`으로 기록한다.
+- 이후 최적화 전후 benchmark는 **반드시 같은 backend label끼리만** 비교한다.
+- backend origin 전체 값이나 secret은 저장하지 않는다.
+
 ## 산출물
 
-- `environment.json` — 측정 환경. secret 값 없음
+- `environment.json` — 측정 환경. `appBaseSha` / `benchmarkHarnessSha` / `backendEnvironmentLabel`을 분리해 기록한다. secret 값 없음
 - `raw/*.jsonl` — sanitized raw evidence
 - `results/*.json` — 시나리오별 집계
 - `summary.json` / `summary.csv`

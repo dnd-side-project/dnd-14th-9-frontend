@@ -16,4 +16,10 @@ describe("sanitizePath", () => {
       "/api/auth/callback?code=%5Bredacted%5D&state=%5Bredacted%5D"
     );
   });
+
+  it("email query를 redacted 한다", () => {
+    expect(sanitizePath("http://localhost:3000/api/members?email=user@example.com")).toBe(
+      "/api/members?email=%5Bredacted%5D"
+    );
+  });
 });

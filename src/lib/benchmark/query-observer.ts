@@ -2,8 +2,19 @@ import { isBenchmarkClientMode } from "./mode";
 
 import type { QueryClient } from "@tanstack/react-query";
 
+export type BenchmarkClientContext = {
+  scenario?: string;
+  run?: number;
+  phase?: string;
+  step?: string;
+};
+
 export type BenchmarkTanstackEvent = {
   t: number;
+  scenario?: string;
+  run?: number;
+  phase?: string;
+  step?: string;
   kind:
     | "query-fetch"
     | "query-success"
@@ -24,6 +35,7 @@ export type BenchmarkTanstackEvent = {
 
 type BenchmarkWindow = Window & {
   __GAK_BENCHMARK_EVENTS__?: BenchmarkTanstackEvent[];
+  __GAK_BENCHMARK_CONTEXT__?: BenchmarkClientContext;
 };
 
 const installedClients = new WeakSet<QueryClient>();
@@ -36,9 +48,18 @@ function getEventBuffer(): BenchmarkTanstackEvent[] {
   return runtime.__GAK_BENCHMARK_EVENTS__;
 }
 
+function getClientContext(): BenchmarkClientContext {
+  return (window as BenchmarkWindow).__GAK_BENCHMARK_CONTEXT__ ?? {};
+}
+
 function record(event: Omit<BenchmarkTanstackEvent, "t">): void {
+  const context = getClientContext();
   getEventBuffer().push({
     t: Math.round(performance.now() * 100) / 100,
+    scenario: context.scenario,
+    run: context.run,
+    phase: context.phase,
+    step: context.step,
     ...event,
   });
 }

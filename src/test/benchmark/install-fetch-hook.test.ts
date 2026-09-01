@@ -12,6 +12,7 @@ import {
   isBenchmarkFetchHookInstalled,
   uninstallBenchmarkFetchHook,
 } from "@/lib/benchmark/install-fetch-hook";
+import { resetBenchmarkRunContext } from "@/lib/benchmark/run-context";
 
 describe("installBenchmarkFetchHook", () => {
   const originalFetch = global.fetch;
@@ -29,6 +30,7 @@ describe("installBenchmarkFetchHook", () => {
     process.env.BACKEND_API_BASE = originalBackend;
     process.env.FRONTEND_ORIGIN = originalFrontend;
     process.env.BENCHMARK_CONTEXT_FILE = originalContextFile;
+    resetBenchmarkRunContext();
   });
 
   async function writeContext(outputDir: string, context: object) {
@@ -50,7 +52,12 @@ describe("installBenchmarkFetchHook", () => {
     process.env.BENCHMARK_OUTPUT_DIR = outputDir;
     process.env.BACKEND_API_BASE = "https://api.example.test/api/v1";
     process.env.FRONTEND_ORIGIN = "http://localhost:3000";
-    await writeContext(outputDir, { scenario: "home-cold", run: 1, phase: "recorded" });
+    await writeContext(outputDir, {
+      scenario: "home-cold",
+      run: 1,
+      phase: "recorded",
+      step: "home-initial",
+    });
 
     const body = JSON.stringify({ isSuccess: true, result: { ok: true } });
     const fetchMock = jest.fn(async () => new Response(body, { status: 200 }));
@@ -77,8 +84,14 @@ describe("installBenchmarkFetchHook", () => {
       source: string;
       target: string;
       status: number;
+      step: string;
+      phase: string;
+      run: number;
     };
     expect(event.scenario).toBe("home-cold");
+    expect(event.run).toBe(1);
+    expect(event.phase).toBe("recorded");
+    expect(event.step).toBe("home-initial");
     expect(event.path).toBe("/sessions/1");
     expect(event.target).toBe("backend");
     expect(event.source).toBe("route-handler");
@@ -91,7 +104,12 @@ describe("installBenchmarkFetchHook", () => {
     process.env.BENCHMARK_OUTPUT_DIR = outputDir;
     process.env.BACKEND_API_BASE = "https://api.example.test/api/v1";
     process.env.FRONTEND_ORIGIN = "http://localhost:3000";
-    await writeContext(outputDir, { scenario: "session-detail-cold", run: 2, phase: "recorded" });
+    await writeContext(outputDir, {
+      scenario: "session-detail-cold",
+      run: 2,
+      phase: "recorded",
+      step: "detail-first",
+    });
 
     global.fetch = jest.fn(
       async () => new Response("{}", { status: 200 })
@@ -103,9 +121,10 @@ describe("installBenchmarkFetchHook", () => {
 
     const event = JSON.parse(
       (await readFile(join(outputDir, "raw/backend-requests.jsonl"), "utf8")).trim()
-    ) as { path: string; source: string; target: string };
+    ) as { path: string; source: string; target: string; step: string };
     expect(event.path).toBe("/api/sessions/42");
     expect(event.target).toBe("self-api");
     expect(event.source).toBe("server-component");
+    expect(event.step).toBe("detail-first");
   });
 });

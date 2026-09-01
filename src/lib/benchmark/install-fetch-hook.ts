@@ -18,6 +18,7 @@ export interface BenchmarkBackendRequestEvent {
   scenario: string;
   run: number;
   phase: string;
+  step: string;
   method: string;
   path: string;
   status: number | null;
@@ -229,6 +230,7 @@ export function installBenchmarkFetchHook(): void {
         scenario: context.scenario,
         run: context.run,
         phase: context.phase,
+        step: context.step,
         method,
         path: sanitizePath(url, getBackendApiBase()),
         status: response.status,
@@ -243,6 +245,7 @@ export function installBenchmarkFetchHook(): void {
         scenario: context.scenario,
         run: context.run,
         phase: context.phase,
+        step: context.step,
         method,
         path: sanitizePath(url, getBackendApiBase()),
         status: null,

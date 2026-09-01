@@ -47,6 +47,7 @@ function presentEnvNames() {
     "BENCHMARK_INTERACTIVE_SESSION_ID",
     "BENCHMARK_INTERACTIVE_SUBTASK_ID",
     "BENCHMARK_ALLOW_PROFILE_MUTATION",
+    "BENCHMARK_BACKEND_LABEL",
     "PORT",
   ];
   for (const name of known) {
@@ -66,6 +67,40 @@ function packageVersion(pkgRoot, name) {
   }
 }
 
+export function isWorkingTreeDirty() {
+  const status = run("git", ["status", "--short"]);
+  return Boolean(status);
+}
+
+export function collectGitProvenance({
+  appBaseSha,
+  benchmarkHarnessSha,
+  resultCommitSha = null,
+  branch,
+  workingTreeDirtyAtRunStart,
+} = {}) {
+  return {
+    appBaseSha:
+      appBaseSha ??
+      run("git", ["merge-base", "HEAD", "origin/main"]) ??
+      run("git", ["rev-parse", "origin/main"]) ??
+      run("git", ["rev-parse", "main"]),
+    benchmarkHarnessSha: benchmarkHarnessSha ?? run("git", ["rev-parse", "HEAD"]),
+    resultCommitSha: resultCommitSha ?? null,
+    branch: branch ?? run("git", ["branch", "--show-current"]),
+    workingTreeDirtyAtRunStart:
+      typeof workingTreeDirtyAtRunStart === "boolean"
+        ? workingTreeDirtyAtRunStart
+        : isWorkingTreeDirty(),
+  };
+}
+
+export function backendEnvironmentLabelFromEnv() {
+  const label = process.env.BENCHMARK_BACKEND_LABEL;
+  if (typeof label === "string" && label.trim().length > 0) return label.trim();
+  return "unknown";
+}
+
 export function collectEnvironment({
   origin,
   browserVersion,
@@ -74,13 +109,24 @@ export function collectEnvironment({
   startedAt,
   gitSha,
   gitBranch,
-}) {
+  git,
+  backendEnvironmentLabel,
+  workingTreeDirtyAtRunStart,
+} = {}) {
   const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+  const provenance = collectGitProvenance({
+    ...(git ?? {}),
+    appBaseSha: git?.appBaseSha,
+    benchmarkHarnessSha: git?.benchmarkHarnessSha ?? gitSha,
+    resultCommitSha: git?.resultCommitSha ?? null,
+    branch: git?.branch ?? gitBranch,
+    workingTreeDirtyAtRunStart: git?.workingTreeDirtyAtRunStart ?? workingTreeDirtyAtRunStart,
+  });
+  const label = backendEnvironmentLabel ?? backendEnvironmentLabelFromEnv();
+
   return {
-    git: {
-      sha: gitSha ?? run("git", ["rev-parse", "HEAD"]),
-      branch: gitBranch ?? run("git", ["branch", "--show-current"]),
-    },
+    git: provenance,
+    backendEnvironmentLabel: label,
     runtime: {
       node: process.version,
       pnpm: run("pnpm", ["-v"]),
@@ -105,11 +151,15 @@ export function collectEnvironment({
       warmupRuns,
       recordedRuns,
       backendEnvironment: "configured BACKEND_API_BASE origin (value not stored)",
+      backendEnvironmentLabel: label,
     },
     envVarNames: presentEnvNames(),
     notes: [
       "Environment variable values, tokens, and cookies are not recorded.",
       "Measurement uses a production build with BENCHMARK_MODE enabled for instrumentation only.",
+      "source is a heuristic classification, not a call-stack trace.",
+      "Document TTFB is time to first document byte, not complete page data ready time.",
+      "Before/After comparisons must use the same backendEnvironmentLabel.",
     ],
   };
 }
