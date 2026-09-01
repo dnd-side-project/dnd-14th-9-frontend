@@ -322,24 +322,26 @@ function persistRunArtifacts({ browserEvents, tanstackEvents }) {
 
 async function setPageStep(page, meta, step) {
   meta.step = step;
-  writeContext({
+  const ctx = {
     scenario: meta.scenario,
     run: meta.run,
     phase: meta.phase,
     step,
-  });
+  };
+  writeContext(ctx);
   try {
-    await page.evaluate(
-      (ctx) => {
-        window.__GAK_BENCHMARK_CONTEXT__ = ctx;
-      },
-      {
-        scenario: meta.scenario,
-        run: meta.run,
-        phase: meta.phase,
-        step,
-      }
-    );
+    // Full document loads reset window state. Init scripts re-apply the current
+    // step before page JS (including TanStack) runs.
+    await page.addInitScript((nextCtx) => {
+      window.__GAK_BENCHMARK_CONTEXT__ = nextCtx;
+    }, ctx);
+  } catch {
+    // page might not accept init scripts yet
+  }
+  try {
+    await page.evaluate((nextCtx) => {
+      window.__GAK_BENCHMARK_CONTEXT__ = nextCtx;
+    }, ctx);
   } catch {
     // about:blank or a detached page must not fail the scenario.
   }
