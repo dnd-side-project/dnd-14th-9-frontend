@@ -10,6 +10,7 @@ import {
   type DehydratedState,
 } from "@tanstack/react-query";
 
+import { ensureQueryObserver } from "@/lib/benchmark/query-observer";
 import { getQueryClient } from "@/lib/getQueryClient";
 
 const ReactQueryDevtools = dynamic(
@@ -27,6 +28,10 @@ interface QueryProviderProps {
 
 export function QueryProvider({ children, dehydratedState }: QueryProviderProps) {
   const queryClient = getQueryClient();
+
+  if (process.env.NEXT_PUBLIC_BENCHMARK_MODE === "true") {
+    ensureQueryObserver(queryClient);
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

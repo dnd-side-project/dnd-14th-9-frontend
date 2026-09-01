@@ -1,0 +1,704 @@
+{
+  "scenario": "ssr-public-session-detail-fallback",
+  "measured": true,
+  "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+  "documentTtfbMs": {
+    "count": 20,
+    "min": 6.15,
+    "max": 10.32,
+    "mean": 7.9,
+    "median": 7.73,
+    "p75": 8.94,
+    "p95": 9.35
+  },
+  "documentTtfbByRun": [
+    {
+      "run": 1,
+      "value": 9.3
+    },
+    {
+      "run": 2,
+      "value": 8.92
+    },
+    {
+      "run": 3,
+      "value": 8.33
+    },
+    {
+      "run": 4,
+      "value": 9.01
+    },
+    {
+      "run": 5,
+      "value": 7.11
+    },
+    {
+      "run": 6,
+      "value": 10.32
+    },
+    {
+      "run": 7,
+      "value": 9.25
+    },
+    {
+      "run": 8,
+      "value": 7.83
+    },
+    {
+      "run": 9,
+      "value": 7.76
+    },
+    {
+      "run": 10,
+      "value": 7.67
+    },
+    {
+      "run": 11,
+      "value": 8.47
+    },
+    {
+      "run": 12,
+      "value": 6.46
+    },
+    {
+      "run": 13,
+      "value": 6.22
+    },
+    {
+      "run": 14,
+      "value": 7.7
+    },
+    {
+      "run": 15,
+      "value": 6.78
+    },
+    {
+      "run": 16,
+      "value": 7.12
+    },
+    {
+      "run": 17,
+      "value": 9.26
+    },
+    {
+      "run": 18,
+      "value": 6.15
+    },
+    {
+      "run": 19,
+      "value": 7.43
+    },
+    {
+      "run": 20,
+      "value": 6.9
+    }
+  ],
+  "browserRequestCount": {
+    "count": 20,
+    "min": 57,
+    "max": 63,
+    "mean": 61,
+    "median": 61,
+    "p75": 61.25,
+    "p95": 62.05
+  },
+  "browserApiRequestCount": {
+    "count": 20,
+    "min": 0,
+    "max": 0,
+    "mean": 0,
+    "median": 0,
+    "p75": 0,
+    "p95": 0
+  },
+  "browserApiRequestCountByRun": [
+    {
+      "run": 1,
+      "value": 0
+    },
+    {
+      "run": 2,
+      "value": 0
+    },
+    {
+      "run": 3,
+      "value": 0
+    },
+    {
+      "run": 4,
+      "value": 0
+    },
+    {
+      "run": 5,
+      "value": 0
+    },
+    {
+      "run": 6,
+      "value": 0
+    },
+    {
+      "run": 7,
+      "value": 0
+    },
+    {
+      "run": 8,
+      "value": 0
+    },
+    {
+      "run": 9,
+      "value": 0
+    },
+    {
+      "run": 10,
+      "value": 0
+    },
+    {
+      "run": 11,
+      "value": 0
+    },
+    {
+      "run": 12,
+      "value": 0
+    },
+    {
+      "run": 13,
+      "value": 0
+    },
+    {
+      "run": 14,
+      "value": 0
+    },
+    {
+      "run": 15,
+      "value": 0
+    },
+    {
+      "run": 16,
+      "value": 0
+    },
+    {
+      "run": 17,
+      "value": 0
+    },
+    {
+      "run": 18,
+      "value": 0
+    },
+    {
+      "run": 19,
+      "value": 0
+    },
+    {
+      "run": 20,
+      "value": 0
+    }
+  ],
+  "browserApiRequestDistribution": {
+    "0": 20
+  },
+  "backendRequestCount": {
+    "count": 20,
+    "min": 1,
+    "max": 1,
+    "mean": 1,
+    "median": 1,
+    "p75": 1,
+    "p95": 1
+  },
+  "backendRequestCountByRun": [
+    {
+      "run": 1,
+      "value": 1
+    },
+    {
+      "run": 2,
+      "value": 1
+    },
+    {
+      "run": 3,
+      "value": 1
+    },
+    {
+      "run": 4,
+      "value": 1
+    },
+    {
+      "run": 5,
+      "value": 1
+    },
+    {
+      "run": 6,
+      "value": 1
+    },
+    {
+      "run": 7,
+      "value": 1
+    },
+    {
+      "run": 8,
+      "value": 1
+    },
+    {
+      "run": 9,
+      "value": 1
+    },
+    {
+      "run": 10,
+      "value": 1
+    },
+    {
+      "run": 11,
+      "value": 1
+    },
+    {
+      "run": 12,
+      "value": 1
+    },
+    {
+      "run": 13,
+      "value": 1
+    },
+    {
+      "run": 14,
+      "value": 1
+    },
+    {
+      "run": 15,
+      "value": 1
+    },
+    {
+      "run": 16,
+      "value": 1
+    },
+    {
+      "run": 17,
+      "value": 1
+    },
+    {
+      "run": 18,
+      "value": 1
+    },
+    {
+      "run": 19,
+      "value": 1
+    },
+    {
+      "run": 20,
+      "value": 1
+    }
+  ],
+  "backendRequestDistribution": {
+    "1": 20
+  },
+  "selfApiRequestCount": {
+    "count": 20,
+    "min": 1,
+    "max": 1,
+    "mean": 1,
+    "median": 1,
+    "p75": 1,
+    "p95": 1
+  },
+  "selfApiRequestCountByRun": [
+    {
+      "run": 1,
+      "value": 1
+    },
+    {
+      "run": 2,
+      "value": 1
+    },
+    {
+      "run": 3,
+      "value": 1
+    },
+    {
+      "run": 4,
+      "value": 1
+    },
+    {
+      "run": 5,
+      "value": 1
+    },
+    {
+      "run": 6,
+      "value": 1
+    },
+    {
+      "run": 7,
+      "value": 1
+    },
+    {
+      "run": 8,
+      "value": 1
+    },
+    {
+      "run": 9,
+      "value": 1
+    },
+    {
+      "run": 10,
+      "value": 1
+    },
+    {
+      "run": 11,
+      "value": 1
+    },
+    {
+      "run": 12,
+      "value": 1
+    },
+    {
+      "run": 13,
+      "value": 1
+    },
+    {
+      "run": 14,
+      "value": 1
+    },
+    {
+      "run": 15,
+      "value": 1
+    },
+    {
+      "run": 16,
+      "value": 1
+    },
+    {
+      "run": 17,
+      "value": 1
+    },
+    {
+      "run": 18,
+      "value": 1
+    },
+    {
+      "run": 19,
+      "value": 1
+    },
+    {
+      "run": 20,
+      "value": 1
+    }
+  ],
+  "backendDurationMs": {
+    "count": 20,
+    "min": 12.51,
+    "max": 84.63,
+    "mean": 21.38,
+    "median": 18.2,
+    "p75": 21.03,
+    "p95": 28.82
+  },
+  "selfApiDurationMs": {
+    "count": 20,
+    "min": 17.28,
+    "max": 88.26,
+    "mean": 26.91,
+    "median": 23.46,
+    "p75": 25.12,
+    "p95": 35.99
+  },
+  "backendSources": {
+    "route-handler": 20
+  },
+  "selfApiSources": {
+    "server-component": 20
+  },
+  "sourceClassification": "heuristic",
+  "expectedRepeatedBrowserApi": [],
+  "expectedRepeatedBackend": [],
+  "duplicateBrowserApi": [],
+  "duplicateBackend": [],
+  "retryCandidateBrowserApi": [],
+  "retryCandidateBackend": [],
+  "tanstack": {
+    "queryFetchPerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "queryFetchTotal": 0,
+    "invalidatePerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "invalidateTotal": 0,
+    "setQueryDataPerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "setQueryDataTotal": 0,
+    "mutationEventPerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "mutationEventTotal": 0,
+    "queryFetchCount": 0,
+    "invalidateCount": 0,
+    "setQueryDataCount": 0,
+    "mutationEventCount": 0,
+    "queryKeysFetched": [],
+    "invalidateQueryKeys": []
+  },
+  "selfHop": {
+    "pairingStatus": "paired",
+    "count": 20,
+    "overheadMs": {
+      "count": 20,
+      "min": 3.63,
+      "max": 8.94,
+      "mean": 5.53,
+      "median": 5.15,
+      "p75": 6.2,
+      "p95": 8.69
+    },
+    "unmatchedSelfCount": 0,
+    "ambiguousCount": 0,
+    "pairs": [
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 1,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 23.01,
+        "backendDurationMs": 14.33,
+        "selfHopOverheadMs": 8.68
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 2,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 21.13,
+        "backendDurationMs": 15.71,
+        "selfHopOverheadMs": 5.42
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 3,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 33.24,
+        "backendDurationMs": 25.88,
+        "selfHopOverheadMs": 7.36
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 4,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 24.55,
+        "backendDurationMs": 19.22,
+        "selfHopOverheadMs": 5.33
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 5,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 23.91,
+        "backendDurationMs": 17.94,
+        "selfHopOverheadMs": 5.97
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 6,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 33.08,
+        "backendDurationMs": 24.14,
+        "selfHopOverheadMs": 8.94
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 7,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 20.23,
+        "backendDurationMs": 13.35,
+        "selfHopOverheadMs": 6.88
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 8,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 21.64,
+        "backendDurationMs": 16.48,
+        "selfHopOverheadMs": 5.16
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 9,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 26.24,
+        "backendDurationMs": 21.63,
+        "selfHopOverheadMs": 4.61
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 10,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 88.26,
+        "backendDurationMs": 84.63,
+        "selfHopOverheadMs": 3.63
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 11,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 18.78,
+        "backendDurationMs": 14.24,
+        "selfHopOverheadMs": 4.54
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 12,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 19.9,
+        "backendDurationMs": 15.94,
+        "selfHopOverheadMs": 3.96
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 13,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 23,
+        "backendDurationMs": 18.47,
+        "selfHopOverheadMs": 4.53
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 14,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 24.73,
+        "backendDurationMs": 19.6,
+        "selfHopOverheadMs": 5.13
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 15,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 24.55,
+        "backendDurationMs": 20.12,
+        "selfHopOverheadMs": 4.43
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 16,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 20.89,
+        "backendDurationMs": 15.57,
+        "selfHopOverheadMs": 5.32
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 17,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 29.65,
+        "backendDurationMs": 22.71,
+        "selfHopOverheadMs": 6.94
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 18,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 24.75,
+        "backendDurationMs": 20.83,
+        "selfHopOverheadMs": 3.92
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 19,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 17.28,
+        "backendDurationMs": 12.51,
+        "selfHopOverheadMs": 4.77
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 20,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 19.3,
+        "backendDurationMs": 14.3,
+        "selfHopOverheadMs": 5
+      }
+    ]
+  },
+  "extra": {
+    "fixture": null,
+    "blocker": null
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "git": {
+    "appBaseSha": "6c4daca3c0cd99928526a0774de8fa646875d6f1",
+    "benchmarkHarnessSha": "b65e3b14de0d16eb194e8a08f377ae562e512dd1",
+    "resultCommitSha": null,
+    "branch": "benchmark/network-baseline-20260901",
+    "workingTreeDirtyAtRunStart": false
+  },
+  "backendEnvironmentLabel": "development",
+  "runtime": {
+    "node": "v22.21.1",
+    "pnpm": "10.27.0",
+    "next": "16.1.4",
+    "react": "19.2.3",
+    "playwright": "1.58.2",
+    "chromium": "145.0.7632.6"
+  },
+  "machine": {
+    "os": "darwin 27.0.0",
+    "arch": "arm64",
+    "cpu": "Apple M2",
+    "memoryBytes": 17179869184,
+    "hostnameRedacted": true
+  },
+  "execution": {
+    "startedAt": "2026-09-01T14:50:13.291Z",
+    "frontendMode": "production (next start)",
+    "benchmarkMode": true,
+    "origin": "http://localhost:3010",
+    "warmupRuns": 2,
+    "recordedRuns": 20,
+    "backendEnvironment": "configured BACKEND_API_BASE origin (value not stored)",
+    "backendEnvironmentLabel": "development"
+  },
+  "envVarNames": [
+    "BACKEND_API_BASE",
+    "BACKEND_ORIGIN",
+    "BENCHMARK_BACKEND_LABEL",
+    "FRONTEND_ORIGIN",
+    "NEXT_PUBLIC_BACKEND_API_BASE",
+    "NEXT_PUBLIC_BACKEND_ORIGIN",
+    "NEXT_PUBLIC_FRONTEND_ORIGIN",
+    "NEXT_PUBLIC_GOOGLE_ANALYTICS",
+    "NEXT_PUBLIC_GOOGLE_VERIFICATION",
+    "NEXT_PUBLIC_NAVER_VERIFICATION",
+    "NEXT_PUBLIC_WS_URL"
+  ],
+  "notes": [
+    "Environment variable values, tokens, and cookies are not recorded.",
+    "Measurement uses a production build with BENCHMARK_MODE enabled for instrumentation only.",
+    "source is a heuristic classification, not a call-stack trace.",
+    "Document TTFB is time to first document byte, not complete page data ready time.",
+    "Before/After comparisons must use the same backendEnvironmentLabel."
+  ]
+}

@@ -1,0 +1,704 @@
+{
+  "scenario": "session-detail-cold",
+  "measured": true,
+  "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+  "documentTtfbMs": {
+    "count": 20,
+    "min": 7.48,
+    "max": 26.55,
+    "mean": 10.19,
+    "median": 9.46,
+    "p75": 9.92,
+    "p95": 13.08
+  },
+  "documentTtfbByRun": [
+    {
+      "run": 1,
+      "value": 9.36
+    },
+    {
+      "run": 2,
+      "value": 9.96
+    },
+    {
+      "run": 3,
+      "value": 9.86
+    },
+    {
+      "run": 4,
+      "value": 9.65
+    },
+    {
+      "run": 5,
+      "value": 11.58
+    },
+    {
+      "run": 6,
+      "value": 9.05
+    },
+    {
+      "run": 7,
+      "value": 9.49
+    },
+    {
+      "run": 8,
+      "value": 7.74
+    },
+    {
+      "run": 9,
+      "value": 9.44
+    },
+    {
+      "run": 10,
+      "value": 7.48
+    },
+    {
+      "run": 11,
+      "value": 26.55
+    },
+    {
+      "run": 12,
+      "value": 9.91
+    },
+    {
+      "run": 13,
+      "value": 7.71
+    },
+    {
+      "run": 14,
+      "value": 12.37
+    },
+    {
+      "run": 15,
+      "value": 8.26
+    },
+    {
+      "run": 16,
+      "value": 10.47
+    },
+    {
+      "run": 17,
+      "value": 9.48
+    },
+    {
+      "run": 18,
+      "value": 7.89
+    },
+    {
+      "run": 19,
+      "value": 8.12
+    },
+    {
+      "run": 20,
+      "value": 9.36
+    }
+  ],
+  "browserRequestCount": {
+    "count": 20,
+    "min": 59,
+    "max": 63,
+    "mean": 61.1,
+    "median": 61,
+    "p75": 61,
+    "p95": 63
+  },
+  "browserApiRequestCount": {
+    "count": 20,
+    "min": 0,
+    "max": 0,
+    "mean": 0,
+    "median": 0,
+    "p75": 0,
+    "p95": 0
+  },
+  "browserApiRequestCountByRun": [
+    {
+      "run": 1,
+      "value": 0
+    },
+    {
+      "run": 2,
+      "value": 0
+    },
+    {
+      "run": 3,
+      "value": 0
+    },
+    {
+      "run": 4,
+      "value": 0
+    },
+    {
+      "run": 5,
+      "value": 0
+    },
+    {
+      "run": 6,
+      "value": 0
+    },
+    {
+      "run": 7,
+      "value": 0
+    },
+    {
+      "run": 8,
+      "value": 0
+    },
+    {
+      "run": 9,
+      "value": 0
+    },
+    {
+      "run": 10,
+      "value": 0
+    },
+    {
+      "run": 11,
+      "value": 0
+    },
+    {
+      "run": 12,
+      "value": 0
+    },
+    {
+      "run": 13,
+      "value": 0
+    },
+    {
+      "run": 14,
+      "value": 0
+    },
+    {
+      "run": 15,
+      "value": 0
+    },
+    {
+      "run": 16,
+      "value": 0
+    },
+    {
+      "run": 17,
+      "value": 0
+    },
+    {
+      "run": 18,
+      "value": 0
+    },
+    {
+      "run": 19,
+      "value": 0
+    },
+    {
+      "run": 20,
+      "value": 0
+    }
+  ],
+  "browserApiRequestDistribution": {
+    "0": 20
+  },
+  "backendRequestCount": {
+    "count": 20,
+    "min": 1,
+    "max": 1,
+    "mean": 1,
+    "median": 1,
+    "p75": 1,
+    "p95": 1
+  },
+  "backendRequestCountByRun": [
+    {
+      "run": 1,
+      "value": 1
+    },
+    {
+      "run": 2,
+      "value": 1
+    },
+    {
+      "run": 3,
+      "value": 1
+    },
+    {
+      "run": 4,
+      "value": 1
+    },
+    {
+      "run": 5,
+      "value": 1
+    },
+    {
+      "run": 6,
+      "value": 1
+    },
+    {
+      "run": 7,
+      "value": 1
+    },
+    {
+      "run": 8,
+      "value": 1
+    },
+    {
+      "run": 9,
+      "value": 1
+    },
+    {
+      "run": 10,
+      "value": 1
+    },
+    {
+      "run": 11,
+      "value": 1
+    },
+    {
+      "run": 12,
+      "value": 1
+    },
+    {
+      "run": 13,
+      "value": 1
+    },
+    {
+      "run": 14,
+      "value": 1
+    },
+    {
+      "run": 15,
+      "value": 1
+    },
+    {
+      "run": 16,
+      "value": 1
+    },
+    {
+      "run": 17,
+      "value": 1
+    },
+    {
+      "run": 18,
+      "value": 1
+    },
+    {
+      "run": 19,
+      "value": 1
+    },
+    {
+      "run": 20,
+      "value": 1
+    }
+  ],
+  "backendRequestDistribution": {
+    "1": 20
+  },
+  "selfApiRequestCount": {
+    "count": 20,
+    "min": 1,
+    "max": 1,
+    "mean": 1,
+    "median": 1,
+    "p75": 1,
+    "p95": 1
+  },
+  "selfApiRequestCountByRun": [
+    {
+      "run": 1,
+      "value": 1
+    },
+    {
+      "run": 2,
+      "value": 1
+    },
+    {
+      "run": 3,
+      "value": 1
+    },
+    {
+      "run": 4,
+      "value": 1
+    },
+    {
+      "run": 5,
+      "value": 1
+    },
+    {
+      "run": 6,
+      "value": 1
+    },
+    {
+      "run": 7,
+      "value": 1
+    },
+    {
+      "run": 8,
+      "value": 1
+    },
+    {
+      "run": 9,
+      "value": 1
+    },
+    {
+      "run": 10,
+      "value": 1
+    },
+    {
+      "run": 11,
+      "value": 1
+    },
+    {
+      "run": 12,
+      "value": 1
+    },
+    {
+      "run": 13,
+      "value": 1
+    },
+    {
+      "run": 14,
+      "value": 1
+    },
+    {
+      "run": 15,
+      "value": 1
+    },
+    {
+      "run": 16,
+      "value": 1
+    },
+    {
+      "run": 17,
+      "value": 1
+    },
+    {
+      "run": 18,
+      "value": 1
+    },
+    {
+      "run": 19,
+      "value": 1
+    },
+    {
+      "run": 20,
+      "value": 1
+    }
+  ],
+  "backendDurationMs": {
+    "count": 20,
+    "min": 11.59,
+    "max": 262.27,
+    "mean": 47.72,
+    "median": 21.04,
+    "p75": 24.75,
+    "p95": 238.24
+  },
+  "selfApiDurationMs": {
+    "count": 20,
+    "min": 16.48,
+    "max": 267.64,
+    "mean": 54.13,
+    "median": 26.89,
+    "p75": 33.73,
+    "p95": 249.51
+  },
+  "backendSources": {
+    "route-handler": 20
+  },
+  "selfApiSources": {
+    "server-component": 20
+  },
+  "sourceClassification": "heuristic",
+  "expectedRepeatedBrowserApi": [],
+  "expectedRepeatedBackend": [],
+  "duplicateBrowserApi": [],
+  "duplicateBackend": [],
+  "retryCandidateBrowserApi": [],
+  "retryCandidateBackend": [],
+  "tanstack": {
+    "queryFetchPerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "queryFetchTotal": 0,
+    "invalidatePerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "invalidateTotal": 0,
+    "setQueryDataPerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "setQueryDataTotal": 0,
+    "mutationEventPerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "mutationEventTotal": 0,
+    "queryFetchCount": 0,
+    "invalidateCount": 0,
+    "setQueryDataCount": 0,
+    "mutationEventCount": 0,
+    "queryKeysFetched": [],
+    "invalidateQueryKeys": []
+  },
+  "selfHop": {
+    "pairingStatus": "paired",
+    "count": 20,
+    "overheadMs": {
+      "count": 20,
+      "min": 4.34,
+      "max": 11.59,
+      "mean": 6.41,
+      "median": 5.4,
+      "p75": 7.14,
+      "p95": 10.11
+    },
+    "unmatchedSelfCount": 0,
+    "ambiguousCount": 0,
+    "pairs": [
+      {
+        "scenario": "session-detail-cold",
+        "run": 1,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 267.64,
+        "backendDurationMs": 262.27,
+        "selfHopOverheadMs": 5.37
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 2,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 27.04,
+        "backendDurationMs": 20.77,
+        "selfHopOverheadMs": 6.27
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 3,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 28.39,
+        "backendDurationMs": 21.52,
+        "selfHopOverheadMs": 6.87
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 4,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 27.25,
+        "backendDurationMs": 21.33,
+        "selfHopOverheadMs": 5.92
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 5,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 26.74,
+        "backendDurationMs": 17.72,
+        "selfHopOverheadMs": 9.02
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 6,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 18.47,
+        "backendDurationMs": 13.31,
+        "selfHopOverheadMs": 5.16
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 7,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 25.27,
+        "backendDurationMs": 19.88,
+        "selfHopOverheadMs": 5.39
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 8,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 18.13,
+        "backendDurationMs": 13.14,
+        "selfHopOverheadMs": 4.99
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 9,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 21.46,
+        "backendDurationMs": 12.62,
+        "selfHopOverheadMs": 8.84
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 10,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 16.48,
+        "backendDurationMs": 11.59,
+        "selfHopOverheadMs": 4.89
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 11,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 248.56,
+        "backendDurationMs": 236.97,
+        "selfHopOverheadMs": 11.59
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 12,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 131.68,
+        "backendDurationMs": 127.34,
+        "selfHopOverheadMs": 4.34
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 13,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 22.6,
+        "backendDurationMs": 17.2,
+        "selfHopOverheadMs": 5.4
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 14,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 34.52,
+        "backendDurationMs": 24.49,
+        "selfHopOverheadMs": 10.03
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 15,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 35.01,
+        "backendDurationMs": 29.63,
+        "selfHopOverheadMs": 5.38
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 16,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 33.47,
+        "backendDurationMs": 25.52,
+        "selfHopOverheadMs": 7.95
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 17,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 28.76,
+        "backendDurationMs": 21.99,
+        "selfHopOverheadMs": 6.77
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 18,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 26.12,
+        "backendDurationMs": 21.31,
+        "selfHopOverheadMs": 4.81
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 19,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 20.71,
+        "backendDurationMs": 15.99,
+        "selfHopOverheadMs": 4.72
+      },
+      {
+        "scenario": "session-detail-cold",
+        "run": 20,
+        "step": "detail-first",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 24.21,
+        "backendDurationMs": 19.73,
+        "selfHopOverheadMs": 4.48
+      }
+    ]
+  },
+  "extra": {
+    "fixture": null,
+    "blocker": null
+  }
+}

@@ -1,0 +1,4 @@
+[
+  "session-result was not measured. Public session detail is recorded separately as ssr-public-session-detail-fallback.",
+  "profile skipped: authenticated profile page requires cookie fixture."
+]

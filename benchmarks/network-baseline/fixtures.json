@@ -1,0 +1,7 @@
+{
+  "sessionId": "678",
+  "sessionStatus": "대기",
+  "sessionSource": "GET /api/sessions",
+  "completedSessionId": null,
+  "ssrPublicSessionDetailPath": "/session/678"
+}

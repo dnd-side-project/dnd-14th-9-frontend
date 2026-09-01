@@ -1,0 +1,152 @@
+{
+  "scenario": "session-result",
+  "measured": false,
+  "runs": [],
+  "documentTtfbMs": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "documentTtfbByRun": [],
+  "browserRequestCount": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "browserApiRequestCount": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "browserApiRequestCountByRun": [],
+  "browserApiRequestDistribution": {},
+  "backendRequestCount": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "backendRequestCountByRun": [],
+  "backendRequestDistribution": {},
+  "selfApiRequestCount": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "selfApiRequestCountByRun": [],
+  "backendDurationMs": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "selfApiDurationMs": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "backendSources": {},
+  "selfApiSources": {},
+  "sourceClassification": "heuristic",
+  "expectedRepeatedBrowserApi": [],
+  "expectedRepeatedBackend": [],
+  "duplicateBrowserApi": [],
+  "duplicateBackend": [],
+  "retryCandidateBrowserApi": [],
+  "retryCandidateBackend": [],
+  "tanstack": {
+    "queryFetchPerRun": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "median": null,
+      "p75": null,
+      "p95": null
+    },
+    "queryFetchTotal": 0,
+    "invalidatePerRun": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "median": null,
+      "p75": null,
+      "p95": null
+    },
+    "invalidateTotal": 0,
+    "setQueryDataPerRun": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "median": null,
+      "p75": null,
+      "p95": null
+    },
+    "setQueryDataTotal": 0,
+    "mutationEventPerRun": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "median": null,
+      "p75": null,
+      "p95": null
+    },
+    "mutationEventTotal": 0,
+    "queryFetchCount": 0,
+    "invalidateCount": 0,
+    "setQueryDataCount": 0,
+    "mutationEventCount": 0,
+    "queryKeysFetched": [],
+    "invalidateQueryKeys": []
+  },
+  "selfHop": {
+    "pairingStatus": "no-self-api",
+    "count": 0,
+    "overheadMs": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "median": null,
+      "p75": null,
+      "p95": null
+    },
+    "pairs": []
+  },
+  "extra": {
+    "fixture": null,
+    "blocker": {
+      "scenario": "session-result",
+      "reason": "Not measured due to unavailable safe authenticated benchmark fixture"
+    }
+  }
+}

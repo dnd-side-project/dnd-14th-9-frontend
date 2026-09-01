@@ -1,0 +1,18 @@
+[
+  {
+    "scenario": "session-result",
+    "reason": "Not measured due to unavailable safe authenticated benchmark fixture"
+  },
+  {
+    "scenario": "profile",
+    "reason": "Not measured due to unavailable safe authenticated benchmark fixture Missing BENCHMARK_ACCESS_TOKEN / BENCHMARK_REFRESH_TOKEN."
+  },
+  {
+    "scenario": "simple-mutation",
+    "reason": "Not measured due to unavailable safe authenticated benchmark fixture Mutation was not forced against real user data."
+  },
+  {
+    "scenario": "interactive-mutation",
+    "reason": "Not measured due to unavailable safe authenticated benchmark fixture Requires BENCHMARK_INTERACTIVE_SESSION_ID and BENCHMARK_INTERACTIVE_SUBTASK_ID."
+  }
+]

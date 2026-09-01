@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest --passWithNoTests",
     "test:auth-concurrency": "pnpm build && node scripts/auth-refresh-concurrency.mjs",
+    "benchmark:network-baseline": "node benchmarks/network-baseline/scripts/run-network-baseline.mjs",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "storybook": "storybook dev -p 6006",
