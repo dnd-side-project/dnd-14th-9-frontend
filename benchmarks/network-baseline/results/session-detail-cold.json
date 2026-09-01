@@ -1,0 +1,244 @@
+{
+  "scenario": "session-detail-cold",
+  "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "documentTtfbMs": {
+    "count": 10,
+    "min": 7.09,
+    "max": 11.72,
+    "mean": 8.3,
+    "median": 7.69,
+    "p75": 8.86,
+    "p95": 10.71
+  },
+  "documentTtfbByRun": [
+    {
+      "run": 1,
+      "value": 9.03
+    },
+    {
+      "run": 2,
+      "value": 7.33
+    },
+    {
+      "run": 3,
+      "value": 7.39
+    },
+    {
+      "run": 4,
+      "value": 7.41
+    },
+    {
+      "run": 5,
+      "value": 9.47
+    },
+    {
+      "run": 6,
+      "value": 8.34
+    },
+    {
+      "run": 7,
+      "value": 11.72
+    },
+    {
+      "run": 8,
+      "value": 7.2
+    },
+    {
+      "run": 9,
+      "value": 7.09
+    },
+    {
+      "run": 10,
+      "value": 7.97
+    }
+  ],
+  "browserRequestCount": {
+    "count": 10,
+    "min": 59,
+    "max": 61,
+    "mean": 60.8,
+    "median": 61,
+    "p75": 61,
+    "p95": 61
+  },
+  "browserApiRequestCount": {
+    "count": 10,
+    "min": 0,
+    "max": 0,
+    "mean": 0,
+    "median": 0,
+    "p75": 0,
+    "p95": 0
+  },
+  "browserApiRequestCountByRun": [
+    {
+      "run": 1,
+      "value": 0
+    },
+    {
+      "run": 2,
+      "value": 0
+    },
+    {
+      "run": 3,
+      "value": 0
+    },
+    {
+      "run": 4,
+      "value": 0
+    },
+    {
+      "run": 5,
+      "value": 0
+    },
+    {
+      "run": 6,
+      "value": 0
+    },
+    {
+      "run": 7,
+      "value": 0
+    },
+    {
+      "run": 8,
+      "value": 0
+    },
+    {
+      "run": 9,
+      "value": 0
+    },
+    {
+      "run": 10,
+      "value": 0
+    }
+  ],
+  "browserApiRequestDistribution": {
+    "0": 10
+  },
+  "backendRequestCount": {
+    "count": 10,
+    "min": 1,
+    "max": 1,
+    "mean": 1,
+    "median": 1,
+    "p75": 1,
+    "p95": 1
+  },
+  "backendRequestCountByRun": [
+    {
+      "run": 1,
+      "value": 1
+    },
+    {
+      "run": 2,
+      "value": 1
+    },
+    {
+      "run": 3,
+      "value": 1
+    },
+    {
+      "run": 4,
+      "value": 1
+    },
+    {
+      "run": 5,
+      "value": 1
+    },
+    {
+      "run": 6,
+      "value": 1
+    },
+    {
+      "run": 7,
+      "value": 1
+    },
+    {
+      "run": 8,
+      "value": 1
+    },
+    {
+      "run": 9,
+      "value": 1
+    },
+    {
+      "run": 10,
+      "value": 1
+    }
+  ],
+  "backendRequestDistribution": {
+    "1": 10
+  },
+  "selfApiRequestCount": {
+    "count": 10,
+    "min": 1,
+    "max": 1,
+    "mean": 1,
+    "median": 1,
+    "p75": 1,
+    "p95": 1
+  },
+  "selfApiRequestCountByRun": [
+    {
+      "run": 1,
+      "value": 1
+    },
+    {
+      "run": 2,
+      "value": 1
+    },
+    {
+      "run": 3,
+      "value": 1
+    },
+    {
+      "run": 4,
+      "value": 1
+    },
+    {
+      "run": 5,
+      "value": 1
+    },
+    {
+      "run": 6,
+      "value": 1
+    },
+    {
+      "run": 7,
+      "value": 1
+    },
+    {
+      "run": 8,
+      "value": 1
+    },
+    {
+      "run": 9,
+      "value": 1
+    },
+    {
+      "run": 10,
+      "value": 1
+    }
+  ],
+  "backendSources": {
+    "route-handler": 10
+  },
+  "selfApiSources": {
+    "server-component": 10
+  },
+  "duplicateBrowserApi": [],
+  "duplicateBackend": [],
+  "tanstack": {
+    "queryFetchCount": 0,
+    "invalidateCount": 0,
+    "setQueryDataCount": 0,
+    "mutationEventCount": 0,
+    "queryKeysFetched": [],
+    "invalidateQueryKeys": []
+  },
+  "retryLikeBackend": 0,
+  "extra": {
+    "fixture": null,
+    "blocker": null
+  }
+}

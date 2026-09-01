@@ -1,0 +1,18 @@
+[
+  {
+    "scenario": "session-result",
+    "reason": "No auth fixture. Used public session detail /session/678 as the closest SSR-heavy page instead of /session/:id/result."
+  },
+  {
+    "scenario": "profile",
+    "reason": "BENCHMARK_ACCESS_TOKEN / BENCHMARK_REFRESH_TOKEN were not provided."
+  },
+  {
+    "scenario": "simple-mutation",
+    "reason": "No authenticated test fixture. Mutation was not forced against real user data."
+  },
+  {
+    "scenario": "interactive-mutation",
+    "reason": "Requires auth cookies plus BENCHMARK_INTERACTIVE_SESSION_ID and BENCHMARK_INTERACTIVE_SUBTASK_ID. No safe in-progress fixture was available."
+  }
+]

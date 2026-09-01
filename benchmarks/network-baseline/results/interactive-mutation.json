@@ -1,0 +1,75 @@
+{
+  "scenario": "interactive-mutation",
+  "runs": [],
+  "documentTtfbMs": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "documentTtfbByRun": [],
+  "browserRequestCount": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "browserApiRequestCount": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "browserApiRequestCountByRun": [],
+  "browserApiRequestDistribution": {},
+  "backendRequestCount": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "backendRequestCountByRun": [],
+  "backendRequestDistribution": {},
+  "selfApiRequestCount": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
+  "selfApiRequestCountByRun": [],
+  "backendSources": {},
+  "selfApiSources": {},
+  "duplicateBrowserApi": [],
+  "duplicateBackend": [],
+  "tanstack": {
+    "queryFetchCount": 0,
+    "invalidateCount": 0,
+    "setQueryDataCount": 0,
+    "mutationEventCount": 0,
+    "queryKeysFetched": [],
+    "invalidateQueryKeys": []
+  },
+  "retryLikeBackend": 0,
+  "extra": {
+    "fixture": null,
+    "blocker": {
+      "scenario": "interactive-mutation",
+      "reason": "Requires auth cookies plus BENCHMARK_INTERACTIVE_SESSION_ID and BENCHMARK_INTERACTIVE_SUBTASK_ID. No safe in-progress fixture was available."
+    }
+  }
+}

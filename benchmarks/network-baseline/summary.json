@@ -1,0 +1,1245 @@
+{
+  "generatedAt": "2026-09-01T13:32:14.999Z",
+  "gitSha": "6c4daca3c0cd99928526a0774de8fa646875d6f1",
+  "fixtures": {
+    "sessionId": "678",
+    "sessionStatus": "대기",
+    "sessionSource": "GET /api/sessions",
+    "sessionResultPage": "/session/678"
+  },
+  "blockers": [
+    {
+      "scenario": "session-result",
+      "reason": "No auth fixture. Used public session detail /session/678 as the closest SSR-heavy page instead of /session/:id/result."
+    },
+    {
+      "scenario": "profile",
+      "reason": "BENCHMARK_ACCESS_TOKEN / BENCHMARK_REFRESH_TOKEN were not provided."
+    },
+    {
+      "scenario": "simple-mutation",
+      "reason": "No authenticated test fixture. Mutation was not forced against real user data."
+    },
+    {
+      "scenario": "interactive-mutation",
+      "reason": "Requires auth cookies plus BENCHMARK_INTERACTIVE_SESSION_ID and BENCHMARK_INTERACTIVE_SUBTASK_ID. No safe in-progress fixture was available."
+    }
+  ],
+  "scenarios": {
+    "home-cold": {
+      "scenario": "home-cold",
+      "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "documentTtfbMs": {
+        "count": 10,
+        "min": 7.82,
+        "max": 11.69,
+        "mean": 9.44,
+        "median": 9.56,
+        "p75": 10.08,
+        "p95": 11.03
+      },
+      "documentTtfbByRun": [
+        {
+          "run": 1,
+          "value": 10.16
+        },
+        {
+          "run": 2,
+          "value": 9.48
+        },
+        {
+          "run": 3,
+          "value": 7.82
+        },
+        {
+          "run": 4,
+          "value": 8.27
+        },
+        {
+          "run": 5,
+          "value": 10.22
+        },
+        {
+          "run": 6,
+          "value": 11.69
+        },
+        {
+          "run": 7,
+          "value": 9.1
+        },
+        {
+          "run": 8,
+          "value": 8.2
+        },
+        {
+          "run": 9,
+          "value": 9.63
+        },
+        {
+          "run": 10,
+          "value": 9.84
+        }
+      ],
+      "browserRequestCount": {
+        "count": 10,
+        "min": 53,
+        "max": 53,
+        "mean": 53,
+        "median": 53,
+        "p75": 53,
+        "p95": 53
+      },
+      "browserApiRequestCount": {
+        "count": 10,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1
+      },
+      "browserApiRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 1
+        },
+        {
+          "run": 2,
+          "value": 1
+        },
+        {
+          "run": 3,
+          "value": 1
+        },
+        {
+          "run": 4,
+          "value": 1
+        },
+        {
+          "run": 5,
+          "value": 1
+        },
+        {
+          "run": 6,
+          "value": 1
+        },
+        {
+          "run": 7,
+          "value": 1
+        },
+        {
+          "run": 8,
+          "value": 1
+        },
+        {
+          "run": 9,
+          "value": 1
+        },
+        {
+          "run": 10,
+          "value": 1
+        }
+      ],
+      "browserApiRequestDistribution": {
+        "1": 10
+      },
+      "backendRequestCount": {
+        "count": 10,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1
+      },
+      "backendRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 1
+        },
+        {
+          "run": 2,
+          "value": 1
+        },
+        {
+          "run": 3,
+          "value": 1
+        },
+        {
+          "run": 4,
+          "value": 1
+        },
+        {
+          "run": 5,
+          "value": 1
+        },
+        {
+          "run": 6,
+          "value": 1
+        },
+        {
+          "run": 7,
+          "value": 1
+        },
+        {
+          "run": 8,
+          "value": 1
+        },
+        {
+          "run": 9,
+          "value": 1
+        },
+        {
+          "run": 10,
+          "value": 1
+        }
+      ],
+      "backendRequestDistribution": {
+        "1": 10
+      },
+      "selfApiRequestCount": {
+        "count": 10,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0
+      },
+      "selfApiRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 0
+        },
+        {
+          "run": 2,
+          "value": 0
+        },
+        {
+          "run": 3,
+          "value": 0
+        },
+        {
+          "run": 4,
+          "value": 0
+        },
+        {
+          "run": 5,
+          "value": 0
+        },
+        {
+          "run": 6,
+          "value": 0
+        },
+        {
+          "run": 7,
+          "value": 0
+        },
+        {
+          "run": 8,
+          "value": 0
+        },
+        {
+          "run": 9,
+          "value": 0
+        },
+        {
+          "run": 10,
+          "value": 0
+        }
+      ],
+      "backendSources": {
+        "route-handler": 10
+      },
+      "selfApiSources": {},
+      "duplicateBrowserApi": [],
+      "duplicateBackend": [],
+      "tanstack": {
+        "queryFetchCount": 10,
+        "invalidateCount": 0,
+        "setQueryDataCount": 0,
+        "mutationEventCount": 0,
+        "queryKeysFetched": ["[\"session\",\"list\",{\"page\":1,\"size\":8,\"sort\":\"POPULAR\"}]"],
+        "invalidateQueryKeys": []
+      },
+      "retryLikeBackend": 0,
+      "extra": {
+        "fixture": null,
+        "blocker": null
+      }
+    },
+    "session-detail-cold": {
+      "scenario": "session-detail-cold",
+      "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "documentTtfbMs": {
+        "count": 10,
+        "min": 7.09,
+        "max": 11.72,
+        "mean": 8.3,
+        "median": 7.69,
+        "p75": 8.86,
+        "p95": 10.71
+      },
+      "documentTtfbByRun": [
+        {
+          "run": 1,
+          "value": 9.03
+        },
+        {
+          "run": 2,
+          "value": 7.33
+        },
+        {
+          "run": 3,
+          "value": 7.39
+        },
+        {
+          "run": 4,
+          "value": 7.41
+        },
+        {
+          "run": 5,
+          "value": 9.47
+        },
+        {
+          "run": 6,
+          "value": 8.34
+        },
+        {
+          "run": 7,
+          "value": 11.72
+        },
+        {
+          "run": 8,
+          "value": 7.2
+        },
+        {
+          "run": 9,
+          "value": 7.09
+        },
+        {
+          "run": 10,
+          "value": 7.97
+        }
+      ],
+      "browserRequestCount": {
+        "count": 10,
+        "min": 59,
+        "max": 61,
+        "mean": 60.8,
+        "median": 61,
+        "p75": 61,
+        "p95": 61
+      },
+      "browserApiRequestCount": {
+        "count": 10,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0
+      },
+      "browserApiRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 0
+        },
+        {
+          "run": 2,
+          "value": 0
+        },
+        {
+          "run": 3,
+          "value": 0
+        },
+        {
+          "run": 4,
+          "value": 0
+        },
+        {
+          "run": 5,
+          "value": 0
+        },
+        {
+          "run": 6,
+          "value": 0
+        },
+        {
+          "run": 7,
+          "value": 0
+        },
+        {
+          "run": 8,
+          "value": 0
+        },
+        {
+          "run": 9,
+          "value": 0
+        },
+        {
+          "run": 10,
+          "value": 0
+        }
+      ],
+      "browserApiRequestDistribution": {
+        "0": 10
+      },
+      "backendRequestCount": {
+        "count": 10,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1
+      },
+      "backendRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 1
+        },
+        {
+          "run": 2,
+          "value": 1
+        },
+        {
+          "run": 3,
+          "value": 1
+        },
+        {
+          "run": 4,
+          "value": 1
+        },
+        {
+          "run": 5,
+          "value": 1
+        },
+        {
+          "run": 6,
+          "value": 1
+        },
+        {
+          "run": 7,
+          "value": 1
+        },
+        {
+          "run": 8,
+          "value": 1
+        },
+        {
+          "run": 9,
+          "value": 1
+        },
+        {
+          "run": 10,
+          "value": 1
+        }
+      ],
+      "backendRequestDistribution": {
+        "1": 10
+      },
+      "selfApiRequestCount": {
+        "count": 10,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1
+      },
+      "selfApiRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 1
+        },
+        {
+          "run": 2,
+          "value": 1
+        },
+        {
+          "run": 3,
+          "value": 1
+        },
+        {
+          "run": 4,
+          "value": 1
+        },
+        {
+          "run": 5,
+          "value": 1
+        },
+        {
+          "run": 6,
+          "value": 1
+        },
+        {
+          "run": 7,
+          "value": 1
+        },
+        {
+          "run": 8,
+          "value": 1
+        },
+        {
+          "run": 9,
+          "value": 1
+        },
+        {
+          "run": 10,
+          "value": 1
+        }
+      ],
+      "backendSources": {
+        "route-handler": 10
+      },
+      "selfApiSources": {
+        "server-component": 10
+      },
+      "duplicateBrowserApi": [],
+      "duplicateBackend": [],
+      "tanstack": {
+        "queryFetchCount": 0,
+        "invalidateCount": 0,
+        "setQueryDataCount": 0,
+        "mutationEventCount": 0,
+        "queryKeysFetched": [],
+        "invalidateQueryKeys": []
+      },
+      "retryLikeBackend": 0,
+      "extra": {
+        "fixture": null,
+        "blocker": null
+      }
+    },
+    "session-detail-warm": {
+      "scenario": "session-detail-warm",
+      "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "documentTtfbMs": {
+        "count": 10,
+        "min": 6.51,
+        "max": 10.06,
+        "mean": 8.8,
+        "median": 8.87,
+        "p75": 9.72,
+        "p95": 10.05
+      },
+      "documentTtfbByRun": [
+        {
+          "run": 1,
+          "value": 8.76
+        },
+        {
+          "run": 2,
+          "value": 8.56
+        },
+        {
+          "run": 3,
+          "value": 8.71
+        },
+        {
+          "run": 4,
+          "value": 10.03
+        },
+        {
+          "run": 5,
+          "value": 8.98
+        },
+        {
+          "run": 6,
+          "value": 6.51
+        },
+        {
+          "run": 7,
+          "value": 10.06
+        },
+        {
+          "run": 8,
+          "value": 7.02
+        },
+        {
+          "run": 9,
+          "value": 9.68
+        },
+        {
+          "run": 10,
+          "value": 9.73
+        }
+      ],
+      "browserRequestCount": {
+        "count": 10,
+        "min": 70,
+        "max": 70,
+        "mean": 70,
+        "median": 70,
+        "p75": 70,
+        "p95": 70
+      },
+      "browserApiRequestCount": {
+        "count": 10,
+        "min": 3,
+        "max": 3,
+        "mean": 3,
+        "median": 3,
+        "p75": 3,
+        "p95": 3
+      },
+      "browserApiRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 3
+        },
+        {
+          "run": 2,
+          "value": 3
+        },
+        {
+          "run": 3,
+          "value": 3
+        },
+        {
+          "run": 4,
+          "value": 3
+        },
+        {
+          "run": 5,
+          "value": 3
+        },
+        {
+          "run": 6,
+          "value": 3
+        },
+        {
+          "run": 7,
+          "value": 3
+        },
+        {
+          "run": 8,
+          "value": 3
+        },
+        {
+          "run": 9,
+          "value": 3
+        },
+        {
+          "run": 10,
+          "value": 3
+        }
+      ],
+      "browserApiRequestDistribution": {
+        "3": 10
+      },
+      "backendRequestCount": {
+        "count": 10,
+        "min": 3,
+        "max": 3,
+        "mean": 3,
+        "median": 3,
+        "p75": 3,
+        "p95": 3
+      },
+      "backendRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 3
+        },
+        {
+          "run": 2,
+          "value": 3
+        },
+        {
+          "run": 3,
+          "value": 3
+        },
+        {
+          "run": 4,
+          "value": 3
+        },
+        {
+          "run": 5,
+          "value": 3
+        },
+        {
+          "run": 6,
+          "value": 3
+        },
+        {
+          "run": 7,
+          "value": 3
+        },
+        {
+          "run": 8,
+          "value": 3
+        },
+        {
+          "run": 9,
+          "value": 3
+        },
+        {
+          "run": 10,
+          "value": 3
+        }
+      ],
+      "backendRequestDistribution": {
+        "3": 10
+      },
+      "selfApiRequestCount": {
+        "count": 10,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0
+      },
+      "selfApiRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 0
+        },
+        {
+          "run": 2,
+          "value": 0
+        },
+        {
+          "run": 3,
+          "value": 0
+        },
+        {
+          "run": 4,
+          "value": 0
+        },
+        {
+          "run": 5,
+          "value": 0
+        },
+        {
+          "run": 6,
+          "value": 0
+        },
+        {
+          "run": 7,
+          "value": 0
+        },
+        {
+          "run": 8,
+          "value": 0
+        },
+        {
+          "run": 9,
+          "value": 0
+        },
+        {
+          "run": 10,
+          "value": 0
+        }
+      ],
+      "backendSources": {
+        "route-handler": 30
+      },
+      "selfApiSources": {},
+      "duplicateBrowserApi": [
+        {
+          "key": "GET /api/sessions/678",
+          "countPerRun": 2,
+          "runs": 10
+        }
+      ],
+      "duplicateBackend": [
+        {
+          "key": "GET /sessions/678",
+          "countPerRun": 2,
+          "runs": 10
+        }
+      ],
+      "tanstack": {
+        "queryFetchCount": 30,
+        "invalidateCount": 0,
+        "setQueryDataCount": 0,
+        "mutationEventCount": 0,
+        "queryKeysFetched": [
+          "[\"session\",\"list\",{\"page\":1,\"size\":8,\"sort\":\"POPULAR\"}]",
+          "[\"session\",\"detail\",\"678\"]"
+        ],
+        "invalidateQueryKeys": []
+      },
+      "retryLikeBackend": 0,
+      "extra": {
+        "fixture": null,
+        "blocker": null
+      }
+    },
+    "session-result": {
+      "scenario": "session-result",
+      "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "documentTtfbMs": {
+        "count": 10,
+        "min": 7.64,
+        "max": 15.24,
+        "mean": 10,
+        "median": 9.09,
+        "p75": 11.07,
+        "p95": 13.71
+      },
+      "documentTtfbByRun": [
+        {
+          "run": 1,
+          "value": 8.28
+        },
+        {
+          "run": 2,
+          "value": 9.18
+        },
+        {
+          "run": 3,
+          "value": 9
+        },
+        {
+          "run": 4,
+          "value": 11.43
+        },
+        {
+          "run": 5,
+          "value": 11.85
+        },
+        {
+          "run": 6,
+          "value": 15.24
+        },
+        {
+          "run": 7,
+          "value": 8.91
+        },
+        {
+          "run": 8,
+          "value": 9.98
+        },
+        {
+          "run": 9,
+          "value": 8.54
+        },
+        {
+          "run": 10,
+          "value": 7.64
+        }
+      ],
+      "browserRequestCount": {
+        "count": 10,
+        "min": 61,
+        "max": 61,
+        "mean": 61,
+        "median": 61,
+        "p75": 61,
+        "p95": 61
+      },
+      "browserApiRequestCount": {
+        "count": 10,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0
+      },
+      "browserApiRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 0
+        },
+        {
+          "run": 2,
+          "value": 0
+        },
+        {
+          "run": 3,
+          "value": 0
+        },
+        {
+          "run": 4,
+          "value": 0
+        },
+        {
+          "run": 5,
+          "value": 0
+        },
+        {
+          "run": 6,
+          "value": 0
+        },
+        {
+          "run": 7,
+          "value": 0
+        },
+        {
+          "run": 8,
+          "value": 0
+        },
+        {
+          "run": 9,
+          "value": 0
+        },
+        {
+          "run": 10,
+          "value": 0
+        }
+      ],
+      "browserApiRequestDistribution": {
+        "0": 10
+      },
+      "backendRequestCount": {
+        "count": 10,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1
+      },
+      "backendRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 1
+        },
+        {
+          "run": 2,
+          "value": 1
+        },
+        {
+          "run": 3,
+          "value": 1
+        },
+        {
+          "run": 4,
+          "value": 1
+        },
+        {
+          "run": 5,
+          "value": 1
+        },
+        {
+          "run": 6,
+          "value": 1
+        },
+        {
+          "run": 7,
+          "value": 1
+        },
+        {
+          "run": 8,
+          "value": 1
+        },
+        {
+          "run": 9,
+          "value": 1
+        },
+        {
+          "run": 10,
+          "value": 1
+        }
+      ],
+      "backendRequestDistribution": {
+        "1": 10
+      },
+      "selfApiRequestCount": {
+        "count": 10,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1
+      },
+      "selfApiRequestCountByRun": [
+        {
+          "run": 1,
+          "value": 1
+        },
+        {
+          "run": 2,
+          "value": 1
+        },
+        {
+          "run": 3,
+          "value": 1
+        },
+        {
+          "run": 4,
+          "value": 1
+        },
+        {
+          "run": 5,
+          "value": 1
+        },
+        {
+          "run": 6,
+          "value": 1
+        },
+        {
+          "run": 7,
+          "value": 1
+        },
+        {
+          "run": 8,
+          "value": 1
+        },
+        {
+          "run": 9,
+          "value": 1
+        },
+        {
+          "run": 10,
+          "value": 1
+        }
+      ],
+      "backendSources": {
+        "route-handler": 10
+      },
+      "selfApiSources": {
+        "server-component": 10
+      },
+      "duplicateBrowserApi": [],
+      "duplicateBackend": [],
+      "tanstack": {
+        "queryFetchCount": 0,
+        "invalidateCount": 0,
+        "setQueryDataCount": 0,
+        "mutationEventCount": 0,
+        "queryKeysFetched": [],
+        "invalidateQueryKeys": []
+      },
+      "retryLikeBackend": 0,
+      "extra": {
+        "fixture": null,
+        "blocker": {
+          "scenario": "session-result",
+          "reason": "No auth fixture. Used public session detail /session/678 as the closest SSR-heavy page instead of /session/:id/result."
+        }
+      }
+    },
+    "profile": {
+      "scenario": "profile",
+      "runs": [],
+      "documentTtfbMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "documentTtfbByRun": [],
+      "browserRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "browserApiRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "browserApiRequestCountByRun": [],
+      "browserApiRequestDistribution": {},
+      "backendRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "backendRequestCountByRun": [],
+      "backendRequestDistribution": {},
+      "selfApiRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "selfApiRequestCountByRun": [],
+      "backendSources": {},
+      "selfApiSources": {},
+      "duplicateBrowserApi": [],
+      "duplicateBackend": [],
+      "tanstack": {
+        "queryFetchCount": 0,
+        "invalidateCount": 0,
+        "setQueryDataCount": 0,
+        "mutationEventCount": 0,
+        "queryKeysFetched": [],
+        "invalidateQueryKeys": []
+      },
+      "retryLikeBackend": 0,
+      "extra": {
+        "fixture": null,
+        "blocker": {
+          "scenario": "profile",
+          "reason": "BENCHMARK_ACCESS_TOKEN / BENCHMARK_REFRESH_TOKEN were not provided."
+        }
+      }
+    },
+    "simple-mutation": {
+      "scenario": "simple-mutation",
+      "runs": [],
+      "documentTtfbMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "documentTtfbByRun": [],
+      "browserRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "browserApiRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "browserApiRequestCountByRun": [],
+      "browserApiRequestDistribution": {},
+      "backendRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "backendRequestCountByRun": [],
+      "backendRequestDistribution": {},
+      "selfApiRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "selfApiRequestCountByRun": [],
+      "backendSources": {},
+      "selfApiSources": {},
+      "duplicateBrowserApi": [],
+      "duplicateBackend": [],
+      "tanstack": {
+        "queryFetchCount": 0,
+        "invalidateCount": 0,
+        "setQueryDataCount": 0,
+        "mutationEventCount": 0,
+        "queryKeysFetched": [],
+        "invalidateQueryKeys": []
+      },
+      "retryLikeBackend": 0,
+      "extra": {
+        "fixture": null,
+        "blocker": {
+          "scenario": "simple-mutation",
+          "reason": "No authenticated test fixture. Mutation was not forced against real user data."
+        }
+      }
+    },
+    "interactive-mutation": {
+      "scenario": "interactive-mutation",
+      "runs": [],
+      "documentTtfbMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "documentTtfbByRun": [],
+      "browserRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "browserApiRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "browserApiRequestCountByRun": [],
+      "browserApiRequestDistribution": {},
+      "backendRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "backendRequestCountByRun": [],
+      "backendRequestDistribution": {},
+      "selfApiRequestCount": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "median": null,
+        "p75": null,
+        "p95": null
+      },
+      "selfApiRequestCountByRun": [],
+      "backendSources": {},
+      "selfApiSources": {},
+      "duplicateBrowserApi": [],
+      "duplicateBackend": [],
+      "tanstack": {
+        "queryFetchCount": 0,
+        "invalidateCount": 0,
+        "setQueryDataCount": 0,
+        "mutationEventCount": 0,
+        "queryKeysFetched": [],
+        "invalidateQueryKeys": []
+      },
+      "retryLikeBackend": 0,
+      "extra": {
+        "fixture": null,
+        "blocker": {
+          "scenario": "interactive-mutation",
+          "reason": "Requires auth cookies plus BENCHMARK_INTERACTIVE_SESSION_ID and BENCHMARK_INTERACTIVE_SUBTASK_ID. No safe in-progress fixture was available."
+        }
+      }
+    }
+  }
+}
