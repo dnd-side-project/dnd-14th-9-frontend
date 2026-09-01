@@ -11,6 +11,7 @@ import { QueryProvider } from "@/providers/QueryProvider";
 
 import { geistMono, geistSans, pretendard } from "./fonts";
 import "./globals.css";
+import { PretendardFontLoader } from "./PretendardFontLoader";
 
 export const metadata = rootMetadata;
 
@@ -29,6 +30,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${pretendard.variable} bg-background-default font-sans antialiased`}
       >
+        <PretendardFontLoader />
         {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ? (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS} />
         ) : null}
