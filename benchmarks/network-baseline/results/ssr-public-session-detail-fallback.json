@@ -1,106 +1,106 @@
 {
-  "scenario": "session-detail-cold",
+  "scenario": "ssr-public-session-detail-fallback",
   "measured": true,
   "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
   "documentTtfbMs": {
     "count": 20,
-    "min": 7.48,
-    "max": 26.55,
-    "mean": 10.19,
-    "median": 9.46,
-    "p75": 9.92,
-    "p95": 13.08
+    "min": 6.15,
+    "max": 10.32,
+    "mean": 7.9,
+    "median": 7.73,
+    "p75": 8.94,
+    "p95": 9.35
   },
   "documentTtfbByRun": [
     {
       "run": 1,
-      "value": 9.36
+      "value": 9.3
     },
     {
       "run": 2,
-      "value": 9.96
+      "value": 8.92
     },
     {
       "run": 3,
-      "value": 9.86
+      "value": 8.33
     },
     {
       "run": 4,
-      "value": 9.65
+      "value": 9.01
     },
     {
       "run": 5,
-      "value": 11.58
+      "value": 7.11
     },
     {
       "run": 6,
-      "value": 9.05
+      "value": 10.32
     },
     {
       "run": 7,
-      "value": 9.49
+      "value": 9.25
     },
     {
       "run": 8,
-      "value": 7.74
+      "value": 7.83
     },
     {
       "run": 9,
-      "value": 9.44
+      "value": 7.76
     },
     {
       "run": 10,
-      "value": 7.48
+      "value": 7.67
     },
     {
       "run": 11,
-      "value": 26.55
+      "value": 8.47
     },
     {
       "run": 12,
-      "value": 9.91
+      "value": 6.46
     },
     {
       "run": 13,
-      "value": 7.71
+      "value": 6.22
     },
     {
       "run": 14,
-      "value": 12.37
+      "value": 7.7
     },
     {
       "run": 15,
-      "value": 8.26
+      "value": 6.78
     },
     {
       "run": 16,
-      "value": 10.47
+      "value": 7.12
     },
     {
       "run": 17,
-      "value": 9.48
+      "value": 9.26
     },
     {
       "run": 18,
-      "value": 7.89
+      "value": 6.15
     },
     {
       "run": 19,
-      "value": 8.12
+      "value": 7.43
     },
     {
       "run": 20,
-      "value": 9.36
+      "value": 6.9
     }
   ],
   "browserRequestCount": {
     "count": 20,
-    "min": 59,
+    "min": 57,
     "max": 63,
-    "mean": 61.1,
+    "mean": 61,
     "median": 61,
-    "p75": 61,
-    "p95": 63
+    "p75": 61.25,
+    "p95": 62.05
   },
   "browserApiRequestCount": {
     "count": 20,
@@ -383,21 +383,21 @@
   ],
   "backendDurationMs": {
     "count": 20,
-    "min": 11.59,
-    "max": 262.27,
-    "mean": 47.72,
-    "median": 21.04,
-    "p75": 24.75,
-    "p95": 238.24
+    "min": 12.51,
+    "max": 84.63,
+    "mean": 21.38,
+    "median": 18.2,
+    "p75": 21.03,
+    "p95": 28.82
   },
   "selfApiDurationMs": {
     "count": 20,
-    "min": 16.48,
-    "max": 267.64,
-    "mean": 54.13,
-    "median": 26.89,
-    "p75": 33.73,
-    "p95": 249.51
+    "min": 17.28,
+    "max": 88.26,
+    "mean": 26.91,
+    "median": 23.46,
+    "p75": 25.12,
+    "p95": 35.99
   },
   "backendSources": {
     "route-handler": 20
@@ -465,235 +465,235 @@
     "count": 20,
     "overheadMs": {
       "count": 20,
-      "min": 4.34,
-      "max": 11.59,
-      "mean": 6.41,
-      "median": 5.4,
-      "p75": 7.14,
-      "p95": 10.11
+      "min": 3.63,
+      "max": 8.94,
+      "mean": 5.53,
+      "median": 5.15,
+      "p75": 6.2,
+      "p95": 8.69
     },
     "unmatchedSelfCount": 0,
     "ambiguousCount": 0,
     "pairs": [
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 1,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 267.64,
-        "backendDurationMs": 262.27,
-        "selfHopOverheadMs": 5.37
+        "selfApiDurationMs": 23.01,
+        "backendDurationMs": 14.33,
+        "selfHopOverheadMs": 8.68
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 2,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 27.04,
-        "backendDurationMs": 20.77,
-        "selfHopOverheadMs": 6.27
+        "selfApiDurationMs": 21.13,
+        "backendDurationMs": 15.71,
+        "selfHopOverheadMs": 5.42
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 3,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 28.39,
-        "backendDurationMs": 21.52,
-        "selfHopOverheadMs": 6.87
+        "selfApiDurationMs": 33.24,
+        "backendDurationMs": 25.88,
+        "selfHopOverheadMs": 7.36
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 4,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 27.25,
-        "backendDurationMs": 21.33,
-        "selfHopOverheadMs": 5.92
+        "selfApiDurationMs": 24.55,
+        "backendDurationMs": 19.22,
+        "selfHopOverheadMs": 5.33
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 5,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 26.74,
-        "backendDurationMs": 17.72,
-        "selfHopOverheadMs": 9.02
+        "selfApiDurationMs": 23.91,
+        "backendDurationMs": 17.94,
+        "selfHopOverheadMs": 5.97
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 6,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 18.47,
-        "backendDurationMs": 13.31,
+        "selfApiDurationMs": 33.08,
+        "backendDurationMs": 24.14,
+        "selfHopOverheadMs": 8.94
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 7,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 20.23,
+        "backendDurationMs": 13.35,
+        "selfHopOverheadMs": 6.88
+      },
+      {
+        "scenario": "ssr-public-session-detail-fallback",
+        "run": 8,
+        "step": "ssr-document",
+        "method": "GET",
+        "selfPath": "/api/sessions/678",
+        "backendPath": "/sessions/678",
+        "selfApiDurationMs": 21.64,
+        "backendDurationMs": 16.48,
         "selfHopOverheadMs": 5.16
       },
       {
-        "scenario": "session-detail-cold",
-        "run": 7,
-        "step": "detail-first",
-        "method": "GET",
-        "selfPath": "/api/sessions/678",
-        "backendPath": "/sessions/678",
-        "selfApiDurationMs": 25.27,
-        "backendDurationMs": 19.88,
-        "selfHopOverheadMs": 5.39
-      },
-      {
-        "scenario": "session-detail-cold",
-        "run": 8,
-        "step": "detail-first",
-        "method": "GET",
-        "selfPath": "/api/sessions/678",
-        "backendPath": "/sessions/678",
-        "selfApiDurationMs": 18.13,
-        "backendDurationMs": 13.14,
-        "selfHopOverheadMs": 4.99
-      },
-      {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 9,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 21.46,
-        "backendDurationMs": 12.62,
-        "selfHopOverheadMs": 8.84
+        "selfApiDurationMs": 26.24,
+        "backendDurationMs": 21.63,
+        "selfHopOverheadMs": 4.61
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 10,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 16.48,
-        "backendDurationMs": 11.59,
-        "selfHopOverheadMs": 4.89
+        "selfApiDurationMs": 88.26,
+        "backendDurationMs": 84.63,
+        "selfHopOverheadMs": 3.63
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 11,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 248.56,
-        "backendDurationMs": 236.97,
-        "selfHopOverheadMs": 11.59
+        "selfApiDurationMs": 18.78,
+        "backendDurationMs": 14.24,
+        "selfHopOverheadMs": 4.54
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 12,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 131.68,
-        "backendDurationMs": 127.34,
-        "selfHopOverheadMs": 4.34
+        "selfApiDurationMs": 19.9,
+        "backendDurationMs": 15.94,
+        "selfHopOverheadMs": 3.96
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 13,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 22.6,
-        "backendDurationMs": 17.2,
-        "selfHopOverheadMs": 5.4
+        "selfApiDurationMs": 23,
+        "backendDurationMs": 18.47,
+        "selfHopOverheadMs": 4.53
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 14,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 34.52,
-        "backendDurationMs": 24.49,
-        "selfHopOverheadMs": 10.03
+        "selfApiDurationMs": 24.73,
+        "backendDurationMs": 19.6,
+        "selfHopOverheadMs": 5.13
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 15,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 35.01,
-        "backendDurationMs": 29.63,
-        "selfHopOverheadMs": 5.38
+        "selfApiDurationMs": 24.55,
+        "backendDurationMs": 20.12,
+        "selfHopOverheadMs": 4.43
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 16,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 33.47,
-        "backendDurationMs": 25.52,
-        "selfHopOverheadMs": 7.95
+        "selfApiDurationMs": 20.89,
+        "backendDurationMs": 15.57,
+        "selfHopOverheadMs": 5.32
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 17,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 28.76,
-        "backendDurationMs": 21.99,
-        "selfHopOverheadMs": 6.77
+        "selfApiDurationMs": 29.65,
+        "backendDurationMs": 22.71,
+        "selfHopOverheadMs": 6.94
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 18,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 26.12,
-        "backendDurationMs": 21.31,
-        "selfHopOverheadMs": 4.81
+        "selfApiDurationMs": 24.75,
+        "backendDurationMs": 20.83,
+        "selfHopOverheadMs": 3.92
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 19,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 20.71,
-        "backendDurationMs": 15.99,
-        "selfHopOverheadMs": 4.72
+        "selfApiDurationMs": 17.28,
+        "backendDurationMs": 12.51,
+        "selfHopOverheadMs": 4.77
       },
       {
-        "scenario": "session-detail-cold",
+        "scenario": "ssr-public-session-detail-fallback",
         "run": 20,
-        "step": "detail-first",
+        "step": "ssr-document",
         "method": "GET",
         "selfPath": "/api/sessions/678",
         "backendPath": "/sessions/678",
-        "selfApiDurationMs": 24.21,
-        "backendDurationMs": 19.73,
-        "selfHopOverheadMs": 4.48
+        "selfApiDurationMs": 19.3,
+        "backendDurationMs": 14.3,
+        "selfHopOverheadMs": 5
       }
     ]
   },

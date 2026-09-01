@@ -1,18 +1,18 @@
 [
   {
     "scenario": "session-result",
-    "reason": "No auth fixture. Used public session detail /session/678 as the closest SSR-heavy page instead of /session/:id/result."
+    "reason": "Not measured due to unavailable safe authenticated benchmark fixture"
   },
   {
     "scenario": "profile",
-    "reason": "BENCHMARK_ACCESS_TOKEN / BENCHMARK_REFRESH_TOKEN were not provided."
+    "reason": "Not measured due to unavailable safe authenticated benchmark fixture Missing BENCHMARK_ACCESS_TOKEN / BENCHMARK_REFRESH_TOKEN."
   },
   {
     "scenario": "simple-mutation",
-    "reason": "No authenticated test fixture. Mutation was not forced against real user data."
+    "reason": "Not measured due to unavailable safe authenticated benchmark fixture Mutation was not forced against real user data."
   },
   {
     "scenario": "interactive-mutation",
-    "reason": "Requires auth cookies plus BENCHMARK_INTERACTIVE_SESSION_ID and BENCHMARK_INTERACTIVE_SUBTASK_ID. No safe in-progress fixture was available."
+    "reason": "Not measured due to unavailable safe authenticated benchmark fixture Requires BENCHMARK_INTERACTIVE_SESSION_ID and BENCHMARK_INTERACTIVE_SUBTASK_ID."
   }
 ]

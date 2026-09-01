@@ -1,68 +1,109 @@
 {
   "scenario": "session-detail-warm",
-  "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "measured": true,
+  "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
   "documentTtfbMs": {
-    "count": 10,
-    "min": 6.51,
-    "max": 10.06,
-    "mean": 8.8,
-    "median": 8.87,
-    "p75": 9.72,
-    "p95": 10.05
+    "count": 20,
+    "min": 6.42,
+    "max": 13.26,
+    "mean": 8.05,
+    "median": 7.36,
+    "p75": 8.4,
+    "p95": 11.56
   },
   "documentTtfbByRun": [
     {
       "run": 1,
-      "value": 8.76
+      "value": 11.47
     },
     {
       "run": 2,
-      "value": 8.56
+      "value": 8.69
     },
     {
       "run": 3,
-      "value": 8.71
+      "value": 9.06
     },
     {
       "run": 4,
-      "value": 10.03
+      "value": 13.26
     },
     {
       "run": 5,
-      "value": 8.98
+      "value": 7.55
     },
     {
       "run": 6,
-      "value": 6.51
+      "value": 6.48
     },
     {
       "run": 7,
-      "value": 10.06
+      "value": 8.3
     },
     {
       "run": 8,
-      "value": 7.02
+      "value": 6.42
     },
     {
       "run": 9,
-      "value": 9.68
+      "value": 7.46
     },
     {
       "run": 10,
-      "value": 9.73
+      "value": 6.65
+    },
+    {
+      "run": 11,
+      "value": 8.3
+    },
+    {
+      "run": 12,
+      "value": 7.15
+    },
+    {
+      "run": 13,
+      "value": 7
+    },
+    {
+      "run": 14,
+      "value": 6.89
+    },
+    {
+      "run": 15,
+      "value": 7.96
+    },
+    {
+      "run": 16,
+      "value": 7.01
+    },
+    {
+      "run": 17,
+      "value": 9.69
+    },
+    {
+      "run": 18,
+      "value": 7.26
+    },
+    {
+      "run": 19,
+      "value": 7.16
+    },
+    {
+      "run": 20,
+      "value": 7.16
     }
   ],
   "browserRequestCount": {
-    "count": 10,
+    "count": 20,
     "min": 70,
-    "max": 70,
-    "mean": 70,
-    "median": 70,
-    "p75": 70,
-    "p95": 70
+    "max": 77,
+    "mean": 71.9,
+    "median": 72.5,
+    "p75": 73,
+    "p95": 73.2
   },
   "browserApiRequestCount": {
-    "count": 10,
+    "count": 20,
     "min": 3,
     "max": 3,
     "mean": 3,
@@ -110,13 +151,53 @@
     {
       "run": 10,
       "value": 3
+    },
+    {
+      "run": 11,
+      "value": 3
+    },
+    {
+      "run": 12,
+      "value": 3
+    },
+    {
+      "run": 13,
+      "value": 3
+    },
+    {
+      "run": 14,
+      "value": 3
+    },
+    {
+      "run": 15,
+      "value": 3
+    },
+    {
+      "run": 16,
+      "value": 3
+    },
+    {
+      "run": 17,
+      "value": 3
+    },
+    {
+      "run": 18,
+      "value": 3
+    },
+    {
+      "run": 19,
+      "value": 3
+    },
+    {
+      "run": 20,
+      "value": 3
     }
   ],
   "browserApiRequestDistribution": {
-    "3": 10
+    "3": 20
   },
   "backendRequestCount": {
-    "count": 10,
+    "count": 20,
     "min": 3,
     "max": 3,
     "mean": 3,
@@ -164,13 +245,53 @@
     {
       "run": 10,
       "value": 3
+    },
+    {
+      "run": 11,
+      "value": 3
+    },
+    {
+      "run": 12,
+      "value": 3
+    },
+    {
+      "run": 13,
+      "value": 3
+    },
+    {
+      "run": 14,
+      "value": 3
+    },
+    {
+      "run": 15,
+      "value": 3
+    },
+    {
+      "run": 16,
+      "value": 3
+    },
+    {
+      "run": 17,
+      "value": 3
+    },
+    {
+      "run": 18,
+      "value": 3
+    },
+    {
+      "run": 19,
+      "value": 3
+    },
+    {
+      "run": 20,
+      "value": 3
     }
   ],
   "backendRequestDistribution": {
-    "3": 10
+    "3": 20
   },
   "selfApiRequestCount": {
-    "count": 10,
+    "count": 20,
     "min": 0,
     "max": 0,
     "mean": 0,
@@ -218,28 +339,135 @@
     {
       "run": 10,
       "value": 0
+    },
+    {
+      "run": 11,
+      "value": 0
+    },
+    {
+      "run": 12,
+      "value": 0
+    },
+    {
+      "run": 13,
+      "value": 0
+    },
+    {
+      "run": 14,
+      "value": 0
+    },
+    {
+      "run": 15,
+      "value": 0
+    },
+    {
+      "run": 16,
+      "value": 0
+    },
+    {
+      "run": 17,
+      "value": 0
+    },
+    {
+      "run": 18,
+      "value": 0
+    },
+    {
+      "run": 19,
+      "value": 0
+    },
+    {
+      "run": 20,
+      "value": 0
     }
   ],
+  "backendDurationMs": {
+    "count": 60,
+    "min": 13.02,
+    "max": 72.87,
+    "mean": 21.94,
+    "median": 19.98,
+    "p75": 23.27,
+    "p95": 44.89
+  },
+  "selfApiDurationMs": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
   "backendSources": {
-    "route-handler": 30
+    "route-handler": 60
   },
   "selfApiSources": {},
-  "duplicateBrowserApi": [
+  "sourceClassification": "heuristic",
+  "expectedRepeatedBrowserApi": [
     {
       "key": "GET /api/sessions/678",
-      "countPerRun": 2,
-      "runs": 10
+      "scenario": "session-detail-warm",
+      "steps": ["detail-first", "detail-revisit"],
+      "count": 2,
+      "runs": 20
     }
   ],
-  "duplicateBackend": [
+  "expectedRepeatedBackend": [
     {
       "key": "GET /sessions/678",
-      "countPerRun": 2,
-      "runs": 10
+      "scenario": "session-detail-warm",
+      "steps": ["detail-first", "detail-revisit"],
+      "count": 2,
+      "runs": 20
     }
   ],
+  "duplicateBrowserApi": [],
+  "duplicateBackend": [],
+  "retryCandidateBrowserApi": [],
+  "retryCandidateBackend": [],
   "tanstack": {
-    "queryFetchCount": 30,
+    "queryFetchPerRun": {
+      "count": 20,
+      "min": 3,
+      "max": 3,
+      "mean": 3,
+      "median": 3,
+      "p75": 3,
+      "p95": 3
+    },
+    "queryFetchTotal": 60,
+    "invalidatePerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "invalidateTotal": 0,
+    "setQueryDataPerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "setQueryDataTotal": 0,
+    "mutationEventPerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "mutationEventTotal": 0,
+    "queryFetchCount": 60,
     "invalidateCount": 0,
     "setQueryDataCount": 0,
     "mutationEventCount": 0,
@@ -249,9 +477,440 @@
     ],
     "invalidateQueryKeys": []
   },
-  "retryLikeBackend": 0,
+  "selfHop": {
+    "pairingStatus": "no-self-api",
+    "count": 0,
+    "overheadMs": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "median": null,
+      "p75": null,
+      "p95": null
+    },
+    "pairs": []
+  },
   "extra": {
     "fixture": null,
     "blocker": null
+  },
+  "warmSteps": {
+    "home-initial": {
+      "browserApiRequestCount": {
+        "count": 20,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1,
+        "paths": {
+          "GET /images/banner/lines-horizontal.svg": 20,
+          "GET /_next/static/media/797e433ab948586e-s.p.29207c2f.woff2": 20,
+          "GET /_next/static/chunks/1a022140de088ea9.css": 20,
+          "GET /_next/static/media/caa3a2e1cccd8315-s.p.3b6cae6d.woff2": 20,
+          "GET /images/banner/lines-diagonal.svg": 20,
+          "GET /header-logo.svg": 20,
+          "GET /footer-logo.svg": 20,
+          "GET /_next/static/chunks/51393c2821da037e.js": 20,
+          "GET /_next/static/chunks/37d668de3fd88aa7.js": 20,
+          "GET /": 20,
+          "GET /_next/static/chunks/f5a356f7065319e2.js": 20,
+          "GET /_next/static/chunks/turbopack-2b64d8095f0f999d.js": 20,
+          "GET /_next/static/chunks/c037d912243b83d7.js": 20,
+          "GET /_next/static/chunks/b8508d4530e23fbb.js": 20,
+          "GET /_next/static/chunks/09d44fafb8fea859.js": 20,
+          "GET /_next/static/chunks/a1f55895a83ccb7c.js": 20,
+          "GET /_next/static/chunks/d8af9547e4dfc09e.js": 20,
+          "GET /_next/static/chunks/edec5ae714f5a33b.js": 20,
+          "GET /_next/static/chunks/face2e0d4d42fdc2.js": 20,
+          "GET /_next/static/chunks/6d7ce3e175255158.js": 20,
+          "GET /_next/static/chunks/e4d5472fad6e222d.js": 20,
+          "GET /_next/static/chunks/67719fffd1d32b05.js": 20,
+          "GET /_next/static/chunks/acfd5a6a88624301.js": 20,
+          "GET /_next/static/chunks/2b903c766eb44803.js": 20,
+          "GET /_next/static/chunks/816a3947171a9c5c.js": 20,
+          "GET /_next/static/chunks/309cd2f666710d7b.js": 20,
+          "GET /_next/static/chunks/2e627622d8cd49e9.js": 20,
+          "GET /_next/static/chunks/828450989f0a3402.js": 20,
+          "GET /_next/static/chunks/16efe8ecf045af04.js": 20,
+          "GET /images/banner/feedback-banner-artwork-desktop.svg": 20,
+          "GET /_next/image?url=%2Fimages%2Fbanner%2Fgoals-section.png&w=384&q=75": 20,
+          "GET /_next/image?url=%2Fimages%2Fbanner%2Fdate-picker.png&w=256&q=75": 20,
+          "GET /_next/image?url=%2Fimages%2Fbanner%2Fprofile-card.png&w=256&q=75": 20,
+          "GET /images/banner/feedback-banner-artwork-desktop-hover.svg": 20,
+          "GET /_next/static/media/PretendardVariable-s.77d5d991.woff2": 20,
+          "GET /login?_rsc=1r34m": 20,
+          "GET /?_rsc=1r34m": 20,
+          "GET /session/create?_rsc=1r34m": 20,
+          "GET /session/create?_rsc=p37cr": 20,
+          "GET /login?_rsc=p37cr": 20,
+          "GET /?_rsc=p37cr": 20,
+          "GET /api/sessions?sort=POPULAR&page=1&size=8": 20,
+          "GET /session/679?_rsc=1r34m": 20,
+          "GET /session/678?_rsc=1r34m": 20,
+          "GET /session/680?_rsc=1r34m": 20,
+          "GET /images/thumbnail-fallback.svg": 20,
+          "GET /_next/image?url=https%3A%2F%2Faxdf2halbi8o.compat.objectstorage.ap-chuncheon-1.oraclecloud.com%2Fgak-bucket%2FsessionThumbnails%2F0b6b551f-055d-473e-a5c7-5c4eb076b7e4&w=1920&q=75": 20,
+          "GET /_next/image?url=https%3A%2F%2Faxdf2halbi8o.compat.objectstorage.ap-chuncheon-1.oraclecloud.com%2Fgak-bucket%2FsessionThumbnails%2Fc66649d1-7224-4647-8cd1-51d3fa229686&w=1920&q=75": 20,
+          "GET /session/680?_rsc=p37cr": 20,
+          "GET /session/678?_rsc=p37cr": 20,
+          "GET /session/679?_rsc=p37cr": 20,
+          "GET /gtag/js?id=G-LGD24D9PYY": 20,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274336661&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1698877653.1788274337&frm=0&ngs=1&pscdl=noapi&rcb=18&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115616986%7E115938465%7E115938468%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274336&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=309": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274343146&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=2011642197.1788274343&frm=0&ngs=1&pscdl=noapi&rcb=6&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274343&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=346": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274349611&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=89205299.1788274350&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274349&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=361": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274356136&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1273946798.1788274356&frm=0&ngs=1&pscdl=noapi&rcb=19&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115616985%7E115938465%7E115938468%7E118897920%7E118897930%7E119791748%7E120213116%7E120385422&sid=1788274356&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=376": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274362607&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=449025766.1788274363&frm=0&ngs=1&pscdl=noapi&rcb=18&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115616985%7E115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274362&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=333": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274369072&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1116103598.1788274369&frm=0&ngs=1&pscdl=noapi&rcb=18&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274369&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=304": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68v0h2v9244723328za200zd9244723328&_p=1788274375544&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=393023351.1788274376&frm=0&ngs=1&pscdl=noapi&rcb=10&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938466%7E115938469%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274375&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=301": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274382027&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1255791471.1788274382&frm=0&ngs=1&pscdl=noapi&rcb=3&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938466%7E115938469%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274382&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=331": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274388513&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=446161192.1788274389&frm=0&ngs=1&pscdl=noapi&rcb=7&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274388&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=265": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68v0h2v9244723328za200zd9244723328&_p=1788274394983&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1173991465.1788274395&frm=0&ngs=1&pscdl=noapi&rcb=17&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259605%7E120213116%7E120385422&sid=1788274395&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=337": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274401438&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1802625652.1788274402&frm=0&ngs=1&pscdl=noapi&rcb=2&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274401&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=323": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274407916&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=808406494.1788274408&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119793974%7E120213116%7E120385423&sid=1788274408&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=293": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274414395&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1327720652.1788274415&frm=0&ngs=1&pscdl=noapi&rcb=7&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938465%7E115938468%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274414&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=300": 1,
+          "GET /a?id=G-LGD24D9PYY&v=3&t=t&pid=1184625071&gtm=45je68s1v9244723328za200zd9244723328&cv=1&rv=68s1&tc=17&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385422&es=1&e=gtm.init&eid=2&u=AAAAAAAAAAAAAACA&h=Ag&tr=1ogtautoevents.1ogt1pdatav2.1ccdgafirst.1setproductsettings.1ccdgaregscope.1ccdemdownload.1ccdemform.1ccdemoutboundclick.1ccdempageview.1ccdemscroll.1ccdemsitesearch.1ccdemvideo.1ccdconversionmarking.1ccdautoredact.1ccdgalast&ti=2ogtautoevents.2ogt1pdatav2.2ccdgafirst.2setproductsettings.2ccdgaregscope.2ccdemdownload.2ccdemform.2ccdemoutboundclick.2ccdempageview.2ccdemscroll.2ccdemsitesearch.2ccdemvideo.2ccdconversionmarking.2ccdautoredact.2ccdgalast&z=0": 1,
+          "GET /a?id=G-LGD24D9PYY&v=3&t=t&pid=1184625071&gtm=45je68s1v9244723328za200zd9244723328&cv=1&rv=68s1&tc=17&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385422&es=1&e=gtag.config&eid=11&u=AAAAAAAAAAAAACCA&h=Ag&epr=1G.2G&z=0": 1,
+          "GET /a?id=G-LGD24D9PYY&v=3&t=t&pid=1184625071&gtm=45je68s1v9244723328za200zd9244723328&cv=1&rv=68s1&tc=17&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385422&es=1&e=gtm.dom&eid=12&u=AAAAAAAAAAAAACCA&h=Ag&z=0": 1,
+          "GET /a?id=G-LGD24D9PYY&v=3&t=t&pid=1184625071&gtm=45je68s1v9244723328za200zd9244723328&cv=1&rv=68s1&tc=17&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385422&es=1&e=gtm.js&eid=3&u=AAAAAAAAAAAAAACA&h=Ag&tr=1gct&ti=2gct&z=0": 1,
+          "GET /a?id=G-LGD24D9PYY&v=3&t=t&pid=1184625071&gtm=45je68s1v9244723328za200zd9244723328&cv=1&rv=68s1&tc=17&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385422&e=gtm.init&eid=2&u=AAAAAAAAAAAAACCA&h=Ag&tr=5ogtautoevents.5ogt1pdatav2.5ccdgafirst.5setproductsettings.5ccdgaregscope.5ccdemdownload.5ccdemform.5ccdemoutboundclick.5ccdempageview&ti=2ogtautoevents.2ogt1pdatav2.2ccdgafirst.2setproductsettings.2ccdgaregscope.2ccdemdownload.2ccdemform.2ccdemoutboundclick.2ccdempageview&z=0": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274420821&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=653454731.1788274421&frm=0&ngs=1&pscdl=noapi&rcb=17&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385422&sid=1788274421&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=331": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274427291&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1108990911.1788274427&frm=0&ngs=1&pscdl=noapi&rcb=15&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938465%7E115938468%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274427&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=263": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274433755&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=598489488.1788274434&frm=0&ngs=1&pscdl=noapi&rcb=5&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938465%7E115938469%7E118012008%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274433&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=315": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274440261&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=206808739.1788274440&frm=0&ngs=1&pscdl=noapi&rcb=4&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938466%7E115938469%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274440&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=300": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274446716&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1101596787.1788274447&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115616985%7E115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385423&sid=1788274447&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=521": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68v0h2v9244723328za200zd9244723328&_p=1788274453216&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=2043602530.1788274453&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115616985%7E115938465%7E115938468%7E118897920%7E118897930%7E120213116%7E120385423%7E120412527%7E120420416&sid=1788274453&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=299": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274459715&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1030001684.1788274460&frm=0&ngs=1&pscdl=noapi&rcb=4&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&_s=1&tag_exp=115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274459&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=301": 1
+        }
+      },
+      "backendRequestCount": {
+        "count": 20,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1,
+        "paths": {
+          "GET /sessions?sort=POPULAR&page=1&size=8": 20
+        }
+      },
+      "selfApiRequestCount": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {
+          "GET /sessions?sort=POPULAR&page=1&size=8": 20
+        }
+      },
+      "queryFetchPerRun": {
+        "count": 20,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1,
+        "paths": {
+          "undefined undefined": 40
+        }
+      },
+      "sessionListBrowserApi": 20,
+      "sessionDetailBrowserApi": 0,
+      "sessionListBackend": 20,
+      "sessionDetailBackend": 0,
+      "selfApiCount": 0,
+      "queryFetchTotal": 20,
+      "browserApiPaths": {
+        "GET /api/sessions?sort=POPULAR&page=1&size=8": 20
+      },
+      "backendPaths": {
+        "GET /sessions?sort=POPULAR&page=1&size=8": 20
+      },
+      "queryHashes": ["[\"session\",\"list\",{\"page\":1,\"size\":8,\"sort\":\"POPULAR\"}]"]
+    },
+    "detail-first": {
+      "browserApiRequestCount": {
+        "count": 20,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1,
+        "paths": {
+          "GET /session/678?_rsc=1adj9": 20,
+          "GET /_next/static/chunks/d8b54bccbd936b3e.js": 20,
+          "GET /_next/static/chunks/049df57ba8411a67.js": 20,
+          "GET /_next/static/chunks/8cd7eb995e5bd0dc.js": 20,
+          "GET /api/sessions/678": 20,
+          "GET /a?id=G-LGD24D9PYY&v=3&t=t&pid=1184625071&gtm=45je68s1v9244723328za200zd9244723328&cv=1&rv=68s1&tc=17&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385422&es=1&e=*&eid=15&u=AgAAAAAAAAAAACCA&h=Ag&epr=1G.2G&z=0": 1
+        }
+      },
+      "backendRequestCount": {
+        "count": 20,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1,
+        "paths": {
+          "GET /sessions/678": 20
+        }
+      },
+      "selfApiRequestCount": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {
+          "GET /sessions/678": 20
+        }
+      },
+      "queryFetchPerRun": {
+        "count": 20,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1,
+        "paths": {
+          "undefined undefined": 40
+        }
+      },
+      "sessionListBrowserApi": 0,
+      "sessionDetailBrowserApi": 20,
+      "sessionListBackend": 0,
+      "sessionDetailBackend": 20,
+      "selfApiCount": 0,
+      "queryFetchTotal": 20,
+      "browserApiPaths": {
+        "GET /api/sessions/678": 20
+      },
+      "backendPaths": {
+        "GET /sessions/678": 20
+      },
+      "queryHashes": ["[\"session\",\"detail\",\"678\"]"]
+    },
+    "terms": {
+      "browserApiRequestCount": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {
+          "GET /terms?_rsc=1k0xv": 20,
+          "GET /cookie-policy?_rsc=1r34m": 20,
+          "GET /privacy?_rsc=1r34m": 20,
+          "GET /terms?_rsc=1r34m": 20,
+          "GET /cookie-policy?_rsc=1847g": 11,
+          "GET /privacy?_rsc=1847g": 10,
+          "GET /terms?_rsc=1847g": 10,
+          "GET /login?_rsc=1847g": 20,
+          "GET /cookie-policy?_rsc=ttpeu": 11,
+          "GET /privacy?_rsc=ttpeu": 11,
+          "GET /terms?_rsc=ttpeu": 11,
+          "GET /privacy?_rsc=p37cr": 9,
+          "GET /cookie-policy?_rsc=p37cr": 9,
+          "GET /terms?_rsc=p37cr": 9
+        }
+      },
+      "backendRequestCount": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {}
+      },
+      "selfApiRequestCount": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {}
+      },
+      "queryFetchPerRun": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {}
+      },
+      "sessionListBrowserApi": 0,
+      "sessionDetailBrowserApi": 0,
+      "sessionListBackend": 0,
+      "sessionDetailBackend": 0,
+      "selfApiCount": 0,
+      "queryFetchTotal": 0,
+      "browserApiPaths": {},
+      "backendPaths": {},
+      "queryHashes": []
+    },
+    "home-return": {
+      "browserApiRequestCount": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {
+          "GET /?_rsc=xkw1y": 20
+        }
+      },
+      "backendRequestCount": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {}
+      },
+      "selfApiRequestCount": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {}
+      },
+      "queryFetchPerRun": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {}
+      },
+      "sessionListBrowserApi": 0,
+      "sessionDetailBrowserApi": 0,
+      "sessionListBackend": 0,
+      "sessionDetailBackend": 0,
+      "selfApiCount": 0,
+      "queryFetchTotal": 0,
+      "browserApiPaths": {},
+      "backendPaths": {},
+      "queryHashes": []
+    },
+    "detail-revisit": {
+      "browserApiRequestCount": {
+        "count": 20,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1,
+        "paths": {
+          "GET /session/678?_rsc=57r97": 20,
+          "GET /api/sessions/678": 20,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274336661&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1698877653.1788274337&frm=0&ngs=1&pscdl=noapi&rcb=18&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115616986%7E115938465%7E115938468%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274336&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5315": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274343146&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=2011642197.1788274343&frm=0&ngs=1&pscdl=noapi&rcb=6&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274343&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5353": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274349611&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=89205299.1788274350&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274349&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5367": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274356136&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1273946798.1788274356&frm=0&ngs=1&pscdl=noapi&rcb=19&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115616985%7E115938465%7E115938468%7E118897920%7E118897930%7E119791748%7E120213116%7E120385422&sid=1788274356&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5384": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274362607&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=449025766.1788274363&frm=0&ngs=1&pscdl=noapi&rcb=18&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115616985%7E115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274362&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5340": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274369072&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1116103598.1788274369&frm=0&ngs=1&pscdl=noapi&rcb=18&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274369&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5310": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68v0h2v9244723328za200zd9244723328&_p=1788274375544&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=393023351.1788274376&frm=0&ngs=1&pscdl=noapi&rcb=10&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938466%7E115938469%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274375&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5307": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274382027&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1255791471.1788274382&frm=0&ngs=1&pscdl=noapi&rcb=3&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938466%7E115938469%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274382&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5337": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274388513&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=446161192.1788274389&frm=0&ngs=1&pscdl=noapi&rcb=7&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274388&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5271": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68v0h2v9244723328za200zd9244723328&_p=1788274394983&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1173991465.1788274395&frm=0&ngs=1&pscdl=noapi&rcb=17&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259605%7E120213116%7E120385422&sid=1788274395&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5344": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274401438&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1802625652.1788274402&frm=0&ngs=1&pscdl=noapi&rcb=2&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274401&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5329": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274407916&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=808406494.1788274408&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119793974%7E120213116%7E120385423&sid=1788274408&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5299": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274414395&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1327720652.1788274415&frm=0&ngs=1&pscdl=noapi&rcb=7&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938465%7E115938468%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274414&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5306": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274420821&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=653454731.1788274421&frm=0&ngs=1&pscdl=noapi&rcb=17&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385422&sid=1788274421&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5338": 1,
+          "GET /a?id=G-LGD24D9PYY&v=3&t=t&pid=1184625071&gtm=45je68s1v9244723328za200zd9244723328&cv=1&rv=68s1&tc=17&tag_exp=115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385422&es=1&e=gtm.historyChange-v2&eid=16&u=AgAAAAAAAAAAACCA&h=Ag&z=0": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274427291&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1108990911.1788274427&frm=0&ngs=1&pscdl=noapi&rcb=15&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938465%7E115938468%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274427&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5270": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274433755&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=598489488.1788274434&frm=0&ngs=1&pscdl=noapi&rcb=5&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938465%7E115938469%7E118012008%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274433&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5322": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274440261&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=206808739.1788274440&frm=0&ngs=1&pscdl=noapi&rcb=4&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938466%7E115938469%7E118897920%7E118897930%7E120213116%7E120385422&sid=1788274440&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5308": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274446716&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1101596787.1788274447&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115616985%7E115938466%7E115938468%7E118897920%7E118897930%7E119259606%7E120213116%7E120385423&sid=1788274447&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5528": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68v0h2v9244723328za200zd9244723328&_p=1788274453216&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=2043602530.1788274453&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115616985%7E115938465%7E115938468%7E118897920%7E118897930%7E120213116%7E120385423%7E120412527%7E120420416&sid=1788274453&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5306": 1,
+          "POST /g/collect?v=2&tid=G-LGD24D9PYY&gtm=45je68s1v9244723328za200zd9244723328&_p=1788274459715&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1030001684.1788274460&frm=0&ngs=1&pscdl=noapi&rcb=4&sr=1280x800&uaa=arm&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=macOS&uapv=27.0.0&uaw=0&ul=ko-kr&tag_exp=115938465%7E115938469%7E118897920%7E118897930%7E120213116%7E120385423&sid=1788274459&sct=1&seg=0&dl=http%3A%2F%2Flocalhost%2F&dt=%ED%99%88+%7C+GAK+-+%EB%AA%A8%EC%97%AC%EC%84%9C+%EA%B0%81%EC%9E%90+%EC%9E%91%EC%97%85&_s=2&tfd=5308": 1
+        }
+      },
+      "backendRequestCount": {
+        "count": 20,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1,
+        "paths": {
+          "GET /sessions/678": 20
+        }
+      },
+      "selfApiRequestCount": {
+        "count": 20,
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "median": 0,
+        "p75": 0,
+        "p95": 0,
+        "paths": {
+          "GET /sessions/678": 20
+        }
+      },
+      "queryFetchPerRun": {
+        "count": 20,
+        "min": 1,
+        "max": 1,
+        "mean": 1,
+        "median": 1,
+        "p75": 1,
+        "p95": 1,
+        "paths": {
+          "undefined undefined": 40
+        }
+      },
+      "sessionListBrowserApi": 0,
+      "sessionDetailBrowserApi": 20,
+      "sessionListBackend": 0,
+      "sessionDetailBackend": 20,
+      "selfApiCount": 0,
+      "queryFetchTotal": 20,
+      "browserApiPaths": {
+        "GET /api/sessions/678": 20
+      },
+      "backendPaths": {
+        "GET /sessions/678": 20
+      },
+      "queryHashes": ["[\"session\",\"detail\",\"678\"]"]
+    },
+    "answers": {
+      "homeReturnSessionListRefetch": false,
+      "detailRevisitDetailRefetch": true,
+      "detailRevisitClassification": "expected repeated request across steps, not a same-step duplicate"
+    }
   }
 }

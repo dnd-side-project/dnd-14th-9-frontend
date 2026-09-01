@@ -1,59 +1,100 @@
 {
   "scenario": "home-cold",
-  "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "measured": true,
+  "runs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
   "documentTtfbMs": {
-    "count": 10,
-    "min": 7.82,
-    "max": 11.69,
-    "mean": 9.44,
-    "median": 9.56,
-    "p75": 10.08,
-    "p95": 11.03
+    "count": 20,
+    "min": 7.31,
+    "max": 13.75,
+    "mean": 9.9,
+    "median": 9.76,
+    "p75": 10.22,
+    "p95": 12.86
   },
   "documentTtfbByRun": [
     {
       "run": 1,
-      "value": 10.16
+      "value": 13.75
     },
     {
       "run": 2,
-      "value": 9.48
+      "value": 12.35
     },
     {
       "run": 3,
-      "value": 7.82
+      "value": 9.8
     },
     {
       "run": 4,
-      "value": 8.27
+      "value": 12.81
     },
     {
       "run": 5,
-      "value": 10.22
+      "value": 11.01
     },
     {
       "run": 6,
-      "value": 11.69
+      "value": 10.26
     },
     {
       "run": 7,
-      "value": 9.1
+      "value": 9.71
     },
     {
       "run": 8,
-      "value": 8.2
+      "value": 9.14
     },
     {
       "run": 9,
-      "value": 9.63
+      "value": 8.03
     },
     {
       "run": 10,
-      "value": 9.84
+      "value": 7.31
+    },
+    {
+      "run": 11,
+      "value": 7.84
+    },
+    {
+      "run": 12,
+      "value": 10.21
+    },
+    {
+      "run": 13,
+      "value": 9.3
+    },
+    {
+      "run": 14,
+      "value": 9.8
+    },
+    {
+      "run": 15,
+      "value": 9.58
+    },
+    {
+      "run": 16,
+      "value": 10.09
+    },
+    {
+      "run": 17,
+      "value": 9.23
+    },
+    {
+      "run": 18,
+      "value": 8.83
+    },
+    {
+      "run": 19,
+      "value": 8.91
+    },
+    {
+      "run": 20,
+      "value": 10.13
     }
   ],
   "browserRequestCount": {
-    "count": 10,
+    "count": 20,
     "min": 53,
     "max": 53,
     "mean": 53,
@@ -62,7 +103,7 @@
     "p95": 53
   },
   "browserApiRequestCount": {
-    "count": 10,
+    "count": 20,
     "min": 1,
     "max": 1,
     "mean": 1,
@@ -110,13 +151,53 @@
     {
       "run": 10,
       "value": 1
+    },
+    {
+      "run": 11,
+      "value": 1
+    },
+    {
+      "run": 12,
+      "value": 1
+    },
+    {
+      "run": 13,
+      "value": 1
+    },
+    {
+      "run": 14,
+      "value": 1
+    },
+    {
+      "run": 15,
+      "value": 1
+    },
+    {
+      "run": 16,
+      "value": 1
+    },
+    {
+      "run": 17,
+      "value": 1
+    },
+    {
+      "run": 18,
+      "value": 1
+    },
+    {
+      "run": 19,
+      "value": 1
+    },
+    {
+      "run": 20,
+      "value": 1
     }
   ],
   "browserApiRequestDistribution": {
-    "1": 10
+    "1": 20
   },
   "backendRequestCount": {
-    "count": 10,
+    "count": 20,
     "min": 1,
     "max": 1,
     "mean": 1,
@@ -164,13 +245,53 @@
     {
       "run": 10,
       "value": 1
+    },
+    {
+      "run": 11,
+      "value": 1
+    },
+    {
+      "run": 12,
+      "value": 1
+    },
+    {
+      "run": 13,
+      "value": 1
+    },
+    {
+      "run": 14,
+      "value": 1
+    },
+    {
+      "run": 15,
+      "value": 1
+    },
+    {
+      "run": 16,
+      "value": 1
+    },
+    {
+      "run": 17,
+      "value": 1
+    },
+    {
+      "run": 18,
+      "value": 1
+    },
+    {
+      "run": 19,
+      "value": 1
+    },
+    {
+      "run": 20,
+      "value": 1
     }
   ],
   "backendRequestDistribution": {
-    "1": 10
+    "1": 20
   },
   "selfApiRequestCount": {
-    "count": 10,
+    "count": 20,
     "min": 0,
     "max": 0,
     "mean": 0,
@@ -218,23 +339,139 @@
     {
       "run": 10,
       "value": 0
+    },
+    {
+      "run": 11,
+      "value": 0
+    },
+    {
+      "run": 12,
+      "value": 0
+    },
+    {
+      "run": 13,
+      "value": 0
+    },
+    {
+      "run": 14,
+      "value": 0
+    },
+    {
+      "run": 15,
+      "value": 0
+    },
+    {
+      "run": 16,
+      "value": 0
+    },
+    {
+      "run": 17,
+      "value": 0
+    },
+    {
+      "run": 18,
+      "value": 0
+    },
+    {
+      "run": 19,
+      "value": 0
+    },
+    {
+      "run": 20,
+      "value": 0
     }
   ],
+  "backendDurationMs": {
+    "count": 20,
+    "min": 16.3,
+    "max": 200.29,
+    "mean": 40.82,
+    "median": 22.1,
+    "p75": 24.57,
+    "p95": 127.38
+  },
+  "selfApiDurationMs": {
+    "count": 0,
+    "min": null,
+    "max": null,
+    "mean": null,
+    "median": null,
+    "p75": null,
+    "p95": null
+  },
   "backendSources": {
-    "route-handler": 10
+    "route-handler": 20
   },
   "selfApiSources": {},
+  "sourceClassification": "heuristic",
+  "expectedRepeatedBrowserApi": [],
+  "expectedRepeatedBackend": [],
   "duplicateBrowserApi": [],
   "duplicateBackend": [],
+  "retryCandidateBrowserApi": [],
+  "retryCandidateBackend": [],
   "tanstack": {
-    "queryFetchCount": 10,
+    "queryFetchPerRun": {
+      "count": 20,
+      "min": 1,
+      "max": 1,
+      "mean": 1,
+      "median": 1,
+      "p75": 1,
+      "p95": 1
+    },
+    "queryFetchTotal": 20,
+    "invalidatePerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "invalidateTotal": 0,
+    "setQueryDataPerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "setQueryDataTotal": 0,
+    "mutationEventPerRun": {
+      "count": 20,
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "median": 0,
+      "p75": 0,
+      "p95": 0
+    },
+    "mutationEventTotal": 0,
+    "queryFetchCount": 20,
     "invalidateCount": 0,
     "setQueryDataCount": 0,
     "mutationEventCount": 0,
     "queryKeysFetched": ["[\"session\",\"list\",{\"page\":1,\"size\":8,\"sort\":\"POPULAR\"}]"],
     "invalidateQueryKeys": []
   },
-  "retryLikeBackend": 0,
+  "selfHop": {
+    "pairingStatus": "no-self-api",
+    "count": 0,
+    "overheadMs": {
+      "count": 0,
+      "min": null,
+      "max": null,
+      "mean": null,
+      "median": null,
+      "p75": null,
+      "p95": null
+    },
+    "pairs": []
+  },
   "extra": {
     "fixture": null,
     "blocker": null

@@ -1,13 +1,4 @@
 [
-  "Measured with production `pnpm build` + `next start` on http://localhost:3010. BENCHMARK_MODE was enabled only for instrumentation.",
-  "Session fixture 678 status is 대기. Direct /session/678 SSR succeeds, then redirects to /session/678/waiting (307) and /login?reason=auth_required for guests.",
-  "Home cold recorded 10/10 runs with exactly 1 browser GET /api/sessions?sort=POPULAR&page=1&size=8 and 1 backend GET /sessions?sort=POPULAR&page=1&size=8.",
-  "Session detail cold recorded 10/10 runs with 1 server self-call GET /api/sessions/678 and 1 backend GET /sessions/678. generateMetadata + page did not produce two backend requests, consistent with React.cache(getSessionDetail).",
-  "Session detail cold had 0 browser /api/sessions/:id requests and 0 TanStack events; the client landed on login after the waiting redirect.",
-  "Session detail warm (same BrowserContext, home card modal → close → /terms → home → same card) recorded 1 session list fetch and 2 session detail fetches per run. List cache was reused on return home; detail was fetched again on revisit.",
-  "Scenario 4 used the same public session detail path because /session/:id/result is auth-gated.",
-  "Scenarios 5–7 were not executed. No test-account cookies or interactive subtask fixture were provided.",
-  "One extra backend GET /sessions?page=1&size=20 from fixture discovery was attributed to an earlier context file leftover; it is visible in raw JSONL.",
-  "Google Analytics is present in the local env contract, so third-party browser requests exist. API counts use /api/* only.",
-  "Fetch-hook overhead is one JSONL append plus a small JSON context file read per instrumented server fetch. Response bodies are not consumed. SSE duration is time-to-headers only."
+  "session-result was not measured. Public session detail is recorded separately as ssr-public-session-detail-fallback.",
+  "profile skipped: authenticated profile page requires cookie fixture."
 ]
