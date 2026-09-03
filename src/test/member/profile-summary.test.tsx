@@ -99,4 +99,31 @@ describe("ProfileSummary", () => {
 
     expect(fileInput).toBeDisabled();
   });
+
+  it("프로필 기본 정보와 formatHHMMSS로 포맷된 누적 시간을 렌더링해야 한다", () => {
+    mockedUseMe.mockReturnValue({
+      data: {
+        result: {
+          ...mockProfile,
+          nickname: "각 잡은 호랑이 #1234",
+          email: "tiger1234@gmail.com",
+          bio: "안녕하세요!",
+          participationSessionCount: 24,
+          totalParticipationTime: 2912, // 00:48:32
+          todoCompletionRate: 85,
+          focusRate: 30,
+        },
+      },
+    } as ReturnType<typeof useMe>);
+
+    const { getByText } = render(<ProfileSummary />);
+
+    expect(getByText("각 잡은 호랑이 #1234")).toBeInTheDocument();
+    expect(getByText("tiger1234@gmail.com")).toBeInTheDocument();
+    expect(getByText("안녕하세요!")).toBeInTheDocument();
+    expect(getByText("24")).toBeInTheDocument();
+    expect(getByText("00:48:32")).toBeInTheDocument();
+    expect(getByText("85%")).toBeInTheDocument();
+    expect(getByText("30%")).toBeInTheDocument();
+  });
 });
