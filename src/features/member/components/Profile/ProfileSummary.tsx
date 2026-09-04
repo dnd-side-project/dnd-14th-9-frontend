@@ -94,7 +94,7 @@ export function ProfileSummary() {
             size="xlarge"
             type={profile.profileImageUrl ? "image" : "empty"}
             edit={!isUpdatingProfileImage && isHovered}
-            className="h-14 w-14 md:h-16 md:w-16"
+            className="size-full"
           />
         </label>
 
