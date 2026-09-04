@@ -18,21 +18,6 @@ const validateProfileImageFile = (file: File): string | null => {
   return null;
 };
 
-interface StatItemProps {
-  label: string;
-  value: React.ReactNode;
-  valueClassName?: string;
-}
-
-function StatItem({ label, value, valueClassName }: StatItemProps) {
-  return (
-    <div className="flex w-full flex-col items-start gap-0.5 md:w-auto md:gap-1 xl:w-22">
-      <span className="text-text-tertiary text-[13px] font-normal md:text-[15px]">{label}</span>
-      <span className={cn("text-base font-semibold md:text-lg", valueClassName)}>{value}</span>
-    </div>
-  );
-}
-
 export function ProfileSummary() {
   const { data } = useMe();
   const { mutate: updateProfileImage, isPending: isUpdatingProfileImage } = useUpdateProfileImage();
@@ -146,6 +131,23 @@ export function ProfileSummary() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function StatItem({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string;
+  value: React.ReactNode;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="flex w-full flex-col items-start gap-0.5 md:w-auto md:gap-1 xl:w-22">
+      <span className="text-text-tertiary text-[13px] font-normal md:text-[15px]">{label}</span>
+      <span className={cn("text-base font-semibold md:text-lg", valueClassName)}>{value}</span>
     </div>
   );
 }
