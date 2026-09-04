@@ -1,57 +1,19 @@
 "use client";
 
-import { type ChangeEvent, useState } from "react";
+import { useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
 import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
-import { useMe, useUpdateProfileImage } from "@/features/member/hooks/useMemberHooks";
-import { toast } from "@/lib/toast";
+import { useMe } from "@/features/member/hooks/useMemberHooks";
+import { useProfileImageUpload } from "@/features/member/hooks/useProfileImageUpload";
 import { formatHHMMSS } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/utils";
 
-const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024;
-const ALLOWED_PROFILE_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
-
-const validateProfileImageFile = (file: File): string | null => {
-  if (file.size > MAX_PROFILE_IMAGE_SIZE) return "5MB 이하 파일만 업로드 가능해요";
-  if (!ALLOWED_PROFILE_IMAGE_TYPES.has(file.type)) return "jpg, png, webp만 지원해요";
-  return null;
-};
-
 export function ProfileSummary() {
   const { data } = useMe();
-  const { mutate: updateProfileImage, isPending: isUpdatingProfileImage } = useUpdateProfileImage();
+  const { handleProfileImageChange, isUpdatingProfileImage } = useProfileImageUpload();
   const profile = data?.result;
   const [isHovered, setIsHovered] = useState(false);
-
-  const handleProfileImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-
-    if (!file) return;
-
-    const fileError = validateProfileImageFile(file);
-    if (fileError) {
-      toast.error(fileError);
-      return;
-    }
-
-    updateProfileImage(
-      { profileImage: file },
-      {
-        onSuccess: () => {
-          toast.success("프로필 이미지가 수정되었습니다.");
-        },
-        onError: (error) => {
-          const message =
-            error instanceof Error && error.message
-              ? error.message
-              : "프로필 이미지 수정 중 오류가 발생했습니다.";
-          toast.error(message);
-        },
-      }
-    );
-  };
 
   if (!profile) return null;
 
