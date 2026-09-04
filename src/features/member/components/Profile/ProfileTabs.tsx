@@ -15,24 +15,32 @@ export function ProfileTabs() {
   const pathname = usePathname();
 
   return (
-    <div className="border-border-subtle scrollbar-hide flex w-full items-center overflow-x-auto border-b-[2px]">
+    <nav
+      aria-label="마이페이지 메뉴"
+      className="border-border-subtle relative flex w-full items-center border-b-[2px]"
+    >
       {TABS.map((tab) => {
         const isActive = pathname === tab.href;
         return (
           <Link
             key={tab.href}
             href={tab.href}
+            aria-current={isActive ? "page" : undefined}
             className={cn(
-              "flex shrink-0 flex-col items-start border-b-[2px] px-4 py-3 transition-colors md:px-6",
-              isActive
-                ? "border-border-stronger text-text-primary mb-[-2px]" // mb-[-2px] ensures the active border overlaps the container's bottom border visually
-                : "text-text-muted hover:text-text-primary mb-[-2px] border-transparent"
+              "relative flex flex-1 shrink-0 items-center justify-center px-6 py-3 text-center transition-colors md:flex-initial md:items-start md:text-left",
+              isActive ? "text-text-primary" : "text-text-muted hover:text-text-primary"
             )}
           >
-            <span className="text-base font-semibold">{tab.name}</span>
+            <span className="text-xs font-semibold whitespace-nowrap md:text-base">{tab.name}</span>
+            {isActive && (
+              <span
+                aria-hidden="true"
+                className="bg-border-stronger absolute right-0 -bottom-[2px] left-0 h-[2px]"
+              />
+            )}
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }
