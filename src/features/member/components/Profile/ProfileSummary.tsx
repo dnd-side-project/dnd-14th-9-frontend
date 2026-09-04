@@ -74,31 +74,29 @@ export function ProfileSummary() {
     <div className="flex w-full flex-col items-start gap-6 md:gap-10">
       <h1 className="text-text-primary text-lg font-bold md:text-2xl">마이페이지</h1>
 
-      <div className="grid w-full grid-cols-[auto_1fr] gap-x-4 gap-y-6 md:gap-x-5 md:gap-y-5 xl:flex xl:flex-row xl:items-start xl:gap-5">
+      <div className="grid w-full grid-cols-[auto_1fr] items-start gap-x-4 gap-y-6 md:gap-x-5 md:gap-y-5 xl:flex xl:flex-row xl:items-start xl:gap-5">
         {/* 1. 아바타 */}
-        <div className="col-start-1 row-start-1 xl:shrink-0">
-          <label
-            className="relative h-14 w-14 shrink-0 cursor-pointer md:h-16 md:w-16"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            <input
-              type="file"
-              className="hidden"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleProfileImageChange}
-              disabled={isUpdatingProfileImage}
-            />
-            <Avatar
-              src={profile.profileImageUrl ?? undefined}
-              alt={profile.nickname}
-              size="xlarge"
-              type={profile.profileImageUrl ? "image" : "empty"}
-              edit={!isUpdatingProfileImage && isHovered}
-              className="h-full w-full"
-            />
-          </label>
-        </div>
+        <label
+          className="relative col-start-1 row-start-1 flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center md:h-16 md:w-16 xl:shrink-0"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <input
+            type="file"
+            className="hidden"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleProfileImageChange}
+            disabled={isUpdatingProfileImage}
+          />
+          <Avatar
+            src={profile.profileImageUrl ?? undefined}
+            alt={profile.nickname}
+            size="xlarge"
+            type={profile.profileImageUrl ? "image" : "empty"}
+            edit={!isUpdatingProfileImage && isHovered}
+            className="h-14 w-14 md:h-16 md:w-16"
+          />
+        </label>
 
         {/* 2. 프로필 정보 */}
         <div className="col-start-2 row-start-1 flex min-w-0 flex-1 flex-col items-start gap-1">
