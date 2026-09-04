@@ -33,7 +33,7 @@ describe("ProfileTabs", () => {
     expect(nav).toBeInTheDocument();
   });
 
-  it("활성 탭에 active 보더, 텍스트 색상 및 aria-current='page'가 적용되어야 한다", () => {
+  it("활성 탭에 active 인디케이터, 텍스트 색상 및 aria-current='page'가 적용되어야 한다", () => {
     mockUsePathname.mockReturnValue("/profile/settings");
     render(<ProfileTabs />);
 
@@ -41,10 +41,21 @@ describe("ProfileTabs", () => {
     const reportTab = screen.getByRole("link", { name: "기록 리포트" });
 
     expect(settingsTab).toHaveAttribute("aria-current", "page");
-    expect(settingsTab).toHaveClass("border-border-stronger", "text-text-primary");
+    expect(settingsTab).toHaveClass("text-text-primary");
+    const activeIndicator = settingsTab.querySelector("span[aria-hidden='true']");
+    expect(activeIndicator).toBeInTheDocument();
+    expect(activeIndicator).toHaveClass(
+      "bg-border-stronger",
+      "absolute",
+      "-bottom-[2px]",
+      "left-0",
+      "right-0",
+      "h-[2px]"
+    );
 
     expect(reportTab).not.toHaveAttribute("aria-current");
-    expect(reportTab).toHaveClass("border-transparent", "text-text-muted");
+    expect(reportTab).toHaveClass("text-text-muted");
+    expect(reportTab.querySelector("span[aria-hidden='true']")).not.toBeInTheDocument();
   });
 
   it("경로 변경 시 해당하는 탭이 활성화되어야 한다", () => {
@@ -55,13 +66,15 @@ describe("ProfileTabs", () => {
     const reportTab = screen.getByRole("link", { name: "기록 리포트" });
 
     expect(reportTab).toHaveAttribute("aria-current", "page");
-    expect(reportTab).toHaveClass("border-border-stronger", "text-text-primary");
+    expect(reportTab).toHaveClass("text-text-primary");
+    expect(reportTab.querySelector("span[aria-hidden='true']")).toBeInTheDocument();
 
     expect(settingsTab).not.toHaveAttribute("aria-current");
-    expect(settingsTab).toHaveClass("border-transparent", "text-text-muted");
+    expect(settingsTab).toHaveClass("text-text-muted");
+    expect(settingsTab.querySelector("span[aria-hidden='true']")).not.toBeInTheDocument();
   });
 
-  it("모바일 균등 분할(flex-1) 및 반응형 타이포그래피, 패딩 클래스를 포함해야 한다", () => {
+  it("모바일 균등 분할(flex-1) 및 반응형 타이포그래피, 피그마 패딩 규격(px-6 py-3)을 포함해야 한다", () => {
     render(<ProfileTabs />);
 
     const tab = screen.getByRole("link", { name: "내 정보" });
@@ -70,15 +83,14 @@ describe("ProfileTabs", () => {
       "justify-center",
       "items-center",
       "text-center",
-      "px-2",
+      "px-6",
       "py-3",
       "md:flex-initial",
       "md:items-start",
-      "md:px-6",
       "md:text-left"
     );
 
-    const span = tab.querySelector("span");
+    const span = tab.querySelector("span:not([aria-hidden='true'])");
     expect(span).toHaveClass("text-xs", "font-semibold", "whitespace-nowrap", "md:text-base");
   });
 });
