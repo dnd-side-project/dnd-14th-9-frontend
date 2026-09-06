@@ -90,7 +90,7 @@ function SessionPerformanceCardSkeleton() {
     <ReportCard>
       <SkeletonBlock className="h-6 w-24" />
       <div className="flex flex-col">
-        <div className="gap-sm grid grid-cols-2">
+        <div className="gap-sm grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="gap-xs flex flex-col">
               <SkeletonBlock className="h-5 w-20" />

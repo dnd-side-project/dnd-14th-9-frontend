@@ -47,7 +47,7 @@ export default function SessionPerformanceCard({ data }: SessionPerformanceCardP
     <ReportCard>
       <SectionTitle>세션 성과</SectionTitle>
       <div className="flex flex-col">
-        <div className="gap-sm grid grid-cols-2">
+        <div className="gap-sm grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
           <PerformanceMetricItem
             label="투두 달성률"
             value={data.todoCompletionRate}
