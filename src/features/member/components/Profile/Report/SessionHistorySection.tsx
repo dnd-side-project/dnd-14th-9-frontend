@@ -31,14 +31,14 @@ export default function SessionHistorySection({ items, pagination }: SessionHist
   };
 
   return (
-    <div className="gap-xl flex flex-1 flex-col">
+    <div className="gap-sm md:gap-md lg:gap-xl flex flex-1 flex-col">
       <SectionTitle>지금까지 참여한 세션</SectionTitle>
 
       {items.length === 0 ? (
         <p className="text-text-tertiary py-20 text-center text-sm">아직 참여한 세션이 없어요.</p>
       ) : (
         <>
-          <div className="gap-lg flex flex-col">
+          <div className="gap-sm md:gap-lg flex flex-col">
             {items.map((session, index) => (
               <SessionHistoryCard
                 key={`${session.sessionId}-${index}`}
@@ -49,7 +49,7 @@ export default function SessionHistorySection({ items, pagination }: SessionHist
             ))}
           </div>
 
-          <div className="py-3xl flex w-full justify-center">
+          <div className="py-xl md:py-3xl flex w-full justify-center">
             <Pagination
               type="list"
               totalPage={pagination.totalPage}
