@@ -24,9 +24,9 @@ function PerformanceMetricItem({ label, value, variant }: PerformanceMetricItemP
 
   return (
     <div className="gap-xs flex flex-col">
-      <p className="text-text-tertiary font-regular text-[15px]">{label}</p>
-      <div className="bg-surface-strong p-md flex flex-col gap-[12px] rounded-xs">
-        <p className={`${styles.text} text-2xl font-bold`}>{value}%</p>
+      <p className="text-text-tertiary font-regular text-[12px] md:text-[15px]">{label}</p>
+      <div className="bg-surface-strong p-md gap-xs flex flex-col rounded-xs md:gap-[12px]">
+        <p className={`${styles.text} text-xl font-semibold md:text-2xl md:font-bold`}>{value}%</p>
         <ProgressBar
           progress={value}
           className="bg-border-default h-[4px] rounded-[1px]"
