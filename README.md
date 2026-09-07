@@ -50,7 +50,7 @@
 | Validation/Form | Zod, React Hook Form                 |
 | Realtime        | SSE (Server-Sent Events)             |
 | Test            | Jest, Vitest, Testing Library        |
-| CI/CD           | GitHub Actions, Chromatic, Docker    |
+| CI/CD           | GitHub Actions, Chromatic, Vercel    |
 
 ## 아키텍처 요약
 
@@ -154,9 +154,13 @@ pnpm dev
 ## 품질 보증 현황 (2026-03-06 기준)
 
 - **CI 파이프라인** (`.github/workflows/ci.yml`)
-  - `main` 대상 PR 생성 및 업데이트 시 `lint` -> `test --ci --coverage` -> `build` -> 인증 동시성 통합 검증 -> `docker build` 실행
+  - `main` 대상 PR 생성 및 업데이트 시 `lint` -> 기존 Jest 단계 -> 어댑터 빌드 회귀 검사 -> `build` -> 인증 동시성 통합 검증 실행
+  - 기존 Jest 단계의 인수 전달 및 coverage 문제는 [#358](https://github.com/dnd-side-project/dnd-14th-9-frontend/issues/358)에서 별도로 복구하며, 전체 테스트 확인에는 `pnpm test:coverage --ci --coverageProvider=v8`를 사용
+- **어댑터 빌드 회귀 검사** (`scripts/test-next-adapter-build.mjs`)
+  - 최소 `onBuildComplete` 어댑터를 연결해 실제 앱을 clean build하고, 어댑터와 출력 설정의 호환성을 검증
+  - 실행 전후 `.next`를 정리하므로 개발 서버나 다른 빌드와 병렬 실행하지 않으며, 이후 `pnpm build`로 일반 실행 결과물을 생성
 - **인증 동시성 통합 검증** (`scripts/auth-refresh-concurrency.mjs`)
-  - 독립된 Next.js 프로세스 2개에서 회전형 Refresh Token 경합과 백엔드 멱등 계약을 로컬 가짜 백엔드로 검증
+  - 동일한 프로덕션 빌드를 사용하는 독립 `next start` 프로세스 2개에서 회전형 Refresh Token 경합과 백엔드 멱등 계약을 로컬 가짜 백엔드로 검증
   - 실제 백엔드 구현이 아니라 동일 Refresh Token에 동일 결과를 반환하는 계약의 프론트엔드 호환성을 검증
 - **UI 변경 검증** (`.github/workflows/chromatic.yml`)
   - 스토리/디자인 토큰/스토리북 설정 변경 시 Chromatic 자동 실행
@@ -164,7 +168,7 @@ pnpm dev
   - 테스트 파일: `27`개 (`src/test/**`)
   - 스토리 파일: `24`개 (`src/stories/**/*.stories.tsx|ts`)
 - **배포 빌드**
-  - Next.js standalone output + 멀티스테이지 Docker 빌드 구성
+  - Vercel이 Next.js 빌드 결과물을 패키징해 배포하며, standalone 출력 및 Docker 이미지 빌드는 사용하지 않음
 
 ## 관련 링크
 

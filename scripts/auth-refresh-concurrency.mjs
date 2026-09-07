@@ -1,5 +1,5 @@
 /**
- * @fileoverview 하나의 Next.js standalone 빌드로 독립 프로세스 두 개를 실행하고, 동일한
+ * @fileoverview 하나의 Next.js 프로덕션 빌드로 독립 프로세스 두 개를 실행하고, 동일한
  * 인증 Cookie를 병렬 요청해 Refresh Token Single-Flight의 인스턴스 경계와 백엔드 계약을
  * 검증한다. 회전형 backend의 갱신 충돌과 멱등 backend의 전체 성공을 비교한다.
  */
@@ -7,8 +7,9 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { createServer } from "node:http";
+import { createRequire } from "node:module";
 import path from "node:path";
 import process from "node:process";
 
@@ -21,8 +22,8 @@ const REQUESTS_PER_INSTANCE = 5;
 /** 과거 구현 측정처럼 결과만 출력하고 현재 동작 단언은 생략할지 여부. */
 const REPORT_ONLY = process.argv.includes("--report-only");
 
-/** `pnpm build`가 생성하는 standalone 출력의 탐색 시작 경로. */
-const STANDALONE_ROOT = path.join(process.cwd(), ".next/standalone");
+/** 설치된 Next.js CLI를 직접 실행해 자식 프로세스의 종료까지 관리한다. */
+const nextCli = createRequire(import.meta.url).resolve("next/dist/bin/next");
 
 /**
  * Mock 응답 지연과 서버 준비 polling 간격을 만들기 위해 지정 시간만큼 기다린다.
@@ -83,33 +84,6 @@ function createExpiredAccessToken(label) {
     encode({ exp: Math.floor(Date.now() / 1000) - 60, sub: label }),
     "test-signature",
   ].join(".");
-}
-
-/**
- * `pnpm build`가 만든 standalone 서버 진입점을 찾는다. monorepo 형태로 중첩된 출력도 찾되,
- * 불필요한 node_modules 순회는 건너뛴다.
- *
- * @returns {string} 실행할 standalone `server.js` 절대 경로.
- * @throws {Error} standalone 빌드가 존재하지 않을 때 발생한다.
- */
-function findStandaloneServer() {
-  const directEntry = path.join(STANDALONE_ROOT, "server.js");
-  if (existsSync(directEntry)) return directEntry;
-
-  const directories = [STANDALONE_ROOT];
-  while (directories.length > 0) {
-    const directory = directories.pop();
-    if (!directory || !existsSync(directory)) continue;
-
-    for (const entry of readdirSync(directory, { withFileTypes: true })) {
-      if (entry.name === "node_modules") continue;
-      const entryPath = path.join(directory, entry.name);
-      if (entry.isDirectory()) directories.push(entryPath);
-      if (entry.isFile() && entry.name === "server.js") return entryPath;
-    }
-  }
-
-  throw new Error("Standalone build not found. Run `pnpm build` first.");
 }
 
 /**
@@ -244,30 +218,34 @@ async function getFreePort() {
 }
 
 /**
- * 같은 standalone 빌드를 별도 OS 프로세스로 실행해 독립된 module-scope 메모리 환경을 만든다.
+ * 같은 프로덕션 빌드를 별도 OS 프로세스로 실행해 독립된 module-scope 메모리 환경을 만든다.
  * stdout과 stderr는 준비 실패나 비정상 종료를 진단할 수 있도록 메모리에 모은다.
  *
  * @param {number} port Next.js 서버가 사용할 포트.
  * @param {string} backendOrigin Mock backend origin.
- * @param {string} standaloneServer 실행할 standalone 서버 파일 경로.
  * @returns {{child: import("node:child_process").ChildProcess, output: string[]}}
  * 실행한 자식 프로세스와 누적 로그.
  */
-function startNextServer(port, backendOrigin, standaloneServer) {
+function startNextServer(port, backendOrigin) {
   const output = [];
-  const child = spawn(process.execPath, [standaloneServer], {
-    cwd: path.dirname(standaloneServer),
-    env: {
-      ...process.env,
-      PORT: String(port),
-      HOSTNAME: HOST,
-      BACKEND_API_BASE: backendOrigin,
-      NEXT_PUBLIC_BACKEND_API_BASE: backendOrigin,
-      FRONTEND_ORIGIN: `http://${HOST}:${port}`,
-      NEXT_PUBLIC_USE_MOCK: "false",
-    },
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+  const child = spawn(
+    process.execPath,
+    [nextCli, "start", "--hostname", HOST, "--port", String(port)],
+    {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        NODE_ENV: "production",
+        PORT: String(port),
+        HOSTNAME: HOST,
+        BACKEND_API_BASE: backendOrigin,
+        NEXT_PUBLIC_BACKEND_API_BASE: backendOrigin,
+        FRONTEND_ORIGIN: `http://${HOST}:${port}`,
+        NEXT_PUBLIC_USE_MOCK: "false",
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    }
+  );
 
   child.stdout.on("data", (chunk) => output.push(chunk.toString()));
   child.stderr.on("data", (chunk) => output.push(chunk.toString()));
@@ -447,7 +425,10 @@ function assertCurrentBehavior(results) {
  * @returns {Promise<void>}
  */
 async function main() {
-  const standaloneServer = findStandaloneServer();
+  assert.ok(
+    existsSync(path.join(process.cwd(), ".next/BUILD_ID")),
+    "Production build not found. Run `pnpm build` first."
+  );
   const state = createBackendState();
   const backend = createBackendServer(state);
   const servers = [];
@@ -460,7 +441,7 @@ async function main() {
       const port = await getFreePort();
       const nextServer = {
         port,
-        ...startNextServer(port, backendOrigin, standaloneServer),
+        ...startNextServer(port, backendOrigin),
       };
       servers.push(nextServer);
     }
