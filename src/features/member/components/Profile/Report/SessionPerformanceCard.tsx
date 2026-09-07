@@ -30,7 +30,7 @@ function PerformanceMetricItem({ label, value, variant }: PerformanceMetricItemP
         <p className={`${styles.text} text-2xl font-bold`}>{value}%</p>
         <ProgressBar
           progress={value}
-          className="bg-border-default h-[4px]"
+          className="bg-border-default h-[4px] rounded-[1px]"
           indicatorClassName={styles.indicator}
         />
       </div>
@@ -44,17 +44,15 @@ interface SessionPerformanceCardProps {
 
 export default function SessionPerformanceCard({ data }: SessionPerformanceCardProps) {
   return (
-    <ReportCard>
+    <ReportCard className="gap-sm md:gap-md lg:gap-lg">
       <SectionTitle>세션 성과</SectionTitle>
-      <div className="flex flex-col">
-        <div className="gap-sm grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
-          <PerformanceMetricItem
-            label="투두 달성률"
-            value={data.todoCompletionRate}
-            variant="primary"
-          />
-          <PerformanceMetricItem label="집중률" value={data.focusRate} variant="secondary" />
-        </div>
+      <div className="gap-xs lg:gap-sm grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+        <PerformanceMetricItem
+          label="투두 달성률"
+          value={data.todoCompletionRate}
+          variant="primary"
+        />
+        <PerformanceMetricItem label="집중률" value={data.focusRate} variant="secondary" />
       </div>
     </ReportCard>
   );
