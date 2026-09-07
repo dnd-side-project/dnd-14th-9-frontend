@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Pagination } from "@/components/Pagination/Pagination";
-import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
 import type { SessionHistoryItem, SessionHistoryPagination } from "@/features/member/types";
 
@@ -32,7 +31,7 @@ export default function SessionHistorySection({ items, pagination }: SessionHist
   };
 
   return (
-    <ReportCard className="gap-xl">
+    <div className="gap-xl flex flex-1 flex-col">
       <SectionTitle>지금까지 참여한 세션</SectionTitle>
 
       {items.length === 0 ? (
@@ -60,6 +59,6 @@ export default function SessionHistorySection({ items, pagination }: SessionHist
           </div>
         </>
       )}
-    </ReportCard>
+    </div>
   );
 }

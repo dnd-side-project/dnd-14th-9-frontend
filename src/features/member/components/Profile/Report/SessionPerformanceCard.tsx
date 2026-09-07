@@ -1,5 +1,4 @@
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
-import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
 import type { SessionPerformanceData } from "@/features/member/types";
 
@@ -44,7 +43,7 @@ interface SessionPerformanceCardProps {
 
 export default function SessionPerformanceCard({ data }: SessionPerformanceCardProps) {
   return (
-    <ReportCard className="gap-sm md:gap-md lg:gap-lg">
+    <div className="gap-sm md:gap-md lg:gap-lg flex flex-1 flex-col">
       <SectionTitle>세션 성과</SectionTitle>
       <div className="gap-xs lg:gap-sm grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
         <PerformanceMetricItem
@@ -54,6 +53,6 @@ export default function SessionPerformanceCard({ data }: SessionPerformanceCardP
         />
         <PerformanceMetricItem label="집중률" value={data.focusRate} variant="secondary" />
       </div>
-    </ReportCard>
+    </div>
   );
 }

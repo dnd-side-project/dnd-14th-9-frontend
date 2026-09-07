@@ -1,9 +1,8 @@
-import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
 
 export default function SessionHistorySkeleton() {
   return (
-    <ReportCard className="gap-xl">
+    <div className="gap-xl flex flex-1 flex-col">
       <SectionTitle>지금까지 참여한 세션</SectionTitle>
       <div className="gap-lg flex flex-col">
         {[1, 2, 3, 4].map((i) => (
@@ -28,7 +27,7 @@ export default function SessionHistorySkeleton() {
           </div>
         ))}
       </div>
-    </ReportCard>
+    </div>
   );
 }
 

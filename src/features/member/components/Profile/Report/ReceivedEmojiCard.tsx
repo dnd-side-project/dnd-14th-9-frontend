@@ -4,7 +4,6 @@ import { HeartFillIcon } from "@/components/Icon/HeartFillIcon";
 import { StarIcon } from "@/components/Icon/StarIcon";
 import { ThumbDownIcon } from "@/components/Icon/ThumbDownIcon";
 import { ThumbUpIcon } from "@/components/Icon/ThumbUpIcon";
-import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
 import type { ReceivedEmojiItem } from "@/features/member/types";
 
@@ -30,7 +29,7 @@ export default function ReceivedEmojiCard({ data }: ReceivedEmojiCardProps) {
   const TopIcon = EMOJI_META[topEmoji.emojiName]?.icon;
 
   return (
-    <ReportCard>
+    <div className="gap-lg flex flex-1 flex-col">
       <SectionTitle>지금까지 받은 리액션</SectionTitle>
       {data.length > 0 && (
         <div className="p-xl border-sm border-border-subtle flex min-h-40 flex-wrap items-center justify-center gap-4 rounded-md max-lg:min-h-0 max-lg:gap-2 max-lg:border-0 max-lg:px-0">
@@ -79,6 +78,6 @@ export default function ReceivedEmojiCard({ data }: ReceivedEmojiCardProps) {
           )}
         </div>
       )}
-    </ReportCard>
+    </div>
   );
 }

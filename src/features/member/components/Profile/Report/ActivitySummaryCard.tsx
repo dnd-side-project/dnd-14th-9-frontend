@@ -1,5 +1,4 @@
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
-import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
 import type { ActivitySummaryData } from "@/features/member/types";
 import { formatHHMMSS } from "@/lib/utils/format";
@@ -22,7 +21,7 @@ export default function ActivitySummaryCard({
   achievementRateLabel = "목표 달성률",
 }: ActivitySummaryCardProps) {
   return (
-    <ReportCard>
+    <div className="gap-lg flex flex-1 flex-col">
       <SectionTitle>{title}</SectionTitle>
       <div className="p-xl gap-2xl border-border-subtle flex flex-1 flex-col rounded-md border max-md:border-0 max-md:px-0">
         <div className="gap-x-2xl gap-y-md flex flex-wrap">
@@ -64,6 +63,6 @@ export default function ActivitySummaryCard({
           </p>
         </div>
       </div>
-    </ReportCard>
+    </div>
   );
 }

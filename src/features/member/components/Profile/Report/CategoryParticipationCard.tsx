@@ -1,5 +1,4 @@
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
-import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
 import type { CategoryParticipationItem } from "@/features/member/types";
 import { CategoryFilter, getCategoryLabel } from "@/lib/constants/category";
@@ -10,7 +9,7 @@ interface CategoryParticipationCardProps {
 
 export default function CategoryParticipationCard({ data }: CategoryParticipationCardProps) {
   return (
-    <ReportCard>
+    <div className="gap-lg flex flex-1 flex-col">
       <SectionTitle>카테고리별 세션 참여율</SectionTitle>
       <div className="p-xl gap-md border-sm border-border-subtle flex flex-1 flex-col rounded-md">
         {data.map((stat, index) => (
@@ -35,6 +34,6 @@ export default function CategoryParticipationCard({ data }: CategoryParticipatio
           </div>
         ))}
       </div>
-    </ReportCard>
+    </div>
   );
 }
