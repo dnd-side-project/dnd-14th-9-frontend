@@ -11,9 +11,9 @@ export default function StatsSkeleton() {
 
 function ActivitySummaryCardSkeleton() {
   return (
-    <div className="gap-lg flex flex-1 flex-col">
+    <div className="gap-sm md:gap-md lg:gap-lg flex flex-1 flex-col">
       <SkeletonBlock className="h-6 w-36" />
-      <div className="p-xl gap-2xl border-border-subtle flex flex-col rounded-md border">
+      <div className="p-md gap-lg border-border-subtle md:p-xl md:gap-2xl flex flex-col rounded-md border">
         <div className="gap-2xl flex">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="gap-sm flex flex-col">
@@ -39,9 +39,9 @@ function CategoryParticipationCardSkeleton() {
   const itemWidths = ["w-24", "w-20", "w-28", "w-16"];
 
   return (
-    <div className="gap-lg flex flex-1 flex-col">
+    <div className="gap-sm md:gap-md lg:gap-lg flex flex-1 flex-col">
       <SkeletonBlock className="h-6 w-44" />
-      <div className="p-xl gap-md border-sm border-border-subtle flex flex-col rounded-md border">
+      <div className="p-md gap-md border-sm border-border-subtle md:p-xl flex flex-col rounded-md border">
         {itemWidths.map((labelWidth) => (
           <div key={labelWidth} className="flex flex-col gap-[8px]">
             <div className="flex justify-between">
@@ -58,7 +58,7 @@ function CategoryParticipationCardSkeleton() {
 
 function ReceivedEmojiCardSkeleton() {
   return (
-    <div className="gap-lg flex flex-1 flex-col">
+    <div className="gap-sm md:gap-md lg:gap-lg flex flex-1 flex-col">
       <SkeletonBlock className="h-6 w-24" />
       <div className="p-xl border-sm border-border-subtle flex gap-[16px] rounded-md border">
         <div className="px-xl py-2xl bg-surface-strong gap-lg flex flex-col items-center justify-center rounded-md">
@@ -85,7 +85,7 @@ function ReceivedEmojiCardSkeleton() {
 
 function SessionPerformanceCardSkeleton() {
   return (
-    <div className="gap-lg flex flex-1 flex-col">
+    <div className="gap-sm md:gap-md lg:gap-lg flex flex-1 flex-col">
       <SkeletonBlock className="h-6 w-24" />
       <div className="flex flex-col">
         <div className="gap-sm grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
