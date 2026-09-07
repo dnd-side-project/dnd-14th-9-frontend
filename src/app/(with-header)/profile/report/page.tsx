@@ -16,7 +16,7 @@ export default async function ProfileReportPage({
   const page = Number(pageParam) || 1;
 
   return (
-    <div className="flex flex-col gap-20">
+    <div className="gap-2xl md:gap-3xl flex flex-col lg:gap-20">
       <Suspense fallback={<StatsSkeleton />}>
         <StatsContent />
       </Suspense>
