@@ -40,15 +40,17 @@ export default function SessionHistoryCard({
 
   return (
     <div
-      className="border-border-[var(--color-alpha-white-8)] bg-surface-strong flex cursor-pointer flex-col justify-center gap-[24px] rounded-[6px] border p-[24px]"
+      className="border-border-[var(--color-alpha-white-8)] bg-surface-strong flex cursor-pointer flex-col justify-center gap-4 rounded-[6px] border p-4 md:gap-[24px] md:p-[24px]"
       onClick={onToggle}
     >
       {/* 헤더 영역 */}
       <div className="flex w-full items-start justify-between">
         <div className="gap-xs flex flex-col">
-          <p className="text-text-primary text-base font-semibold">{session.title}</p>
+          <p className="text-text-primary text-[13px] font-semibold md:text-base">
+            {session.title}
+          </p>
           <div className="gap-sm flex items-center">
-            <ChipBadge radius="xs" className="border-0">
+            <ChipBadge radius="xs" className="border-0 max-md:text-[10px]">
               {getCategoryLabel(session.category as CategoryFilter)}
             </ChipBadge>
             <div className="gap-xs flex">
@@ -77,10 +79,22 @@ export default function SessionHistoryCard({
 
       {/* 확장 상세 영역 */}
       {isExpanded && (
-        <div className="pt-md gap-3xl flex items-center border-t border-t-[var(--color-alpha-white-8)]">
-          <StatItem label="집중 시간" value={formatHHMMSS(session.focusedTime)} />
-          <StatItem label="집중률" value={`${session.focusRate}%`} />
-          <StatItem label="투두 달성률" value={`${session.todoCompletionRate}%`} />
+        <div className="pt-md gap-3xl md:pt-lg lg:pt-md flex items-center border-t border-t-[var(--color-alpha-white-8)]">
+          <StatItem
+            label="집중 시간"
+            value={formatHHMMSS(session.focusedTime)}
+            valueClassName="text-text-primary"
+          />
+          <StatItem
+            label="투두 달성률"
+            value={`${session.todoCompletionRate}%`}
+            valueClassName="text-text-brand-default"
+          />
+          <StatItem
+            label="집중률"
+            value={`${session.focusRate}%`}
+            valueClassName="text-text-status-positive-default"
+          />
         </div>
       )}
     </div>
@@ -89,18 +103,30 @@ export default function SessionHistoryCard({
 
 function MetadataItem({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="gap-2xs text-text-secondary flex items-center justify-center">
+    <div className="gap-2xs text-text-disabled flex items-center justify-center">
       {icon}
-      <span className="text-[13px]">{children}</span>
+      <span className="text-xs md:text-[13px]">{children}</span>
     </div>
   );
 }
 
-function StatItem({ label, value }: { label: string; value: string }) {
+function StatItem({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string;
+  value: string;
+  valueClassName?: string;
+}) {
   return (
     <div className="gap-2xs flex flex-col">
-      <p className="text-text-secondary font-regular text-[15px]">{label}</p>
-      <p className="text-text-brand-default text-[13px] font-semibold">{value}</p>
+      <p className="text-text-secondary font-regular text-xs md:text-[13px] lg:text-[15px]">
+        {label}
+      </p>
+      <p className={cn("text-[15px] font-semibold md:text-base lg:text-[13px]", valueClassName)}>
+        {value}
+      </p>
     </div>
   );
 }

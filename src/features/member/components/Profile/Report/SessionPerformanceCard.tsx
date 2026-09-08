@@ -1,5 +1,4 @@
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
-import ReportCard from "@/components/ReportCard/ReportCard";
 import SectionTitle from "@/components/ReportCard/SectionTitle";
 import type { SessionPerformanceData } from "@/features/member/types";
 
@@ -25,12 +24,12 @@ function PerformanceMetricItem({ label, value, variant }: PerformanceMetricItemP
 
   return (
     <div className="gap-xs flex flex-col">
-      <p className="text-text-tertiary font-regular text-[15px]">{label}</p>
-      <div className="bg-surface-strong p-md flex flex-col gap-[12px] rounded-xs">
-        <p className={`${styles.text} text-2xl font-bold`}>{value}%</p>
+      <p className="text-text-tertiary font-regular text-[12px] md:text-[15px]">{label}</p>
+      <div className="bg-surface-strong p-md gap-xs flex flex-col rounded-xs md:gap-[12px]">
+        <p className={`${styles.text} text-xl font-semibold md:text-2xl md:font-bold`}>{value}%</p>
         <ProgressBar
           progress={value}
-          className="bg-border-default h-[4px]"
+          className="bg-border-default h-[4px] rounded-[1px]"
           indicatorClassName={styles.indicator}
         />
       </div>
@@ -44,18 +43,16 @@ interface SessionPerformanceCardProps {
 
 export default function SessionPerformanceCard({ data }: SessionPerformanceCardProps) {
   return (
-    <ReportCard>
+    <div className="gap-sm md:gap-md lg:gap-lg flex flex-1 flex-col">
       <SectionTitle>세션 성과</SectionTitle>
-      <div className="flex flex-col">
-        <div className="gap-sm grid grid-cols-2">
-          <PerformanceMetricItem
-            label="투두 달성률"
-            value={data.todoCompletionRate}
-            variant="primary"
-          />
-          <PerformanceMetricItem label="집중률" value={data.focusRate} variant="secondary" />
-        </div>
+      <div className="gap-xs lg:gap-sm grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+        <PerformanceMetricItem
+          label="투두 달성률"
+          value={data.todoCompletionRate}
+          variant="primary"
+        />
+        <PerformanceMetricItem label="집중률" value={data.focusRate} variant="secondary" />
       </div>
-    </ReportCard>
+    </div>
   );
 }

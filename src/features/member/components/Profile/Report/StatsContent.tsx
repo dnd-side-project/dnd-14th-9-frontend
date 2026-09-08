@@ -15,7 +15,7 @@ export default async function StatsContent() {
   const stats = data.result;
 
   return (
-    <div className="gap-lg grid grid-cols-1 md:grid-cols-2">
+    <div className="gap-x-lg gap-y-2xl md:gap-y-3xl lg:gap-y-lg grid grid-cols-1 md:grid-cols-2">
       <ActivitySummaryCard
         data={{
           focusedTime: stats.focusedTime,
