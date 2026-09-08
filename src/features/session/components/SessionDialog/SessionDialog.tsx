@@ -81,14 +81,6 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
   const isCheckingParticipation = isAuthenticated && (isMeLoading || isWaitingRoomLoading);
 
   const statusDisplay = session ? getSessionStatusDisplay(session.status) : null;
-  const footerLayout =
-    sessionError ||
-    hasParticipationCheckError ||
-    isRecovering ||
-    isCheckingParticipation ||
-    isAuthenticated
-      ? "single"
-      : "dual";
 
   let footerContent;
 
@@ -137,14 +129,9 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
     );
   } else {
     footerContent = (
-      <>
-        <Button variant="solid" colorScheme="tertiary" size="medium" onClick={handleClose}>
-          건너뛰기
-        </Button>
-        <Button href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
-          로그인하고 참여하기
-        </Button>
-      </>
+      <Button href={LOGIN_ROUTE} variant="solid" colorScheme="primary" size="medium">
+        로그인하고 참여하기
+      </Button>
     );
   }
 
@@ -228,7 +215,7 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
           )}
 
           {/* 버튼 영역 */}
-          <ButtonGroup layout={footerLayout} horizontal={false} className="w-full [&>*]:w-full">
+          <ButtonGroup layout="single" horizontal={false} className="w-full [&>*]:w-full">
             {footerContent}
           </ButtonGroup>
         </div>

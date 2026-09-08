@@ -63,6 +63,23 @@ jest.mock("@/components/Icon/ShareIcon", () => ({
   ShareIcon: () => <svg aria-hidden="true" />,
 }));
 
+function expectGuestLoginCta() {
+  const group = screen.getByRole("group", { hidden: true });
+  const loginLinks = within(group).getAllByRole("link", {
+    name: "로그인하고 참여하기",
+    hidden: true,
+  });
+
+  expect(loginLinks).toHaveLength(1);
+  expect(loginLinks[0]).toHaveAttribute("href", "/login");
+  expect(
+    within(group).queryByRole("button", { name: "건너뛰기", hidden: true })
+  ).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: "다시 시도하기", hidden: true })
+  ).not.toBeInTheDocument();
+}
+
 describe("SessionDialog", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -101,20 +118,13 @@ describe("SessionDialog", () => {
     });
   });
 
-  it("guest 상태에서는 dual footer 액션을 유지해야 한다", () => {
+  it("guest 상태에서는 로그인 CTA 하나만 노출해야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "guest" });
     mockUseMe.mockReturnValue({ data: undefined });
 
     render(<SessionDialog sessionId="1" />);
 
-    expect(screen.getByRole("button", { name: "건너뛰기", hidden: true })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "로그인하고 참여하기", hidden: true })).toHaveAttribute(
-      "href",
-      "/login"
-    );
-    expect(
-      screen.queryByRole("button", { name: "다시 시도하기", hidden: true })
-    ).not.toBeInTheDocument();
+    expectGuestLoginCta();
     expect(mockUseMe).toHaveBeenCalledWith({ enabled: false });
     expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: false });
   });
@@ -194,14 +204,7 @@ describe("SessionDialog", () => {
 
     render(<SessionDialog sessionId="1" />);
 
-    expect(screen.getByRole("button", { name: "건너뛰기", hidden: true })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "로그인하고 참여하기", hidden: true })).toHaveAttribute(
-      "href",
-      "/login"
-    );
-    expect(
-      screen.queryByRole("button", { name: "다시 시도하기", hidden: true })
-    ).not.toBeInTheDocument();
+    expectGuestLoginCta();
     expect(mockUseMe).toHaveBeenCalledWith({ enabled: false });
     expect(mockNavigateWithHardReload).not.toHaveBeenCalled();
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
@@ -224,14 +227,7 @@ describe("SessionDialog", () => {
 
     render(<SessionDialog sessionId="1" />);
 
-    expect(screen.getByRole("button", { name: "건너뛰기", hidden: true })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "로그인하고 참여하기", hidden: true })).toHaveAttribute(
-      "href",
-      "/login"
-    );
-    expect(
-      screen.queryByRole("button", { name: "다시 시도하기", hidden: true })
-    ).not.toBeInTheDocument();
+    expectGuestLoginCta();
     expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: false });
     expect(mockNavigateWithHardReload).not.toHaveBeenCalled();
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
@@ -261,14 +257,7 @@ describe("SessionDialog", () => {
     mockUseAuthState.mockReturnValue({ status: "guest" });
     rerender(<SessionDialog sessionId="1" />);
 
-    expect(screen.getByRole("button", { name: "건너뛰기", hidden: true })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "로그인하고 참여하기", hidden: true })).toHaveAttribute(
-      "href",
-      "/login"
-    );
-    expect(
-      screen.queryByRole("button", { name: "다시 시도하기", hidden: true })
-    ).not.toBeInTheDocument();
+    expectGuestLoginCta();
     expect(refetchMe).not.toHaveBeenCalled();
     expect(refetchWaitingRoom).not.toHaveBeenCalled();
     expect(mockNavigateWithHardReload).not.toHaveBeenCalled();
@@ -301,10 +290,7 @@ describe("SessionDialog", () => {
     render(<SessionDialog sessionId="1" />);
 
     expect(mockNavigateWithHardReload).not.toHaveBeenCalled();
-    expect(screen.getByRole("link", { name: "로그인하고 참여하기", hidden: true })).toHaveAttribute(
-      "href",
-      "/login"
-    );
+    expectGuestLoginCta();
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
   });
 
