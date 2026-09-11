@@ -33,7 +33,8 @@ export function useProfileEditForm() {
   });
 
   useEffect(() => {
-    if (profile) {
+    // 편집 중(isDirty)에는 백그라운드 edit 캐시 갱신이 미저장 입력을 덮어쓰지 않도록 한다.
+    if (profile && !isDirty) {
       reset({
         nickname: profile.nickname,
         email: profile.email ?? "",
@@ -45,7 +46,7 @@ export function useProfileEditForm() {
         ].filter(Boolean) as string[],
       });
     }
-  }, [profile, reset]);
+  }, [profile, reset, isDirty]);
 
   useUnsavedChangesWarning(isDirty && !isPending);
 
