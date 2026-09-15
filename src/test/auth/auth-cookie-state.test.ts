@@ -26,10 +26,11 @@ describe("auth-cookie-state", () => {
       hasAccessToken: false,
       hasRefreshToken: false,
       hasAuthCookies: false,
+      isAccessTokenUsable: false,
     });
   });
 
-  it("accessToken만 있으면 access/auth 상태만 true여야 함", async () => {
+  it("accessToken만 있으면 access/auth 상태만 true여야 함(단, 유효한 JWT가 아니므로 isAccessTokenUsable은 false)", async () => {
     mockCookieStore.get.mockImplementation((name: string) =>
       name === "accessToken" ? { value: "access-token" } : undefined
     );
@@ -38,6 +39,7 @@ describe("auth-cookie-state", () => {
       hasAccessToken: true,
       hasRefreshToken: false,
       hasAuthCookies: true,
+      isAccessTokenUsable: false,
     });
   });
 
@@ -50,10 +52,11 @@ describe("auth-cookie-state", () => {
       hasAccessToken: false,
       hasRefreshToken: true,
       hasAuthCookies: true,
+      isAccessTokenUsable: false,
     });
   });
 
-  it("두 토큰이 모두 있으면 모든 상태가 true여야 함", async () => {
+  it("두 토큰이 모두 있으면 모든 상태가 true여야 함(단, 유효한 JWT가 아니므로 isAccessTokenUsable은 false)", async () => {
     mockCookieStore.get.mockImplementation((name: string) => {
       if (name === "accessToken") {
         return { value: "access-token" };
@@ -70,6 +73,43 @@ describe("auth-cookie-state", () => {
       hasAccessToken: true,
       hasRefreshToken: true,
       hasAuthCookies: true,
+      isAccessTokenUsable: false,
+    });
+  });
+
+  it("accessToken이 만료 전(exp가 미래)이면 isAccessTokenUsable이 true여야 함", async () => {
+    const futureExpSeconds = Math.floor(Date.now() / 1000) + 10 * 60;
+    const validAccessToken = createMockAccessToken(futureExpSeconds);
+    mockCookieStore.get.mockImplementation((name: string) =>
+      name === "accessToken" ? { value: validAccessToken } : undefined
+    );
+
+    await expect(getServerAuthCookieState()).resolves.toEqual({
+      hasAccessToken: true,
+      hasRefreshToken: false,
+      hasAuthCookies: true,
+      isAccessTokenUsable: true,
+    });
+  });
+
+  it("accessToken이 만료(exp가 과거)되었으면 isAccessTokenUsable이 false여야 함", async () => {
+    const pastExpSeconds = Math.floor(Date.now() / 1000) - 60;
+    const expiredAccessToken = createMockAccessToken(pastExpSeconds);
+    mockCookieStore.get.mockImplementation((name: string) =>
+      name === "accessToken" ? { value: expiredAccessToken } : undefined
+    );
+
+    await expect(getServerAuthCookieState()).resolves.toEqual({
+      hasAccessToken: true,
+      hasRefreshToken: false,
+      hasAuthCookies: true,
+      isAccessTokenUsable: false,
     });
   });
 });
+
+function createMockAccessToken(expSeconds: number): string {
+  const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+  const body = btoa(JSON.stringify({ exp: expSeconds, userId: "test-user" }));
+  return `${header}.${body}.mock_signature`;
+}

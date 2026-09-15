@@ -20,12 +20,30 @@ describe("RootLayout auth prefetch flow", () => {
       hasAccessToken: false,
       hasRefreshToken: false,
       hasAuthCookies: false,
+      isAccessTokenUsable: false,
     });
     const queryClient = new QueryClient();
     const fetchSpy = jest.spyOn(queryClient, "fetchQuery");
 
     await prepareAuthMeQuery(queryClient);
 
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("인증 쿠키는 있지만 Access Token이 만료/부재해 사용 불가능하면 me prefetch를 생략해야 한다", async () => {
+    // Access Token이 만료된 채로 SSR이 prefetch를 수행하면 서버 내부 API 호출을 통해
+    // Refresh Token 회전이 발생하고, 그 결과 쿠키는 브라우저로 전달되지 않는다.
+    // 이 회전을 막기 위해 이 경우에는 prefetch를 생략해야 한다.
+    mockedGetServerAuthCookieState.mockResolvedValue({
+      hasAccessToken: false,
+      hasRefreshToken: true,
+      hasAuthCookies: true,
+      isAccessTokenUsable: false,
+    });
+    const queryClient = new QueryClient();
+    const fetchSpy = jest.spyOn(queryClient, "fetchQuery");
+
+    await expect(prepareAuthMeQuery(queryClient)).resolves.toEqual({ hasAuthCookies: true });
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
@@ -36,6 +54,7 @@ describe("RootLayout auth prefetch flow", () => {
       hasAccessToken: false,
       hasRefreshToken: false,
       hasAuthCookies: false,
+      isAccessTokenUsable: false,
     });
     const queryClient = new QueryClient();
     const fetchSpy = jest.spyOn(queryClient, "fetchQuery").mockResolvedValue({
@@ -55,11 +74,12 @@ describe("RootLayout auth prefetch flow", () => {
     }
   });
 
-  it("인증 쿠키가 있으면 me prefetch를 수행해야 한다", async () => {
+  it("Access Token이 사용 가능하면 me prefetch를 수행해야 한다", async () => {
     mockedGetServerAuthCookieState.mockResolvedValue({
       hasAccessToken: true,
       hasRefreshToken: true,
       hasAuthCookies: true,
+      isAccessTokenUsable: true,
     });
     const queryClient = new QueryClient();
     const fetchSpy = jest.spyOn(queryClient, "fetchQuery").mockResolvedValue({
@@ -79,6 +99,7 @@ describe("RootLayout auth prefetch flow", () => {
       hasAccessToken: true,
       hasRefreshToken: true,
       hasAuthCookies: true,
+      isAccessTokenUsable: true,
     });
     const queryClient = new QueryClient();
     jest.spyOn(queryClient, "fetchQuery").mockRejectedValue(new Error("Unauthorized"));
