@@ -855,7 +855,7 @@ describe("Proxy Middleware", () => {
       expect(hasSetCookie(responseB, (cookie) => cookie.includes("access-a"))).toBe(false);
     });
 
-    it("보호된 라우트에서 재발급 응답 형식이 비정상이면 로그인 라우트(COMMON500)로 리다이렉트해야 함", async () => {
+    it("보호된 라우트에서 재발급 응답 형식이 비정상이면 로그인 라우트(COMMON500)로 리다이렉트하되 인증 쿠키는 보존해야 함", async () => {
       // Given
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
@@ -879,17 +879,17 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then
+      // Then: invalid_response는 일시적 오류이므로 아직 유효한 Refresh Token을 지우지 않는다.
       expectLoginRedirect(response, "COMMON500");
       expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
       expectRefreshFailureLog({
         reason: "invalid_response",
         routeType: "protected",
         status: 200,
-        cookieClear: true,
+        cookieClear: false,
       });
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
     });
 
     it("재발급 API가 실패하면 백엔드 에러 코드로 로그인 라우트에 리다이렉트해야 함", async () => {
@@ -948,7 +948,7 @@ describe("Proxy Middleware", () => {
       expect(mockFetch).toHaveBeenCalledTimes(2);
     });
 
-    it("재발급 API 호출 중 네트워크 에러가 발생하면 로그인 라우트로 리다이렉트해야 함", async () => {
+    it("재발급 API 호출 중 네트워크 에러가 발생하면 로그인 라우트로 리다이렉트하되 인증 쿠키는 보존해야 함", async () => {
       // Given
       const refreshToken = createMockToken(30 * 24 * 60 * 60);
       const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
@@ -963,11 +963,12 @@ describe("Proxy Middleware", () => {
       // When
       const response = await proxy(request);
 
-      // Then: 네트워크 에러 시 로그인 라우트 유도
+      // Then: 네트워크 에러는 일시적 오류이므로 로그인 라우트로 유도하되
+      // 아직 유효한 Refresh Token까지 지우지는 않는다.
       expectLoginRedirect(response, "network_error");
       expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
     });
 
     it("BACKEND_API_BASE가 설정되지 않으면 로그인 라우트로 리다이렉트해야 함", async () => {
@@ -990,6 +991,77 @@ describe("Proxy Middleware", () => {
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
       expect(mockFetch).not.toHaveBeenCalled(); // API 호출 안함
+    });
+  });
+
+  describe("hard 갱신 일시 실패 시 인증 쿠키 보존 정책", () => {
+    it("timeout으로 hard 갱신이 실패하면 인증 쿠키를 삭제하지 않아야 함", async () => {
+      jest.useFakeTimers();
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
+        headers: { cookie: `refreshToken=${refreshToken}` },
+      });
+      mockFetch.mockImplementationOnce((_url, init) => {
+        return new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            reject(new DOMException("Aborted", "AbortError"));
+          });
+        });
+      });
+
+      const responsePromise = proxy(request);
+      await jest.advanceTimersByTimeAsync(10_000);
+      const response = await responsePromise;
+
+      expectLoginRedirect(response, "network_error");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
+    });
+
+    it("백엔드 5xx 오류로 hard 갱신이 실패하면 인증 쿠키를 삭제하지 않아야 함", async () => {
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
+        headers: { cookie: `refreshToken=${refreshToken}` },
+      });
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        json: jest.fn().mockResolvedValue({
+          code: "COMMON500",
+          message: "일시적인 서버 오류입니다.",
+          isSuccess: false,
+          httpStatus: "SERVICE_UNAVAILABLE",
+        }),
+      });
+
+      const response = await proxy(request);
+
+      expectLoginRedirect(response, "COMMON500");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
+    });
+
+    it("백엔드가 403으로 인증을 명시적으로 거부하면 인증 쿠키를 삭제해야 함", async () => {
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
+        headers: { cookie: `refreshToken=${refreshToken}` },
+      });
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: jest.fn().mockResolvedValue({
+          code: "AUTH403_1",
+          message: "권한이 없습니다.",
+          isSuccess: false,
+          httpStatus: "FORBIDDEN",
+        }),
+      });
+
+      const response = await proxy(request);
+
+      expectLoginRedirect(response, "AUTH403_1");
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
   });
 
@@ -1433,7 +1505,7 @@ describe("Proxy Middleware", () => {
         reason: "timeout",
         routeType: "api",
         status: 504,
-        cookieClear: true,
+        cookieClear: false,
       });
 
       const retriedResponse = await proxy(createRequest());

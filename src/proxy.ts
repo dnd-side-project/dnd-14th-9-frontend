@@ -278,8 +278,21 @@ function buildRefreshSuccessResponse(
 }
 
 /**
+ * hard 갱신 실패 중 인증 Cookie를 삭제할지 판별한다.
+ * 백엔드가 인증을 명시적으로 거부한 경우(401/403 http_error)에만 삭제하고,
+ * 5xx·invalid_response·timeout·network_error 같은 일시적 실패에서는 아직 유효한
+ * Refresh Token을 보존해 다음 요청이 재시도할 수 있게 한다.
+ */
+function shouldClearAuthOnHardFailure(
+  outcome: Extract<RefreshOutcome, { kind: "failure" }>
+): boolean {
+  return outcome.reason === "http_error" && (outcome.status === 401 || outcome.status === 403);
+}
+
+/**
  * hard 갱신 실패를 보호 페이지의 로그인 이동 또는 보호 API의 JSON 오류 응답으로 바꾼다.
- * hard 요청은 유효한 Access Token 없이 진행할 수 없으므로 인증 Cookie도 함께 삭제한다.
+ * 인증이 명시적으로 거부된 경우에만 인증 Cookie를 삭제하고(shouldClearAuthOnHardFailure),
+ * 일시적 실패에서는 아직 유효한 Refresh Token을 보존한다.
  *
  * @param request 페이지 요청인지 API 요청인지 판단할 현재 요청.
  * @param outcome 백엔드 HTTP 오류, 잘못된 응답, timeout 또는 network 오류 정보.
@@ -289,11 +302,13 @@ function buildHardRefreshFailureResponse(
   request: NextRequest,
   outcome: Extract<RefreshOutcome, { kind: "failure" }>
 ): NextResponse {
+  const clearAuth = shouldClearAuthOnHardFailure(outcome);
+
   if (outcome.reason === "http_error") {
     const status =
       outcome.status === 401 || outcome.status === 403 ? 401 : outcome.status >= 500 ? 500 : 400;
     return buildAuthFailureResponse(request, {
-      clearAuth: true,
+      clearAuth,
       reason: outcome.errorCode ?? BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
       status,
     });
@@ -301,14 +316,14 @@ function buildHardRefreshFailureResponse(
 
   if (outcome.reason === "invalid_response") {
     return buildAuthFailureResponse(request, {
-      clearAuth: true,
+      clearAuth,
       reason: BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
       status: 500,
     });
   }
 
   return buildAuthFailureResponse(request, {
-    clearAuth: true,
+    clearAuth,
     reason: LOGIN_INTERNAL_ERROR_CODES.NETWORK_ERROR,
     status: outcome.status,
   });
@@ -336,7 +351,7 @@ function buildResponseFromRefreshOutcome(
   logRefreshFailure(request, {
     reason: outcome.reason,
     status: outcome.status,
-    cookieClear: mode === "hard",
+    cookieClear: mode === "hard" && shouldClearAuthOnHardFailure(outcome),
     mode,
   });
 
