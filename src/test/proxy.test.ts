@@ -1063,6 +1063,29 @@ describe("Proxy Middleware", () => {
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
     });
+
+    it("/api/* 에서 401/403이 아닌 4xx(400)로 hard 갱신이 실패하면 400 JSON을 반환하고 쿠키를 보존해야 함", async () => {
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
+        headers: { cookie: `refreshToken=${refreshToken}` },
+      });
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: jest.fn().mockResolvedValue({
+          code: "COMMON400",
+          message: "잘못된 요청입니다.",
+          isSuccess: false,
+          httpStatus: "BAD_REQUEST",
+        }),
+      });
+
+      const response = await proxy(request);
+
+      await expectApiAuthError(response, { status: 400, code: "COMMON400" });
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
+    });
   });
 
   describe("토큰 만료 임박 시 refreshToken 없음", () => {

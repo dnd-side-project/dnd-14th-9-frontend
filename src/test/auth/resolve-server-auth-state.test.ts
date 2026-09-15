@@ -112,4 +112,26 @@ describe("RootLayout auth prefetch flow", () => {
       exact: true,
     });
   });
+
+  it("Access Token 만료 시 SSR prefetch는 어떤 outbound fetch도 만들지 않아야 한다 (네트워크 경계 검증)", async () => {
+    // fetchQuery 호출 여부가 아니라 실제 네트워크 경계에서 검증한다. 게이트가 뚫려
+    // getMe → api → fetch 체인이 실행되면 서버에서 Refresh Token 회전이 소모되므로,
+    // 만료 상태에서는 그 어떤 outbound fetch도 발생하지 않아야 한다.
+    mockedGetServerAuthCookieState.mockResolvedValue({
+      hasAccessToken: false,
+      hasRefreshToken: true,
+      hasAuthCookies: true,
+      isAccessTokenUsable: false,
+    });
+    const originalFetch = global.fetch;
+    const fetchSpy = jest.fn();
+    global.fetch = fetchSpy as unknown as typeof fetch;
+
+    try {
+      await prepareAuthMeQuery(new QueryClient());
+      expect(fetchSpy).not.toHaveBeenCalled();
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
 });
