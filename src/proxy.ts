@@ -400,7 +400,7 @@ async function tryHardRefreshToken(
   if (!backendUrl) {
     console.error("Proxy: BACKEND_API_BASE is not configured");
     return buildAuthFailureResponse(request, {
-      clearAuth: true,
+      clearAuth: false,
       reason: LOGIN_INTERNAL_ERROR_CODES.CONFIG_ERROR,
       status: 500,
     });

@@ -10,7 +10,7 @@ import { PretendardFontLoader } from "./PretendardFontLoader";
 
 export const metadata = rootMetadata;
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
   modal,
 }: Readonly<{

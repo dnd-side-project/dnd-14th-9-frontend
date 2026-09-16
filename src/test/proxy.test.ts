@@ -988,8 +988,8 @@ describe("Proxy Middleware", () => {
       // Then
       expectLoginRedirect(response, "config_error");
       expectRedirectAfterLoginCookie(response, PRIMARY_PROTECTED_PAGE_PATH);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(true);
-      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(true);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
       expect(mockFetch).not.toHaveBeenCalled(); // API 호출 안함
     });
   });
@@ -1014,6 +1014,12 @@ describe("Proxy Middleware", () => {
       const response = await responsePromise;
 
       expectLoginRedirect(response, "network_error");
+      expectRefreshFailureLog({
+        reason: "timeout",
+        routeType: "protected",
+        status: 504,
+        cookieClear: false,
+      });
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
     });
@@ -1037,6 +1043,12 @@ describe("Proxy Middleware", () => {
       const response = await proxy(request);
 
       expectLoginRedirect(response, "COMMON500");
+      expectRefreshFailureLog({
+        reason: "http_error",
+        routeType: "protected",
+        status: 503,
+        cookieClear: false,
+      });
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("accessToken=;"))).toBe(false);
       expect(hasSetCookie(response, (cookie) => cookie.startsWith("refreshToken=;"))).toBe(false);
     });

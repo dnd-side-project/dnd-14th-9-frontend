@@ -58,6 +58,7 @@ export const memberQueries = {
       queryFn: memberApi.getMe,
       staleTime: MEMBER_STALE_TIME,
       retry: false,
+      refetchOnWindowFocus: false,
     }),
   edit: () =>
     queryOptions({
@@ -87,23 +88,11 @@ export function useMe(options?: UseMeOptions) {
 
 export const useDeleteMe = memberCore.useDelete!;
 
-export async function prefetchMe() {
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(memberQueries.me());
-  return dehydrate(queryClient);
-}
-
 export function useMeForEdit() {
   return useQuery(memberQueries.edit());
 }
 export function useSuspenseMeForEdit() {
   return useSuspenseQuery(memberQueries.edit());
-}
-
-export async function prefetchMeForEdit() {
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(memberQueries.edit());
-  return dehydrate(queryClient);
 }
 
 // Report 쿼리 (Session의 useSessionReport와 동일한 패턴)

@@ -8,12 +8,12 @@ import {
 } from "@/lib/auth/auth-state";
 
 export function useAuthState() {
-  const { data, isPending } = useMe();
+  const { data, isPending, isFetching } = useMe();
 
   if (data?.result) {
     return createAuthenticatedAuthState(data.result);
   }
-  if (isPending) {
+  if (isPending || isFetching) {
     return createRecoveringAuthState();
   }
   return GUEST_AUTH_STATE;

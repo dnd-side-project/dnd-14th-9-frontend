@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
-import { memberKeys } from "@/features/member/hooks/useMemberHooks";
-import type { GetMeResponse } from "@/features/member/types";
 import { SessionPageContent } from "@/features/session/components/SessionPageContent";
 import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
 import { getSessionDetail } from "@/features/session/server/get-session-detail";
 import { isWaitingStatus } from "@/features/session/types";
 import { handleSessionNotFound } from "@/features/session/utils/handleSessionNotFound";
+import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 import { getQueryClient } from "@/lib/getQueryClient";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
@@ -56,8 +56,11 @@ export default async function SessionPage({ params }: SessionPageProps) {
     redirect(`/session/${sessionId}/waiting`);
   }
 
-  const meData = queryClient.getQueryData<GetMeResponse>(memberKeys.me());
-  if (meData?.result) {
+  const cookieStore = await cookies();
+  const hasAuthCookies = Boolean(
+    cookieStore.get(ACCESS_TOKEN_COOKIE)?.value || cookieStore.get(REFRESH_TOKEN_COOKIE)?.value
+  );
+  if (hasAuthCookies) {
     await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
   }
 

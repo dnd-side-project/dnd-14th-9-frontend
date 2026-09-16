@@ -3,8 +3,6 @@ import { redirect } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { WaitingRoomContent } from "@/features/lobby/components/WaitingRoomContent";
-import { memberKeys } from "@/features/member/hooks/useMemberHooks";
-import type { GetMeResponse } from "@/features/member/types";
 import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
 import { isInProgressStatus } from "@/features/session/types";
 import { handleSessionNotFound } from "@/features/session/utils/handleSessionNotFound";
@@ -30,10 +28,7 @@ export default async function WaitingRoomPage({ params }: WaitingRoomPageProps) 
     redirect(`/session/${sessionId}`);
   }
 
-  const meData = queryClient.getQueryData<GetMeResponse>(memberKeys.me());
-  if (meData?.result) {
-    await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
-  }
+  await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
