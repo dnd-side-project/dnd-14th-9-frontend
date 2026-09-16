@@ -1,7 +1,7 @@
 import { dehydrate } from "@tanstack/react-query";
 
 import { ToastViewport } from "@/components/Toast/ToastViewport";
-import { prepareAuthMeQuery } from "@/lib/auth/prepare-auth-me-query";
+import { resolveServerAuthHint } from "@/lib/auth/resolve-server-auth-hint";
 import { getQueryClient } from "@/lib/getQueryClient";
 import GoogleAnalytics from "@/lib/GoogleAnalytics";
 import { rootMetadata } from "@/lib/seo/metadata";
@@ -23,7 +23,7 @@ export default async function RootLayout({
   modal: React.ReactNode;
 }>) {
   const queryClient = getQueryClient();
-  const { hasAuthCookies } = await prepareAuthMeQuery(queryClient);
+  const { hasAuthCookies } = await resolveServerAuthHint();
 
   return (
     <html lang="ko" className="dark">
