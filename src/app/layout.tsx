@@ -1,11 +1,6 @@
-import { dehydrate } from "@tanstack/react-query";
-
 import { ToastViewport } from "@/components/Toast/ToastViewport";
-import { resolveServerAuthHint } from "@/lib/auth/resolve-server-auth-hint";
-import { getQueryClient } from "@/lib/getQueryClient";
 import GoogleAnalytics from "@/lib/GoogleAnalytics";
 import { rootMetadata } from "@/lib/seo/metadata";
-import { AuthStateProvider } from "@/providers/AuthStateProvider";
 import { MockProvider } from "@/providers/MockProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
 
@@ -22,9 +17,6 @@ export default async function RootLayout({
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
-  const queryClient = getQueryClient();
-  const { hasAuthCookies } = await resolveServerAuthHint();
-
   return (
     <html lang="ko" className="dark">
       <body
@@ -35,12 +27,10 @@ export default async function RootLayout({
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS} />
         ) : null}
         <MockProvider>
-          <QueryProvider dehydratedState={dehydrate(queryClient)}>
-            <AuthStateProvider hasAuthCookies={hasAuthCookies}>
-              {children}
-              {modal}
-              <ToastViewport />
-            </AuthStateProvider>
+          <QueryProvider>
+            {children}
+            {modal}
+            <ToastViewport />
           </QueryProvider>
         </MockProvider>
       </body>

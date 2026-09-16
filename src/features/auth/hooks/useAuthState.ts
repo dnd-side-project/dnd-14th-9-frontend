@@ -6,27 +6,15 @@ import {
   createRecoveringAuthState,
   GUEST_AUTH_STATE,
 } from "@/lib/auth/auth-state";
-import { useAuthHint } from "@/providers/AuthStateProvider";
 
 export function useAuthState() {
-  const hasAuthCookies = useAuthHint();
-  const { data, isLoading, isFetching, isError } = useMe({ enabled: hasAuthCookies });
-
-  if (!hasAuthCookies) {
-    return GUEST_AUTH_STATE;
-  }
+  const { data, isPending } = useMe();
 
   if (data?.result) {
     return createAuthenticatedAuthState(data.result);
   }
-
-  if (isLoading || isFetching) {
+  if (isPending) {
     return createRecoveringAuthState();
   }
-
-  if (isError) {
-    return GUEST_AUTH_STATE;
-  }
-
   return GUEST_AUTH_STATE;
 }
