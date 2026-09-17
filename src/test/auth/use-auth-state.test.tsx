@@ -56,7 +56,21 @@ describe("useAuthState", () => {
     expect(result.current).toEqual({ status: "authenticated", profile });
   });
 
-  it("에러/빈 결과로 해소되면 guest여야 한다", () => {
+  it("데이터가 있으면 재요청 중이어도 authenticated를 유지해야 한다", () => {
+    mockedUseMe.mockReturnValue(
+      stubMe({
+        isPending: false,
+        isFetching: true,
+        data: { result: profile } as GetMeResponse,
+      })
+    );
+
+    const { result } = renderHook(() => useAuthState());
+
+    expect(result.current).toEqual({ status: "authenticated", profile });
+  });
+
+  it("에러로 해소되면 guest여야 한다", () => {
     mockedUseMe.mockReturnValue(
       stubMe({
         isPending: false,
