@@ -165,6 +165,7 @@ describe("SessionPageContent", () => {
 
     render(<SessionPageContent sessionId="1" />);
 
+    expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: true });
     expect(screen.getByTestId("session-header")).toBeInTheDocument();
     expect(screen.getByTestId("session-detail-section")).toBeInTheDocument();
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
@@ -185,6 +186,7 @@ describe("SessionPageContent", () => {
 
     render(<SessionPageContent sessionId="1" />);
 
+    expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: false });
     expect(screen.getByRole("link", { name: "로그인하고 참여하기" })).toHaveAttribute(
       "href",
       "/login"

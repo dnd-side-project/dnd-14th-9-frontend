@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
@@ -10,7 +9,6 @@ import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
 import { getSessionDetail } from "@/features/session/server/get-session-detail";
 import { isWaitingStatus } from "@/features/session/types";
 import { handleSessionNotFound } from "@/features/session/utils/handleSessionNotFound";
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
 import { getQueryClient } from "@/lib/getQueryClient";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
@@ -54,14 +52,6 @@ export default async function SessionPage({ params }: SessionPageProps) {
   // mock mode에서는 UI 확인을 위해 세션 화면에 직접 접근할 수 있도록 상태 기반 redirect를 제한한다.
   if (!isMockModeEnabled() && isWaitingStatus(sessionData.result.status)) {
     redirect(`/session/${sessionId}/waiting`);
-  }
-
-  const cookieStore = await cookies();
-  const hasAuthCookies = Boolean(
-    cookieStore.get(ACCESS_TOKEN_COOKIE)?.value || cookieStore.get(REFRESH_TOKEN_COOKIE)?.value
-  );
-  if (hasAuthCookies) {
-    await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
   }
 
   return (
