@@ -11,12 +11,10 @@ import {
   useQuery,
   useSuspenseQuery,
   useQueryClient,
-  dehydrate,
   queryOptions,
 } from "@tanstack/react-query";
 
 import { createSingletonHooks } from "@/hooks/createSingletonHooks";
-import { getQueryClient } from "@/lib/getQueryClient";
 
 import { memberApi } from "../api";
 
@@ -98,12 +96,6 @@ export function useSuspenseMeForEdit() {
 // Report 쿼리 (Session의 useSessionReport와 동일한 패턴)
 export function useMyReport() {
   return useQuery(memberQueries.report());
-}
-
-export async function prefetchMyReport() {
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(memberQueries.report());
-  return dehydrate(queryClient);
 }
 
 // Mutation 헬퍼 (Session의 createSessionMutationHook과 동일한 역할)
