@@ -4,6 +4,7 @@ import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { useHasAuthMarker } from "@/features/auth/hooks/useHasAuthMarker";
 import { useMe } from "@/features/member/hooks/useMemberHooks";
 import type { GetMeResponse, MemberProfileView } from "@/features/member/types";
+import { ApiError, NetworkError } from "@/lib/api/api-client";
 import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
 
 import type { UseQueryResult } from "@tanstack/react-query";
@@ -121,19 +122,33 @@ describe("useAuthState (마커 있음)", () => {
     expect(result.current).toEqual({ status: "authenticated", profile });
   });
 
-  it("에러로 해소되면 guest여야 한다", () => {
+  it("인증 거부(401)로 해소되면 guest여야 한다", () => {
     mockedUseMe.mockReturnValue(
       stubMe({
         isPending: false,
         isFetching: false,
         data: undefined,
         isError: true,
+        error: new ApiError("인증이 필요합니다.", 401),
       })
     );
 
     const { result } = renderHook(() => useAuthState());
 
     expect(result.current).toEqual({ status: "guest" });
+  });
+
+  it.each([
+    ["5xx", new ApiError("서버 오류", 500)],
+    ["네트워크 오류", new NetworkError("네트워크 오류")],
+  ])("일시 실패(%s)로 확인하지 못하면 guest가 아닌 recovering이어야 한다", (_, error) => {
+    mockedUseMe.mockReturnValue(
+      stubMe({ isPending: false, isFetching: false, data: undefined, isError: true, error })
+    );
+
+    const { result } = renderHook(() => useAuthState());
+
+    expect(result.current).toEqual({ status: "recovering" });
   });
 
   it("빈 결과로 해소되면 guest여야 한다", () => {

@@ -58,6 +58,9 @@ export const memberQueries = {
       staleTime: MEMBER_STALE_TIME,
       // 인증 거부는 재시도해도 같으므로 일시 실패(5xx·네트워크)만 재시도한다.
       retry: (failureCount, error) => !isAuthRejectedError(error) && failureCount < 2,
+      meta: {
+        transientErrorToast: "로그인 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+      },
     }),
   edit: () =>
     queryOptions({
