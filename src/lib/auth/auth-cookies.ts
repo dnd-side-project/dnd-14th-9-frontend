@@ -1,5 +1,6 @@
 import {
   ACCESS_TOKEN_COOKIE,
+  AUTH_MARKER_COOKIE,
   ACCESS_TOKEN_MAX_AGE_SECONDS,
   REFRESH_TOKEN_COOKIE,
   REFRESH_TOKEN_MAX_AGE_SECONDS,
@@ -50,9 +51,17 @@ export function setAuthCookies(
     ...baseOptions,
     maxAge: REFRESH_TOKEN_MAX_AGE_SECONDS,
   });
+
+  // 비로그인 사용자가 /me를 호출하지 않도록 클라이언트가 읽는 마커. Refresh Token과 수명을 맞춘다.
+  writer.set(AUTH_MARKER_COOKIE, "1", {
+    ...baseOptions,
+    httpOnly: false,
+    maxAge: REFRESH_TOKEN_MAX_AGE_SECONDS,
+  });
 }
 
 export function clearAuthCookies(writer: CookieWriter) {
   writer.delete(ACCESS_TOKEN_COOKIE);
   writer.delete(REFRESH_TOKEN_COOKIE);
+  writer.delete(AUTH_MARKER_COOKIE);
 }

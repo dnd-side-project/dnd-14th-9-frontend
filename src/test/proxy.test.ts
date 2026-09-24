@@ -346,6 +346,17 @@ describe("Proxy Middleware", () => {
         expect(mockFetch).not.toHaveBeenCalled();
       }
     });
+    it("토큰 없이 마커만 남은 me 요청은 401과 함께 마커를 지워야 함", async () => {
+      const request = new NextRequest("http://localhost:3000/api/members/me/profile", {
+        headers: { cookie: "hasAuthSession=1" },
+      });
+
+      const response = await proxy(request);
+
+      await expectApiAuthError(response, { code: "auth_required" });
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("hasAuthSession=;"))).toBe(true);
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
   });
 
   describe("mock 모드 인증 우회", () => {
@@ -763,9 +774,11 @@ describe("Proxy Middleware", () => {
 
       // Then: 응답에 새 쿠키 포함
       const setCookies = response.headers.getSetCookie();
-      expect(setCookies).toHaveLength(2);
+      expect(setCookies).toHaveLength(3);
       expect(setCookies[0]).toContain(newAccessToken);
       expect(setCookies[1]).toContain(newRefreshToken);
+      expect(setCookies[2]).toMatch(/^hasAuthSession=1;/);
+      expect(setCookies[2]).not.toMatch(/HttpOnly/i);
     });
 
     it("Refresh Token과 새 토큰 쌍을 로그에 남기지 않아야 함", async () => {
