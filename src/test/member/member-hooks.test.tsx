@@ -7,6 +7,7 @@ import { memberApi } from "@/features/member/api";
 import {
   memberKeys,
   memberQueries,
+  useMe,
   useMeForEdit,
   useUpdateInterestCategories,
   useUpdateNickname,
@@ -144,6 +145,32 @@ describe("memberHooks query", () => {
     expect(mockedMemberApi.getMeForEdit).toHaveBeenCalledTimes(1);
     expect(queryClient.getQueryData(memberKeys.edit())).toEqual(response);
   });
+
+  it.each([401, 403])(
+    "useMe는 인증 거부(%i) 후 이전 프로필 데이터를 노출하지 않아야 한다",
+    async (status) => {
+      const queryClient = new QueryClient();
+      const previousResponse = createMockProfileResponse("previous");
+      queryClient.setQueryData(memberKeys.me(), previousResponse);
+      mockedMemberApi.getMe.mockRejectedValueOnce(new ApiError("인증이 필요합니다.", status));
+
+      const { result } = renderHook(
+        () => {
+          const query = useMe();
+          return { data: query.data, isError: query.isError, refetch: query.refetch };
+        },
+        { wrapper: createWrapper(queryClient) }
+      );
+
+      await act(async () => {
+        await result.current.refetch();
+      });
+
+      await waitFor(() => expect(result.current.isError).toBe(true));
+      expect(result.current.data).toBeUndefined();
+      expect(queryClient.getQueryData(memberKeys.me())).toEqual(previousResponse);
+    }
+  );
 });
 
 describe("memberQueries.me 재시도·포커스 재조회", () => {

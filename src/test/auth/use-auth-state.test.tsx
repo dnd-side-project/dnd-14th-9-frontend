@@ -51,6 +51,15 @@ describe("useAuthState 마커 게이트", () => {
     expect(result.current).toEqual({ status: "guest" });
   });
 
+  it("마커가 없으면 이전 me 데이터가 남아 있어도 guest여야 한다", () => {
+    mockedUseHasAuthMarker.mockReturnValue(false);
+    mockedUseMe.mockReturnValue(stubMe({ data: { result: profile } as GetMeResponse }));
+
+    const { result } = renderHook(() => useAuthState());
+
+    expect(result.current).toEqual({ status: "guest" });
+  });
+
   it("hydration 전(마커 판단 불가)에는 me를 조회하지 않고 recovering이어야 한다", () => {
     mockedUseHasAuthMarker.mockReturnValue(null);
 
@@ -136,6 +145,36 @@ describe("useAuthState (마커 있음)", () => {
     const { result } = renderHook(() => useAuthState());
 
     expect(result.current).toEqual({ status: "guest" });
+  });
+
+  it.each([401, 403])("이전 me 데이터가 있어도 인증 거부(%i) 후에는 guest여야 한다", (status) => {
+    mockedUseMe.mockReturnValue(
+      stubMe({
+        isPending: false,
+        isFetching: false,
+        data: { result: profile } as GetMeResponse,
+        error: new ApiError("인증이 필요합니다.", status),
+      })
+    );
+
+    const { result } = renderHook(() => useAuthState());
+
+    expect(result.current).toEqual({ status: "guest" });
+  });
+
+  it("일시 실패 후에도 이전 me 데이터가 있으면 authenticated를 유지해야 한다", () => {
+    mockedUseMe.mockReturnValue(
+      stubMe({
+        isPending: false,
+        isFetching: false,
+        data: { result: profile } as GetMeResponse,
+        error: new ApiError("서버 오류", 500),
+      })
+    );
+
+    const { result } = renderHook(() => useAuthState());
+
+    expect(result.current).toEqual({ status: "authenticated", profile });
   });
 
   it.each([

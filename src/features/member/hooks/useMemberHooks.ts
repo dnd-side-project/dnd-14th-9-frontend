@@ -82,10 +82,12 @@ interface UseMeOptions {
 }
 
 export function useMe(options?: UseMeOptions) {
-  return useQuery({
+  const query = useQuery({
     ...memberQueries.me(),
     ...options,
   });
+
+  return isAuthRejectedError(query.error) ? { ...query, data: undefined } : query;
 }
 
 export const useDeleteMe = memberCore.useDelete!;
