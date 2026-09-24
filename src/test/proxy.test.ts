@@ -305,6 +305,61 @@ describe("Proxy Middleware", () => {
     });
   });
 
+  describe("인증 마커 보충", () => {
+    it("마커 도입 전 세션(토큰만 있음)은 홈 요청에서 마커를 보충해야 함", async () => {
+      const accessToken = createMockToken(30 * 60);
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/", {
+        headers: { cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}` },
+      });
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("hasAuthSession=1;"))).toBe(true);
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("이미 마커가 있으면 다시 심지 않아야 함", async () => {
+      const accessToken = createMockToken(30 * 60);
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest("http://localhost:3000/", {
+        headers: {
+          cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}; hasAuthSession=1`,
+        },
+      });
+
+      const response = await proxy(request);
+
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("hasAuthSession="))).toBe(false);
+    });
+
+    it("Refresh Token이 없으면 마커를 심지 않아야 함", async () => {
+      const request = new NextRequest("http://localhost:3000/");
+
+      const response = await proxy(request);
+
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("hasAuthSession="))).toBe(false);
+    });
+
+    it("인증 거부로 쿠키를 지우는 응답에는 마커를 다시 심지 않아야 함", async () => {
+      const refreshToken = createMockToken(30 * 24 * 60 * 60);
+      const request = new NextRequest(`http://localhost:3000${PRIMARY_PROTECTED_PAGE_PATH}`, {
+        headers: { cookie: `refreshToken=${refreshToken}` },
+      });
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ isSuccess: false, code: "AUTH401_7" }), { status: 401 })
+      );
+
+      const response = await proxy(request);
+
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("hasAuthSession=1;"))).toBe(
+        false
+      );
+      expect(hasSetCookie(response, (cookie) => cookie.startsWith("hasAuthSession=;"))).toBe(true);
+    });
+  });
+
   describe("공개 API 예외 경로", () => {
     it("정의된 공개 API 경로는 토큰 없이 통과해야 함", async () => {
       const publicApiPaths = [

@@ -2,8 +2,12 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { getAccessTokenRefreshState } from "@/lib/auth/access-token-state";
-import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+import { clearAuthCookies, setAuthCookies, setAuthMarkerCookie } from "@/lib/auth/auth-cookies";
+import {
+  ACCESS_TOKEN_COOKIE,
+  AUTH_MARKER_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "@/lib/auth/cookie-constants";
 import { mergeCookieHeaderWithAuthTokens } from "@/lib/auth/cookie-header-utils";
 import { buildLoginRedirectUrl } from "@/lib/auth/login-redirect-utils";
 import { setRedirectAfterLoginCookie } from "@/lib/auth/redirect-after-login-cookie";
@@ -46,6 +50,27 @@ type RefreshFailureReason = Extract<RefreshOutcome, { kind: "failure" }>["reason
  * @returns 인증 상태에 따라 통과, 새 Cookie, redirect 또는 API 오류가 적용된 응답.
  */
 export async function proxy(request: NextRequest) {
+  const response = await handleAuth(request);
+  backfillAuthMarker(request, response);
+  return response;
+}
+
+/**
+ * 마커 도입 전에 로그인한 세션은 토큰만 있고 마커가 없어 클라이언트가 게스트로 오판한다.
+ * Refresh Token이 있는데 마커가 없으면 응답에 마커를 보충한다. 응답이 이미 마커를 심거나
+ * 지우는 경우(갱신 성공·인증 거부)는 그 결정을 따른다.
+ */
+function backfillAuthMarker(request: NextRequest, response: NextResponse) {
+  if (
+    request.cookies.has(REFRESH_TOKEN_COOKIE) &&
+    !request.cookies.has(AUTH_MARKER_COOKIE) &&
+    !response.cookies.has(AUTH_MARKER_COOKIE)
+  ) {
+    setAuthMarkerCookie(response.cookies);
+  }
+}
+
+async function handleAuth(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   const isPublicPageRoute = isKnownPublicPageRoute(pathname);
   const requiresHardAuth = isApiRoute(pathname) || isProtectedPageRoute(pathname);

@@ -52,9 +52,18 @@ export function setAuthCookies(
     maxAge: REFRESH_TOKEN_MAX_AGE_SECONDS,
   });
 
-  // 비로그인 사용자가 /me를 호출하지 않도록 클라이언트가 읽는 마커. Refresh Token과 수명을 맞춘다.
+  setAuthMarkerCookie(writer, isProduction);
+}
+
+/**
+ * 비로그인 사용자가 /me를 호출하지 않도록 클라이언트가 읽는 마커를 심는다. Refresh Token과 수명을 맞춘다.
+ */
+export function setAuthMarkerCookie(
+  writer: CookieWriter,
+  isProduction: boolean = process.env.NODE_ENV === "production"
+) {
   writer.set(AUTH_MARKER_COOKIE, "1", {
-    ...baseOptions,
+    ...getBaseCookieOptions(isProduction),
     httpOnly: false,
     maxAge: REFRESH_TOKEN_MAX_AGE_SECONDS,
   });
