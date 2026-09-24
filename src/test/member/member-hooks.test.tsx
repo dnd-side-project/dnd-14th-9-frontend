@@ -16,7 +16,7 @@ import type {
   MemberProfileMutationResponse,
   UpdateInterestCategoriesRequest,
 } from "@/features/member/types";
-import { ApiError } from "@/lib/api/api-client";
+import { ApiError, NetworkError } from "@/lib/api/api-client";
 
 jest.mock("@/features/member/api", () => ({
   memberApi: {
@@ -146,7 +146,7 @@ describe("memberHooks query", () => {
   });
 });
 
-describe("memberQueries.me 포커스 재조회", () => {
+describe("memberQueries.me 재시도·포커스 재조회", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -155,9 +155,9 @@ describe("memberQueries.me 포커스 재조회", () => {
     focusManager.setFocused(undefined);
   });
 
-  // me의 5분 staleTime은 두 경우 모두 포커스 재조회를 막으므로 0으로 두고 포커스 정책만 검증한다.
+  // 5분 staleTime은 포커스 재조회를 막고 기본 retryDelay는 테스트를 늦추므로 둘 다 0으로 두고 정책만 검증한다.
   function renderMeQuery(queryClient: QueryClient) {
-    return renderHook(() => useQuery({ ...memberQueries.me(), staleTime: 0 }), {
+    return renderHook(() => useQuery({ ...memberQueries.me(), staleTime: 0, retryDelay: 0 }), {
       wrapper: createWrapper(queryClient),
     });
   }
@@ -168,6 +168,29 @@ describe("memberQueries.me 포커스 재조회", () => {
       focusManager.setFocused(true);
     });
   }
+
+  it.each([401, 403])("인증 거부(%i)는 재시도하지 않아야 한다", async (status) => {
+    const queryClient = new QueryClient();
+    mockedMemberApi.getMe.mockRejectedValue(new ApiError("인증이 필요합니다.", status));
+
+    const { result } = renderMeQuery(queryClient);
+    await waitFor(() => expect(result.current.isError).toBe(true));
+
+    expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ["5xx", new ApiError("서버 오류", 500)],
+    ["네트워크 오류", new NetworkError("네트워크 오류")],
+  ])("일시 실패(%s)는 2번 재시도해야 한다", async (_, error) => {
+    const queryClient = new QueryClient();
+    mockedMemberApi.getMe.mockRejectedValue(error);
+
+    const { result } = renderMeQuery(queryClient);
+    await waitFor(() => expect(result.current.isError).toBe(true));
+
+    expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(3);
+  });
 
   it("로그인 유저는 탭 포커스 복귀 시 me를 다시 조회해야 한다", async () => {
     const queryClient = new QueryClient();
@@ -183,15 +206,15 @@ describe("memberQueries.me 포커스 재조회", () => {
     await waitFor(() => expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(2));
   });
 
-  it("비로그인 유저는 탭 포커스 복귀 시 me를 다시 조회하지 않아야 한다", async () => {
+  it("일시 실패로 확인하지 못한 경우 탭 포커스 복귀 시 다시 조회해야 한다", async () => {
     const queryClient = new QueryClient();
-    mockedMemberApi.getMe.mockRejectedValue(new ApiError("인증이 필요합니다.", 401));
+    mockedMemberApi.getMe.mockRejectedValue(new ApiError("서버 오류", 500));
 
     const { result } = renderMeQuery(queryClient);
     await waitFor(() => expect(result.current.isError).toBe(true));
 
     await refocusWindow();
 
-    expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(mockedMemberApi.getMe.mock.calls.length).toBeGreaterThan(3));
   });
 });

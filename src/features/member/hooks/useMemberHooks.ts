@@ -15,6 +15,7 @@ import {
 } from "@tanstack/react-query";
 
 import { createSingletonHooks } from "@/hooks/createSingletonHooks";
+import { isAuthRejectedError } from "@/lib/api/api-client";
 
 import { memberApi } from "../api";
 
@@ -55,9 +56,8 @@ export const memberQueries = {
       queryKey: memberKeys.me(),
       queryFn: memberApi.getMe,
       staleTime: MEMBER_STALE_TIME,
-      retry: false,
-      // 비로그인(데이터 없음)은 포커스마다 401을 반복하지 않도록 로그인 상태일 때만 재조회한다.
-      refetchOnWindowFocus: (query) => query.state.data != null,
+      // 인증 거부는 재시도해도 같으므로 일시 실패(5xx·네트워크)만 재시도한다.
+      retry: (failureCount, error) => !isAuthRejectedError(error) && failureCount < 2,
     }),
   edit: () =>
     queryOptions({
