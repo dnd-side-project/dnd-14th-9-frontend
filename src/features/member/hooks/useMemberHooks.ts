@@ -56,7 +56,8 @@ export const memberQueries = {
       queryFn: memberApi.getMe,
       staleTime: MEMBER_STALE_TIME,
       retry: false,
-      refetchOnWindowFocus: false,
+      // 비로그인(데이터 없음)은 포커스마다 401을 반복하지 않도록 로그인 상태일 때만 재조회한다.
+      refetchOnWindowFocus: (query) => query.state.data != null,
     }),
   edit: () =>
     queryOptions({

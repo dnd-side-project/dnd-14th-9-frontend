@@ -1,11 +1,12 @@
 import type { PropsWithChildren } from "react";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { focusManager, QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
 import { memberApi } from "@/features/member/api";
 import {
   memberKeys,
+  memberQueries,
   useMeForEdit,
   useUpdateInterestCategories,
   useUpdateNickname,
@@ -15,6 +16,7 @@ import type {
   MemberProfileMutationResponse,
   UpdateInterestCategoriesRequest,
 } from "@/features/member/types";
+import { ApiError } from "@/lib/api/api-client";
 
 jest.mock("@/features/member/api", () => ({
   memberApi: {
@@ -141,5 +143,55 @@ describe("memberHooks query", () => {
 
     expect(mockedMemberApi.getMeForEdit).toHaveBeenCalledTimes(1);
     expect(queryClient.getQueryData(memberKeys.edit())).toEqual(response);
+  });
+});
+
+describe("memberQueries.me 포커스 재조회", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    focusManager.setFocused(undefined);
+  });
+
+  // me의 5분 staleTime은 두 경우 모두 포커스 재조회를 막으므로 0으로 두고 포커스 정책만 검증한다.
+  function renderMeQuery(queryClient: QueryClient) {
+    return renderHook(() => useQuery({ ...memberQueries.me(), staleTime: 0 }), {
+      wrapper: createWrapper(queryClient),
+    });
+  }
+
+  async function refocusWindow() {
+    await act(async () => {
+      focusManager.setFocused(false);
+      focusManager.setFocused(true);
+    });
+  }
+
+  it("로그인 유저는 탭 포커스 복귀 시 me를 다시 조회해야 한다", async () => {
+    const queryClient = new QueryClient();
+    mockedMemberApi.getMe.mockResolvedValue({
+      result: createMockProfileResponse("me").result,
+    } as Awaited<ReturnType<typeof memberApi.getMe>>);
+
+    const { result } = renderMeQuery(queryClient);
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    await refocusWindow();
+
+    await waitFor(() => expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(2));
+  });
+
+  it("비로그인 유저는 탭 포커스 복귀 시 me를 다시 조회하지 않아야 한다", async () => {
+    const queryClient = new QueryClient();
+    mockedMemberApi.getMe.mockRejectedValue(new ApiError("인증이 필요합니다.", 401));
+
+    const { result } = renderMeQuery(queryClient);
+    await waitFor(() => expect(result.current.isError).toBe(true));
+
+    await refocusWindow();
+
+    expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(1);
   });
 });
