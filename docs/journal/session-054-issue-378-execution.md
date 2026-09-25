@@ -37,7 +37,13 @@ PR #380 head 기준 남은 SSR self-hop은 대기 페이지 상세·대기실 �
 - Playwright 프로덕션 페이지 QA: HTTP 200, 세션 수정 제목 렌더링, 페이지 JavaScript 오류 0건. 백엔드 세션 제목이 HTML에 들어 있음을 재확인했다.
 - 인증 페이지 실측은 안전한 전용 계정/fixture 부재로 미실시. Proxy 테스트는 보호 페이지 갱신 후 요청 Cookie 헤더에 새 토큰을 전달하는 것을 검증하고, 서버 API 테스트는 `cookies()`의 토큰을 `Bearer` 헤더에 넣는 것을 검증한다. 실제 인증 페이지에서 두 경로가 이어지는 라이브 검증은 미실시로 남긴다.
 
+## 원격 인계 상태
+
+- 코드·테스트 `fe8b538`, 계획·ADR·측정 기록 `41ecad4`를 커밋하고 `refactor/#378-ssr-self-hop` 브랜치에 푸시했다. pre-push 훅의 lint, typecheck, Jest 93개 스위트·801개 테스트가 통과했다.
+- #380이 미병합이고 리뷰가 필요한 상태라, `main` 대상 [Draft PR #382](https://github.com/dnd-side-project/dnd-14th-9-frontend/pull/382)를 열었다. PR 본문에 대안별 트레이드오프, 채택 근거, 측정값, 미측정 항목과 남은 위험을 기록했다. #380 병합 전에는 PR diff에 #380 변경도 함께 보인다.
+
 ## Next session starts here
 
-1. #378 코드·테스트는 `fe8b538`에 묶었다. 계획·ADR·저널 문서는 Git ignore 대상이므로 필요한 세 파일만 명시적으로 추가해 문서 커밋을 완료한다.
-2. #380 병합 상태를 확인한다. 병합 후 main 기준으로 브랜치를 정리하고 Ready PR 본문에 선택 근거와 검증 결과를 남긴다. 병합은 별도 요청 없이는 하지 않는다.
+1. [PR #380](https://github.com/dnd-side-project/dnd-14th-9-frontend/pull/380)의 병합 여부를 확인한다. 직접 병합하지 않는다.
+2. 병합되면 최신 `origin/main`을 fetch하고 [Draft PR #382](https://github.com/dnd-side-project/dnd-14th-9-frontend/pull/382)의 diff가 #378 변경만 보여 주는지 확인한다. 필요하면 브랜치를 정리한 후 관련 검증을 다시 실행한다.
+3. PR 본문의 검증·측정·트레이드오프가 최종 diff와 일치하는지 확인하고 Ready로 전환해 CodeRabbit 리뷰를 받는다. 리뷰 피드백을 처리한 뒤 병합 요청 전까지 인계한다.
