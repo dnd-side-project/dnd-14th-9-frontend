@@ -146,6 +146,14 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
           buttonLabel="세션으로 돌아가기"
           href={`/session/${sessionId}/waiting`}
         />
+      ) : authState.status === "unavailable" ? (
+        <ErrorFallbackUI
+          className="py-20"
+          title="로그인 상태를 확인할 수 없어요"
+          description="로그인 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."
+          buttonLabel="다시 시도하기"
+          onRetry={authState.retry}
+        />
       ) : !isAuthenticated ? (
         <ErrorFallbackUI
           className="py-20"

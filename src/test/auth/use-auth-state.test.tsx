@@ -179,15 +179,28 @@ describe("useAuthState (마커 있음)", () => {
 
   it.each([
     ["5xx", new ApiError("서버 오류", 500)],
+    ["400", new ApiError("잘못된 요청", 400)],
     ["네트워크 오류", new NetworkError("네트워크 오류")],
-  ])("일시 실패(%s)로 확인하지 못하면 guest가 아닌 recovering이어야 한다", (_, error) => {
+  ])("일시 실패(%s)로 확인하지 못하면 재시도 가능한 unavailable이어야 한다", (_, error) => {
+    const refetch = jest.fn();
     mockedUseMe.mockReturnValue(
-      stubMe({ isPending: false, isFetching: false, data: undefined, isError: true, error })
+      stubMe({
+        isPending: false,
+        isFetching: false,
+        data: undefined,
+        isError: true,
+        error,
+        refetch,
+      })
     );
 
     const { result } = renderHook(() => useAuthState());
 
-    expect(result.current).toEqual({ status: "recovering" });
+    expect(result.current).toEqual({ status: "unavailable", retry: refetch });
+    if (result.current.status === "unavailable") {
+      result.current.retry();
+    }
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 
   it("빈 결과로 해소되면 guest여야 한다", () => {
@@ -211,6 +224,7 @@ describe("useAuthState (마커 있음)", () => {
         isFetching: true,
         data: undefined,
         isError: true,
+        error: new ApiError("서버 오류", 500),
       })
     );
 

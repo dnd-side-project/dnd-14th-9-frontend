@@ -8,12 +8,21 @@ export interface RecoveringAuthState {
   status: "recovering";
 }
 
+export interface UnavailableAuthState {
+  status: "unavailable";
+  retry: () => void;
+}
+
 export interface AuthenticatedAuthState {
   status: "authenticated";
   profile: MemberProfileView;
 }
 
-export type AuthState = GuestAuthState | RecoveringAuthState | AuthenticatedAuthState;
+export type AuthState =
+  | GuestAuthState
+  | RecoveringAuthState
+  | UnavailableAuthState
+  | AuthenticatedAuthState;
 
 export const GUEST_AUTH_STATE: GuestAuthState = {
   status: "guest",

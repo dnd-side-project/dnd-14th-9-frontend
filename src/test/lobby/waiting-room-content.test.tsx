@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { WaitingRoomContent } from "@/features/lobby/components/WaitingRoomContent";
 
@@ -118,6 +119,19 @@ describe("WaitingRoomContent", () => {
 
     expect(screen.getByTestId("waiting-room-skeleton")).toBeInTheDocument();
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
+  });
+
+  it("인증 조회 실패 시 스켈레톤이나 로그인 안내 대신 재시도 화면을 표시한다", async () => {
+    const retry = jest.fn();
+    mockUseAuthState.mockReturnValue({ status: "unavailable", retry });
+    mockUseMe.mockReturnValue({ data: undefined, isLoading: false });
+
+    render(<WaitingRoomContent sessionId="1" />);
+
+    expect(screen.queryByTestId("waiting-room-skeleton")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "로그인하고 참여하기" })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "다시 시도하기" }));
+    expect(retry).toHaveBeenCalledTimes(1);
   });
 
   it("waitingRoom 데이터 로딩 중이면 스켈레톤을 표시해야 한다", () => {
