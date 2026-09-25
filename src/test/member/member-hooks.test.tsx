@@ -1,11 +1,13 @@
 import type { PropsWithChildren } from "react";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { focusManager, QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
 import { memberApi } from "@/features/member/api";
 import {
   memberKeys,
+  memberQueries,
+  useMe,
   useMeForEdit,
   useUpdateInterestCategories,
   useUpdateNickname,
@@ -15,6 +17,7 @@ import type {
   MemberProfileMutationResponse,
   UpdateInterestCategoriesRequest,
 } from "@/features/member/types";
+import { ApiError, NetworkError } from "@/lib/api/api-client";
 
 jest.mock("@/features/member/api", () => ({
   memberApi: {
@@ -141,5 +144,104 @@ describe("memberHooks query", () => {
 
     expect(mockedMemberApi.getMeForEdit).toHaveBeenCalledTimes(1);
     expect(queryClient.getQueryData(memberKeys.edit())).toEqual(response);
+  });
+
+  it.each([401, 403])(
+    "useMe는 인증 거부(%i) 후 이전 프로필 데이터를 노출하지 않아야 한다",
+    async (status) => {
+      const queryClient = new QueryClient();
+      const previousResponse = createMockProfileResponse("previous");
+      queryClient.setQueryData(memberKeys.me(), previousResponse);
+      mockedMemberApi.getMe.mockRejectedValueOnce(new ApiError("인증이 필요합니다.", status));
+
+      const { result } = renderHook(
+        () => {
+          const query = useMe();
+          return { data: query.data, isError: query.isError, refetch: query.refetch };
+        },
+        { wrapper: createWrapper(queryClient) }
+      );
+
+      await act(async () => {
+        await result.current.refetch();
+      });
+
+      await waitFor(() => expect(result.current.isError).toBe(true));
+      expect(result.current.data).toBeUndefined();
+      expect(queryClient.getQueryData(memberKeys.me())).toEqual(previousResponse);
+    }
+  );
+});
+
+describe("memberQueries.me 재시도·포커스 재조회", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    focusManager.setFocused(undefined);
+  });
+
+  // 5분 staleTime은 포커스 재조회를 막고 기본 retryDelay는 테스트를 늦추므로 둘 다 0으로 두고 정책만 검증한다.
+  function renderMeQuery(queryClient: QueryClient) {
+    return renderHook(() => useQuery({ ...memberQueries.me(), staleTime: 0, retryDelay: 0 }), {
+      wrapper: createWrapper(queryClient),
+    });
+  }
+
+  async function refocusWindow() {
+    await act(async () => {
+      focusManager.setFocused(false);
+      focusManager.setFocused(true);
+    });
+  }
+
+  it.each([401, 403])("인증 거부(%i)는 재시도하지 않아야 한다", async (status) => {
+    const queryClient = new QueryClient();
+    mockedMemberApi.getMe.mockRejectedValue(new ApiError("인증이 필요합니다.", status));
+
+    const { result } = renderMeQuery(queryClient);
+    await waitFor(() => expect(result.current.isError).toBe(true));
+
+    expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ["5xx", new ApiError("서버 오류", 500)],
+    ["네트워크 오류", new NetworkError("네트워크 오류")],
+  ])("일시 실패(%s)는 2번 재시도해야 한다", async (_, error) => {
+    const queryClient = new QueryClient();
+    mockedMemberApi.getMe.mockRejectedValue(error);
+
+    const { result } = renderMeQuery(queryClient);
+    await waitFor(() => expect(result.current.isError).toBe(true));
+
+    expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(3);
+  });
+
+  it("로그인 유저는 탭 포커스 복귀 시 me를 다시 조회해야 한다", async () => {
+    const queryClient = new QueryClient();
+    mockedMemberApi.getMe.mockResolvedValue({
+      result: createMockProfileResponse("me").result,
+    } as Awaited<ReturnType<typeof memberApi.getMe>>);
+
+    const { result } = renderMeQuery(queryClient);
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    await refocusWindow();
+
+    await waitFor(() => expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(2));
+  });
+
+  it("일시 실패로 확인하지 못한 경우 탭 포커스 복귀 시 다시 조회해야 한다", async () => {
+    const queryClient = new QueryClient();
+    mockedMemberApi.getMe.mockRejectedValue(new ApiError("서버 오류", 500));
+
+    const { result } = renderMeQuery(queryClient);
+    await waitFor(() => expect(result.current.isError).toBe(true));
+
+    await refocusWindow();
+
+    await waitFor(() => expect(mockedMemberApi.getMe.mock.calls.length).toBeGreaterThan(3));
   });
 });

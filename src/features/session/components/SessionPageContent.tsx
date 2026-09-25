@@ -112,6 +112,19 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
     );
   }
 
+  if (authState.status === "unavailable") {
+    return (
+      <div className="flex h-[calc(100vh-200px)] min-h-100 items-center justify-center">
+        <ErrorFallbackUI
+          title="로그인 상태를 확인할 수 없어요"
+          description="로그인 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."
+          buttonLabel="다시 시도하기"
+          onRetry={authState.retry}
+        />
+      </div>
+    );
+  }
+
   const session = sessionData.result;
 
   // 비로그인 사용자 → 로그인 유도

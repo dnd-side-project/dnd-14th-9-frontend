@@ -24,6 +24,12 @@ jest.mock("@/features/session/components/SessionPageContent", () => ({
   SessionPageContent: () => null,
 }));
 
+jest.mock("next/headers", () => ({
+  cookies: jest.fn().mockResolvedValue({
+    get: jest.fn().mockReturnValue(undefined),
+  }),
+}));
+
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(() => {
     throw new Error("NEXT_REDIRECT");

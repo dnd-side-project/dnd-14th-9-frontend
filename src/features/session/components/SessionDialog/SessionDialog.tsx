@@ -96,6 +96,12 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
         로그인 상태 확인 중...
       </Button>
     );
+  } else if (authState.status === "unavailable") {
+    footerContent = (
+      <Button variant="solid" colorScheme="secondary" size="medium" onClick={authState.retry}>
+        다시 시도하기
+      </Button>
+    );
   } else if (isCheckingParticipation) {
     footerContent = (
       <Button variant="solid" colorScheme="primary" size="medium" disabled>

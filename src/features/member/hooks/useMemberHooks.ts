@@ -11,12 +11,11 @@ import {
   useQuery,
   useSuspenseQuery,
   useQueryClient,
-  dehydrate,
   queryOptions,
 } from "@tanstack/react-query";
 
 import { createSingletonHooks } from "@/hooks/createSingletonHooks";
-import { getQueryClient } from "@/lib/getQueryClient";
+import { isAuthRejectedError } from "@/lib/api/api-client";
 
 import { memberApi } from "../api";
 
@@ -57,7 +56,11 @@ export const memberQueries = {
       queryKey: memberKeys.me(),
       queryFn: memberApi.getMe,
       staleTime: MEMBER_STALE_TIME,
-      retry: false,
+      // 인증 거부(401/403)는 재시도하지 않고, 그 외 오류는 최대 2회 재시도한다.
+      retry: (failureCount, error) => !isAuthRejectedError(error) && failureCount < 2,
+      meta: {
+        transientErrorToast: "로그인 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+      },
     }),
   edit: () =>
     queryOptions({
@@ -79,19 +82,15 @@ interface UseMeOptions {
 }
 
 export function useMe(options?: UseMeOptions) {
-  return useQuery({
+  const query = useQuery({
     ...memberQueries.me(),
     ...options,
   });
+
+  return isAuthRejectedError(query.error) ? { ...query, data: undefined } : query;
 }
 
 export const useDeleteMe = memberCore.useDelete!;
-
-export async function prefetchMe() {
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(memberQueries.me());
-  return dehydrate(queryClient);
-}
 
 export function useMeForEdit() {
   return useQuery(memberQueries.edit());
@@ -100,21 +99,9 @@ export function useSuspenseMeForEdit() {
   return useSuspenseQuery(memberQueries.edit());
 }
 
-export async function prefetchMeForEdit() {
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(memberQueries.edit());
-  return dehydrate(queryClient);
-}
-
 // Report 쿼리 (Session의 useSessionReport와 동일한 패턴)
 export function useMyReport() {
   return useQuery(memberQueries.report());
-}
-
-export async function prefetchMyReport() {
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(memberQueries.report());
-  return dehydrate(queryClient);
 }
 
 // Mutation 헬퍼 (Session의 createSessionMutationHook과 동일한 역할)

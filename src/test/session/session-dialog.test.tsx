@@ -129,6 +129,21 @@ describe("SessionDialog", () => {
     expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: false });
   });
 
+  it("인증 조회 실패 시 세션 카드를 유지하고 인증 재시도를 제공한다", () => {
+    const retry = jest.fn();
+    mockUseAuthState.mockReturnValue({ status: "unavailable", retry });
+    mockUseMe.mockReturnValue({ data: undefined });
+
+    render(<SessionDialog sessionId="1" />);
+
+    expect(screen.getByTestId("session-card")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "로그인하고 참여하기", hidden: true })
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "다시 시도하기", hidden: true }));
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
   it("authenticated 상태에서는 single footer 액션을 유지해야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "authenticated" });
     mockUseMe.mockReturnValue({

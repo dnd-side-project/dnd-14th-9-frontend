@@ -1,5 +1,6 @@
 export const ACCESS_TOKEN_COOKIE = "accessToken";
 export const REFRESH_TOKEN_COOKIE = "refreshToken";
+export const AUTH_MARKER_COOKIE = "hasAuthSession";
 export const REDIRECT_AFTER_LOGIN_COOKIE = "redirectAfterLogin";
 
 export const ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 60;

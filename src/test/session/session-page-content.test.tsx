@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { SessionPageContent } from "@/features/session/components/SessionPageContent";
 
@@ -153,6 +154,19 @@ describe("SessionPageContent", () => {
     expect(screen.queryByTestId("session-timer-section")).not.toBeInTheDocument();
   });
 
+  it("인증 조회 실패 시 스켈레톤이나 로그인 안내 대신 재시도 화면을 표시한다", async () => {
+    const retry = jest.fn();
+    mockUseAuthState.mockReturnValue({ status: "unavailable", retry });
+    mockUseMe.mockReturnValue({ data: undefined, isLoading: false });
+
+    render(<SessionPageContent sessionId="1" />);
+
+    expect(screen.queryByTestId("session-page-skeleton")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "로그인하고 참여하기" })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "다시 시도하기" }));
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
   it("authenticated + 참여자이면 메인 콘텐츠를 렌더링해야 한다", () => {
     mockUseMe.mockReturnValue({
       data: {
@@ -165,6 +179,7 @@ describe("SessionPageContent", () => {
 
     render(<SessionPageContent sessionId="1" />);
 
+    expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: true });
     expect(screen.getByTestId("session-header")).toBeInTheDocument();
     expect(screen.getByTestId("session-detail-section")).toBeInTheDocument();
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
@@ -185,6 +200,7 @@ describe("SessionPageContent", () => {
 
     render(<SessionPageContent sessionId="1" />);
 
+    expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: false });
     expect(screen.getByRole("link", { name: "로그인하고 참여하기" })).toHaveAttribute(
       "href",
       "/login"

@@ -230,6 +230,18 @@ describe("SessionEditContent", () => {
     expect(screen.getByText("불러오는 중...")).toBeInTheDocument();
   });
 
+  it("인증 조회 실패 시 로그인 안내 대신 재시도 화면을 표시해야 한다", async () => {
+    const retry = jest.fn();
+    mockUseAuthState.mockReturnValue({ status: "unavailable", retry });
+
+    render(<SessionEditContent sessionId="1" />);
+
+    expect(screen.queryByTestId("session-edit-form")).not.toBeInTheDocument();
+    expect(screen.queryByText("로그인이 필요해요")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "다시 시도하기" }));
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
   it("대기 중이 아닌 세션이면 호스트여도 수정 불가 안내를 표시해야 한다", () => {
     mockUseSessionDetail.mockReturnValue({
       data: {
