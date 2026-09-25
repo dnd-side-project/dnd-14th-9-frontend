@@ -56,7 +56,7 @@ export const memberQueries = {
       queryKey: memberKeys.me(),
       queryFn: memberApi.getMe,
       staleTime: MEMBER_STALE_TIME,
-      // 인증 거부는 재시도해도 같으므로 일시 실패(5xx·네트워크)만 재시도한다.
+      // 인증 거부(401/403)는 재시도하지 않고, 그 외 오류는 최대 2회 재시도한다.
       retry: (failureCount, error) => !isAuthRejectedError(error) && failureCount < 2,
       meta: {
         transientErrorToast: "로그인 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
