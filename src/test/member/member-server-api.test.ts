@@ -74,4 +74,29 @@ describe("memberServerApi report reads", () => {
       expect.objectContaining({ method: "GET", headers: authorization })
     );
   });
+
+  it("me는 백엔드 /members/me/profile로 직행하고 Authorization을 첨부한다", async () => {
+    const fetchMock = jest.fn().mockResolvedValue(
+      mockJsonResponse({
+        isSuccess: true,
+        code: "COMMON200",
+        message: "ok",
+        result: { id: 1 },
+      })
+    );
+    global.fetch = fetchMock as typeof fetch;
+
+    const { memberServerApi } = await import("@/features/member/server/api");
+    await memberServerApi.getMe();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://backend.example.com/members/me/profile",
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.objectContaining({
+          Authorization: "Bearer test-access-token",
+        }),
+      })
+    );
+  });
 });

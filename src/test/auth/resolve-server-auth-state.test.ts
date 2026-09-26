@@ -1,8 +1,16 @@
 import { QueryClient } from "@tanstack/react-query";
 
+import { memberApi } from "@/features/member/api";
 import { memberKeys, memberQueries } from "@/features/member/hooks/useMemberHooks";
+import { memberServerApi } from "@/features/member/server/api";
 import { getServerAuthCookieState } from "@/lib/auth/auth-cookie-state";
 import { prepareAuthMeQuery } from "@/lib/auth/prepare-auth-me-query";
+
+jest.mock("@/features/member/server/api", () => ({
+  memberServerApi: {
+    getMe: jest.fn(),
+  },
+}));
 
 jest.mock("@/lib/auth/auth-cookie-state", () => ({
   getServerAuthCookieState: jest.fn(),
@@ -13,7 +21,28 @@ describe("RootLayout auth prefetch flow", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest
+      .spyOn(memberApi, "getMe")
+      .mockResolvedValue({} as Awaited<ReturnType<typeof memberApi.getMe>>);
+    jest.mocked(memberServerApi.getMe).mockResolvedValue({
+      isSuccess: true,
+      code: "COMMON200",
+      message: "ok",
+      result: { id: 1 },
+    } as Awaited<ReturnType<typeof memberServerApi.getMe>>);
   });
+
+  async function expectServerMePrefetch(fetchSpy: jest.SpiedFunction<QueryClient["fetchQuery"]>) {
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const passed = fetchSpy.mock.calls[0][0] as {
+      queryKey: readonly unknown[];
+      queryFn: () => Promise<unknown>;
+    };
+    expect(passed.queryKey).toEqual(memberQueries.me().queryKey);
+    await passed.queryFn();
+    expect(memberServerApi.getMe).toHaveBeenCalledTimes(1);
+    expect(memberApi.getMe).not.toHaveBeenCalled();
+  }
 
   it("인증 쿠키가 없으면 me prefetch를 생략해야 한다", async () => {
     mockedGetServerAuthCookieState.mockResolvedValue({
@@ -45,7 +74,7 @@ describe("RootLayout auth prefetch flow", () => {
 
     try {
       await expect(prepareAuthMeQuery(queryClient)).resolves.toEqual({ hasAuthCookies: true });
-      expect(fetchSpy).toHaveBeenCalledWith(memberQueries.me());
+      await expectServerMePrefetch(fetchSpy);
     } finally {
       if (previousUseMock === undefined) {
         delete process.env.NEXT_PUBLIC_USE_MOCK;
@@ -71,7 +100,7 @@ describe("RootLayout auth prefetch flow", () => {
 
     await prepareAuthMeQuery(queryClient);
 
-    expect(fetchSpy).toHaveBeenCalledWith(memberQueries.me());
+    await expectServerMePrefetch(fetchSpy);
   });
 
   it("me prefetch가 실패하면 member 캐시를 정리해야 한다", async () => {

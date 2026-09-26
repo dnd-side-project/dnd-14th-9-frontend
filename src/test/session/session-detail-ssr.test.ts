@@ -2,18 +2,27 @@ import { notFound, redirect } from "next/navigation";
 
 import { dehydrate, QueryClient } from "@tanstack/react-query";
 
+import { memberKeys } from "@/features/member/hooks/useMemberHooks";
+import { sessionApi } from "@/features/session/api";
 import { sessionKeys, sessionQueries } from "@/features/session/hooks/useSessionHooks";
 import { getSessionDetail } from "@/features/session/server/get-session-detail";
-import type { SessionDetailResponse } from "@/features/session/types";
+import type { SessionDetailResponse, WaitingRoomResponse } from "@/features/session/types";
 import { ApiError } from "@/lib/api/api-client";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import type { ApiSuccessResponse } from "@/types/shared/types";
 
 const mockGetSessionDetail = jest.fn();
+const mockGetWaitingRoom = jest.fn();
 const mockGetQueryClient = jest.fn();
 
 jest.mock("@/features/session/server/get-session-detail", () => ({
   getSessionDetail: (...args: unknown[]) => mockGetSessionDetail(...args),
+}));
+
+jest.mock("@/features/session/server/api", () => ({
+  sessionServerApi: {
+    getWaitingRoom: (...args: unknown[]) => mockGetWaitingRoom(...args),
+  },
 }));
 
 jest.mock("@/lib/getQueryClient", () => ({
@@ -79,6 +88,7 @@ describe("session detail SSR hydration", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetSessionDetail.mockReset();
+    mockGetWaitingRoom.mockReset();
     mockGetQueryClient.mockReset();
   });
 
@@ -238,5 +248,44 @@ describe("session detail SSR hydration", () => {
     expect(queryB?.state.data).toEqual(responseB);
     expect(mockGetSessionDetail).toHaveBeenCalledWith("669");
     expect(mockGetSessionDetail).toHaveBeenCalledWith("670");
+  });
+
+  it("인증된 세션 페이지는 waitingRoom을 서버 함수로 같은 queryKey에 저장한다", async () => {
+    const sessionId = "669";
+    const response = createSessionDetailResponse(669);
+    const serverWaitingRoom: ApiSuccessResponse<WaitingRoomResponse> = {
+      isSuccess: true,
+      code: "COMMON200",
+      message: "성공적으로 요청을 처리했습니다.",
+      result: { participantCount: 1, members: [] },
+    };
+    mockGetSessionDetail.mockResolvedValue(response);
+    mockGetWaitingRoom.mockResolvedValue(serverWaitingRoom);
+    const waitingRoomSpy = jest.spyOn(sessionApi, "getWaitingRoom").mockResolvedValue({
+      ...serverWaitingRoom,
+      result: { participantCount: 9, members: [] },
+    });
+
+    const queryClient = createTestQueryClient();
+    queryClient.setQueryData(memberKeys.me(), {
+      isSuccess: true,
+      code: "COMMON200",
+      message: "ok",
+      result: { id: 1 },
+    });
+    mockGetQueryClient.mockReturnValue(queryClient);
+
+    try {
+      const { default: SessionPage } = await loadSessionPageModule();
+      await SessionPage({ params: Promise.resolve({ sessionId }) });
+
+      expect(mockGetWaitingRoom).toHaveBeenCalledWith(sessionId);
+      expect(waitingRoomSpy).not.toHaveBeenCalled();
+      expect(queryClient.getQueryData(sessionKeys.waitingRoom(sessionId))).toEqual(
+        serverWaitingRoom
+      );
+    } finally {
+      waitingRoomSpy.mockRestore();
+    }
   });
 });

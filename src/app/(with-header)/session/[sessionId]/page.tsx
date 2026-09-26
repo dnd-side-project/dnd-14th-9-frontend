@@ -8,6 +8,7 @@ import { memberKeys } from "@/features/member/hooks/useMemberHooks";
 import type { GetMeResponse } from "@/features/member/types";
 import { SessionPageContent } from "@/features/session/components/SessionPageContent";
 import { sessionQueries } from "@/features/session/hooks/useSessionHooks";
+import { sessionServerApi } from "@/features/session/server/api";
 import { getSessionDetail } from "@/features/session/server/get-session-detail";
 import { isWaitingStatus } from "@/features/session/types";
 import { handleSessionNotFound } from "@/features/session/utils/handleSessionNotFound";
@@ -58,7 +59,10 @@ export default async function SessionPage({ params }: SessionPageProps) {
 
   const meData = queryClient.getQueryData<GetMeResponse>(memberKeys.me());
   if (meData?.result) {
-    await queryClient.prefetchQuery(sessionQueries.waitingRoom(sessionId));
+    await queryClient.prefetchQuery({
+      ...sessionQueries.waitingRoom(sessionId),
+      queryFn: () => sessionServerApi.getWaitingRoom(sessionId),
+    });
   }
 
   return (
