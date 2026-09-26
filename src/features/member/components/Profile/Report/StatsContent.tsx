@@ -1,4 +1,4 @@
-import { memberApi } from "@/features/member/api";
+import { memberServerApi } from "@/features/member/server/api";
 
 import ActivitySummaryCard from "./ActivitySummaryCard";
 import CategoryParticipationCard from "./CategoryParticipationCard";
@@ -6,7 +6,7 @@ import ReceivedEmojiCard from "./ReceivedEmojiCard";
 import SessionPerformanceCard from "./SessionPerformanceCard";
 
 export default async function StatsContent() {
-  const data = await memberApi.getMyReportStats();
+  const data = await memberServerApi.getReportStats();
 
   if (!data?.result) {
     throw new Error("Failed to load report statistics");

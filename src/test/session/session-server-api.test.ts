@@ -148,4 +148,29 @@ describe("sessionServerApi.getDetail", () => {
       })
     );
   });
+
+  it.each([
+    ["getWaitingRoom", "https://backend.example.com/sessions/101/waiting-room"],
+    ["getMyReport", "https://backend.example.com/sessions/101/me/report"],
+    ["getReport", "https://backend.example.com/sessions/101/report"],
+  ] as const)("%s는 백엔드로 직행하고 Authorization을 첨부한다", async (method, url) => {
+    cookieStore.accessToken = { value: "test-access-token" };
+    const fetchMock = jest
+      .fn()
+      .mockResolvedValue(mockJsonResponse(createSessionDetailResponse(101)));
+    global.fetch = fetchMock as typeof fetch;
+
+    const sessionServerApi = await loadSessionServerApi();
+    await sessionServerApi[method]("101");
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.objectContaining({
+          Authorization: "Bearer test-access-token",
+        }),
+      })
+    );
+  });
 });
