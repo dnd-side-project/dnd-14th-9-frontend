@@ -1,4 +1,4 @@
-import { memberApi } from "@/features/member/api";
+import { memberServerApi } from "@/features/member/server/api";
 
 import SessionHistorySection from "./SessionHistorySection";
 
@@ -9,7 +9,7 @@ interface SessionHistoryContentProps {
 const SESSION_HISTORY_PAGE_SIZE = 4;
 
 export default async function SessionHistoryContent({ page }: SessionHistoryContentProps) {
-  const data = await memberApi.getMyReportSessions({ page, size: SESSION_HISTORY_PAGE_SIZE });
+  const data = await memberServerApi.getReportSessions({ page, size: SESSION_HISTORY_PAGE_SIZE });
 
   if (!data?.result) {
     throw new Error("Failed to load session history");
