@@ -69,4 +69,14 @@ describe("Header", () => {
     expect(screen.queryByRole("link", { name: "로그인" })).not.toBeInTheDocument();
     expect(screen.queryByTestId("profile-dropdown")).not.toBeInTheDocument();
   });
+
+  it("인증 조회 실패 시 로딩 UI 대신 로그인 링크를 표시한다", () => {
+    const retry = jest.fn();
+    mockedUseAuthState.mockReturnValue({ status: "unavailable", retry });
+    render(<Header />);
+
+    expect(screen.getAllByRole("link", { name: "로그인" })).toHaveLength(2);
+    expect(screen.queryByRole("status", { name: "인증 상태 확인 중" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "다시 시도하기" })).not.toBeInTheDocument();
+  });
 });

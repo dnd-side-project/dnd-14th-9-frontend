@@ -36,6 +36,14 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * 서버가 인증을 명시적으로 거부한 에러(401/403)인지 판별한다.
+ * 다시 요청해도 결과가 같으므로 재시도하지 않고, 5xx·네트워크 오류 같은 일시 실패와 구분한다.
+ */
+export function isAuthRejectedError(error: unknown): boolean {
+  return error instanceof ApiError && (error.status === 401 || error.status === 403);
+}
+
 export class NetworkError extends Error {
   constructor(
     message: string,

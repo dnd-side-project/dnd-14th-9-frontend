@@ -1,8 +1,13 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { clearAuthCookies, setAuthCookies } from "@/lib/auth/auth-cookies";
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/cookie-constants";
+import { getAccessTokenRefreshState } from "@/lib/auth/access-token-state";
+import { clearAuthCookies, setAuthCookies, setAuthMarkerCookie } from "@/lib/auth/auth-cookies";
+import {
+  ACCESS_TOKEN_COOKIE,
+  AUTH_MARKER_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "@/lib/auth/cookie-constants";
 import { mergeCookieHeaderWithAuthTokens } from "@/lib/auth/cookie-header-utils";
 import { buildLoginRedirectUrl } from "@/lib/auth/login-redirect-utils";
 import { setRedirectAfterLoginCookie } from "@/lib/auth/redirect-after-login-cookie";
@@ -24,9 +29,6 @@ const PUBLIC_API_ROUTE_PATTERNS = [
   /^\/api\/sessions\/\d+$/,
 ];
 
-// 토큰 갱신 임계값 (5분)
-const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
-
 interface AuthFailureResponseOptions {
   clearAuth?: boolean;
   reason?: string;
@@ -34,7 +36,6 @@ interface AuthFailureResponseOptions {
 }
 
 type RouteType = "public" | "protected" | "api";
-type AccessTokenRefreshState = "usable" | "expiring" | "expired_or_invalid";
 type RefreshMode = "soft" | "hard";
 type RefreshFailureReason = Extract<RefreshOutcome, { kind: "failure" }>["reason"];
 
@@ -49,6 +50,27 @@ type RefreshFailureReason = Extract<RefreshOutcome, { kind: "failure" }>["reason
  * @returns 인증 상태에 따라 통과, 새 Cookie, redirect 또는 API 오류가 적용된 응답.
  */
 export async function proxy(request: NextRequest) {
+  const response = await handleAuth(request);
+  backfillAuthMarker(request, response);
+  return response;
+}
+
+/**
+ * 마커 도입 전에 로그인한 세션은 토큰만 있고 마커가 없어 클라이언트가 게스트로 오판한다.
+ * Refresh Token이 있는데 마커가 없으면 응답에 마커를 보충한다. 응답이 이미 마커를 심거나
+ * 지우는 경우(갱신 성공·인증 거부)는 그 결정을 따른다.
+ */
+function backfillAuthMarker(request: NextRequest, response: NextResponse) {
+  if (
+    request.cookies.has(REFRESH_TOKEN_COOKIE) &&
+    !request.cookies.has(AUTH_MARKER_COOKIE) &&
+    !response.cookies.has(AUTH_MARKER_COOKIE)
+  ) {
+    setAuthMarkerCookie(response.cookies);
+  }
+}
+
+async function handleAuth(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   const isPublicPageRoute = isKnownPublicPageRoute(pathname);
   const requiresHardAuth = isApiRoute(pathname) || isProtectedPageRoute(pathname);
@@ -235,43 +257,6 @@ function logRefreshFailure(
 }
 
 /**
- * JWT payload는 base64url 인코딩(-, _)과 padding 생략을 사용한다.
- * atob 디코딩 전 표준 base64(+ , /) 및 padding으로 정규화한다.
- */
-function decodeBase64Url(value: string): string {
-  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
-  const paddingLength = (4 - (normalized.length % 4)) % 4;
-  return atob(normalized + "=".repeat(paddingLength));
-}
-
-/**
- * JWT payload의 exp만 base64url decode해 Refresh 필요 상태를 판단한다.
- * 서명 검증은 수행하지 않으므로 이 결과만으로 토큰의 진위나 인증·인가를 보장하지 않는다.
- */
-function getAccessTokenRefreshState(token: string): AccessTokenRefreshState {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3 || !parts[1]) {
-      return "expired_or_invalid";
-    }
-
-    const payload = JSON.parse(decodeBase64Url(parts[1]));
-    if (typeof payload?.exp !== "number") {
-      return "expired_or_invalid";
-    }
-
-    const remainingMs = payload.exp * 1000 - Date.now();
-    if (remainingMs <= 0) {
-      return "expired_or_invalid";
-    }
-
-    return remainingMs < REFRESH_THRESHOLD_MS ? "expiring" : "usable";
-  } catch {
-    return "expired_or_invalid";
-  }
-}
-
-/**
  * 공유된 Refresh 성공 결과를 현재 caller만의 NextResponse로 변환한다.
  *
  * 갱신된 토큰을 현재 요청의 Cookie header에 넣어 뒤의 route handler가 바로 사용할 수 있게 하고,
@@ -318,8 +303,21 @@ function buildRefreshSuccessResponse(
 }
 
 /**
+ * hard 갱신 실패 중 인증 Cookie를 삭제할지 판별한다.
+ * 백엔드가 인증을 명시적으로 거부한 경우(401/403 http_error)에만 삭제하고,
+ * 5xx·invalid_response·timeout·network_error 같은 일시적 실패에서는 아직 유효한
+ * Refresh Token을 보존해 다음 요청이 재시도할 수 있게 한다.
+ */
+function shouldClearAuthOnHardFailure(
+  outcome: Extract<RefreshOutcome, { kind: "failure" }>
+): boolean {
+  return outcome.reason === "http_error" && (outcome.status === 401 || outcome.status === 403);
+}
+
+/**
  * hard 갱신 실패를 보호 페이지의 로그인 이동 또는 보호 API의 JSON 오류 응답으로 바꾼다.
- * hard 요청은 유효한 Access Token 없이 진행할 수 없으므로 인증 Cookie도 함께 삭제한다.
+ * 인증이 명시적으로 거부된 경우에만 인증 Cookie를 삭제하고(shouldClearAuthOnHardFailure),
+ * 일시적 실패에서는 아직 유효한 Refresh Token을 보존한다.
  *
  * @param request 페이지 요청인지 API 요청인지 판단할 현재 요청.
  * @param outcome 백엔드 HTTP 오류, 잘못된 응답, timeout 또는 network 오류 정보.
@@ -329,11 +327,13 @@ function buildHardRefreshFailureResponse(
   request: NextRequest,
   outcome: Extract<RefreshOutcome, { kind: "failure" }>
 ): NextResponse {
+  const clearAuth = shouldClearAuthOnHardFailure(outcome);
+
   if (outcome.reason === "http_error") {
     const status =
       outcome.status === 401 || outcome.status === 403 ? 401 : outcome.status >= 500 ? 500 : 400;
     return buildAuthFailureResponse(request, {
-      clearAuth: true,
+      clearAuth,
       reason: outcome.errorCode ?? BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
       status,
     });
@@ -341,14 +341,14 @@ function buildHardRefreshFailureResponse(
 
   if (outcome.reason === "invalid_response") {
     return buildAuthFailureResponse(request, {
-      clearAuth: true,
+      clearAuth,
       reason: BACKEND_ERROR_CODES.COMMON_INTERNAL_SERVER_ERROR,
       status: 500,
     });
   }
 
   return buildAuthFailureResponse(request, {
-    clearAuth: true,
+    clearAuth,
     reason: LOGIN_INTERNAL_ERROR_CODES.NETWORK_ERROR,
     status: outcome.status,
   });
@@ -376,7 +376,7 @@ function buildResponseFromRefreshOutcome(
   logRefreshFailure(request, {
     reason: outcome.reason,
     status: outcome.status,
-    cookieClear: mode === "hard",
+    cookieClear: mode === "hard" && shouldClearAuthOnHardFailure(outcome),
     mode,
   });
 
@@ -425,7 +425,7 @@ async function tryHardRefreshToken(
   if (!backendUrl) {
     console.error("Proxy: BACKEND_API_BASE is not configured");
     return buildAuthFailureResponse(request, {
-      clearAuth: true,
+      clearAuth: false,
       reason: LOGIN_INTERNAL_ERROR_CODES.CONFIG_ERROR,
       status: 500,
     });
