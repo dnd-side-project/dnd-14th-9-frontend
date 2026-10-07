@@ -1,6 +1,6 @@
 import ActivitySummaryCard from "@/features/member/components/Profile/Report/ActivitySummaryCard";
-import { sessionApi } from "@/features/session/api";
 import { SessionDetailSection } from "@/features/session/components/SessionDetailSection";
+import { sessionServerApi } from "@/features/session/server/api";
 import { handleSessionNotFound } from "@/features/session/utils/handleSessionNotFound";
 import {
   mapEmojiResultToItems,
@@ -19,8 +19,8 @@ interface SessionResultContentProps {
 
 export async function SessionResultContent({ sessionId }: SessionResultContentProps) {
   const [myReportResult, sessionDetailResult] = await Promise.allSettled([
-    sessionApi.getMyReport(sessionId),
-    sessionApi.getDetail(sessionId),
+    sessionServerApi.getMyReport(sessionId),
+    sessionServerApi.getDetail(sessionId),
   ]);
 
   // 세션 상세의 404(삭제/미존재)를 먼저 판정해 not-found 페이지로 안내한다.

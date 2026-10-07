@@ -27,8 +27,6 @@ describe("session server-only API build boundary", () => {
       "src/features/session/api.ts",
       "src/features/session/hooks/useSessionHooks.ts",
       "src/features/session/components/SessionPageContent.tsx",
-      "src/features/session/components/SessionResult/SessionResultContent.tsx",
-      "src/features/session/components/SessionResult/ParticipantsReportContent.tsx",
     ];
 
     for (const relativePath of clientSources) {

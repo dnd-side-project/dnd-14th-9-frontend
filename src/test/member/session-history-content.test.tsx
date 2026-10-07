@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 
 import { memberApi } from "@/features/member/api";
 import SessionHistoryContent from "@/features/member/components/Profile/Report/SessionHistoryContent";
+import { memberServerApi } from "@/features/member/server/api";
 import type { GetMyReportSessionsResponse } from "@/features/member/types";
 
 const mockSessionHistorySection = jest.fn();
@@ -9,6 +10,12 @@ const mockSessionHistorySection = jest.fn();
 jest.mock("@/features/member/api", () => ({
   memberApi: {
     getMyReportSessions: jest.fn(),
+  },
+}));
+
+jest.mock("@/features/member/server/api", () => ({
+  memberServerApi: {
+    getReportSessions: jest.fn(),
   },
 }));
 
@@ -32,6 +39,7 @@ jest.mock("@/features/member/components/Profile/Report/SessionHistorySection", (
 }));
 
 const mockedMemberApi = memberApi as jest.Mocked<typeof memberApi>;
+const mockedMemberServerApi = memberServerApi as jest.Mocked<typeof memberServerApi>;
 
 describe("SessionHistoryContent", () => {
   beforeEach(() => {
@@ -67,11 +75,13 @@ describe("SessionHistoryContent", () => {
     };
 
     mockedMemberApi.getMyReportSessions.mockResolvedValue(mockResponse);
+    mockedMemberServerApi.getReportSessions.mockResolvedValue(mockResponse);
 
     const view = await SessionHistoryContent({ page: 2 });
     render(view);
 
-    expect(mockedMemberApi.getMyReportSessions).toHaveBeenCalledWith({ page: 2, size: 4 });
+    expect(mockedMemberServerApi.getReportSessions).toHaveBeenCalledWith({ page: 2, size: 4 });
+    expect(mockedMemberApi.getMyReportSessions).not.toHaveBeenCalled();
     expect(mockSessionHistorySection).toHaveBeenCalledWith({
       items: overflowSessions.slice(0, 4),
       pagination: {
