@@ -30,7 +30,7 @@ function getBaseCookieOptions(isProduction: boolean): Omit<CookieOptions, "maxAg
   return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    sameSite: "lax",
     path: "/",
   };
 }
