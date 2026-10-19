@@ -4,7 +4,7 @@ export const metadata = { title: "새로운 세션 만들기" };
 
 export default function SessionCreatePage() {
   return (
-    <main className="p-md md:p-xl xl:p-3xl mx-auto w-full max-w-7xl">
+    <div className="p-md md:p-xl xl:p-3xl mx-auto w-full max-w-7xl">
       {/* 제목 섹션 */}
       <header className="mb-xl md:mb-2xl">
         <h1 className="text-lg leading-[140%] font-bold text-gray-50 md:text-2xl">세션 만들기</h1>
@@ -15,6 +15,6 @@ export default function SessionCreatePage() {
 
       {/* 폼 섹션 */}
       <SessionCreateForm />
-    </main>
+    </div>
   );
 }

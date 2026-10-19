@@ -21,10 +21,10 @@ export default async function SessionEditPage({ params }: SessionEditPageProps) 
   });
 
   return (
-    <main className="p-md md:p-xl xl:p-3xl mx-auto w-full max-w-7xl">
+    <div className="p-md md:p-xl xl:p-3xl mx-auto w-full max-w-7xl">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <SessionEditContent sessionId={sessionId} />
       </HydrationBoundary>
-    </main>
+    </div>
   );
 }
