@@ -1,6 +1,6 @@
 "use client";
 
-import { ProgressRing } from "@/components/ProgressRing/ProgressRing";
+import { TimerCircular } from "@/components/TimerCircular/TimerCircular";
 import { useCountdown } from "@/features/lobby/hooks/useCountdown";
 
 interface TotalTimerProps {
@@ -22,10 +22,13 @@ export function TotalTimer({
 }: TotalTimerProps) {
   const { hours, minutes, seconds, formatted, isExpired } = useCountdown(sessionEndTime);
 
-  // 전체 시간 대비 남은 시간 비율 계산 (100에서 0으로 줄어드는 형태)
+  // 전체 시간 대비 경과 시간 비율 계산 (0에서 100으로 차오르는 형태, MyTimer와 동일)
   const totalSeconds = sessionDurationMinutes * 60;
   const remainingSeconds = hours * 3600 + minutes * 60 + seconds;
-  const progress = (remainingSeconds / totalSeconds) * 100;
+  const progress = 100 - (remainingSeconds / totalSeconds) * 100;
+
+  // 링 상태: 종료 > 남은 시간 10% 이하(경고) > 진행 중
+  const ringState = isExpired ? "completed" : progress >= 90 ? "warning" : "running";
 
   return (
     <div className="gap-xl p-xl bg-surface-strong flex h-full flex-col rounded-2xl sm:flex-row">
@@ -46,19 +49,16 @@ export function TotalTimer({
         </span>
       </div>
 
-      {/* 오른쪽: Progress Ring with Time (가운데 정렬) */}
+      {/* 오른쪽: TimerCircular with Time (가운데 정렬) */}
       <div className="flex items-center justify-center">
-        <ProgressRing
+        <TimerCircular
+          scope="all"
+          state={ringState}
           progress={progress}
-          size={200}
-          strokeWidth={12}
-          trackClassName="stroke-border-inverse"
-          progressClassName="stroke-border-error-default"
-        >
-          <span className="text-text-disabled text-2xl font-bold">
-            {isExpired ? "종료" : formatted}
-          </span>
-        </ProgressRing>
+          size={150}
+          strokeWidth={6}
+          time={formatted}
+        />
       </div>
     </div>
   );

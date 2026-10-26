@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/Button/Button";
-import { ProgressRing } from "@/components/ProgressRing/ProgressRing";
+import { TimerCircular } from "@/components/TimerCircular/TimerCircular";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { toast } from "@/lib/toast";
@@ -22,6 +22,10 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
     maxSeconds,
     autoStart: true,
   });
+
+  // 링 상태: 종료 > 진행 중 > 시작 전(0%에서 정지) > 정지
+  const ringState =
+    progress >= 100 ? "completed" : isRunning ? "running" : progress === 0 ? "default" : "paused";
 
   const { mutate: toggleStatus, isPending } = useToggleMyStatus();
 
@@ -115,17 +119,16 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
         </Button>
       </div>
 
-      {/* 오른쪽: Progress Ring with Time (가운데 정렬) */}
+      {/* 오른쪽: TimerCircular with Time (가운데 정렬) */}
       <div className="flex items-center justify-center">
-        <ProgressRing
+        <TimerCircular
+          scope="my"
+          state={ringState}
           progress={progress}
-          size={200}
-          strokeWidth={12}
-          trackClassName="stroke-gray-700"
-          progressClassName="stroke-green-600"
-        >
-          <span className="text-text-secondary text-2xl font-bold">{formatted}</span>
-        </ProgressRing>
+          size={150}
+          strokeWidth={6}
+          time={formatted}
+        />
       </div>
     </div>
   );
