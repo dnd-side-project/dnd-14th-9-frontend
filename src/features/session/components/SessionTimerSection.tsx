@@ -6,9 +6,12 @@ const MyTimer = dynamic(() => import("./MyTimer/MyTimer").then((mod) => mod.MyTi
   ssr: false,
 });
 
-const TotalTimer = dynamic(() => import("./TotalTimer/TotalTimer").then((mod) => mod.TotalTimer), {
-  ssr: false,
-});
+const OverallTimer = dynamic(
+  () => import("./OverallTimer/OverallTimer").then((mod) => mod.OverallTimer),
+  {
+    ssr: false,
+  }
+);
 
 interface SessionTimerSectionProps {
   sessionId: string;
@@ -38,7 +41,7 @@ export function SessionTimerSection({
       </div>
 
       <div className="xl:flex-4">
-        <TotalTimer
+        <OverallTimer
           sessionEndTime={sessionEndTime}
           sessionDurationMinutes={sessionDurationMinutes}
           focusingCount={focusingCount}

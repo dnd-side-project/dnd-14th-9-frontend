@@ -4,7 +4,7 @@ import { TimerCircular } from "@/components/TimerCircular/TimerCircular";
 import { useCountdown } from "@/features/lobby/hooks/useCountdown";
 import { formatHHMMSS, formatTimer } from "@/lib/utils/format";
 
-interface TotalTimerProps {
+interface OverallTimerProps {
   /** 세션 종료 시간 */
   sessionEndTime: Date;
   /** 전체 세션 시간 (분) */
@@ -15,12 +15,12 @@ interface TotalTimerProps {
   totalCount: number;
 }
 
-export function TotalTimer({
+export function OverallTimer({
   sessionEndTime,
   sessionDurationMinutes,
   focusingCount,
   totalCount,
-}: TotalTimerProps) {
+}: OverallTimerProps) {
   const { hours, minutes, seconds, isExpired } = useCountdown(sessionEndTime);
 
   // 전체 시간 대비 경과 시간 비율 계산 (0에서 100으로 차오르는 형태, MyTimer와 동일)

@@ -1,14 +1,14 @@
 import { type ComponentProps, useState } from "react";
 
-import { TotalTimer } from "./TotalTimer";
+import { OverallTimer } from "./OverallTimer";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const SESSION_DURATION_MINUTES = 60;
 
 const META = {
-  title: "Features/Session/TotalTimer",
-  component: TotalTimer,
+  title: "Features/Session/OverallTimer",
+  component: OverallTimer,
   parameters: {
     layout: "centered",
   },
@@ -25,25 +25,25 @@ const META = {
     focusingCount: 4,
     totalCount: 6,
   },
-} satisfies Meta<typeof TotalTimer>;
+} satisfies Meta<typeof OverallTimer>;
 
 export default META;
 type Story = StoryObj<typeof META>;
 
 // useCountdown은 sessionEndTime 객체가 바뀔 때마다 interval을 다시 만들어서, 종료 시각을 마운트 시 한 번만 계산한다
-function TotalTimerWithRemaining({
+function OverallTimerWithRemaining({
   remainingSeconds,
   ...props
-}: Omit<ComponentProps<typeof TotalTimer>, "sessionEndTime"> & { remainingSeconds: number }) {
+}: Omit<ComponentProps<typeof OverallTimer>, "sessionEndTime"> & { remainingSeconds: number }) {
   const [sessionEndTime] = useState(() => new Date(Date.now() + remainingSeconds * 1000));
-  return <TotalTimer {...props} sessionEndTime={sessionEndTime} />;
+  return <OverallTimer {...props} sessionEndTime={sessionEndTime} />;
 }
 
 function withRemaining(remainingSeconds: number): Story {
   return {
     // 남은 시간이 있으면 매초 시간이 바뀌어 Chromatic 스냅샷이 흔들리므로 제외한다
     parameters: { chromatic: { disableSnapshot: remainingSeconds > 0 } },
-    render: (args) => <TotalTimerWithRemaining {...args} remainingSeconds={remainingSeconds} />,
+    render: (args) => <OverallTimerWithRemaining {...args} remainingSeconds={remainingSeconds} />,
   };
 }
 
