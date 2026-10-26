@@ -34,6 +34,15 @@ describe("SessionHeader", () => {
     );
   });
 
+  it("다음 영역과의 간격은 부모의 gap이 정하므로 자기 아래 여백을 두지 않는다", () => {
+    // Given: 진행 중인 세션의 헤더
+    // When: 렌더링하면
+    renderSessionHeader();
+
+    // Then: 헤더에 mb-* 여백 클래스가 없다 (있으면 부모 gap과 합쳐져 40px보다 커진다)
+    expect(screen.getByRole("banner").className).not.toMatch(/\bmb-/);
+  });
+
   it("나가기 버튼은 44px 높이이고 글자 오른쪽에 로그아웃 아이콘이 있다", () => {
     // Given: 진행 중인 세션의 헤더
     // When: 렌더링하면

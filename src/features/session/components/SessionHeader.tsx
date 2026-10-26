@@ -35,7 +35,7 @@ export function SessionHeader({
 
   return (
     <>
-      <header className="mb-2xl gap-md flex items-start justify-between">
+      <header className="gap-md flex items-start justify-between">
         <div className="gap-2xs flex flex-1 flex-col">
           <h1 className="text-text-primary text-2xl leading-[1.4] font-bold">세션 진행 중!</h1>
           <p className="text-text-tertiary text-base leading-[1.4]">

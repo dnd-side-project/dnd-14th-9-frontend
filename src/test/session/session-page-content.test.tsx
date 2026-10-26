@@ -58,11 +58,15 @@ jest.mock("@/features/session/components/SessionHeader", () => ({
 }));
 
 jest.mock("@/features/session/components/SessionDetailSection", () => ({
-  SessionDetailSection: () => <div data-testid="session-detail-section" />,
+  SessionDetailSection: ({ className }: { className?: string }) => (
+    <div data-testid="session-detail-section" className={className} />
+  ),
 }));
 
 jest.mock("@/features/session/components/SessionTimerSection", () => ({
-  SessionTimerSection: () => <div data-testid="session-timer-section" />,
+  SessionTimerSection: ({ className }: { className?: string }) => (
+    <div data-testid="session-timer-section" className={className} />
+  ),
 }));
 
 jest.mock("@/features/session/components/SessionGoalAndTodoCard/SessionGoalAndTodoCard", () => ({
@@ -183,6 +187,39 @@ describe("SessionPageContent", () => {
     expect(screen.getByTestId("session-header")).toBeInTheDocument();
     expect(screen.getByTestId("session-detail-section")).toBeInTheDocument();
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
+  });
+
+  it("헤더·상세·타이머는 한 묶음으로 Figma gap/3xl인 40px(gap-3xl) 간격을 갖는다", () => {
+    // Given: 참여자로 인증된 상태
+    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
+
+    // When: 메인 콘텐츠를 렌더링하면
+    render(<SessionPageContent sessionId="1" />);
+
+    // Then: 세 영역은 gap-3xl 세로 flex 묶음의 자식이고, 각자 위 여백(mt-*)은 두지 않는다
+    const header = screen.getByTestId("session-header");
+    const detail = screen.getByTestId("session-detail-section");
+    const timer = screen.getByTestId("session-timer-section");
+    const group = header.parentElement;
+    expect(group).toHaveClass("flex", "flex-col", "gap-3xl");
+    expect(detail.parentElement).toBe(group);
+    expect(timer.parentElement).toBe(group);
+    expect(detail.className).not.toMatch(/\bmt-/);
+    expect(timer.className).not.toMatch(/\bmt-/);
+  });
+
+  it("목표·참여자 카드 행은 40px 묶음 밖에 있고 타이머와 24px(mt-xl) 간격을 유지한다", () => {
+    // Given: 참여자로 인증된 상태
+    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
+
+    // When: 메인 콘텐츠를 렌더링하면
+    render(<SessionPageContent sessionId="1" />);
+
+    // Then: 카드 행은 헤더·상세·타이머 묶음에 들어 있지 않고, 자기 위 여백 mt-xl을 그대로 갖는다
+    const group = screen.getByTestId("session-header").parentElement;
+    const cardRow = screen.getByTestId("session-goal-card").parentElement;
+    expect(group).not.toContainElement(cardRow);
+    expect(cardRow).toHaveClass("mt-xl");
   });
 
   it("guest 상태이면 로그인 유도 UI를 노출해야 한다", () => {
