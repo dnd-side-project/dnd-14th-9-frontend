@@ -2,6 +2,7 @@
 
 import { TimerCircular } from "@/components/TimerCircular/TimerCircular";
 import { useCountdown } from "@/features/lobby/hooks/useCountdown";
+import { formatHHMMSS, formatTimer } from "@/lib/utils/format";
 
 interface TotalTimerProps {
   /** 세션 종료 시간 */
@@ -20,25 +21,26 @@ export function TotalTimer({
   focusingCount,
   totalCount,
 }: TotalTimerProps) {
-  const { hours, minutes, seconds, formatted, isExpired } = useCountdown(sessionEndTime);
+  const { hours, minutes, seconds, isExpired } = useCountdown(sessionEndTime);
 
   // 전체 시간 대비 경과 시간 비율 계산 (0에서 100으로 차오르는 형태, MyTimer와 동일)
   const totalSeconds = sessionDurationMinutes * 60;
   const remainingSeconds = hours * 3600 + minutes * 60 + seconds;
+  const elapsedSeconds = Math.max(0, totalSeconds - remainingSeconds);
   const progress = 100 - (remainingSeconds / totalSeconds) * 100;
 
   // 링 상태: 종료 > 남은 시간 10% 이하(경고) > 진행 중
   const ringState = isExpired ? "completed" : progress >= 90 ? "warning" : "running";
 
   return (
-    <div className="gap-xl p-xl bg-surface-strong flex h-full flex-col rounded-2xl sm:flex-row">
+    <div className="gap-lg p-2xl bg-surface-strong border-border-subtle flex h-full flex-col rounded-md border sm:flex-row">
       {/* 왼쪽: 정보 영역 */}
-      <div className="flex flex-1 flex-col gap-3">
+      <div className="gap-lg flex flex-1 flex-col">
         {/* 제목 + 시간 */}
-        <div className="flex flex-col gap-1">
-          <h2 className="text-xl font-bold text-gray-50">전체 타이머</h2>
-          <span className="text-[32px] font-bold text-gray-50">
-            {isExpired ? "종료" : formatted}
+        <div className="flex flex-col">
+          <h2 className="text-text-secondary text-lg leading-[1.4] font-bold">전체 타이머</h2>
+          <span className="text-text-primary text-[32px] leading-[1.4] font-bold">
+            {isExpired ? "종료" : formatHHMMSS(elapsedSeconds)}
           </span>
         </div>
 
@@ -57,7 +59,7 @@ export function TotalTimer({
           progress={progress}
           size={150}
           strokeWidth={6}
-          time={formatted}
+          time={formatTimer(elapsedSeconds)}
         />
       </div>
     </div>
