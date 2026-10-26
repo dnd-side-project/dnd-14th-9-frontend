@@ -148,3 +148,26 @@ describe("OverallTimer 시간 표기", () => {
     expect(screen.getByText("00:51:10")).toBeInTheDocument();
   });
 });
+
+describe("OverallTimer 카드 레이아웃", () => {
+  beforeEach(() => {
+    // Given(공통): 현재 시각을 고정한다
+    jest.useFakeTimers();
+    jest.setSystemTime(NOW);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("시간 영역과 집중 인원 줄 사이 간격은 MyTimer와 같은 8px(gap-xs)이다", () => {
+    // Given: 60분 세션이 40분 남은 상태
+    // When: 렌더링하면
+    renderOverallTimer(minutes(40));
+
+    // Then: 왼쪽 정보 열(제목+시간 블록과 집중 인원 줄의 부모)의 간격이 gap-xs다
+    const infoColumn = screen.getByRole("heading", { name: "전체 타이머" }).parentElement
+      ?.parentElement;
+    expect(infoColumn).toHaveClass("gap-xs");
+  });
+});

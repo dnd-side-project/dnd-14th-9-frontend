@@ -35,7 +35,7 @@ export function OverallTimer({
   return (
     <div className="gap-lg p-2xl bg-surface-strong border-border-subtle flex h-full flex-col rounded-md border sm:flex-row">
       {/* 왼쪽: 정보 영역 */}
-      <div className="gap-lg flex flex-1 flex-col">
+      <div className="gap-xs flex flex-1 flex-col">
         {/* 제목 + 시간 */}
         <div className="flex flex-col">
           <h2 className="text-text-secondary text-lg leading-[1.4] font-bold">전체 타이머</h2>
