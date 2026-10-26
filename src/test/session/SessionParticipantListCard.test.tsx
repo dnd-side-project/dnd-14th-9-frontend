@@ -156,6 +156,19 @@ describe("SessionParticipantListCard — 헤더와 카드 구조", () => {
       pathOf(container.firstElementChild)
     );
   });
+
+  it("채팅 열기 버튼 안 아이콘은 Figma 레이어대로 20px(h-5 w-5)이다", () => {
+    // Given: 참여자 카드
+    // When: 렌더링하면
+    renderCard();
+
+    // Then: 버튼(44px) 안 아이콘 박스는 Figma Button/Solid md iconOnly와 같은 20px이다 (기본 24px 아님)
+    const icon = screen
+      .getByRole("button", { name: "채팅 열기" })
+      .querySelector("svg")?.parentElement;
+    expect(icon).toHaveClass("h-5", "w-5");
+    expect(icon).not.toHaveClass("h-6", "w-6");
+  });
 });
 
 describe("SessionParticipantListCard — 평균 달성률 줄", () => {

@@ -92,7 +92,7 @@ export function SessionParticipantListCard({
             colorScheme="primary"
             size="medium"
             iconOnly
-            leftIcon={<ChatBubbleIcon />}
+            leftIcon={<ChatBubbleIcon size="small" />}
             aria-label="채팅 열기"
             className="!rounded-max"
             onClick={() => setIsChatOpen(true)}
