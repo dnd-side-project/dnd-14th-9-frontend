@@ -212,18 +212,33 @@ describe("SessionPageContent", () => {
     expect(timer.className).not.toMatch(/\bmt-/);
   });
 
-  it("목표·참여자 카드 행은 40px 묶음 밖에 있고 타이머와 24px(mt-xl) 간격을 유지한다", () => {
+  it("헤더 묶음과 카드 행 사이 간격은 루트 gap이 정한다 (기본 24px, xl에서 Figma 80px)", () => {
     // Given: 참여자로 인증된 상태
     mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
     // When: 메인 콘텐츠를 렌더링하면
     render(<SessionPageContent sessionId="1" />);
 
-    // Then: 카드 행은 헤더·상세·타이머 묶음에 들어 있지 않고, 자기 위 여백 mt-xl을 그대로 갖는다
+    // Then: 두 영역은 루트의 자식이고 간격은 루트 gap이 정하므로, 카드 행은 자기 위 여백(mt-*)을 갖지 않는다
     const group = screen.getByTestId("session-header").parentElement;
     const cardRow = screen.getByTestId("session-goal-card").parentElement;
+    const root = group?.parentElement;
+    expect(cardRow?.parentElement).toBe(root);
     expect(group).not.toContainElement(cardRow);
-    expect(cardRow).toHaveClass("mt-xl");
+    expect(root).toHaveClass("flex", "flex-col", "gap-xl", "xl:gap-20");
+    expect(cardRow?.className).not.toMatch(/\bmt-|xl:mt-/);
+  });
+
+  it("본문 바깥 여백은 xl에서 Figma Main Content와 같다 (좌우 54px, 위 64px, 아래 128px)", () => {
+    // Given: 참여자로 인증된 상태
+    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
+
+    // When: 메인 콘텐츠를 렌더링하면
+    render(<SessionPageContent sessionId="1" />);
+
+    // Then: 기본 p-3xl(40px)을 두고, xl에서 좌우 54px·위 64px·아래 128px(본문 아래 패딩 64 + 푸터 gap 64)이다
+    const root = screen.getByTestId("session-header").parentElement?.parentElement;
+    expect(root).toHaveClass("p-3xl", "xl:px-[54px]", "xl:pt-4xl", "xl:pb-32");
   });
 
   it("카드 행이 xl에서 높이 560px(h-140)와 두 카드의 폭 비율(6:4)을 정한다", () => {

@@ -153,7 +153,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const myMember = inProgressData?.members.find((m) => m.memberId === myMemberId);
 
   return (
-    <div className="p-3xl flex flex-col">
+    <div className="p-3xl gap-xl xl:pt-4xl flex flex-col xl:gap-20 xl:px-[54px] xl:pb-32">
       <div className="gap-3xl flex flex-col">
         <SessionHeader
           sessionId={sessionId}
@@ -181,7 +181,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
           totalCount={inProgressData?.participantCount ?? session.currentParticipants}
         />
       </div>
-      <div className="gap-lg mt-xl flex flex-col xl:h-140 xl:flex-row">
+      <div className="gap-lg flex flex-col xl:h-140 xl:flex-row">
         <SessionGoalAndTodoCard
           className="xl:flex-6"
           goal={myMember?.task?.goal ?? ""}
