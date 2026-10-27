@@ -15,9 +15,11 @@ import { useSessionTimer } from "../../hooks/useSessionTimer";
 interface MyTimerProps {
   sessionId: string;
   sessionDurationMinutes: number;
+  /** 링 크기 (Figma size 변형): 모바일은 sm(104px), 그 외 md(150px). 화면 크기는 상위가 안다 */
+  ringSize?: "sm" | "md";
 }
 
-export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
+export function MyTimer({ sessionId, sessionDurationMinutes, ringSize = "md" }: MyTimerProps) {
   const maxSeconds = sessionDurationMinutes * 60;
 
   const { elapsedSeconds, formatted, isFocusing, isRunning, focusRate, progress, start, pause } =
@@ -73,24 +75,25 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
   };
 
   return (
-    <div className="gap-lg p-2xl bg-surface-strong border-border-subtle flex h-full flex-col rounded-md border sm:flex-row">
-      {/* 왼쪽: 정보 영역 */}
-      <div className="gap-xs flex flex-1 flex-col">
+    <div className="gap-2xl p-lg bg-surface-strong border-border-subtle md:p-xl xl:gap-lg xl:p-2xl flex h-full items-start rounded-md border md:flex-col md:items-end md:justify-between xl:flex-row xl:items-stretch">
+      {/* 왼쪽: 정보 영역 (태블릿은 오른쪽 정렬 카드에서 폭을 줄이지 않게 늘린다) */}
+      <div className="gap-xs flex flex-1 flex-col md:self-stretch xl:self-auto">
         {/* 제목 + 시간 + 정지/시작 버튼 */}
         <div className="flex flex-col">
           <h2
-            className={`text-lg leading-[1.4] font-bold ${isRunning ? "text-text-brand-subtler" : "text-text-disabled"}`}
+            className={`text-[15px] leading-[1.4] font-bold md:text-lg ${isRunning ? "text-text-brand-subtler" : "text-text-disabled"}`}
           >
             나의 집중 시간
           </h2>
-          <div className="gap-xs flex items-center">
+          <div className="gap-xs flex flex-wrap items-center md:flex-nowrap">
             <span
-              className={`text-[32px] leading-[1.4] font-bold tabular-nums ${isRunning ? "text-text-brand-default" : "text-text-disabled"}`}
+              className={`text-2xl leading-[1.4] font-bold tabular-nums md:text-[32px] ${isRunning ? "text-text-brand-default" : "text-text-disabled"}`}
             >
               {formatHHMMSS(elapsedSeconds)}
             </span>
+            {/* 모바일은 글자 없이 32px 아이콘 버튼 (Button iconOnly small과 같은 값, 이름은 sr-only로 유지) */}
             <Button
-              className="pl-xs"
+              className="pl-xs max-md:p-xs max-md:size-8 max-md:min-w-0"
               variant={isRunning ? "outlined" : "solid"}
               colorScheme="secondary"
               size="small"
@@ -98,22 +101,24 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
               onClick={handleToggle}
               disabled={isPending}
             >
-              {isRunning ? "잠깐 정지하기" : "다시 시작하기"}
+              <span className="max-md:sr-only">
+                {isRunning ? "잠깐 정지하기" : "다시 시작하기"}
+              </span>
             </Button>
           </div>
         </div>
 
         {/* 상태 + 집중도 */}
-        <div className="gap-md flex items-center">
+        <div className="gap-xs md:gap-md flex flex-wrap items-center md:flex-nowrap">
           <span
-            className={`gap-xs flex shrink-0 items-center text-[15px] leading-[1.4] font-semibold whitespace-nowrap ${isFocusing ? "text-text-status-positive-default" : "text-text-secondary"}`}
+            className={`gap-xs flex shrink-0 items-center text-[13px] leading-[1.4] font-semibold whitespace-nowrap md:text-[15px] ${isFocusing ? "text-text-status-positive-default" : "text-text-secondary"}`}
           >
             <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
               <circle cx="3" cy="3" r="3" />
             </svg>
             {isFocusing ? "집중 중" : "자리비움"}
           </span>
-          <span className="inline-flex gap-2 text-[13px] leading-[1.4] font-semibold whitespace-nowrap">
+          <span className="inline-flex gap-2 text-[11px] leading-[1.4] whitespace-nowrap md:text-[13px] md:font-semibold">
             <span className="text-text-disabled">전체 시간 대비</span>
             <span className={isRunning ? "text-text-primary" : "text-text-muted"}>
               {focusRate}% 집중 중
@@ -123,13 +128,12 @@ export function MyTimer({ sessionId, sessionDurationMinutes }: MyTimerProps) {
       </div>
 
       {/* 오른쪽: TimerCircular with Time (가운데 정렬) */}
-      <div className="flex items-center justify-center">
+      <div className="flex shrink-0 items-center justify-center">
         <TimerCircular
           scope="my"
           state={ringState}
           progress={progress}
-          size={150}
-          strokeWidth={6}
+          preset={ringSize}
           time={formatted}
         />
       </div>

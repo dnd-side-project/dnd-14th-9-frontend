@@ -11,13 +11,18 @@ const SESSION_MINUTES = 60;
 const minutes = (value: number) => value * 60;
 
 /** sessionMinutes분 세션이 remainingSeconds초 남은 상태로 렌더링한다 */
-function renderOverallTimer(remainingSeconds: number, sessionMinutes = SESSION_MINUTES) {
+function renderOverallTimer(
+  remainingSeconds: number,
+  sessionMinutes = SESSION_MINUTES,
+  ringSize?: "sm" | "md"
+) {
   const result = render(
     <OverallTimer
       sessionEndTime={new Date(NOW.getTime() + remainingSeconds * SECOND)}
       sessionDurationMinutes={sessionMinutes}
       focusingCount={3}
       totalCount={6}
+      ringSize={ringSize}
     />
   );
   const ring = screen.getByRole("progressbar");
@@ -169,5 +174,75 @@ describe("OverallTimer 카드 레이아웃", () => {
     const infoColumn = screen.getByRole("heading", { name: "전체 타이머" }).parentElement
       ?.parentElement;
     expect(infoColumn).toHaveClass("gap-xs");
+  });
+});
+
+describe("OverallTimer 반응형 (Figma 모바일 · 태블릿 · 데스크톱)", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(NOW);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  const getCard = () => {
+    const infoColumn = screen.getByRole("heading", { name: "전체 타이머" }).parentElement
+      ?.parentElement as HTMLElement;
+    return { infoColumn, card: infoColumn.parentElement as HTMLElement };
+  };
+
+  it("카드는 MyTimer와 같이 모바일 가로, 태블릿 세로(링이 오른쪽 아래), 데스크톱 가로이다", () => {
+    // Given: 60분 세션이 40분 남은 상태
+    // When: 렌더링하면
+    renderOverallTimer(minutes(40));
+
+    // Then: 기본은 가로이고 md에서 세로+오른쪽 정렬+위아래 끝 정렬, xl에서 다시 가로이다
+    const { card } = getCard();
+    expect(card).toHaveClass("items-start", "md:flex-col", "md:items-end", "md:justify-between");
+    expect(card).toHaveClass("xl:flex-row", "xl:items-stretch");
+    expect(card).not.toHaveClass("flex-col");
+    expect(card.className).not.toMatch(/(^|\s)sm:/);
+  });
+
+  it("안쪽 여백은 20 → 24 → 32px, 링과의 간격은 32 → 32 → 20px이다", () => {
+    // Given: 60분 세션이 40분 남은 상태
+    // When: 렌더링하면
+    renderOverallTimer(minutes(40));
+
+    // Then: MyTimer와 같은 값이다
+    const { card } = getCard();
+    expect(card).toHaveClass("p-lg", "md:p-xl", "xl:p-2xl", "gap-2xl", "xl:gap-lg");
+  });
+
+  it("태블릿에서 정보 열은 카드 폭을 모두 쓰고, 데스크톱에서는 기본 정렬로 돌아간다", () => {
+    // Given: 60분 세션이 40분 남은 상태
+    // When: 렌더링하면
+    renderOverallTimer(minutes(40));
+
+    // Then: 오른쪽 정렬 카드에서 정보 열이 줄어들지 않게 md에서 늘린다
+    expect(getCard().infoColumn).toHaveClass("md:self-stretch", "xl:self-auto");
+  });
+
+  it("제목은 15 → 18px, 시간은 24 → 32px이다", () => {
+    // Given: 60분 세션이 9분 50초 남은 상태
+    // When: 렌더링하면
+    renderOverallTimer(minutes(9) + 50);
+
+    // Then: 모바일 글자 크기가 기본이고 md부터 커진다
+    expect(screen.getByText("전체 타이머")).toHaveClass("text-[15px]", "md:text-lg");
+    expect(screen.getByText("00:50:10")).toHaveClass("text-2xl", "md:text-[32px]");
+  });
+
+  it("ringSize를 안 넘기면 150px 링, sm이면 104px 링이다", () => {
+    // Given/When: 기본과 sm으로 각각 렌더링하면
+    const { unmount } = renderOverallTimer(minutes(40));
+
+    // Then: 기본은 150px, sm은 104px 링이다
+    expect(screen.getByRole("progressbar")).toHaveStyle({ width: "150px", height: "150px" });
+    unmount();
+    renderOverallTimer(minutes(40), SESSION_MINUTES, "sm");
+    expect(screen.getByRole("progressbar")).toHaveStyle({ width: "104px", height: "104px" });
   });
 });

@@ -13,6 +13,8 @@ interface OverallTimerProps {
   focusingCount: number;
   /** 전체 인원 */
   totalCount: number;
+  /** 링 크기 (Figma size 변형): 모바일은 sm(104px), 그 외 md(150px). 화면 크기는 상위가 안다 */
+  ringSize?: "sm" | "md";
 }
 
 export function OverallTimer({
@@ -20,6 +22,7 @@ export function OverallTimer({
   sessionDurationMinutes,
   focusingCount,
   totalCount,
+  ringSize = "md",
 }: OverallTimerProps) {
   const { hours, minutes, seconds, isExpired } = useCountdown(sessionEndTime);
 
@@ -33,13 +36,15 @@ export function OverallTimer({
   const ringState = isExpired ? "completed" : progress >= 90 ? "warning" : "running";
 
   return (
-    <div className="gap-lg p-2xl bg-surface-strong border-border-subtle flex h-full flex-col rounded-md border sm:flex-row">
-      {/* 왼쪽: 정보 영역 */}
-      <div className="gap-xs flex flex-1 flex-col">
+    <div className="gap-2xl p-lg bg-surface-strong border-border-subtle md:p-xl xl:gap-lg xl:p-2xl flex h-full items-start rounded-md border md:flex-col md:items-end md:justify-between xl:flex-row xl:items-stretch">
+      {/* 왼쪽: 정보 영역 (태블릿은 오른쪽 정렬 카드에서 폭을 줄이지 않게 늘린다) */}
+      <div className="gap-xs flex flex-1 flex-col md:self-stretch xl:self-auto">
         {/* 제목 + 시간 */}
         <div className="flex flex-col">
-          <h2 className="text-text-secondary text-lg leading-[1.4] font-bold">전체 타이머</h2>
-          <span className="text-text-primary text-[32px] leading-[1.4] font-bold">
+          <h2 className="text-text-secondary text-[15px] leading-[1.4] font-bold md:text-lg">
+            전체 타이머
+          </h2>
+          <span className="text-text-primary text-2xl leading-[1.4] font-bold md:text-[32px]">
             {isExpired ? "종료" : formatHHMMSS(elapsedSeconds)}
           </span>
         </div>
@@ -52,13 +57,12 @@ export function OverallTimer({
       </div>
 
       {/* 오른쪽: TimerCircular with Time (가운데 정렬) */}
-      <div className="flex items-center justify-center">
+      <div className="flex shrink-0 items-center justify-center">
         <TimerCircular
           scope="all"
           state={ringState}
           progress={progress}
-          size={150}
-          strokeWidth={6}
+          preset={ringSize}
           time={formatTimer(elapsedSeconds)}
         />
       </div>
