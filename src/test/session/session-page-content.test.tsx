@@ -70,13 +70,17 @@ jest.mock("@/features/session/components/SessionTimerSection", () => ({
 }));
 
 jest.mock("@/features/session/components/SessionGoalAndTodoCard/SessionGoalAndTodoCard", () => ({
-  SessionGoalAndTodoCard: () => <div data-testid="session-goal-card" />,
+  SessionGoalAndTodoCard: ({ className }: { className?: string }) => (
+    <div data-testid="session-goal-card" className={className} />
+  ),
 }));
 
 jest.mock(
   "@/features/session/components/SessionParticipantListCard/SessionParticipantListCard",
   () => ({
-    SessionParticipantListCard: () => <div data-testid="session-participant-card" />,
+    SessionParticipantListCard: ({ className }: { className?: string }) => (
+      <div data-testid="session-participant-card" className={className} />
+    ),
   })
 );
 
@@ -220,6 +224,20 @@ describe("SessionPageContent", () => {
     const cardRow = screen.getByTestId("session-goal-card").parentElement;
     expect(group).not.toContainElement(cardRow);
     expect(cardRow).toHaveClass("mt-xl");
+  });
+
+  it("카드 행이 xl에서 높이 560px(h-140)와 두 카드의 폭 비율(6:4)을 정한다", () => {
+    // Given: 참여자로 인증된 상태
+    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
+
+    // When: 메인 콘텐츠를 렌더링하면
+    render(<SessionPageContent sessionId="1" />);
+
+    // Then: 카드는 크기를 갖지 않으므로 행이 높이를 정하고, 폭 비율은 className으로 카드에 넘긴다
+    const cardRow = screen.getByTestId("session-goal-card").parentElement;
+    expect(cardRow).toHaveClass("xl:h-140", "xl:flex-row");
+    expect(screen.getByTestId("session-goal-card")).toHaveClass("xl:flex-6");
+    expect(screen.getByTestId("session-participant-card")).toHaveClass("xl:flex-4");
   });
 
   it("guest 상태이면 로그인 유도 UI를 노출해야 한다", () => {

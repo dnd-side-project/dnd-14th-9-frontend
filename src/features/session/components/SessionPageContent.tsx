@@ -181,13 +181,15 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
           totalCount={inProgressData?.participantCount ?? session.currentParticipants}
         />
       </div>
-      <div className="gap-lg mt-xl flex flex-col xl:flex-row">
+      <div className="gap-lg mt-xl flex flex-col xl:h-140 xl:flex-row">
         <SessionGoalAndTodoCard
+          className="xl:flex-6"
           goal={myMember?.task?.goal ?? ""}
           todos={myMember?.task?.todos ?? []}
           achievementRate={myMember?.achievementRate}
         />
         <SessionParticipantListCard
+          className="xl:flex-4"
           members={inProgressData?.members}
           participantCount={inProgressData?.participantCount}
           averageAchievementRate={inProgressData?.averageAchievementRate}

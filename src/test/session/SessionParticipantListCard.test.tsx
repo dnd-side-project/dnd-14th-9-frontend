@@ -129,6 +129,24 @@ describe("SessionParticipantListCard — 헤더와 카드 구조", () => {
     expect(card.parentElement).toContainElement(heading);
   });
 
+  it("카드 자체는 높이와 폭 비율 클래스를 갖지 않고, 상위가 넘긴 className만 루트에 붙는다", () => {
+    // Given/When: 상위가 폭 비율을 className으로 넘겨 렌더링하면
+    const { card } = renderCard({ className: "xl:flex-4" });
+    const root = card.parentElement as HTMLElement;
+
+    // Then: 루트에는 넘긴 클래스만 있고, 고정 높이(h-*, xl:h-*)나 자체 폭 비율은 없다
+    expect(root).toHaveClass("xl:flex-4");
+    expect(root.className).not.toMatch(/(^|\s)(xl:)?h-/);
+  });
+
+  it("className을 안 넘기면 폭 비율 클래스도 없다", () => {
+    // Given/When: className 없이 렌더링하면
+    const { card } = renderCard();
+
+    // Then: 폭 비율(xl:flex-N)은 상위 몫이라 카드에는 없다
+    expect((card.parentElement as HTMLElement).className).not.toMatch(/xl:flex-\d/);
+  });
+
   it("목록 카드는 surface-default 배경에 24px 안쪽 여백과 반경 12px(rounded-lg)이다", () => {
     // Given: 참여자 카드
     // When: 렌더링하면

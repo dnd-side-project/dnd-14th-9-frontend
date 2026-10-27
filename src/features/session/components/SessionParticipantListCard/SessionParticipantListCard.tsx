@@ -74,7 +74,7 @@ export function SessionParticipantListCard({
 
   return (
     <>
-      <div className={`gap-xl flex h-auto flex-col xl:h-157 xl:flex-4 ${className ?? ""}`}>
+      <div className={`gap-xl flex flex-col ${className ?? ""}`}>
         {/* 헤더 */}
         <div className="gap-lg flex items-start">
           <div className="gap-2xs flex flex-1 flex-col leading-[1.4]">
