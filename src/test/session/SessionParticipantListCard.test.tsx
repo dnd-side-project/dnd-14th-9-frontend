@@ -106,7 +106,11 @@ describe("SessionParticipantListCard — 헤더와 카드 구조", () => {
     renderCard();
 
     // Then: 제목은 보조 글자색, 부제는 비활성 글자색이고 문구가 바뀌었다
-    expect(screen.getByRole("heading", { name: "참여자 목록" })).toHaveClass("text-text-secondary");
+    // text-2xl은 자체 줄 높이(32px)를 가져 부모의 leading을 이기므로 제목에 직접 1.4를 준다 (Figma 34px)
+    expect(screen.getByRole("heading", { name: "참여자 목록" })).toHaveClass(
+      "text-text-secondary",
+      "leading-[1.4]"
+    );
     expect(screen.getByText("다른 사용자의 집중 상태를 확인할 수 있어요")).toHaveClass(
       "text-text-disabled"
     );

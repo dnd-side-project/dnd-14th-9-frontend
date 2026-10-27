@@ -78,7 +78,7 @@ export function SessionParticipantListCard({
         {/* 헤더 */}
         <div className="gap-lg flex items-start">
           <div className="gap-2xs flex flex-1 flex-col leading-[1.4]">
-            <h2 className="text-text-secondary text-2xl font-bold">참여자 목록</h2>
+            <h2 className="text-text-secondary text-2xl leading-[1.4] font-bold">참여자 목록</h2>
             <p className="text-text-disabled text-[15px]">
               다른 사용자의 집중 상태를 확인할 수 있어요
             </p>
