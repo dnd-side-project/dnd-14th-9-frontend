@@ -11,6 +11,10 @@ interface SessionParticipantItemProps {
   member: InProgressMember;
   isExpanded: boolean;
   onToggle: () => void;
+  /** 아바타 크기 (Figma Avatar lg 40px / xl 48px). 화면 크기는 상위가 안다 */
+  avatarSize?: "large" | "xlarge";
+  /** 모바일에서만 숨긴다 (목록이 접혀 있을 때). md 이상에서는 항상 보인다 */
+  hiddenOnMobile?: boolean;
 }
 
 /** 참여자 목록의 한 항목 (Figma Select 세트: 항목 카드 + 펼침 시 투두 패널). 펼침 상태는 부모가 가진다 */
@@ -18,6 +22,8 @@ export function SessionParticipantItem({
   member,
   isExpanded,
   onToggle,
+  avatarSize = "xlarge",
+  hiddenOnMobile = false,
 }: SessionParticipantItemProps) {
   const todos = member.task?.todos ?? [];
   const completedCount = todos.filter((t) => t.isCompleted).length;
@@ -25,12 +31,12 @@ export function SessionParticipantItem({
   const isHost = member.role === "HOST";
 
   return (
-    <li className="gap-xs flex flex-col">
-      <div className="bg-surface-strong p-md gap-md relative flex items-start rounded-lg">
+    <li className={cn("gap-xs flex flex-col", hiddenOnMobile && "max-md:hidden")}>
+      <div className="bg-surface-strong p-sm gap-sm md:p-md md:gap-md relative flex items-start rounded-lg">
         {/* 프로필 이미지 */}
         <Avatar
           className="shrink-0"
-          size="xlarge"
+          size={avatarSize}
           type={member.profileImageUrl ? "image" : "empty"}
           src={member.profileImageUrl}
           alt={member.nickname}
@@ -38,10 +44,10 @@ export function SessionParticipantItem({
         />
 
         {/* 정보 */}
-        <div className="gap-sm flex min-w-0 flex-1 flex-col">
+        <div className="gap-sm @container flex min-w-0 flex-1 flex-col">
           <div className="gap-3xs flex flex-col">
             {/* 오른쪽 위에 겹쳐 놓인 펼침 버튼(24px + 여백 8px)과 닉네임이 겹치지 않게 비운다 */}
-            <span className="text-text-primary pr-2xl text-base leading-[1.4] font-semibold">
+            <span className="text-text-primary pr-2xl text-sm leading-[1.4] font-semibold md:text-base">
               {member.nickname}
             </span>
             <span className="text-text-muted truncate text-xs leading-[1.4]">
@@ -49,12 +55,12 @@ export function SessionParticipantItem({
             </span>
           </div>
 
-          <div className="gap-sm flex items-center">
+          <div className="gap-sm flex flex-wrap items-center">
             <span className="gap-xs flex items-center">
               {/* 현재 상태 (집중 중 / 자리비움) */}
               <span
                 className={cn(
-                  "gap-xs flex shrink-0 items-center text-xs leading-[1.4] font-semibold whitespace-nowrap",
+                  "gap-xs flex shrink-0 items-center text-[11px] leading-[1.4] font-semibold whitespace-nowrap md:text-xs",
                   isFocusing ? "text-text-status-positive-default" : "text-text-tertiary"
                 )}
               >
@@ -77,7 +83,7 @@ export function SessionParticipantItem({
                 <ChipBadge
                   radius="xs"
                   status={isFocusing ? "positive" : "recruiting"}
-                  className="leading-[1.4]"
+                  className="text-[10px] leading-[1.4] md:text-xs"
                 >
                   {formatHHMMSS(member.totalFocusSeconds)}
                 </ChipBadge>
@@ -87,15 +93,15 @@ export function SessionParticipantItem({
             <span
               data-testid="status-divider"
               aria-hidden="true"
-              className="bg-border-default h-[18px] w-px shrink-0"
+              className="bg-border-default h-[18px] w-px shrink-0 @max-[255px]:hidden"
             />
 
             {/* 투두 달성률 */}
             <span className="gap-xs flex items-center">
-              <span className="text-text-tertiary shrink-0 text-xs leading-[1.4] font-semibold whitespace-nowrap">
+              <span className="text-text-tertiary shrink-0 text-[11px] leading-[1.4] font-semibold whitespace-nowrap md:text-xs">
                 투두 달성률
               </span>
-              <ChipBadge radius="xs" className="leading-[1.4]">
+              <ChipBadge radius="xs" className="text-[10px] leading-[1.4] md:text-xs">
                 {member.achievementRate}%
               </ChipBadge>
             </span>

@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ChatBubbleIcon } from "@/components/Icon/ChatBubbleIcon";
+import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
+import { useViewportLayout } from "@/hooks/useViewportLayout";
 import { cn } from "@/lib/utils/utils";
 
 import { ChatDialog } from "../ChatDialog/ChatDialog";
@@ -12,6 +14,9 @@ import { useSessionChat } from "../ChatDialog/useSessionChat";
 import { SessionParticipantItem } from "./SessionParticipantItem";
 
 import type { InProgressMember } from "../../types";
+
+// 모바일에서 목록이 접혀 있을 때 보여주는 참여자 수 (Figma 모바일 시안)
+const MOBILE_COLLAPSED_COUNT = 2;
 
 interface SessionParticipantListCardProps {
   members?: InProgressMember[];
@@ -43,6 +48,13 @@ export function SessionParticipantListCard({
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [hasMoreBelow, setHasMoreBelow] = useState(false);
+  // 모바일 전용: 처음 2명만 보여주고 "더보기"로 펼친다 (태블릿부터는 560px 안에서 스크롤)
+  const [isListExpanded, setIsListExpanded] = useState(false);
+  const hasMobileHiddenMembers = members.length > MOBILE_COLLAPSED_COUNT;
+  const isCollapsedOnMobile = hasMobileHiddenMembers && !isListExpanded;
+  // 아바타 크기는 CSS로 못 바꾸므로(Figma lg/xl 변형) 모바일일 때만 40px을 쓴다
+  const { layout } = useViewportLayout();
+  const avatarSize = layout === "mobile" ? "large" : "xlarge";
   const chatButtonRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -74,12 +86,14 @@ export function SessionParticipantListCard({
 
   return (
     <>
-      <div className={`gap-xl flex flex-col ${className ?? ""}`}>
+      <div className={`gap-lg md:gap-xl flex flex-col ${className ?? ""}`}>
         {/* 헤더 */}
         <div className="gap-lg flex items-start">
-          <div className="gap-2xs flex flex-1 flex-col leading-[1.4]">
-            <h2 className="text-text-secondary text-2xl leading-[1.4] font-bold">참여자 목록</h2>
-            <p className="text-text-disabled text-[15px]">
+          <div className="gap-3xs md:gap-2xs flex flex-1 flex-col leading-[1.4]">
+            <h2 className="text-text-secondary text-base leading-[1.4] font-bold md:text-2xl">
+              참여자 목록
+            </h2>
+            <p className="text-text-disabled text-[13px] md:text-[15px]">
               다른 사용자의 집중 상태를 확인할 수 있어요
             </p>
           </div>
@@ -96,15 +110,17 @@ export function SessionParticipantListCard({
           />
         </div>
 
-        {/* 참여자 목록 카드 */}
-        <div className="bg-surface-default border-border-subtle p-xl gap-sm flex min-h-0 flex-1 flex-col rounded-lg border shadow-[0_0_80px_rgba(0,0,0,0.3)]">
+        {/* 참여자 목록 카드 (모바일은 카드 껍데기 없이 펼쳐진다) */}
+        <div className="gap-sm md:bg-surface-default md:border-border-subtle md:p-xl flex min-h-0 flex-1 flex-col md:rounded-lg md:border md:shadow-[0_0_80px_rgba(0,0,0,0.3)]">
           {/* 평균 목표 달성률 + 참여자 수 */}
           <div className="flex items-center justify-between leading-[1.4]">
-            <p className="gap-2xs flex items-center text-[13px]">
-              <span className="text-text-muted">참여자 평균 목표 달성률</span>
+            <p className="gap-2xs flex items-center text-[11px] md:text-[13px]">
+              <span className="text-text-disabled md:text-text-muted">참여자 평균 목표 달성률</span>
               <span className="text-text-secondary font-semibold">{averageAchievementRate}%</span>
             </p>
-            <span className="text-text-disabled text-xs">총 {participantCount}명</span>
+            <span className="text-text-disabled text-[11px] md:text-xs">
+              총 {participantCount}명
+            </span>
           </div>
 
           {/* 참여자 목록 — 그라데이션은 스크롤 영역(ul)의 형제여야 내용과 함께 스크롤되지 않는다 */}
@@ -114,12 +130,14 @@ export function SessionParticipantListCard({
               onScroll={updateScrollState}
               className="gap-sm flex h-full flex-col overflow-y-auto"
             >
-              {members.map((member) => (
+              {members.map((member, index) => (
                 <SessionParticipantItem
                   key={member.memberId}
                   member={member}
                   isExpanded={expandedId === member.memberId}
                   onToggle={() => handleToggle(member.memberId)}
+                  avatarSize={avatarSize}
+                  hiddenOnMobile={isCollapsedOnMobile && index >= MOBILE_COLLAPSED_COUNT}
                 />
               ))}
             </ul>
@@ -132,6 +150,35 @@ export function SessionParticipantListCard({
                 hasMoreBelow ? "opacity-100" : "opacity-0"
               )}
             />
+
+            {/* 모바일 전용: 접힌 목록 아래 그라데이션과 더보기/숨기기 (Figma 모바일 시안) */}
+            {isCollapsedOnMobile && (
+              <div
+                aria-hidden="true"
+                data-testid="participants-more-gradient"
+                className="from-surface-default pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-linear-to-t to-transparent md:hidden"
+              />
+            )}
+            {hasMobileHiddenMembers && (
+              <div className="mt-sm relative flex justify-center md:hidden">
+                <Button
+                  className="pl-xs"
+                  variant="outlined"
+                  colorScheme="secondary"
+                  size="small"
+                  leftIcon={
+                    <ChevronDownIcon
+                      size="xsmall"
+                      className={isListExpanded ? "rotate-180" : undefined}
+                    />
+                  }
+                  aria-expanded={isListExpanded}
+                  onClick={() => setIsListExpanded((prev) => !prev)}
+                >
+                  {isListExpanded ? "숨기기" : "더보기"}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

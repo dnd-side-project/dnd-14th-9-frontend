@@ -6,6 +6,17 @@ import { ChatBubbleIcon } from "@/components/Icon/ChatBubbleIcon";
 import { SessionParticipantListCard } from "@/features/session/components/SessionParticipantListCard/SessionParticipantListCard";
 import type { InProgressMember } from "@/features/session/types";
 
+const mockUseViewportLayout = jest.fn();
+
+// 아바타 크기만 화면 크기를 JS로 알아야 해서 훅을 쓴다 (jsdom에는 ResizeObserver가 없다)
+jest.mock("@/hooks/useViewportLayout", () => ({
+  useViewportLayout: () => mockUseViewportLayout(),
+}));
+
+beforeEach(() => {
+  mockUseViewportLayout.mockReturnValue({ layout: "desktop", isResolved: true });
+});
+
 // 카드가 useSessionChat(→ useChatSocket)을 직접 호출하므로 소켓 연결을 차단한다
 jest.mock("@/lib/socket/useChatSocket", () => ({
   useChatSocket: () => ({ status: "connected", send: jest.fn() }),
@@ -89,9 +100,9 @@ function renderCard(props: Partial<ComponentProps<typeof SessionParticipantListC
       {...props}
     />
   );
-  // 참여자 카드를 담은 목록 영역(스크롤 대상)과 그 바깥 카드 껍데기
+  // 참여자 카드를 담은 목록 영역(스크롤 대상)과 그 바깥 카드 (ul → relative 영역 → 카드)
   const list = screen.getAllByRole("list")[0];
-  return { list, card: list.closest(".border") as HTMLElement };
+  return { list, card: list.parentElement?.parentElement as HTMLElement };
 }
 
 /** 렌더링된 아이콘의 path 모양(d)을 읽는다 */
@@ -106,7 +117,7 @@ describe("SessionParticipantListCard — 헤더와 카드 구조", () => {
     renderCard();
 
     // Then: 제목은 보조 글자색, 부제는 비활성 글자색이고 문구가 바뀌었다
-    // text-2xl은 자체 줄 높이(32px)를 가져 부모의 leading을 이기므로 제목에 직접 1.4를 준다 (Figma 34px)
+    // text-base/text-2xl은 자체 줄 높이를 가져 부모의 leading을 이기므로 제목에 직접 1.4를 준다 (Figma 34px)
     expect(screen.getByRole("heading", { name: "참여자 목록" })).toHaveClass(
       "text-text-secondary",
       "leading-[1.4]"
@@ -117,16 +128,32 @@ describe("SessionParticipantListCard — 헤더와 카드 구조", () => {
     expect(screen.queryByText("이번 세션에서 함께할 참여자들이에요")).not.toBeInTheDocument();
   });
 
-  it("헤더는 목록 카드 밖에 있고 둘 사이 간격은 24px(gap-xl)이다", () => {
+  it("헤더는 목록 카드 밖에 있고 둘 사이 간격은 모바일 20px, 태블릿부터 24px이다", () => {
     // Given: 참여자 카드
     // When: 렌더링하면
     const { card } = renderCard();
 
-    // Then: 헤더 제목은 테두리 있는 목록 카드 안에 없고, 두 영역의 부모가 gap-xl이다
+    // Then: 헤더 제목은 목록 카드 안에 없고, 두 영역의 부모가 gap-lg → md:gap-xl이다
     const heading = screen.getByRole("heading", { name: "참여자 목록" });
     expect(card).not.toContainElement(heading);
-    expect(card.parentElement).toHaveClass("gap-xl");
+    expect(card.parentElement).toHaveClass("gap-lg", "md:gap-xl");
+    expect(card.parentElement).not.toHaveClass("gap-xl");
     expect(card.parentElement).toContainElement(heading);
+  });
+
+  it("제목은 모바일 16px, 태블릿부터 24px이고 부제는 13px → 15px, 둘 사이 간격은 2px → 4px이다", () => {
+    // Given: 참여자 카드
+    // When: 렌더링하면
+    renderCard();
+
+    // Then: 기본이 모바일 크기이고 md부터 커진다
+    const heading = screen.getByRole("heading", { name: "참여자 목록" });
+    expect(heading).toHaveClass("text-base", "md:text-2xl");
+    expect(screen.getByText("다른 사용자의 집중 상태를 확인할 수 있어요")).toHaveClass(
+      "text-[13px]",
+      "md:text-[15px]"
+    );
+    expect(heading.parentElement).toHaveClass("gap-3xs", "md:gap-2xs");
   });
 
   it("카드 자체는 높이와 폭 비율 클래스를 갖지 않고, 상위가 넘긴 className만 루트에 붙는다", () => {
@@ -147,13 +174,24 @@ describe("SessionParticipantListCard — 헤더와 카드 구조", () => {
     expect((card.parentElement as HTMLElement).className).not.toMatch(/xl:flex-\d/);
   });
 
-  it("목록 카드는 surface-default 배경에 24px 안쪽 여백과 반경 12px(rounded-lg)이다", () => {
+  it("목록 카드 모양(배경·테두리·안쪽 24px·반경 12px·그림자)은 태블릿부터이고, 모바일은 껍데기 없이 펼쳐진다", () => {
     // Given: 참여자 카드
     // When: 렌더링하면
     const { card } = renderCard();
 
-    // Then: Figma List 카드 스타일이다
-    expect(card).toHaveClass("bg-surface-default", "border-border-subtle", "p-xl", "rounded-lg");
+    // Then: Figma List 카드 스타일은 md부터이고, 항목 사이 간격 12px은 모든 크기에서 같다
+    expect(card).toHaveClass(
+      "md:bg-surface-default",
+      "md:border",
+      "md:border-border-subtle",
+      "md:p-xl",
+      "md:rounded-lg",
+      "md:shadow-[0_0_80px_rgba(0,0,0,0.3)]",
+      "gap-sm"
+    );
+    for (const cardClass of ["bg-surface-default", "border", "p-xl", "rounded-lg"]) {
+      expect(card).not.toHaveClass(cardClass);
+    }
   });
 
   it("채팅 열기 버튼은 Button 기본 반경(rounded-md)을 이기고 원형(radius-max)이 된다", () => {
@@ -199,20 +237,34 @@ describe("SessionParticipantListCard — 평균 달성률 줄", () => {
     // When: 렌더링하면
     renderCard();
 
-    // Then: 값은 보조 글자색(초록 아님)이고, 총 인원은 평균 달성률 뒤(오른쪽)에 있다
+    // Then: 값은 보조 글자색(초록 아님)이고, 총 인원은 평균 달성률 뒤(오른쪽)에 있다.
+    // 라벨은 모바일에서 disabled 색, 태블릿부터 muted 색이다
     const label = screen.getByText("참여자 평균 목표 달성률");
     const value = screen.getByText("42%");
     const total = screen.getByText("총 6명");
-    expect(label).toHaveClass("text-text-muted");
+    expect(label).toHaveClass("text-text-disabled", "md:text-text-muted");
     expect(value).toHaveClass("text-text-secondary", "font-semibold");
     expect(value).not.toHaveClass("text-green-600");
     expect(total).toHaveClass("text-text-disabled");
     expect(label.compareDocumentPosition(total) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
+
+  it("글자는 모바일 11px이고, 태블릿부터 라벨·값 13px, 총 인원 12px이다", () => {
+    // Given: 평균 42%, 총 6명인 카드
+    // When: 렌더링하면
+    renderCard();
+
+    // Then: 라벨·값·총 인원이 크기별 글자 크기를 갖는다
+    expect(screen.getByText("참여자 평균 목표 달성률").parentElement).toHaveClass(
+      "text-[11px]",
+      "md:text-[13px]"
+    );
+    expect(screen.getByText("총 6명")).toHaveClass("text-[11px]", "md:text-xs");
+  });
 });
 
 describe("SessionParticipantListCard — 참여자 카드", () => {
-  it("항목끼리는 12px(gap-sm), 항목 안 카드는 테두리 없는 surface-strong에 안쪽 16px·반경 12px이다", () => {
+  it("항목끼리는 12px(gap-sm), 항목 안 카드는 테두리 없는 surface-strong에 안쪽 모바일 12px·태블릿부터 16px, 반경 12px이다", () => {
     // Given: 참여자 2명
     // When: 렌더링하면
     const { list } = renderCard();
@@ -222,7 +274,14 @@ describe("SessionParticipantListCard — 참여자 카드", () => {
     const item = group.firstElementChild;
     expect(list).toHaveClass("gap-sm");
     expect(group).not.toHaveClass("bg-surface-strong");
-    expect(item).toHaveClass("bg-surface-strong", "rounded-lg", "p-md", "gap-md");
+    expect(item).toHaveClass(
+      "bg-surface-strong",
+      "rounded-lg",
+      "p-sm",
+      "gap-sm",
+      "md:p-md",
+      "md:gap-md"
+    );
     expect(item).not.toHaveClass("border");
   });
 
@@ -433,6 +492,142 @@ describe("SessionParticipantListCard — 집중 시간 칩(값이 있을 때만)
 
     // Then: 값이 없는 것과 구별해서 칩을 보여준다
     expect(screen.getAllByText("00:00:00")).toHaveLength(2);
+  });
+});
+
+/** 참여자 n명을 만든다 */
+function makeMembers(count: number): InProgressMember[] {
+  return Array.from({ length: count }, (_, index) => ({
+    memberId: index + 1,
+    nickname: `참여자 ${index + 1}`,
+    role: index === 0 ? "HOST" : "PARTICIPANT",
+    achievementRate: 50,
+    status: "FOCUSED",
+    task: { taskId: index + 1, goal: `목표 ${index + 1}`, todos: [] },
+  }));
+}
+
+describe("SessionParticipantListCard — 모바일 더보기/숨기기", () => {
+  const itemOf = (nickname: string) => screen.getByText(nickname).closest("li") as HTMLElement;
+
+  it("모바일에서는 처음 2명만 보이고 나머지는 숨겨 두며, 태블릿부터는 모두 보인다", () => {
+    // Given: 참여자 4명
+    // When: 렌더링하면
+    renderCard({ members: makeMembers(4), participantCount: 4 });
+
+    // Then: 3번째부터 max-md:hidden이라 모바일에서만 숨겨진다 (md 이상 목록은 그대로 스크롤)
+    expect(itemOf("참여자 1")).not.toHaveClass("max-md:hidden");
+    expect(itemOf("참여자 2")).not.toHaveClass("max-md:hidden");
+    expect(itemOf("참여자 3")).toHaveClass("max-md:hidden");
+    expect(itemOf("참여자 4")).toHaveClass("max-md:hidden");
+  });
+
+  it("숨긴 참여자가 있으면 '더보기' 버튼과 아래쪽 그라데이션이 모바일에서만 보인다", () => {
+    // Given: 참여자 4명
+    // When: 렌더링하면
+    renderCard({ members: makeMembers(4), participantCount: 4 });
+
+    // Then: 버튼과 그라데이션 모두 md:hidden이고, 버튼은 아직 펼치지 않은 상태이다
+    const button = screen.getByRole("button", { name: "더보기" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(button.parentElement).toHaveClass("md:hidden");
+    expect(screen.getByTestId("participants-more-gradient")).toHaveClass("md:hidden");
+  });
+
+  it("'더보기'를 누르면 모두 보이고 버튼이 '숨기기'로 바뀌며 그라데이션이 사라진다", () => {
+    // Given: 참여자 4명을 렌더링하고
+    renderCard({ members: makeMembers(4), participantCount: 4 });
+
+    // When: 더보기를 누르면
+    fireEvent.click(screen.getByRole("button", { name: "더보기" }));
+
+    // Then: 숨김이 풀리고, 버튼은 숨기기(펼침 상태)이고, 그라데이션이 없다
+    expect(itemOf("참여자 3")).not.toHaveClass("max-md:hidden");
+    expect(itemOf("참여자 4")).not.toHaveClass("max-md:hidden");
+    expect(screen.queryByRole("button", { name: "더보기" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "숨기기" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.queryByTestId("participants-more-gradient")).not.toBeInTheDocument();
+  });
+
+  it("'숨기기'를 누르면 다시 처음 2명만 보인다", () => {
+    // Given: 펼쳐 둔 참여자 4명
+    renderCard({ members: makeMembers(4), participantCount: 4 });
+    fireEvent.click(screen.getByRole("button", { name: "더보기" }));
+
+    // When: 숨기기를 누르면
+    fireEvent.click(screen.getByRole("button", { name: "숨기기" }));
+
+    // Then: 3번째부터 다시 숨고 버튼과 그라데이션이 돌아온다
+    expect(itemOf("참여자 3")).toHaveClass("max-md:hidden");
+    expect(screen.getByRole("button", { name: "더보기" })).toBeInTheDocument();
+    expect(screen.getByTestId("participants-more-gradient")).toBeInTheDocument();
+  });
+
+  it("참여자가 2명 이하이면 숨길 것이 없어 버튼도 그라데이션도 없다", () => {
+    // Given/When: 참여자 2명으로 렌더링하면
+    renderCard();
+
+    // Then: 더보기/숨기기 버튼, 모바일 그라데이션, 숨김 항목이 모두 없다
+    expect(screen.queryByRole("button", { name: "더보기" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "숨기기" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("participants-more-gradient")).not.toBeInTheDocument();
+    expect(itemOf("각 잡은 호랑이")).not.toHaveClass("max-md:hidden");
+  });
+
+  it("버튼은 Figma처럼 32px 윤곽선 버튼이고 그라데이션 위에 놓인다", () => {
+    // Given: 참여자 4명
+    // When: 렌더링하면
+    renderCard({ members: makeMembers(4), participantCount: 4 });
+
+    // Then: 작은 윤곽선 버튼(h-8)이 위치 지정된(relative) 가운데 정렬 칸에 있어 그라데이션(absolute)에 가려지지 않는다
+    const button = screen.getByRole("button", { name: "더보기" });
+    expect(button).toHaveClass("h-8", "border-border-default");
+    expect(button.parentElement).toHaveClass("relative", "flex", "justify-center");
+    expect(button.querySelector("svg")).not.toBeNull();
+  });
+
+  it("모바일 그라데이션은 Figma처럼 목록 아래 128px, 위쪽으로 번지고 클릭을 가로채지 않는다", () => {
+    // Given/When: 참여자 4명으로 렌더링하면
+    renderCard({ members: makeMembers(4), participantCount: 4 });
+
+    // Then: 높이 128px, 아래쪽이 surface-default인 위쪽 방향 그라데이션이다
+    expect(screen.getByTestId("participants-more-gradient")).toHaveClass(
+      "h-32",
+      "bottom-0",
+      "bg-linear-to-t",
+      "from-surface-default",
+      "to-transparent",
+      "pointer-events-none",
+      "absolute"
+    );
+  });
+});
+
+describe("SessionParticipantListCard — 아바타 크기", () => {
+  /** 첫 항목의 아바타 원 */
+  const firstAvatar = () =>
+    screen.getAllByRole("listitem")[0].querySelector(".rounded-full") as HTMLElement;
+
+  it("모바일에서는 40px(large) 아바타, 태블릿 이상에서는 48px(xlarge) 아바타를 쓴다", () => {
+    // Given: 화면 크기가 모바일인 상태
+    mockUseViewportLayout.mockReturnValue({ layout: "mobile", isResolved: true });
+
+    // When: 렌더링하면
+    const { unmount } = render(<SessionParticipantListCard {...BASE_PROPS} members={MEMBERS} />);
+
+    // Then: Figma Avatar size=lg(40px)이다
+    expect(firstAvatar()).toHaveClass("size-10");
+    unmount();
+
+    // When: 태블릿과 데스크톱에서 렌더링하면
+    for (const layout of ["tablet", "desktop"]) {
+      mockUseViewportLayout.mockReturnValue({ layout, isResolved: true });
+      const view = render(<SessionParticipantListCard {...BASE_PROPS} members={MEMBERS} />);
+
+      // Then: Figma Avatar size=xl(48px)이다
+      expect(firstAvatar()).toHaveClass("size-12");
+      view.unmount();
+    }
   });
 });
 

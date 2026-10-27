@@ -98,4 +98,69 @@ describe("SessionParticipantItem", () => {
     // Then: 패널 제목이 없다
     expect(screen.queryByText("투두리스트")).not.toBeInTheDocument();
   });
+
+  it("항목 카드는 모바일 안쪽 12px · 간격 12px, 태블릿부터 16px · 16px이다", () => {
+    // Given/When: 렌더링하면
+    renderItem();
+
+    // Then: 기본이 모바일 값이고 md부터 커진다
+    const card = screen.getByRole("listitem").firstElementChild;
+    expect(card).toHaveClass("p-sm", "gap-sm", "md:p-md", "md:gap-md");
+    expect(card).not.toHaveClass("p-md");
+  });
+
+  it("글자와 칩은 모바일에서 한 단계 작다 (닉네임 14, 상태·라벨 11, 칩 10 → 16, 12, 12)", () => {
+    // Given: 집중 중인 참여자
+    // When: 렌더링하면
+    renderItem();
+
+    // Then: 닉네임 14px → 16px, 상태 글자와 '투두 달성률' 11px → 12px, 칩 10px → 12px
+    expect(screen.getByText("각 잡은 호랑이")).toHaveClass("text-sm", "md:text-base");
+    expect(screen.getByText("집중 중")).toHaveClass("text-[11px]", "md:text-xs");
+    expect(screen.getByText("투두 달성률")).toHaveClass("text-[11px]", "md:text-xs");
+    expect(screen.getByText("90%")).toHaveClass("text-[10px]", "md:text-xs");
+  });
+
+  it("avatarSize를 안 넘기면 48px, large를 넘기면 40px 아바타이다", () => {
+    // Given/When: 기본과 large로 각각 렌더링하면
+    const { unmount } = render(
+      <ul>
+        <SessionParticipantItem member={MEMBER} isExpanded={false} onToggle={jest.fn()} />
+      </ul>
+    );
+
+    // Then: 기본은 size-12, large는 size-10이다
+    expect(screen.getByRole("listitem").querySelector(".rounded-full")).toHaveClass("size-12");
+    unmount();
+    renderItem({ avatarSize: "large" });
+    expect(screen.getByRole("listitem").querySelector(".rounded-full")).toHaveClass("size-10");
+  });
+
+  it("hiddenOnMobile이면 모바일에서만 숨고, 아니면 항상 보인다", () => {
+    // Given/When: 기본과 hiddenOnMobile로 각각 렌더링하면
+    const { unmount } = render(
+      <ul>
+        <SessionParticipantItem member={MEMBER} isExpanded={false} onToggle={jest.fn()} />
+      </ul>
+    );
+
+    // Then: 기본은 숨김 클래스가 없고, hiddenOnMobile은 max-md:hidden이다 (md 이상에서는 보임)
+    expect(screen.getByRole("listitem")).not.toHaveClass("max-md:hidden");
+    unmount();
+    renderItem({ hiddenOnMobile: true });
+    expect(screen.getByRole("listitem")).toHaveClass("max-md:hidden");
+  });
+
+  it("상태 줄이 좁아지면(작은 폰) 넘치지 않고 줄바꿈하며, 그 폭에서는 구분선을 숨긴다", () => {
+    // Given/When: 렌더링하면
+    renderItem();
+
+    // Then: 상태 줄은 flex-wrap이고(Figma 375px에서는 한 줄), 정보 열이 컨테이너라 줄 폭이 255px 이하면
+    // 구분선이 줄 끝에 덩그러니 남지 않게 숨긴다 (그보다 넓으면 한 줄로 보이므로 구분선이 필요하다)
+    const divider = screen.getByTestId("status-divider");
+    const statusRow = divider.parentElement;
+    expect(statusRow).toHaveClass("flex-wrap");
+    expect(statusRow?.parentElement).toHaveClass("@container");
+    expect(divider).toHaveClass("@max-[255px]:hidden");
+  });
 });
