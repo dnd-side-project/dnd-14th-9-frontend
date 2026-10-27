@@ -13,6 +13,8 @@ type TimerVariant =
 interface TimerCircularBaseProps extends ComponentPropsWithoutRef<"div"> {
   /** 진행률 (0-100) */
   progress: number;
+  /** Figma size 변형: 링 크기·두께·중앙 글자 크기를 한 번에 정한다 (직접 넘긴 size, strokeWidth가 우선) */
+  preset?: TimerCirclePreset;
   /** 링 크기 (px) */
   size?: number;
   /** 링 두께 (px) */
@@ -31,6 +33,27 @@ interface TimerCircularBaseProps extends ComponentPropsWithoutRef<"div"> {
 }
 
 export type TimerCircularProps = TimerCircularBaseProps & TimerVariant;
+
+type TimerCirclePreset = "sm" | "md";
+
+// 두께 4.16은 150px 링의 6px을 104px로 줄인 같은 비율이다 (Figma size=sm)
+const PRESETS: Record<
+  TimerCirclePreset,
+  { size: number; strokeWidth: number; timeTextClassName: string; completedTextClassName: string }
+> = {
+  sm: {
+    size: 104,
+    strokeWidth: 4.16,
+    timeTextClassName: "text-lg",
+    completedTextClassName: "text-base",
+  },
+  md: {
+    size: 150,
+    strokeWidth: 6,
+    timeTextClassName: "text-2xl",
+    completedTextClassName: "text-lg",
+  },
+};
 
 interface VariantStyle {
   /** 호 그라디언트 시작·끝 색(text-* 클래스). 없으면 progressClassName 단색 */
@@ -75,8 +98,9 @@ export function getGradientVector(cx: number, cy: number, radius: number, progre
 
 export function TimerCircular({
   progress,
-  size = 42,
-  strokeWidth = 4,
+  preset,
+  size: sizeProp,
+  strokeWidth: strokeWidthProp,
   trackClassName = "stroke-gray-700",
   progressClassName = "stroke-green-600",
   scope,
@@ -89,6 +113,9 @@ export function TimerCircular({
   ...props
 }: TimerCircularProps) {
   const gradientId = useId();
+  const presetStyle = PRESETS[preset ?? "md"];
+  const size = sizeProp ?? (preset ? presetStyle.size : 42);
+  const strokeWidth = strokeWidthProp ?? (preset ? presetStyle.strokeWidth : 4);
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const clampedProgress = Math.min(100, Math.max(0, progress));
@@ -156,7 +183,9 @@ export function TimerCircular({
             <span
               className={cn(
                 "font-bold",
-                state === "completed" ? "text-lg" : "text-2xl",
+                state === "completed"
+                  ? presetStyle.completedTextClassName
+                  : presetStyle.timeTextClassName,
                 variant.textClassName
               )}
             >

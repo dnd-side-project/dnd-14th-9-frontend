@@ -135,6 +135,74 @@ describe("TimerCircular 상태별 스타일", () => {
   });
 });
 
+describe("TimerCircular 크기 프리셋 (Figma size=sm | md)", () => {
+  it("md 프리셋은 150px 링, 두께 6px, 시간 24px이다", () => {
+    // Given: 진행 중인 링
+    // When: preset="md"로 렌더링하면
+    const { container } = render(
+      <TimerCircular preset="md" scope="my" state="running" progress={50} time="43:21" />
+    );
+
+    // Then: 지름 150, 호 두께 6, 가운데 시간 글자 text-2xl
+    const progress = Array.from(container.querySelectorAll("circle"))[1];
+    expect(screen.getByRole("progressbar")).toHaveStyle({ width: "150px", height: "150px" });
+    expect(progress).toHaveAttribute("stroke-width", "6");
+    expect(screen.getByText("43:21")).toHaveClass("text-2xl");
+  });
+
+  it("sm 프리셋은 104px 링, 두께 4.16px, 시간 18px이다", () => {
+    // Given: 진행 중인 링
+    // When: preset="sm"으로 렌더링하면
+    const { container } = render(
+      <TimerCircular preset="sm" scope="my" state="running" progress={50} time="43:21" />
+    );
+
+    // Then: 지름 104, 호 두께 4.16(150px 링 6px의 같은 비율), 가운데 시간 글자 text-lg
+    const progress = Array.from(container.querySelectorAll("circle"))[1];
+    expect(screen.getByRole("progressbar")).toHaveStyle({ width: "104px", height: "104px" });
+    expect(progress).toHaveAttribute("stroke-width", "4.16");
+    expect(screen.getByText("43:21")).toHaveClass("text-lg");
+    expect(screen.getByText("43:21")).not.toHaveClass("text-2xl");
+  });
+
+  it("종료 문구는 md에서 18px, sm에서 16px이다", () => {
+    // Given/When: 종료 상태를 md와 sm으로 각각 렌더링하면
+    const { rerender } = render(
+      <TimerCircular preset="md" scope="my" state="completed" progress={100} time="60:00" />
+    );
+
+    // Then: md는 text-lg, sm은 text-base
+    expect(screen.getByText("세션 종료!")).toHaveClass("text-lg");
+    rerender(
+      <TimerCircular preset="sm" scope="my" state="completed" progress={100} time="60:00" />
+    );
+    expect(screen.getByText("세션 종료!")).toHaveClass("text-base");
+  });
+
+  it("size나 strokeWidth를 직접 넘기면 프리셋 값보다 우선한다", () => {
+    // Given/When: sm 프리셋에 size와 strokeWidth를 직접 넘기면
+    const { container } = render(
+      <TimerCircular preset="sm" size={120} strokeWidth={5} progress={50} />
+    );
+
+    // Then: 직접 넘긴 값이 쓰인다
+    const progress = Array.from(container.querySelectorAll("circle"))[1];
+    expect(screen.getByRole("progressbar")).toHaveStyle({ width: "120px", height: "120px" });
+    expect(progress).toHaveAttribute("stroke-width", "5");
+  });
+
+  it("프리셋을 안 쓰면 기존 기본값(42px, 두께 4px)을 유지한다", () => {
+    // Given: ImageUploader처럼 프리셋 없이 쓰는 경우
+    // When: 렌더링하면
+    const { container } = render(<TimerCircular progress={45} />);
+
+    // Then: 기존 기본 크기와 두께 그대로다
+    const progress = Array.from(container.querySelectorAll("circle"))[1];
+    expect(screen.getByRole("progressbar")).toHaveStyle({ width: "42px", height: "42px" });
+    expect(progress).toHaveAttribute("stroke-width", "4");
+  });
+});
+
 describe("getGradientVector", () => {
   // 150px / 6px 링: 중심 (75, 75), 호 중심선 반지름 72
   const CX = 75;
