@@ -36,23 +36,26 @@ export function SessionHeader({
   return (
     <>
       <header className="gap-md flex items-start justify-between">
-        <div className="gap-2xs flex flex-1 flex-col">
-          <h1 className="text-text-primary text-2xl leading-[1.4] font-bold">세션 진행 중!</h1>
-          <p className="text-text-tertiary text-base leading-[1.4]">
+        <div className="gap-3xs md:gap-2xs flex flex-1 flex-col">
+          <h1 className="text-text-primary text-lg leading-[1.4] font-bold md:text-2xl">
+            세션 진행 중!
+          </h1>
+          <p className="text-text-tertiary text-[13px] leading-[1.4] md:text-base">
             시간이 흐르고 있어요. 세션에 몰입해 보세요.
           </p>
         </div>
 
+        {/* 모바일은 글자 없이 44px 아이콘 버튼 (Button iconOnly medium과 같은 값, 이름은 sr-only로 유지) */}
         <Button
           ref={leaveButtonRef}
-          className="pr-sm"
+          className="pr-sm max-md:p-sm max-md:size-11 max-md:min-w-0"
           variant="outlined"
           colorScheme="secondary"
           size="medium"
           rightIcon={<LogoutIcon size="small" />}
           onClick={onShowDialog}
         >
-          나가기
+          <span className="max-md:sr-only">나가기</span>
         </Button>
       </header>
 

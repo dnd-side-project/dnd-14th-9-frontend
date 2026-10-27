@@ -63,4 +63,43 @@ describe("SessionHeader", () => {
     // Then: onShowDialog가 한 번 호출된다
     expect(onShowDialog).toHaveBeenCalledTimes(1);
   });
+
+  it("제목과 안내 문구는 모바일 18px · 13px, 태블릿부터 24px · 16px이다", () => {
+    // Given: 진행 중인 세션의 헤더
+    // When: 렌더링하면
+    renderSessionHeader();
+
+    // Then: 기본이 모바일 크기이고 md부터 커진다 (text-lg/text-2xl이 줄 높이를 정하므로 1.4를 같이 둔다)
+    expect(screen.getByRole("heading", { level: 1 })).toHaveClass(
+      "text-lg",
+      "md:text-2xl",
+      "leading-[1.4]"
+    );
+    expect(screen.getByText("시간이 흐르고 있어요. 세션에 몰입해 보세요.")).toHaveClass(
+      "text-[13px]",
+      "md:text-base",
+      "leading-[1.4]"
+    );
+  });
+
+  it("제목과 안내 문구 사이 간격은 모바일 2px, 태블릿부터 4px이다", () => {
+    // Given: 진행 중인 세션의 헤더
+    // When: 렌더링하면
+    renderSessionHeader();
+
+    // Then: gap-3xs → md:gap-2xs
+    const textColumn = screen.getByRole("heading", { level: 1 }).parentElement;
+    expect(textColumn).toHaveClass("gap-3xs", "md:gap-2xs");
+    expect(textColumn).not.toHaveClass("gap-2xs");
+  });
+
+  it("나가기 버튼은 모바일에서 글자 없이 44px 아이콘 버튼이고, 태블릿부터 글자가 보인다", () => {
+    // Given: 진행 중인 세션의 헤더
+    // When: 렌더링하면
+    const { leaveButton } = renderSessionHeader();
+
+    // Then: 글자는 화면에서만 숨겨(sr-only) 이름은 그대로이고, 버튼은 모바일에서 44px 정사각형이다
+    expect(screen.getByText("나가기")).toHaveClass("max-md:sr-only");
+    expect(leaveButton).toHaveClass("max-md:size-11", "max-md:min-w-0", "max-md:p-sm");
+  });
 });
