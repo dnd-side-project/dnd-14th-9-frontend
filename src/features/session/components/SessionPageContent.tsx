@@ -153,8 +153,8 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const myMember = inProgressData?.members.find((m) => m.memberId === myMemberId);
 
   return (
-    <div className="p-3xl gap-xl xl:pt-4xl flex flex-col xl:gap-20 xl:px-[54px] xl:pb-32">
-      <div className="gap-3xl flex flex-col">
+    <div className="px-lg pt-md gap-xl md:px-3xl md:pt-3xl md:gap-3xl xl:pt-4xl flex flex-col pb-14 md:pb-20 xl:gap-20 xl:px-[54px] xl:pb-32">
+      <div className="gap-md md:gap-3xl flex flex-col">
         <SessionHeader
           sessionId={sessionId}
           showDialog={showLeaveDialog}
@@ -181,7 +181,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
           totalCount={inProgressData?.participantCount ?? session.currentParticipants}
         />
       </div>
-      <div className="gap-lg flex flex-col xl:h-140 xl:flex-row">
+      <div className="gap-3xl xl:gap-lg flex flex-col xl:h-140 xl:flex-row">
         <SessionGoalAndTodoCard
           className="xl:flex-6"
           goal={myMember?.task?.goal ?? ""}
@@ -189,7 +189,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
           achievementRate={myMember?.achievementRate}
         />
         <SessionParticipantListCard
-          className="xl:flex-4"
+          className="md:h-140 xl:flex-4"
           members={inProgressData?.members}
           participantCount={inProgressData?.participantCount}
           averageAchievementRate={inProgressData?.averageAchievementRate}

@@ -193,26 +193,27 @@ describe("SessionPageContent", () => {
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
   });
 
-  it("헤더·상세·타이머는 한 묶음으로 Figma gap/3xl인 40px(gap-3xl) 간격을 갖는다", () => {
+  it("헤더·상세·타이머는 한 묶음으로 Figma 간격을 갖는다 (모바일 16px, 태블릿부터 40px)", () => {
     // Given: 참여자로 인증된 상태
     mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
     // When: 메인 콘텐츠를 렌더링하면
     render(<SessionPageContent sessionId="1" />);
 
-    // Then: 세 영역은 gap-3xl 세로 flex 묶음의 자식이고, 각자 위 여백(mt-*)은 두지 않는다
+    // Then: 세 영역은 gap-md(16) → md:gap-3xl(40) 세로 flex 묶음의 자식이고, 각자 위 여백(mt-*)은 두지 않는다
     const header = screen.getByTestId("session-header");
     const detail = screen.getByTestId("session-detail-section");
     const timer = screen.getByTestId("session-timer-section");
     const group = header.parentElement;
-    expect(group).toHaveClass("flex", "flex-col", "gap-3xl");
+    expect(group).toHaveClass("flex", "flex-col", "gap-md", "md:gap-3xl");
+    expect(group).not.toHaveClass("gap-3xl");
     expect(detail.parentElement).toBe(group);
     expect(timer.parentElement).toBe(group);
     expect(detail.className).not.toMatch(/\bmt-/);
     expect(timer.className).not.toMatch(/\bmt-/);
   });
 
-  it("헤더 묶음과 카드 행 사이 간격은 루트 gap이 정한다 (기본 24px, xl에서 Figma 80px)", () => {
+  it("헤더 묶음과 카드 행 사이 간격은 루트 gap이 정한다 (모바일 24px, 태블릿 40px, 데스크톱 80px)", () => {
     // Given: 참여자로 인증된 상태
     mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
@@ -225,32 +226,68 @@ describe("SessionPageContent", () => {
     const root = group?.parentElement;
     expect(cardRow?.parentElement).toBe(root);
     expect(group).not.toContainElement(cardRow);
-    expect(root).toHaveClass("flex", "flex-col", "gap-xl", "xl:gap-20");
-    expect(cardRow?.className).not.toMatch(/\bmt-|xl:mt-/);
+    expect(root).toHaveClass("flex", "flex-col", "gap-xl", "md:gap-3xl", "xl:gap-20");
+    expect(cardRow?.className).not.toMatch(/\bmt-|md:mt-|xl:mt-/);
   });
 
-  it("본문 바깥 여백은 xl에서 Figma Main Content와 같다 (좌우 54px, 위 64px, 아래 128px)", () => {
+  it("본문 바깥 여백은 화면 크기별 Figma Main Content와 같다 (좌우 20/40/54, 위 16/40/64, 아래 56/80/128)", () => {
     // Given: 참여자로 인증된 상태
     mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
     // When: 메인 콘텐츠를 렌더링하면
     render(<SessionPageContent sessionId="1" />);
 
-    // Then: 기본 p-3xl(40px)을 두고, xl에서 좌우 54px·위 64px·아래 128px(본문 아래 패딩 64 + 푸터 gap 64)이다
+    // Then: 여백을 한 번에 주는 p-3xl 대신 방향별로 모바일 → 태블릿(md) → 데스크톱(xl) 값을 둔다
+    // (위/아래는 Figma 루트 프레임의 GNB·푸터 gap 몫까지 포함한 값이다)
     const root = screen.getByTestId("session-header").parentElement?.parentElement;
-    expect(root).toHaveClass("p-3xl", "xl:px-[54px]", "xl:pt-4xl", "xl:pb-32");
+    expect(root).toHaveClass("px-lg", "pt-md", "pb-14");
+    expect(root).toHaveClass("md:px-3xl", "md:pt-3xl", "md:pb-20");
+    expect(root).toHaveClass("xl:px-[54px]", "xl:pt-4xl", "xl:pb-32");
+    expect(root).not.toHaveClass("p-3xl");
   });
 
-  it("카드 행이 xl에서 높이 560px(h-140)와 두 카드의 폭 비율(6:4)을 정한다", () => {
+  it("카드 행은 xl 미만에서 세로로 쌓이고(간격 40px) xl부터 가로로 나란히 놓인다(간격 20px)", () => {
     // Given: 참여자로 인증된 상태
     mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
     // When: 메인 콘텐츠를 렌더링하면
     render(<SessionPageContent sessionId="1" />);
 
-    // Then: 카드는 크기를 갖지 않으므로 행이 높이를 정하고, 폭 비율은 className으로 카드에 넘긴다
+    // Then: 행은 세로 flex가 기본이고 xl에서만 가로로 바뀌며, 간격도 40 → 20으로 바뀐다
     const cardRow = screen.getByTestId("session-goal-card").parentElement;
-    expect(cardRow).toHaveClass("xl:h-140", "xl:flex-row");
+    expect(cardRow).toHaveClass("flex", "flex-col", "gap-3xl", "xl:flex-row", "xl:gap-lg");
+    expect(cardRow).not.toHaveClass("gap-lg");
+  });
+
+  it("태블릿은 참여자 카드만 560px(Fixed), 데스크톱은 행이 560px을 정하고, 모바일은 둘 다 내용만큼이다", () => {
+    // Given: 참여자로 인증된 상태
+    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
+
+    // When: 메인 콘텐츠를 렌더링하면
+    render(<SessionPageContent sessionId="1" />);
+
+    // Then: Figma 태블릿에서 Participants Section은 Fixed 560, Goals Section은 Hug이다.
+    // (태블릿 목표 카드가 560인 것은 할 일 5개의 내용 높이가 우연히 같은 값이다.)
+    // 데스크톱은 가로로 놓여 행이 높이 560을 정하고, 목표 카드는 그 높이에 맞춰 늘어난 채 안에서 스크롤한다
+    // (그러지 않으면 할 일이 많을 때 목표 카드만 560보다 커진다). 모바일은 어디에도 높이가 없다.
+    const goal = screen.getByTestId("session-goal-card");
+    const participants = screen.getByTestId("session-participant-card");
+    const cardRow = goal.parentElement as HTMLElement;
+    expect(participants).toHaveClass("md:h-140");
+    expect(participants.className).not.toMatch(/(^|\s)h-/);
+    expect(goal.className).not.toMatch(/(^|\s)(\w+:)?h-/);
+    expect(cardRow).toHaveClass("xl:h-140");
+    expect(cardRow.className).not.toMatch(/(^|\s)(h-|md:h-)/);
+  });
+
+  it("두 카드의 폭 비율(6:4)은 xl에서만 넘긴다", () => {
+    // Given: 참여자로 인증된 상태
+    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
+
+    // When: 메인 콘텐츠를 렌더링하면
+    render(<SessionPageContent sessionId="1" />);
+
+    // Then: xl 미만에서는 세로로 쌓여 폭이 전체이므로 비율 클래스는 xl 접두사만 있다
     expect(screen.getByTestId("session-goal-card")).toHaveClass("xl:flex-6");
     expect(screen.getByTestId("session-participant-card")).toHaveClass("xl:flex-4");
   });
