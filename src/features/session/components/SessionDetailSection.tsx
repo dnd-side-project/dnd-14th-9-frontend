@@ -30,24 +30,40 @@ export function SessionDetailSection({
   notice,
 }: SessionDetailSectionProps) {
   return (
-    <section className={`gap-lg flex flex-col rounded-lg xl:flex-row ${className ?? ""}`}>
-      {/* 왼쪽: 썸네일 (모바일·태블릿 풀폭 / 데스크탑 30%) */}
-      <div className="h-50 xl:h-auto xl:flex-3">
-        <Thumbnail src={thumbnailUrl} alt={title} radius="lg" className="h-full" />
+    <section
+      className={`gap-xl md:bg-surface-default md:border-border-subtle md:p-xl flex flex-col md:rounded-lg md:border md:drop-shadow-[0_0_40px_rgba(0,0,0,0.3)] xl:flex-row xl:items-center ${className ?? ""}`}
+    >
+      {/* 왼쪽: 썸네일 (모바일 335:160 · 태블릿 640:250 비율로 폭을 채움 / 데스크탑 361px 고정, 열 높이에 맞춤) */}
+      <div className="xl:w-[361px] xl:shrink-0 xl:self-stretch">
+        <Thumbnail
+          src={thumbnailUrl}
+          alt={title}
+          radius="xs"
+          border="none"
+          className="xl:border-sm aspect-[335/160] md:aspect-[640/250] xl:aspect-auto xl:h-full xl:rounded-md"
+        />
       </div>
 
-      {/* 오른쪽: 정보 영역 (데스크탑 70%) */}
-      <div className="gap-sm flex flex-col xl:flex-7">
-        {/* 카테고리 Badge */}
-        <ChipBadge radius="xs" className="w-fit border-0">
-          {category}
-        </ChipBadge>
+      {/* 오른쪽: 정보 영역 */}
+      <div className="gap-sm md:gap-md flex flex-col xl:flex-1">
+        <div className="gap-xs flex flex-col">
+          {/* 카테고리 Badge */}
+          <ChipBadge radius="xs" className="w-fit border-0">
+            {category}
+          </ChipBadge>
 
-        {/* 제목 */}
-        <h2 className="text-2xl font-bold text-gray-50">{title}</h2>
+          <div className="gap-2xs flex flex-col">
+            {/* 제목 */}
+            <h2 className="text-text-primary text-lg leading-[1.4] font-bold md:text-2xl">
+              {title}
+            </h2>
 
-        {/* 방 소개 */}
-        <p className="text-base text-gray-200">{description}</p>
+            {/* 방 소개 */}
+            <p className="text-text-tertiary text-[11px] leading-[1.4] md:text-[15px]">
+              {description}
+            </p>
+          </div>
+        </div>
 
         {/* 메타 정보 */}
         <CardMeta
@@ -55,16 +71,19 @@ export function SessionDetailSection({
           maxParticipants={maxParticipants}
           durationMinutes={durationMinutes}
           sessionDate={sessionDate}
-          className="text-sm"
+          size="responsive"
+          className="md:gap-x-sm leading-[1.4] md:text-base"
         />
 
         {/* 공지사항 */}
-        <div className="px-lg py-lg gap-md mt-auto flex flex-row rounded-lg bg-gray-900">
-          <p className="text-common-white flex shrink-0 items-center gap-1 text-base font-semibold whitespace-nowrap">
-            <AnnouncementIcon size="small" className="shrink-0 text-gray-400" />
+        <div className="gap-xs p-sm bg-surface-strong md:gap-md md:p-lg mt-auto flex flex-col items-start rounded-md md:flex-row">
+          <p className="text-text-tertiary flex shrink-0 items-center gap-1 text-xs leading-[1.4] font-semibold whitespace-nowrap md:text-base">
+            <AnnouncementIcon size="small" className="shrink-0 max-md:size-4" />
             공지사항
           </p>
-          <p className="text-base text-gray-400">{notice}</p>
+          <p className="text-text-tertiary text-[11px] leading-[1.4] whitespace-pre-line md:text-[15px]">
+            {notice}
+          </p>
         </div>
       </div>
     </section>

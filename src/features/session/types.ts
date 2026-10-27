@@ -294,6 +294,8 @@ export interface InProgressMember {
   achievementRate: number;
   status: InProgressMemberStatus;
   task: InProgressTask | null;
+  /** 누적 집중 시간(초). 백엔드 필드 확정 전이라 선택값이고, 없으면 참여자 카드의 집중 시간 칩을 숨긴다 */
+  totalFocusSeconds?: number;
 }
 
 // in-progress 응답 (REST + SSE 동일 구조)

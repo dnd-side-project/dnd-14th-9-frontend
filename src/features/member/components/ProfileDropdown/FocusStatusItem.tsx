@@ -1,7 +1,7 @@
 "use client";
 
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
-import { ProgressRing } from "@/components/ProgressRing/ProgressRing";
+import { TimerCircular } from "@/components/TimerCircular/TimerCircular";
 import { formatSecondsToMinutes } from "@/lib/utils/format";
 
 interface FocusStatusItemProps {
@@ -34,7 +34,7 @@ export function FocusStatusItem({
           </p>
         </div>
         <div className="py-md flex h-[56px] w-[56px] shrink-0 items-center justify-center px-[13px]">
-          <ProgressRing
+          <TimerCircular
             progress={focusPercentage}
             size={56}
             strokeWidth={2.8}
@@ -44,7 +44,7 @@ export function FocusStatusItem({
             <span className="text-text-brand-subtle text-sm font-semibold">
               {Math.round(focusPercentage)}%
             </span>
-          </ProgressRing>
+          </TimerCircular>
         </div>
       </div>
 

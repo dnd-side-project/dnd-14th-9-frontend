@@ -1,6 +1,6 @@
-import { CalendarIcon } from "@/components/Icon/CalendarIcon";
-import { ClockIcon } from "@/components/Icon/ClockIcon";
-import { UsersIcon } from "@/components/Icon/UsersIcon";
+import { DateAndTimeIcon } from "@/components/Icon/DateAndTimeIcon";
+import { DurationIcon } from "@/components/Icon/DurationIcon";
+import { UserProfilesIcon } from "@/components/Icon/UserProfilesIcon";
 import { formatSessionDateTime } from "@/lib/utils/date";
 import { formatParticipantCount, formatSessionDuration } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/utils";
@@ -43,15 +43,15 @@ export function CardMeta({
       )}
     >
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <UsersIcon className={iconClassName} />
+        <UserProfilesIcon className={iconClassName} />
         <span>{formatParticipantCount(currentParticipants, maxParticipants)}</span>
       </span>
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <ClockIcon className={iconClassName} />
+        <DurationIcon className={iconClassName} />
         <span>{formatSessionDuration(durationMinutes)}</span>
       </span>
       <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-        <CalendarIcon className={iconClassName} />
+        <DateAndTimeIcon className={iconClassName} />
         <span>{formatSessionDateTime(sessionDate)}</span>
       </span>
     </div>
