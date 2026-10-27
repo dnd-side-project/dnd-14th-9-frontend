@@ -30,8 +30,8 @@ function renderCard(props: Partial<ComponentProps<typeof SessionGoalAndTodoCard>
       {...props}
     />
   );
-  // 목표·투두를 담은 테두리 카드 (헤더는 이 카드 밖에 있다)
-  const card = screen.getByText("목표").closest(".border") as HTMLElement;
+  // 목표·투두를 담은 카드: 라벨 → 목표 블록 → 카드 (헤더는 이 카드 밖에 있다)
+  const card = screen.getByText("목표").parentElement?.parentElement as HTMLElement;
   return { card };
 }
 
@@ -55,24 +55,43 @@ describe("SessionGoalAndTodoCard — 헤더와 카드 구조", () => {
     const subtitle = screen.getByText("세션을 진행하면서 투두리스트를 체크해 보세요");
     expect(card).not.toContainElement(heading);
     expect(card.parentElement).toHaveClass("gap-xl");
-    // text-2xl은 자체 줄 높이(32px)를 가져 부모의 leading을 이기므로 제목에 직접 1.4를 준다 (Figma 34px)
-    expect(heading).toHaveClass("text-text-secondary", "text-2xl", "font-bold", "leading-[1.4]");
-    expect(subtitle).toHaveClass("text-text-disabled", "text-[15px]");
+    // text-base/text-2xl은 자체 줄 높이를 가져 부모의 leading을 이기므로 제목에 직접 1.4를 준다 (Figma 34px)
+    expect(heading).toHaveClass("text-text-secondary", "font-bold", "leading-[1.4]");
+    expect(subtitle).toHaveClass("text-text-disabled");
   });
 
-  it("카드는 surface-default 배경에 24px 안쪽 여백, 반경 12px, 블록 간격 32px이다", () => {
+  it("제목은 모바일 16px, 태블릿부터 24px이고 부제는 13px → 15px, 둘 사이 간격은 2px → 4px이다", () => {
+    // Given/When: 렌더링하면
+    renderCard();
+
+    // Then: 기본이 모바일 크기이고 md부터 커진다
+    const heading = screen.getByRole("heading", { name: "나의 목표" });
+    expect(heading).toHaveClass("text-base", "md:text-2xl");
+    expect(screen.getByText("세션을 진행하면서 투두리스트를 체크해 보세요")).toHaveClass(
+      "text-[13px]",
+      "md:text-[15px]"
+    );
+    expect(heading.parentElement).toHaveClass("gap-3xs", "md:gap-2xs");
+  });
+
+  it("카드 모양(배경·테두리·여백·반경·그림자)은 태블릿부터이고, 블록 간격은 모바일 24px, 태블릿부터 32px이다", () => {
     // Given/When: 렌더링하면
     const { card } = renderCard();
 
-    // Then: Figma Goals Section 카드 스타일이다
+    // Then: Figma 태블릿·데스크톱 Goals Section 카드 스타일은 md부터, 모바일은 껍데기 없이 펼쳐진다
     expect(card).toHaveClass(
-      "bg-surface-default",
-      "border-border-subtle",
-      "p-xl",
-      "gap-2xl",
-      "rounded-lg",
-      "shadow-[0_0_40px_rgba(0,0,0,0.3)]"
+      "md:bg-surface-default",
+      "md:border",
+      "md:border-border-subtle",
+      "md:p-xl",
+      "md:rounded-lg",
+      "md:shadow-[0_0_40px_rgba(0,0,0,0.3)]",
+      "gap-xl",
+      "md:gap-2xl"
     );
+    for (const cardClass of ["bg-surface-default", "border", "p-xl", "rounded-lg", "gap-2xl"]) {
+      expect(card).not.toHaveClass(cardClass);
+    }
   });
 });
 
@@ -97,24 +116,36 @@ describe("SessionGoalAndTodoCard — 크기는 상위가 정한다", () => {
 });
 
 describe("SessionGoalAndTodoCard — 목표", () => {
-  it("라벨은 16px 세미볼드, 목표 칸은 높이 56px에 안쪽 여백 16px과 default 테두리이다", () => {
+  it("라벨은 모바일 12px, 태블릿부터 16px 세미볼드이다", () => {
     // Given/When: 렌더링하면
     renderCard();
 
-    // Then: Figma TextInput 스타일이다
+    // Then: Figma TextInput 라벨 스타일이다
     expect(screen.getByText("목표")).toHaveClass(
       "text-text-secondary",
-      "text-base",
+      "text-xs",
+      "md:text-base",
       "font-semibold"
     );
+  });
+
+  it("목표 칸은 모바일 44px(안쪽 16·12px)·13px, 태블릿부터 56px(안쪽 16px)·16px이다", () => {
+    // Given/When: 렌더링하면
+    renderCard();
+
+    // Then: Figma TextInput 입력 칸 스타일이다
     expect(screen.getByText("주요 페이지 2개 리팩토링 완료하기")).toHaveClass(
       "bg-surface-strong",
       "border-border-default",
-      "p-md",
-      "h-14",
+      "h-11",
+      "md:h-14",
+      "px-md",
+      "py-sm",
+      "md:p-md",
       "rounded-sm",
       "text-text-primary",
-      "text-base"
+      "text-[13px]",
+      "md:text-base"
     );
   });
 });
@@ -125,10 +156,11 @@ describe("SessionGoalAndTodoCard — 투두리스트 제목과 달성률", () =>
     // When: 렌더링하면
     renderCard();
 
-    // Then: 제목 줄은 16px 세미볼드이고, '투두리스트'는 기본 글자색, 완료 수와 '/전체'는 색이 다르다
+    // Then: 제목 줄은 모바일 12px → 태블릿부터 16px 세미볼드이고, '투두리스트'는 기본 글자색,
+    // 완료 수와 '/전체'는 색이 다르다
     const title = screen.getByText("투두리스트");
     expect(title).toHaveClass("text-text-primary");
-    expect(title.parentElement).toHaveClass("text-base", "font-semibold");
+    expect(title.parentElement).toHaveClass("text-xs", "md:text-base", "font-semibold");
     expect(screen.getByText("1")).toHaveClass("text-text-brand-subtler");
     expect(screen.getByText("/3")).toHaveClass("text-text-muted");
   });
@@ -149,21 +181,23 @@ describe("SessionGoalAndTodoCard — 투두리스트 제목과 달성률", () =>
 });
 
 describe("SessionGoalAndTodoCard — 할 일 항목", () => {
-  it("항목 사이 간격은 12px이고, 항목은 고정 높이 없이 안쪽 여백으로 높이가 정해진다", () => {
+  it("항목 사이 간격은 12px이고, 항목은 고정 높이 없이 안쪽 여백(모바일 12px, 태블릿부터 좌우 16px)으로 높이가 정해진다", () => {
     // Given/When: 렌더링하면
     renderCard();
 
-    // Then: 목록은 gap-sm, 항목은 px-md py-sm이고 h-13.5가 없다
+    // Then: 목록은 gap-sm, 항목은 px-sm → md:px-md, py-sm이고 h-13.5가 없다
     const option = optionOf("아티클 읽기");
     expect(option.parentElement).toHaveClass("gap-sm");
     expect(option).toHaveClass(
       "border-border-subtle",
-      "px-md",
+      "px-sm",
+      "md:px-md",
       "py-sm",
       "gap-sm",
       "rounded-sm",
       "border"
     );
+    expect(option).not.toHaveClass("px-md");
     expect(option).not.toHaveClass("h-13.5");
   });
 
@@ -177,18 +211,19 @@ describe("SessionGoalAndTodoCard — 할 일 항목", () => {
     expect(optionOf("아티클 읽기")).toHaveClass("bg-surface-strong");
   });
 
-  it("내용은 15px이고, 완료는 muted 취소선, 미완료는 secondary 색이다", () => {
+  it("내용은 모바일 13px, 태블릿부터 15px이고, 완료는 muted 취소선, 미완료는 secondary 색이다", () => {
     // Given/When: 렌더링하면
     renderCard();
 
-    // Then: Figma Body/3 스타일이다
+    // Then: Figma Body/4 · Body/3 스타일이다
     expect(screen.getByText("노션에 할 일 정리하기")).toHaveClass(
-      "text-[15px]",
+      "text-[13px]",
+      "md:text-[15px]",
       "text-text-muted",
       "line-through"
     );
     const todoText = screen.getByText("아티클 읽기");
-    expect(todoText).toHaveClass("text-[15px]", "text-text-secondary");
+    expect(todoText).toHaveClass("text-[13px]", "md:text-[15px]", "text-text-secondary");
     expect(todoText).not.toHaveClass("line-through");
   });
 

@@ -42,19 +42,23 @@ export function SessionGoalAndTodoCard({
   return (
     <div className={`gap-xl flex flex-col ${className ?? ""}`}>
       {/* 헤더 */}
-      <div className="gap-2xs flex flex-col leading-[1.4]">
-        <h2 className="text-text-secondary text-2xl leading-[1.4] font-bold">나의 목표</h2>
-        <p className="text-text-disabled text-[15px]">
+      <div className="gap-3xs md:gap-2xs flex flex-col leading-[1.4]">
+        <h2 className="text-text-secondary text-base leading-[1.4] font-bold md:text-2xl">
+          나의 목표
+        </h2>
+        <p className="text-text-disabled text-[13px] md:text-[15px]">
           세션을 진행하면서 투두리스트를 체크해 보세요
         </p>
       </div>
 
-      {/* 목표 + 투두 카드 */}
-      <div className="bg-surface-default border-border-subtle p-xl gap-2xl flex min-h-0 flex-1 flex-col rounded-lg border shadow-[0_0_40px_rgba(0,0,0,0.3)]">
+      {/* 목표 + 투두 카드 (모바일은 카드 껍데기 없이 펼쳐진다) */}
+      <div className="gap-xl md:bg-surface-default md:border-border-subtle md:p-xl md:gap-2xl flex min-h-0 flex-1 flex-col md:rounded-lg md:border md:shadow-[0_0_40px_rgba(0,0,0,0.3)]">
         {/* 목표 */}
         <div className="gap-xs flex w-full flex-col">
-          <span className="text-text-secondary text-base leading-[1.4] font-semibold">목표</span>
-          <div className="bg-surface-strong border-border-default p-md text-text-primary flex h-14 items-center rounded-sm border text-base leading-[1.4]">
+          <span className="text-text-secondary text-xs leading-[1.4] font-semibold md:text-base">
+            목표
+          </span>
+          <div className="bg-surface-strong border-border-default px-md py-sm md:p-md text-text-primary flex h-11 items-center rounded-sm border text-[13px] leading-[1.4] md:h-14 md:text-base">
             {goal ?? "목표가 설정되지 않았습니다"}
           </div>
         </div>
@@ -62,7 +66,7 @@ export function SessionGoalAndTodoCard({
         {/* Todo */}
         <div className="gap-md flex min-h-0 flex-1 flex-col">
           <div className="flex items-start justify-between">
-            <p className="gap-2xs flex items-center text-base leading-[1.4] font-semibold">
+            <p className="gap-2xs flex items-center text-xs leading-[1.4] font-semibold md:text-base">
               <span className="text-text-primary">투두리스트</span>
               <span>
                 <span className="text-text-brand-subtler">{completedCount}</span>
@@ -83,7 +87,7 @@ export function SessionGoalAndTodoCard({
                 <li
                   key={todo.subtaskId}
                   className={cn(
-                    "border-border-subtle px-md py-sm gap-sm flex shrink-0 items-center rounded-sm border",
+                    "border-border-subtle px-sm md:px-md py-sm gap-sm flex shrink-0 items-center rounded-sm border",
                     todo.isCompleted ? "bg-surface-default" : "bg-surface-strong"
                   )}
                 >
@@ -107,7 +111,7 @@ export function SessionGoalAndTodoCard({
                   {/* 내용 */}
                   <span
                     className={cn(
-                      "text-[15px] leading-[1.4]",
+                      "text-[13px] leading-[1.4] md:text-[15px]",
                       todo.isCompleted ? "text-text-muted line-through" : "text-text-secondary"
                     )}
                   >
