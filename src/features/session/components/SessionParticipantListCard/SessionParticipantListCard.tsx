@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ChatBubbleIcon } from "@/components/Icon/ChatBubbleIcon";
@@ -67,11 +67,11 @@ export function SessionParticipantListCard({
   };
 
   // 목록 아래에 아직 안 보이는 내용이 있을 때만 하단 그라데이션을 보여준다
-  const updateScrollState = useCallback(() => {
+  const updateScrollState = () => {
     const list = listRef.current;
     if (!list) return;
     setHasMoreBelow(list.scrollTop < list.scrollHeight - list.clientHeight - 1);
-  }, []);
+  };
 
   // 참여자 수나 펼침 상태가 바뀌어 내용 길이가 달라질 때 다시 잰다
   useEffect(() => {
