@@ -631,101 +631,15 @@ describe("SessionParticipantListCard — 아바타 크기", () => {
   });
 });
 
-describe("SessionParticipantListCard — 하단 그라데이션", () => {
-  /** 목록(ul)의 스크롤 크기를 jsdom에 심는다 (jsdom은 레이아웃이 없어 항상 0) */
-  function mockListScroll({
-    scrollHeight,
-    clientHeight,
-  }: {
-    scrollHeight: number;
-    clientHeight: number;
-  }) {
-    jest.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(scrollHeight);
-    jest.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(clientHeight);
-  }
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it("목록이 넘치지 않으면 그라데이션이 보이지 않는다", () => {
-    // Given: 내용이 영역보다 작은 목록 (300 < 465)
-    mockListScroll({ scrollHeight: 300, clientHeight: 465 });
-
-    // When: 렌더링하면
-    renderCard();
-
-    // Then: 그라데이션은 투명이다
-    expect(screen.getByTestId("participants-bottom-gradient")).toHaveClass("opacity-0");
-  });
-
-  it("아래에 더 볼 내용이 있으면 그라데이션이 보인다", () => {
-    // Given: 내용이 영역보다 긴 목록 (800 > 465), 맨 위에 있음
-    mockListScroll({ scrollHeight: 800, clientHeight: 465 });
-
-    // When: 렌더링하면
-    renderCard();
-
-    // Then: 그라데이션이 보인다
-    expect(screen.getByTestId("participants-bottom-gradient")).toHaveClass("opacity-100");
-  });
-
-  it("맨 아래까지 스크롤하면 그라데이션이 사라지고, 다시 올리면 나타난다", () => {
-    // Given: 넘치는 목록
-    mockListScroll({ scrollHeight: 800, clientHeight: 465 });
+describe("SessionParticipantListCard — 하단 흐림", () => {
+  it("목록에 scroll-fade-bottom을 걸고, 별도 오버레이 요소는 두지 않는다", () => {
+    // Given & When: 참여자가 있는 카드를 렌더링하면
     const { list } = renderCard();
-    const gradient = screen.getByTestId("participants-bottom-gradient");
 
-    // When: 끝까지 스크롤하면 (800 - 465 = 335)
-    list.scrollTop = 335;
-    fireEvent.scroll(list);
-
-    // Then: 사라진다
-    expect(gradient).toHaveClass("opacity-0");
-
-    // When: 다시 위로 올리면
-    list.scrollTop = 100;
-    fireEvent.scroll(list);
-
-    // Then: 다시 나타난다
-    expect(gradient).toHaveClass("opacity-100");
-  });
-
-  it("참여자가 늘어 목록이 넘치게 되면 그라데이션이 나타난다", () => {
-    // Given: 넘치지 않는 목록
-    mockListScroll({ scrollHeight: 300, clientHeight: 465 });
-    const { rerender } = render(
-      <SessionParticipantListCard {...BASE_PROPS} members={MEMBERS.slice(0, 1)} />
-    );
-    expect(screen.getByTestId("participants-bottom-gradient")).toHaveClass("opacity-0");
-
-    // When: 참여자가 늘어 내용이 길어지면
-    mockListScroll({ scrollHeight: 800, clientHeight: 465 });
-    rerender(<SessionParticipantListCard {...BASE_PROPS} members={MEMBERS} />);
-
-    // Then: 그라데이션이 나타난다
-    expect(screen.getByTestId("participants-bottom-gradient")).toHaveClass("opacity-100");
-  });
-
-  it("Figma처럼 목록 아래 128px, surface-default에서 투명으로 번지고 클릭을 가로채지 않는다", () => {
-    // Given: 넘치는 목록
-    mockListScroll({ scrollHeight: 800, clientHeight: 465 });
-
-    // When: 렌더링하면
-    const { list } = renderCard();
-    const gradient = screen.getByTestId("participants-bottom-gradient");
-
-    // Then: 높이 128px, 아래쪽이 surface-default인 위쪽 방향 그라데이션이고 pointer-events가 없다
-    expect(gradient).toHaveClass(
-      "h-32",
-      "bottom-0",
-      "bg-linear-to-t",
-      "from-surface-default",
-      "to-transparent",
-      "pointer-events-none"
-    );
-    // 스크롤 영역 안에 있으면 내용과 함께 스크롤되어 사라지므로 형제여야 한다
-    expect(list).not.toContainElement(gradient);
-    expect(list.parentElement).toContainElement(gradient);
+    // Then: 스크롤 위치로 구동되는 CSS 흐림이 스크롤 목록에 걸려 있다
+    // (jsdom은 스크롤 구동 애니메이션을 계산하지 못해 클래스로 확인한다)
+    expect(list).toHaveClass("scroll-fade-bottom", "overflow-y-auto");
+    // JS 상태로 제어하던 오버레이는 없다
+    expect(screen.queryByTestId("participants-bottom-gradient")).not.toBeInTheDocument();
   });
 });

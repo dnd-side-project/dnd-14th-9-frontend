@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ChatBubbleIcon } from "@/components/Icon/ChatBubbleIcon";
 import { ChevronDownIcon } from "@/components/Icon/ChevronDownIcon";
 import { useViewportLayout } from "@/hooks/useViewportLayout";
-import { cn } from "@/lib/utils/utils";
 
 import { ChatDialog } from "../ChatDialog/ChatDialog";
 import { useSessionChat } from "../ChatDialog/useSessionChat";
@@ -47,7 +46,6 @@ export function SessionParticipantListCard({
 }: SessionParticipantListCardProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [hasMoreBelow, setHasMoreBelow] = useState(false);
   // 모바일 전용: 처음 2명만 보여주고 "더보기"로 펼친다 (태블릿부터는 560px 안에서 스크롤)
   const [isListExpanded, setIsListExpanded] = useState(false);
   const hasMobileHiddenMembers = members.length > MOBILE_COLLAPSED_COUNT;
@@ -56,7 +54,6 @@ export function SessionParticipantListCard({
   const { layout } = useViewportLayout();
   const avatarSize = layout === "mobile" ? "large" : "xlarge";
   const chatButtonRef = useRef<HTMLButtonElement>(null);
-  const listRef = useRef<HTMLUListElement>(null);
 
   // 채팅 상태(소켓 연결·수신 기록)를 카드가 소유한다 — 다이얼로그를 닫아도
   // 연결과 기록이 유지되고, 닫혀 있는 동안 수신한 메시지도 보존된다.
@@ -65,24 +62,6 @@ export function SessionParticipantListCard({
   const handleToggle = (memberId: number) => {
     setExpandedId((prev) => (prev === memberId ? null : memberId));
   };
-
-  // 목록 아래에 아직 안 보이는 내용이 있을 때만 하단 그라데이션을 보여준다
-  const updateScrollState = () => {
-    const list = listRef.current;
-    if (!list) return;
-    setHasMoreBelow(list.scrollTop < list.scrollHeight - list.clientHeight - 1);
-  };
-
-  // 참여자 수나 펼침 상태가 바뀌어 내용 길이가 달라질 때 다시 잰다
-  useEffect(() => {
-    updateScrollState();
-  }, [updateScrollState, members, expandedId]);
-
-  // 창 크기가 바뀌어 목록 영역 높이가 달라질 때(xl 경계 등) 다시 잰다
-  useEffect(() => {
-    window.addEventListener("resize", updateScrollState);
-    return () => window.removeEventListener("resize", updateScrollState);
-  }, [updateScrollState]);
 
   return (
     <>
@@ -123,13 +102,9 @@ export function SessionParticipantListCard({
             </span>
           </div>
 
-          {/* 참여자 목록 — 그라데이션은 스크롤 영역(ul)의 형제여야 내용과 함께 스크롤되지 않는다 */}
+          {/* 참여자 목록 — 아래에 더 볼 내용이 있으면 scroll-fade-bottom이 하단을 흐리게 한다 */}
           <div className="relative min-h-0 flex-1">
-            <ul
-              ref={listRef}
-              onScroll={updateScrollState}
-              className="gap-sm flex h-full flex-col overflow-y-auto"
-            >
+            <ul className="scroll-fade-bottom gap-sm flex h-full flex-col overflow-y-auto">
               {members.map((member, index) => (
                 <SessionParticipantItem
                   key={member.memberId}
@@ -141,15 +116,6 @@ export function SessionParticipantListCard({
                 />
               ))}
             </ul>
-
-            <div
-              aria-hidden="true"
-              data-testid="participants-bottom-gradient"
-              className={cn(
-                "from-surface-default pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-linear-to-t to-transparent transition-opacity duration-200 ease-out",
-                hasMoreBelow ? "opacity-100" : "opacity-0"
-              )}
-            />
 
             {/* 모바일 전용: 접힌 목록 아래 그라데이션과 더보기/숨기기 (Figma 모바일 시안) */}
             {isCollapsedOnMobile && (
