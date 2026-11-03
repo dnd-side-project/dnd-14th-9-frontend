@@ -53,18 +53,10 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
 }
 
 /* shadcn/ui 토큰 정의 */
 :root {
-  --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -142,8 +134,8 @@
     @apply bg-background-default text-foreground;
   }
   body.pretendard-ready {
-    --font-app-sans: "Pretendard Variable", var(--font-pretendard),
-      var(--font-geist-sans), sans-serif;
+    --font-app-sans:
+      "Pretendard Variable", var(--font-pretendard), var(--font-geist-sans), sans-serif;
   }
   button,
   a,
@@ -164,6 +156,38 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* 스크롤 영역 아래에 더 볼 내용이 있을 때만 하단 128px을 흐리게 한다.
+   끝 128px 구간에서 흐림의 세기만 스크롤에 맞춰 옅어지고 길이는 그대로다 (오버레이 opacity와 같다).
+   남은 스크롤이 128px보다 짧으면 맨 위에서 최대 세기로 시작해 남은 거리 동안 옅어진다.
+   스크롤 위치로 구동되어 JS가 필요 없고, 지원하지 않는 브라우저는 흐림 없이 그대로 보인다. */
+@utility scroll-fade-bottom {
+  @supports (animation-timeline: scroll()) {
+    mask-image: linear-gradient(
+      to bottom,
+      #000 calc(100% - 128px),
+      rgb(0 0 0 / calc(1 - var(--scroll-fade-strength))) 100%
+    );
+    animation: scroll-fade-strength linear both;
+    animation-timeline: scroll(self);
+    animation-range: max(0%, calc(100% - 128px)) 100%;
+  }
+}
+
+@property --scroll-fade-strength {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes scroll-fade-strength {
+  from {
+    --scroll-fade-strength: 1;
+  }
+  to {
+    --scroll-fade-strength: 0;
   }
 }
 

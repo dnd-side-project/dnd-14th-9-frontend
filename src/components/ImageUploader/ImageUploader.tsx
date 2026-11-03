@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils/utils";
 import { Button } from "../Button/Button";
 import { FileIcon } from "../Icon/FileIcon";
 import { ImageIcon } from "../Icon/ImageIcon";
-import { ProgressRing } from "../ProgressRing/ProgressRing";
+import { TimerCircular } from "../TimerCircular/TimerCircular";
 
 const DEFAULT_MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -202,7 +202,7 @@ export function ImageUploader({
         {/* 상태별 콘텐츠 렌더링 */}
         {isUploading ? (
           <div className="flex flex-col items-center gap-3">
-            <ProgressRing progress={uploadProgress!} />
+            <TimerCircular progress={uploadProgress!} />
             <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
               {uploadingText}
             </span>

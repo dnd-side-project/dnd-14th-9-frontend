@@ -153,41 +153,43 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   const myMember = inProgressData?.members.find((m) => m.memberId === myMemberId);
 
   return (
-    <div className="p-3xl flex flex-col">
-      <SessionHeader
-        sessionId={sessionId}
-        showDialog={showLeaveDialog}
-        onShowDialog={() => setShowLeaveDialog(true)}
-        onCloseDialog={() => setShowLeaveDialog(false)}
-        isLeavingRef={isLeavingRef}
-      />
-      <SessionDetailSection
-        className="mt-xl"
-        thumbnailUrl={session.imageUrl}
-        category={session.category}
-        title={session.title}
-        description={session.summary}
-        currentParticipants={inProgressData?.participantCount ?? session.currentParticipants}
-        maxParticipants={session.maxParticipants}
-        durationMinutes={session.sessionDurationMinutes}
-        sessionDate={session.startTime}
-        notice={session.notice}
-      />
-      <SessionTimerSection
-        sessionId={sessionId}
-        sessionDurationMinutes={session.sessionDurationMinutes}
-        startTime={session.startTime}
-        focusingCount={inProgressData?.members.filter((m) => m.status === "FOCUSED").length ?? 0}
-        totalCount={inProgressData?.participantCount ?? session.currentParticipants}
-        className="mt-xl"
-      />
-      <div className="gap-lg mt-xl flex flex-col xl:flex-row">
+    <div className="px-lg pt-md gap-xl md:px-3xl md:pt-3xl md:gap-3xl xl:pt-4xl flex flex-col pb-14 md:pb-20 xl:gap-20 xl:px-[54px] xl:pb-32">
+      <div className="gap-md md:gap-3xl flex flex-col">
+        <SessionHeader
+          sessionId={sessionId}
+          showDialog={showLeaveDialog}
+          onShowDialog={() => setShowLeaveDialog(true)}
+          onCloseDialog={() => setShowLeaveDialog(false)}
+          isLeavingRef={isLeavingRef}
+        />
+        <SessionDetailSection
+          thumbnailUrl={session.imageUrl}
+          category={session.category}
+          title={session.title}
+          description={session.summary}
+          currentParticipants={inProgressData?.participantCount ?? session.currentParticipants}
+          maxParticipants={session.maxParticipants}
+          durationMinutes={session.sessionDurationMinutes}
+          sessionDate={session.startTime}
+          notice={session.notice}
+        />
+        <SessionTimerSection
+          sessionId={sessionId}
+          sessionDurationMinutes={session.sessionDurationMinutes}
+          startTime={session.startTime}
+          focusingCount={inProgressData?.members.filter((m) => m.status === "FOCUSED").length ?? 0}
+          totalCount={inProgressData?.participantCount ?? session.currentParticipants}
+        />
+      </div>
+      <div className="gap-3xl xl:gap-lg flex flex-col xl:h-140 xl:flex-row">
         <SessionGoalAndTodoCard
+          className="xl:flex-6"
           goal={myMember?.task?.goal ?? ""}
           todos={myMember?.task?.todos ?? []}
           achievementRate={myMember?.achievementRate}
         />
         <SessionParticipantListCard
+          className="md:h-140 xl:flex-4"
           members={inProgressData?.members}
           participantCount={inProgressData?.participantCount}
           averageAchievementRate={inProgressData?.averageAchievementRate}

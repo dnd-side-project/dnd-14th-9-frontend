@@ -2,13 +2,18 @@
 
 import dynamic from "next/dynamic";
 
+import { useViewportLayout } from "@/hooks/useViewportLayout";
+
 const MyTimer = dynamic(() => import("./MyTimer/MyTimer").then((mod) => mod.MyTimer), {
   ssr: false,
 });
 
-const TotalTimer = dynamic(() => import("./TotalTimer/TotalTimer").then((mod) => mod.TotalTimer), {
-  ssr: false,
-});
+const OverallTimer = dynamic(
+  () => import("./OverallTimer/OverallTimer").then((mod) => mod.OverallTimer),
+  {
+    ssr: false,
+  }
+);
 
 interface SessionTimerSectionProps {
   sessionId: string;
@@ -27,18 +32,29 @@ export function SessionTimerSection({
   totalCount,
   className,
 }: SessionTimerSectionProps) {
+  // 링 크기만 CSS로 못 바꾸므로(Figma size 변형) 모바일일 때 sm을 넘긴다
+  const { layout } = useViewportLayout();
+  const ringSize = layout === "mobile" ? "sm" : "md";
   const sessionEndTime = new Date(
     new Date(startTime).getTime() + sessionDurationMinutes * 60 * 1000
   );
 
   return (
-    <section className={`gap-lg flex flex-col items-stretch xl:flex-row ${className ?? ""}`}>
-      <div className="xl:flex-6">
-        <MyTimer sessionId={sessionId} sessionDurationMinutes={sessionDurationMinutes} />
+    <section
+      className={`gap-md md:gap-lg flex flex-col items-stretch md:flex-row ${className ?? ""}`}
+    >
+      {/* 폭: 태블릿은 Figma 421:247을 비율로, 데스크톱은 6:4 */}
+      <div className="md:flex-[421] xl:flex-6">
+        <MyTimer
+          sessionId={sessionId}
+          sessionDurationMinutes={sessionDurationMinutes}
+          ringSize={ringSize}
+        />
       </div>
 
-      <div className="xl:flex-4">
-        <TotalTimer
+      <div className="md:flex-[247] xl:flex-4">
+        <OverallTimer
+          ringSize={ringSize}
           sessionEndTime={sessionEndTime}
           sessionDurationMinutes={sessionDurationMinutes}
           focusingCount={focusingCount}

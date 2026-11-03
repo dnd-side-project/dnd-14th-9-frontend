@@ -18,8 +18,17 @@ const BADGE_SIZES: Record<"xlarge" | "large" | "medium" | "small", string> = {
   small: "size-2.5", // 10px (24px 아바타, 보간)
 };
 
+// 방장 배지 중심 위치 — 아바타 중심에서 오른쪽·아래로 N px (Figma Leader Badge: xl 40/48, lg 34/40, md 28/32)
+// small은 시안에 배지가 없어 기존 85% 위치를 유지한다
+const BADGE_POSITIONS: Record<"xlarge" | "large" | "medium" | "small", string> = {
+  xlarge: "top-[calc(50%+16px)] left-[calc(50%+16px)]",
+  large: "top-[calc(50%+14px)] left-[calc(50%+14px)]",
+  medium: "top-[calc(50%+12px)] left-[calc(50%+12px)]",
+  small: "top-[85%] left-[85%]",
+};
+
 const AVATAR_VARIANTS = cva(
-  "relative inline-flex items-center justify-center overflow-hidden rounded-full bg-surface-subtle ring-1 ring-inset ring-border-strong box-border",
+  "relative inline-flex items-center justify-center overflow-hidden rounded-full bg-surface-subtle ring-1 ring-inset box-border",
   {
     variants: {
       size: {
@@ -28,9 +37,10 @@ const AVATAR_VARIANTS = cva(
         medium: "size-8", // 32px
         small: "size-6", // 24px
       },
+      // Figma Avatar: 빈 아바타 테두리는 흰색 8%, 이미지 아바타는 32%
       type: {
-        image: "",
-        empty: "",
+        image: "ring-border-strong",
+        empty: "ring-border-subtle",
       },
     },
     defaultVariants: {
@@ -93,10 +103,22 @@ export const Avatar = ({
     }
   };
 
+  // 테두리는 실제로 그려지는 모양을 따른다 (type이 image여도 src가 없으면 기본 아이콘 = 빈 아바타)
+  const imageSrc = type === "image" ? src : undefined;
+
   const circle = (
-    <div className={cn(AVATAR_VARIANTS({ size, type, className }))} {...props}>
-      {type === "image" && src ? (
-        <Image src={src} alt={alt} fill className="aspect-square object-cover" sizes={getSizes()} />
+    <div
+      className={cn(AVATAR_VARIANTS({ size, type: imageSrc ? "image" : "empty", className }))}
+      {...props}
+    >
+      {imageSrc ? (
+        <Image
+          src={imageSrc}
+          alt={alt}
+          fill
+          className="aspect-square object-cover"
+          sizes={getSizes()}
+        />
       ) : (
         <DefaultProfileIcon
           size={iconSize}
@@ -122,12 +144,16 @@ export const Avatar = ({
     <div className="relative inline-flex shrink-0">
       {circle}
       <span
-        className="absolute top-[85%] left-[85%] inline-flex -translate-x-1/2 -translate-y-1/2"
+        className={cn(
+          "absolute inline-flex -translate-x-1/2 -translate-y-1/2",
+          BADGE_POSITIONS[size ?? "xlarge"]
+        )}
         aria-label="방장"
       >
         <HostBadgeIcon
           className={cn(
-            "border-border-gray-subtler rounded-full border-2",
+            // 2px 고리는 초록 원 바깥에 그려야 원이 20/16/12px로 보인다 (Figma Leader Badge)
+            "ring-border-gray-subtler rounded-full ring-2",
             BADGE_SIZES[size ?? "xlarge"]
           )}
         />
