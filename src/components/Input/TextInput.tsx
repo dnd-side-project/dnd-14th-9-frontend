@@ -35,7 +35,7 @@ const textInputVariants = cva(
           "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
         ],
         filled: [
-          "border-border-subtle",
+          "border-border-default",
           "text-text-primary",
           "focus:border-text-brand-default",
           "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
@@ -54,7 +54,7 @@ const textInputVariants = cva(
         ],
       },
       size: {
-        md: "h-[56px] px-md",
+        md: "h-11 px-sm text-[13px] md:h-14 md:px-md md:text-base",
         sm: "h-[44px] px-md",
       },
     },
@@ -155,7 +155,7 @@ export function TextInput({
   return (
     <div className={cn("flex w-full flex-col gap-2", !fullWidth && "max-w-95", containerClassName)}>
       {label && (
-        <label htmlFor={inputId} className="text-text-secondary text-base">
+        <label htmlFor={inputId} className="text-text-secondary text-xs font-semibold md:text-base">
           {label}
           {required && (
             <span className="text-text-status-negative-default ml-1" aria-hidden="true">
@@ -202,11 +202,11 @@ export function TextInput({
       </div>
 
       {showCount && (
-        <div className="flex w-full justify-end">
+        <div className="flex w-full">
           <span
             className={cn(
-              "text-sm",
-              error ? "text-text-status-negative-default" : "text-text-muted"
+              "text-[11px] md:text-xs",
+              error ? "text-text-status-negative-default" : "text-text-disabled"
             )}
             aria-live="polite"
           >

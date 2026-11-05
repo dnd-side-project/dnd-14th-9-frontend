@@ -13,18 +13,18 @@ import { cn } from "@/lib/utils/utils";
 import { HelperText, type HelperTextType } from "./HelperText";
 
 const SIZE_STYLES = {
-  medium: { minHeight: "98px" },
-  small: { minHeight: "87px" },
+  medium: "min-h-[78px] md:min-h-[98px]",
+  small: "min-h-[87px]",
 } as const;
 
 const textareaVariants = cva(
   [
     "w-full",
     "max-w-90",
-    "p-md",
+    "p-sm md:p-md",
     "rounded-sm",
     "border",
-    "text-base",
+    "text-[13px] md:text-base",
     "transition-[border-color,box-shadow]",
     "outline-none",
     "placeholder:text-text-muted",
@@ -41,7 +41,7 @@ const textareaVariants = cva(
           "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
         ],
         filled: [
-          "border-border-subtle",
+          "border-border-default",
           "text-text-primary",
           "focus:border-text-brand-default",
           "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
@@ -142,7 +142,10 @@ export function Textarea({
   return (
     <div className={cn("flex w-full max-w-90 flex-col gap-2", containerClassName)}>
       {label && (
-        <label htmlFor={textareaId} className="text-text-secondary text-base">
+        <label
+          htmlFor={textareaId}
+          className="text-text-secondary text-xs font-semibold md:text-base"
+        >
           {label}
           {required && (
             <span className="text-text-status-negative-default ml-1" aria-hidden="true">
@@ -155,8 +158,7 @@ export function Textarea({
       <textarea
         ref={ref}
         id={textareaId}
-        className={cn(textareaVariants({ state: getState() }), className)}
-        style={SIZE_STYLES[size]}
+        className={cn(textareaVariants({ state: getState() }), SIZE_STYLES[size], className)}
         disabled={disabled}
         value={currentValue}
         maxLength={maxLength}
@@ -170,11 +172,11 @@ export function Textarea({
       />
 
       {showCount && (
-        <div className="flex w-full justify-end">
+        <div className="flex w-full">
           <span
             className={cn(
-              "text-sm",
-              error ? "text-text-status-negative-default" : "text-text-muted"
+              "text-[11px] md:text-xs",
+              error ? "text-text-status-negative-default" : "text-text-disabled"
             )}
             aria-live="polite"
           >
