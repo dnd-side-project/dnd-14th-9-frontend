@@ -20,12 +20,14 @@ const imageUploaderVariants = cva(
     "flex",
     "flex-col",
     "items-center",
-    "justify-between",
+    "justify-center",
+    "gap-3",
     "w-full",
-    "min-h-[144px]",
-    "py-6",
-    "rounded-lg",
-    "border-2",
+    // 시안 패딩 64/40(64)은 안쪽 선 1px을 포함한 값이라 border 1px을 뺀다.
+    "px-[63px]",
+    "py-[39px] md:py-[63px]",
+    "rounded-sm",
+    "border",
     "cursor-pointer",
     "transition-colors",
     "duration-200",
@@ -38,7 +40,8 @@ const imageUploaderVariants = cva(
   {
     variants: {
       state: {
-        default: ["border-dashed", "border-border-default", "bg-transparent", "hover:bg-green-950"],
+        // 기본 상태의 점선은 CSS dashed로는 대시 길이를 정할 수 없어 SVG로 그린다(시안: 4/4, 1px, 반경 6).
+        default: ["bg-surface-default", "hover:bg-green-950"],
         dragging: ["border-solid", "border-green-600", "bg-green-950"],
         uploading: ["border-solid", "border-green-600", "bg-transparent", "cursor-default"],
       },
@@ -53,6 +56,16 @@ const imageUploaderVariants = cva(
     },
   }
 );
+
+/**
+ * 시안의 점선 테두리(안쪽 1px, 대시 4 / 간격 4, 반경 6)를 마스크로 그린다.
+ * - CSS dashed는 대시 길이를 정할 수 없고, 일반 SVG 요소는 소수 좌표에서 두 픽셀 줄에 번진다.
+ *   배경 마스크는 요소 상자와 함께 픽셀에 스냅되어 선이 또렷하다. 색은 마스크를 입힌 요소의 배경(토큰)이다.
+ * - 두께 2의 선을 가장자리에 두고 바깥 절반이 이미지 밖으로 잘리게 해 안쪽 1px 선을 만든다.
+ */
+const DASHED_BORDER_MASK = `url("data:image/svg+xml,${encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'><rect width='100%' height='100%' rx='6' fill='none' stroke='black' stroke-width='2' stroke-dasharray='4 4'/></svg>"
+)}")`;
 
 type UploadState = "default" | "dragging" | "uploading";
 
@@ -153,7 +166,10 @@ export function ImageUploader({
     <div className={cn("w-full", containerClassName)}>
       <div
         ref={containerRef}
-        className={cn(imageUploaderVariants({ state, disabled, className }))}
+        className={cn(
+          imageUploaderVariants({ state, disabled, className }),
+          state === "default" && "border-transparent"
+        )}
         onDragEnter={dragHandlers.onDragEnter}
         onDragLeave={dragHandlers.onDragLeave}
         onDragOver={dragHandlers.onDragOver}
@@ -165,6 +181,19 @@ export function ImageUploader({
         aria-label="이미지 업로드 영역"
         aria-disabled={disabled || isUploading}
       >
+        {state === "default" && (
+          <span
+            aria-hidden="true"
+            className="bg-border-default pointer-events-none absolute -inset-px"
+            style={{
+              maskImage: DASHED_BORDER_MASK,
+              WebkitMaskImage: DASHED_BORDER_MASK,
+              maskSize: "100% 100%",
+              maskRepeat: "no-repeat",
+            }}
+          />
+        )}
+
         {/* 숨겨진 파일 input */}
         <input
           ref={(node) => {
@@ -220,11 +249,16 @@ export function ImageUploader({
           </div>
         ) : (
           <>
-            <ImageIcon size="large" className="text-gray-400" />
-            <span className="text-sm text-gray-50">{mainText}</span>
-            <span id={`${inputId}-hint`} className="text-text-secondary text-sm leading-[1.43]">
-              {hintText}
-            </span>
+            <ImageIcon size="xlarge" className="text-text-muted" />
+            <div className="gap-2xs flex flex-col items-center leading-[1.4]">
+              <span className="text-text-muted text-[13px] md:text-base">{mainText}</span>
+              <span
+                id={`${inputId}-hint`}
+                className="text-text-disabled text-[11px] md:text-[13px]"
+              >
+                {hintText}
+              </span>
+            </div>
           </>
         )}
       </div>
