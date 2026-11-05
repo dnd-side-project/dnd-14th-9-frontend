@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { Button } from "@/components/Button/Button";
 import { CategoryFilterButton } from "@/components/CategoryFilterButton/CategoryFilterButton";
 import { DatePicker } from "@/components/DatePicker/DatePicker";
 import { CalendarIcon } from "@/components/Icon/CalendarIcon";
+import { ClockIcon } from "@/components/Icon/ClockIcon";
 import { InfoIcon } from "@/components/Icon/InfoIcon";
 import { ImageUploader } from "@/components/ImageUploader/ImageUploader";
 import { Textarea } from "@/components/Input/Textarea";
@@ -27,7 +28,11 @@ import {
 } from "@/lib/constants/category";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { toast } from "@/lib/toast";
-import { formatDateTimeDisplay, formatDurationKorean, formatLocalDateTime } from "@/lib/utils/date";
+import {
+  formatDateTimeDisplay,
+  formatLocalDateTime,
+  formatSessionTimeRange,
+} from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
 
 import {
@@ -54,6 +59,58 @@ interface SessionCreateFormProps {
   mode?: "create" | "edit";
   sessionId?: string;
   initialValues?: SessionDetailResponse;
+}
+
+// 시안은 모든 텍스트의 줄 높이가 1.4. Tailwind text-xs/sm/base는 자체 줄 높이(1.33/1.43/1.5)를 쓰므로
+// --tw-leading은 상속되지 않아, 폼 범위에서 크기별 줄 높이 변수를 덮어쓴다.
+const LINE_HEIGHT_1_4 =
+  "leading-[1.4] [--text-xs--line-height:1.4] [--text-sm--line-height:1.4] [--text-base--line-height:1.4]";
+// 날짜 선택기는 이번 시안 범위 밖이라 Tailwind 기본 줄 높이로 되돌린다.
+const LINE_HEIGHT_DEFAULT =
+  "leading-normal [--text-xs--line-height:calc(1/0.75)] [--text-sm--line-height:calc(1.25/0.875)] [--text-base--line-height:calc(1.5/1)]";
+// 시안의 선은 모두 INSIDE(패딩 안쪽)라 border로 그리면 박스가 2px 커진다. 안쪽 링은 레이아웃에 영향이 없다.
+const INSIDE_RING = "ring-border-subtle ring-1 ring-inset";
+// 시안의 텍스트 입력 높이는 py 포함 54(모바일 42)로, 날짜 입력(56/44)과 다른 컴포넌트다.
+const TEXT_FIELD_HEIGHT = "h-[42px] md:h-[54px]";
+
+const FIELD_LABEL = "text-text-secondary text-xs font-semibold md:text-base";
+
+function RequiredMark() {
+  return (
+    <span className="text-text-status-negative-default ml-1" aria-hidden="true">
+      *
+    </span>
+  );
+}
+
+interface RateRangeFieldProps {
+  label: string;
+  /** 툴팁 두 줄 (시안은 줄바꿈 위치가 고정) */
+  tooltip: [string, string];
+  children: ReactNode;
+}
+
+/** 투두 달성률·집중률 범위 슬라이더 공통 틀: 라벨 + 호버 툴팁 + 테두리 컨테이너 */
+function RateRangeField({ label, tooltip, children }: RateRangeFieldProps) {
+  return (
+    <div className="flex w-full flex-col gap-4 md:flex-1">
+      <div className="group gap-2xs flex w-fit items-center">
+        <span className={FIELD_LABEL}>{label}</span>
+        <span className="relative flex items-center">
+          <InfoIcon size="xsmall" className="text-text-muted cursor-pointer" />
+          <div className="pointer-events-none absolute bottom-full left-1/2 mb-1 -translate-x-3.5 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="bg-surface-strong text-text-tertiary px-sm py-xs w-[231px] rounded-sm text-[11px] leading-[1.4] md:w-max md:text-[15px]">
+              {tooltip.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+            <div className="border-t-surface-strong absolute top-full left-0 border-x-[14px] border-t-[6px] border-x-transparent" />
+          </div>
+        </span>
+      </div>
+      <div className={cn(INSIDE_RING, "rounded-md px-5 py-5 xl:px-10")}>{children}</div>
+    </div>
+  );
 }
 
 export function SessionCreateForm({
@@ -333,77 +390,79 @@ export function SessionCreateForm({
   };
 
   return (
-    <form className="gap-xl flex w-full flex-col" onSubmit={handleSubmit}>
-      {/* 방 이름 */}
-      <TextInput
-        label="세션 이름"
-        required
-        placeholder="예) 아침 코딩 모각작"
-        maxLength={20}
-        showCharacterCount
-        value={roomName}
-        onChange={(e) => {
-          setRoomName(e.target.value);
-          clearFieldError("title");
-        }}
-        onClear={() => setRoomName("")}
-        error={!!formErrors.title}
-        errorMessage={formErrors.title}
-        containerClassName="max-w-full"
-        className="max-w-full"
-      />
+    <form
+      className={cn("flex w-full flex-col gap-6 md:gap-11 xl:gap-16", LINE_HEIGHT_1_4)}
+      onSubmit={handleSubmit}
+    >
+      {/* 이름 · 한 줄 소개 · 공지사항 */}
+      <div className="flex flex-col gap-4 md:gap-5">
+        <TextInput
+          label="세션 이름"
+          required
+          placeholder="예) 아침 코딩 모각작"
+          maxLength={20}
+          showCharacterCount
+          value={roomName}
+          onChange={(e) => {
+            setRoomName(e.target.value);
+            clearFieldError("title");
+          }}
+          onClear={() => setRoomName("")}
+          error={!!formErrors.title}
+          errorMessage={formErrors.title}
+          fullWidth
+          className={TEXT_FIELD_HEIGHT}
+        />
 
-      {/* 방 한줄 소개 */}
-      <TextInput
-        label="방 한줄 소개"
-        required
-        placeholder="예) 1일 1목표를 달성하는 방이에요"
-        maxLength={50}
-        showCharacterCount
-        value={roomDescription}
-        onChange={(e) => {
-          setRoomDescription(e.target.value);
-          clearFieldError("summary");
-        }}
-        onClear={() => setRoomDescription("")}
-        error={!!formErrors.summary}
-        errorMessage={formErrors.summary}
-        containerClassName="max-w-full"
-        className="max-w-full"
-      />
+        <TextInput
+          label="한 줄 소개"
+          required
+          placeholder="예) 1일 1목표를 달성하는 방이에요"
+          maxLength={50}
+          showCharacterCount
+          value={roomDescription}
+          onChange={(e) => {
+            setRoomDescription(e.target.value);
+            clearFieldError("summary");
+          }}
+          onClear={() => setRoomDescription("")}
+          error={!!formErrors.summary}
+          errorMessage={formErrors.summary}
+          fullWidth
+          className={TEXT_FIELD_HEIGHT}
+        />
 
-      {/* 공지사항 */}
-      <Textarea
-        label="공지사항"
-        required
-        placeholder="예) 세션의 규칙, 공지사항을 작성해주세요"
-        maxLength={100}
-        showCharacterCount
-        value={notice}
-        onChange={(e) => {
-          setNotice(e.target.value);
-          clearFieldError("notice");
-        }}
-        error={!!formErrors.notice}
-        errorMessage={formErrors.notice}
-        containerClassName="max-w-full"
-        className="h-[260px] max-w-full"
-      />
+        <Textarea
+          label="공지사항"
+          required
+          placeholder="예) 세션의 규칙을 작성해 주세요"
+          maxLength={100}
+          showCharacterCount
+          value={notice}
+          onChange={(e) => {
+            setNotice(e.target.value);
+            clearFieldError("notice");
+          }}
+          error={!!formErrors.notice}
+          errorMessage={formErrors.notice}
+          containerClassName="max-w-full"
+          className="max-w-full"
+        />
+      </div>
 
-      {/* 대표 이미지 + 카테고리 (모바일은 세로, md 이상 가로 정렬) */}
-      <div className="gap-xl flex flex-col md:flex-row md:items-start md:gap-5">
-        {/* 대표 이미지 (디자인 기준 574x228) */}
-        <div className="flex flex-col gap-2 md:w-95 md:shrink-0 xl:w-143.5">
-          <span className="text-text-secondary text-base">대표 이미지</span>
+      {/* 대표 이미지 + 카테고리 (모바일은 세로, md 이상 50:50 가로) */}
+      <div className="flex flex-col gap-6 md:flex-row md:items-start">
+        <div className="flex flex-col gap-2 md:flex-1 md:gap-4">
+          <span className={FIELD_LABEL}>대표 이미지</span>
           {imagePreviewUrl ? (
             <div className="relative w-full">
               <Image
                 src={imagePreviewUrl}
                 alt="대표 이미지 미리보기"
                 width={574}
-                height={228}
+                height={224}
                 unoptimized
-                className="h-57 w-full rounded-lg object-cover"
+                className="border-border-strong h-56 w-full rounded-sm border object-cover"
               />
               <Button
                 type="button"
@@ -419,23 +478,20 @@ export function SessionCreateForm({
           ) : (
             <ImageUploader
               mainText="대표 이미지를 등록해 주세요"
-              hintText="최대 5MB의 jpg/png만 가능해요"
+              hintText="최대 5MB의 jpg와 png만 가능해요"
               accept="image/jpeg,image/png"
               onFileSelect={handleImageSelect}
-              className="h-57 justify-center gap-1"
+              className="md:h-56"
             />
           )}
         </div>
 
-        {/* 카테고리 */}
-        <div className="flex flex-col gap-2 md:flex-1">
-          <span className="text-text-secondary text-base">
+        <div className="flex flex-col gap-3 md:flex-1 md:gap-4">
+          <span className={FIELD_LABEL}>
             카테고리
-            <span className="text-text-status-negative-default ml-1" aria-hidden="true">
-              *
-            </span>
+            <RequiredMark />
           </span>
-          <div className="flex flex-wrap gap-3">
+          <div className="gap-xs md:gap-sm flex flex-wrap">
             {ONBOARDING_CATEGORIES.map((category) => (
               <CategoryFilterButton
                 key={category}
@@ -456,39 +512,57 @@ export function SessionCreateForm({
         </div>
       </div>
 
-      {/* 세션 세부사항 */}
-      <div className="flex flex-col gap-2">
-        <span className="text-text-secondary text-base">
-          세션 세부 사항
-          <span className="text-text-status-negative-default ml-1" aria-hidden="true">
-            *
+      {/* 일정: 시작 일시 · 진행 시간 (모바일은 카드가 분리됨) */}
+      <div className="flex flex-col gap-3 md:gap-4">
+        <div className="flex items-center gap-3">
+          <span className={FIELD_LABEL}>
+            일정
+            <RequiredMark />
           </span>
-        </span>
-        <div className="gap-xl border-border-default flex flex-col rounded-sm border p-4 md:flex-row md:items-center md:gap-5">
+          {startDateTime && (
+            <span className="text-text-disabled gap-2xs flex items-center text-xs md:text-base">
+              <ClockIcon size="xsmall" aria-hidden="true" />
+              {formatSessionTimeRange(startDateTime, duration)}
+            </span>
+          )}
+        </div>
+
+        <div
+          className={cn(
+            INSIDE_RING,
+            "flex flex-col gap-3 rounded-md p-3 md:flex-row md:items-start md:gap-6 md:p-6"
+          )}
+        >
           {/* 시작 일시 */}
           <div ref={datePickerContainerRef} className="relative w-full md:flex-1">
-            <div className="flex flex-col gap-2">
-              <span className="text-text-secondary text-sm">시작 일시</span>
+            <div className="flex flex-col gap-3 md:gap-2">
+              <span className="text-text-tertiary md:text-text-secondary text-xs font-semibold md:text-base">
+                시작 일시
+              </span>
               <button
                 type="button"
                 onClick={() => setIsDatePickerOpen((prev) => !prev)}
                 aria-expanded={isDatePickerOpen}
-                className="flex h-14 w-full cursor-pointer items-center justify-between gap-2 rounded-sm bg-gray-900 px-3 text-left focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:outline-none"
+                className={cn(
+                  "bg-surface-strong px-md flex h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-sm border text-left text-[13px] md:h-14 md:text-base",
+                  "focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:outline-none",
+                  startDateTime
+                    ? "border-border-default text-text-primary"
+                    : "border-border-subtle text-text-muted"
+                )}
               >
-                <span
-                  className={cn(
-                    "text-sm",
-                    startDateTime ? "text-text-secondary" : "text-text-muted"
-                  )}
-                >
-                  {startDateTime ? formatDateTimeDisplay(startDateTime) : "YYYY.MM.DD 00:00"}
-                </span>
-                <CalendarIcon size="xsmall" className="text-text-muted shrink-0" />
+                <span>{startDateTime ? formatDateTimeDisplay(startDateTime) : "MM.DD 00:00"}</span>
+                <CalendarIcon size="medium" className="text-text-muted shrink-0" />
               </button>
             </div>
 
             {isDatePickerOpen && (
-              <div className="bg-surface-default border-border-subtle absolute top-full left-0 z-10 mt-1 rounded-md border shadow-lg">
+              <div
+                className={cn(
+                  "bg-surface-default border-border-subtle absolute top-full left-0 z-10 mt-1 rounded-md border shadow-lg",
+                  LINE_HEIGHT_DEFAULT
+                )}
+              >
                 <DatePicker
                   mode="single"
                   showTimePicker
@@ -507,9 +581,9 @@ export function SessionCreateForm({
           </div>
 
           {/* 진행 시간 (md 이상: 시작 일시와 같은 카드에 가로 배치) */}
-          <div className="hidden w-full items-center justify-between gap-3 md:flex md:flex-1">
-            <div className="flex flex-col gap-1">
-              <span className="text-text-secondary text-sm">진행 시간</span>
+          <div className="py-xs hidden w-full items-center justify-between gap-3 md:flex md:flex-1">
+            <div className="gap-2xs flex flex-col">
+              <span className="text-text-secondary text-base font-semibold">진행 시간</span>
               <span className="text-text-muted text-xs break-keep">5분 단위로 설정이 가능해요</span>
             </div>
             <NumericStepper
@@ -517,7 +591,7 @@ export function SessionCreateForm({
               hint="5분 단위로 설정이 가능해요"
               hideHeader
               value={duration}
-              displayValue={formatDurationKorean(duration)}
+              displayValue={`${duration}분`}
               min={SESSION_DURATION_MINUTES_MIN}
               max={SESSION_DURATION_MINUTES_MAX}
               step={SESSION_DURATION_MINUTES_STEP}
@@ -529,17 +603,19 @@ export function SessionCreateForm({
 
         {/* 모바일: 진행 시간 + 참여 인원 2열 카드 */}
         <div className="grid grid-cols-2 gap-3 md:hidden">
-          <div className="border-border-default flex flex-col gap-3 rounded-sm border p-3">
-            <div className="flex flex-col gap-1">
-              <span className="text-text-secondary text-sm">진행 시간</span>
-              <span className="text-text-muted text-xs break-keep">5분 단위로 설정이 가능해요</span>
+          <div className={cn(INSIDE_RING, "flex flex-col gap-3 rounded-md p-3")}>
+            <div className="gap-3xs flex flex-col">
+              <span className="text-text-tertiary text-xs font-semibold">진행 시간</span>
+              <span className="text-text-muted text-[10px] break-keep">
+                5분 단위로 설정이 가능해요
+              </span>
             </div>
             <NumericStepper
               label="진행 시간"
               hint="5분 단위로 설정이 가능해요"
               hideHeader
               value={duration}
-              displayValue={formatDurationKorean(duration)}
+              displayValue={`${duration}분`}
               min={SESSION_DURATION_MINUTES_MIN}
               max={SESSION_DURATION_MINUTES_MAX}
               step={SESSION_DURATION_MINUTES_STEP}
@@ -547,10 +623,10 @@ export function SessionCreateForm({
               className="mt-auto border-none p-0"
             />
           </div>
-          <div className="border-border-default flex flex-col gap-3 rounded-sm border p-3">
-            <div className="flex flex-col gap-1">
-              <span className="text-text-secondary text-sm">참여 인원</span>
-              <span className="text-text-muted text-xs break-keep">최대 10명까지 가능해요</span>
+          <div className={cn(INSIDE_RING, "flex flex-col gap-3 rounded-md p-3")}>
+            <div className="gap-3xs flex flex-col">
+              <span className="text-text-tertiary text-xs font-semibold">참여 인원</span>
+              <span className="text-text-muted text-[10px] break-keep">최대 10명까지 가능해요</span>
             </div>
             <NumericStepper
               label="참여 인원"
@@ -569,9 +645,14 @@ export function SessionCreateForm({
       </div>
 
       {/* 참여 인원 (md 이상: 테두리 카드) */}
-      <div className="border-border-default hidden w-full items-center justify-between gap-3 rounded-sm border p-4 md:flex">
-        <div className="flex flex-col gap-1">
-          <span className="text-text-secondary text-sm">참여 인원</span>
+      <div
+        className={cn(
+          INSIDE_RING,
+          "hidden w-full items-center justify-between gap-6 rounded-md p-6 md:flex"
+        )}
+      >
+        <div className="gap-2xs flex flex-col">
+          <span className="text-text-secondary text-base font-semibold">참여 인원</span>
           <span className="text-text-muted text-xs break-keep">최대 10명까지 가능해요</span>
         </div>
         <NumericStepper
@@ -589,58 +670,39 @@ export function SessionCreateForm({
       </div>
 
       {/* 투두 달성률 범위 + 집중률 범위 */}
-      <div className="flex flex-col gap-3 xl:flex-row xl:gap-5">
-        <div className="flex w-full flex-col gap-2 xl:flex-1">
-          <div className="group flex w-fit items-center gap-1">
-            <span className="text-text-secondary text-base leading-none">투두 달성률 범위</span>
-            <span className="relative flex items-center">
-              <InfoIcon size="xsmall" className="text-text-muted cursor-pointer" />
-              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-2.5 opacity-0 transition-opacity group-hover:opacity-100">
-                <div className="w-max max-w-[min(240px,calc(100vw-3rem))] rounded-sm bg-gray-700 px-3 py-2 text-xs break-keep text-gray-200">
-                  참여 가능한 투두 달성률 범위를 설정해요. 단, 내 투두 달성률보다 높은 범위는 설정할
-                  수 없어요.
-                </div>
-                <div className="absolute top-full left-1.5 border-4 border-transparent border-t-gray-700" />
-              </div>
-            </span>
-          </div>
-          <div className="px-2">
-            <StepperSlide
-              value={achievementRange}
-              onChange={setAchievementRange}
-              myFocusValue={myProfile?.todoCompletionRate}
-              myFocusLabel="내 달성률"
-              limit={achievementLimit}
-              className="w-full"
-            />
-          </div>
-        </div>
-        {/* 집중률 범위 */}
-        <div className="flex w-full flex-col gap-2 xl:flex-1">
-          <div className="group flex w-fit items-center gap-1">
-            <span className="text-text-secondary text-base leading-none">집중률 범위</span>
-            <span className="relative flex items-center">
-              <InfoIcon size="xsmall" className="text-text-muted cursor-pointer" />
-              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-2.5 opacity-0 transition-opacity group-hover:opacity-100">
-                <div className="w-max max-w-[min(240px,calc(100vw-3rem))] rounded-sm bg-gray-700 px-3 py-2 text-xs break-keep text-gray-200">
-                  참여 가능한 집중률 범위를 설정해요. 단, 내 집중률보다 높은 범위는 설정할 수
-                  없어요.
-                </div>
-                <div className="absolute top-full left-1.5 border-4 border-transparent border-t-gray-700" />
-              </div>
-            </span>
-          </div>
-          <div className="px-2">
-            <StepperSlide
-              value={focusRange}
-              onChange={setFocusRange}
-              myFocusValue={myProfile?.focusRate}
-              myFocusLabel="내 집중률"
-              limit={focusLimit}
-              className="w-full"
-            />
-          </div>
-        </div>
+      <div className="flex flex-col gap-6 md:flex-row md:gap-5">
+        <RateRangeField
+          label="투두 달성률 범위"
+          tooltip={[
+            "참여 가능한 투두 달성률 범위를 설정해요.",
+            "단, 나의 투두 달성률보다 높은 범위는 설정할 수 없어요.",
+          ]}
+        >
+          <StepperSlide
+            value={achievementRange}
+            onChange={setAchievementRange}
+            myFocusValue={myProfile?.todoCompletionRate}
+            myFocusLabel="내 달성률"
+            limit={achievementLimit}
+            className="w-full"
+          />
+        </RateRangeField>
+        <RateRangeField
+          label="집중률 범위"
+          tooltip={[
+            "참여 가능한 집중률 범위를 설정해요.",
+            "단, 나의 집중률보다 높은 범위는 설정할 수 없어요.",
+          ]}
+        >
+          <StepperSlide
+            value={focusRange}
+            onChange={setFocusRange}
+            myFocusValue={myProfile?.focusRate}
+            myFocusLabel="내 집중률"
+            limit={focusLimit}
+            className="w-full"
+          />
+        </RateRangeField>
       </div>
 
       {/* 서버 에러 배너 */}
@@ -650,14 +712,14 @@ export function SessionCreateForm({
         </div>
       )}
 
-      {/* 버튼 그룹 */}
-      <div className="mt-10 mb-10 flex flex-col gap-3 md:mt-20 md:mb-20 md:flex-row md:justify-center md:gap-4">
+      {/* 버튼 그룹: 입력이 없는 초기 상태에서는 제출 비활성. 시안의 "그만두기"는 md 이상에서 폭 77 고정 */}
+      <div className="mt-4 flex flex-wrap justify-center gap-3 md:mt-7 xl:mt-8">
         <Button
           type="button"
           variant="solid"
           colorScheme="tertiary"
-          size="large"
-          className="px-lg py-xs h-13.5 w-full md:w-28.25"
+          size="medium"
+          className="md:py-md md:h-13.5 md:w-[77px] md:px-0 md:text-base"
           disabled={isPending}
           onClick={() => router.back()}
         >
@@ -667,9 +729,9 @@ export function SessionCreateForm({
           type="submit"
           variant="solid"
           colorScheme="primary"
-          size="large"
-          className="px-lg py-xs h-13.5 w-full md:w-28.25"
-          disabled={isPending || (isEdit && !editDirty)}
+          size="medium"
+          className="md:px-xl md:py-md md:h-13.5 md:text-base"
+          disabled={isPending || !hasUnsavedChanges}
         >
           {isEdit
             ? isPending
