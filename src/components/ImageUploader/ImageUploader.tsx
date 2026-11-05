@@ -40,12 +40,19 @@ const imageUploaderVariants = cva(
     variants: {
       state: {
         // 기본 상태의 점선은 CSS dashed로는 대시 길이를 정할 수 없어 마스크 이미지로 그린다(시안: 4/4, 1px, 반경 6).
-        default: ["bg-surface-default", "hover:bg-green-950"],
+        default: ["bg-surface-default", "hover:bg-surface-strong"],
         dragging: ["inset-ring-1", "inset-ring-green-600", "bg-green-950"],
         uploading: ["inset-ring-1", "inset-ring-green-600", "bg-transparent", "cursor-default"],
       },
       disabled: {
-        true: ["cursor-not-allowed", "opacity-50", "inset-ring-gray-600", "hover:bg-transparent"],
+        // 시안의 비활성: 배경 surface/disabled + 실선 border/disabled (점선 아님)
+        true: [
+          "cursor-not-allowed",
+          "bg-surface-disabled",
+          "inset-ring-1",
+          "inset-ring-border-disabled",
+          "hover:bg-surface-disabled",
+        ],
         false: "",
       },
     },
@@ -177,7 +184,7 @@ export function ImageUploader({
         aria-label="이미지 업로드 영역"
         aria-disabled={disabled || isUploading}
       >
-        {state === "default" && (
+        {state === "default" && !disabled && (
           <span
             aria-hidden="true"
             className="bg-border-default pointer-events-none absolute inset-0"
