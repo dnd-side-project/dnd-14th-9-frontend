@@ -21,7 +21,8 @@ const textareaVariants = cva(
   [
     "w-full",
     "max-w-90",
-    "p-sm md:p-md",
+    // 시안: 오른쪽 패딩만 8px (왼쪽 · 위 · 아래는 모바일 12 / md 16)
+    "py-sm pr-xs pl-sm md:py-md md:pl-md",
     "rounded-sm",
     "border",
     "text-[13px] md:text-base",
@@ -38,17 +39,20 @@ const textareaVariants = cva(
           "border-border-subtle",
           "text-text-primary",
           "focus:border-text-brand-default",
-          "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
+          "focus:shadow-[0_0_16px_0]",
+          "focus:shadow-text-brand-default/30",
         ],
         filled: [
           "border-border-default",
           "text-text-primary",
           "focus:border-text-brand-default",
-          "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
+          "focus:shadow-[0_0_16px_0]",
+          "focus:shadow-text-brand-default/30",
         ],
         error: [
           "border-border-error-default",
-          "text-text-primary",
+          "text-text-status-negative-default",
+          "placeholder:text-text-status-negative-default",
           "focus:shadow-[0_0_8px_rgba(239,68,68,0.5)]",
         ],
         disabled: [
@@ -173,13 +177,7 @@ export function Textarea({
 
       {showCount && (
         <div className="flex w-full">
-          <span
-            className={cn(
-              "text-[11px] md:text-xs",
-              error ? "text-text-status-negative-default" : "text-text-disabled"
-            )}
-            aria-live="polite"
-          >
+          <span className="text-text-disabled text-[11px] md:text-xs" aria-live="polite">
             {characterCount}/{maxLength}
           </span>
         </div>

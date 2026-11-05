@@ -32,17 +32,20 @@ const textInputVariants = cva(
           "border-border-subtle",
           "text-text-primary",
           "focus:border-text-brand-default",
-          "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
+          "focus:shadow-[0_0_16px_0]",
+          "focus:shadow-text-brand-default/30",
         ],
         filled: [
           "border-border-default",
           "text-text-primary",
           "focus:border-text-brand-default",
-          "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
+          "focus:shadow-[0_0_16px_0]",
+          "focus:shadow-text-brand-default/30",
         ],
         error: [
           "border-border-error-default",
-          "text-text-primary",
+          "text-text-status-negative-default",
+          "placeholder:text-text-status-negative-default",
           "focus:shadow-[0_0_8px_rgba(239,68,68,0.5)]",
         ],
         disabled: [
@@ -203,13 +206,7 @@ export function TextInput({
 
       {showCount && (
         <div className="flex w-full">
-          <span
-            className={cn(
-              "text-[11px] md:text-xs",
-              error ? "text-text-status-negative-default" : "text-text-disabled"
-            )}
-            aria-live="polite"
-          >
+          <span className="text-text-disabled text-[11px] md:text-xs" aria-live="polite">
             {characterCount}/{maxLength}
           </span>
         </div>
