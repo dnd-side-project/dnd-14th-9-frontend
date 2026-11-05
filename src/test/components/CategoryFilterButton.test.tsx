@@ -14,13 +14,15 @@ describe("CategoryFilterButton", () => {
     expect(button).toHaveClass(
       "bg-surface-strong",
       "text-text-muted",
-      "text-xs",
+      "text-sm",
+      "md:text-base",
       "font-semibold",
-      "py-sm",
-      "px-md",
-      "rounded-sm"
+      "h-11",
+      "md:h-14",
+      "rounded-md"
     );
     expect(button).toHaveClass("hover:bg-surface-subtle", "hover:text-text-primary");
+    expect(button.querySelector("svg")).toBeNull();
   });
 
   it("renders with selected styles and aria-pressed=true when isSelected is true", () => {
@@ -30,7 +32,10 @@ describe("CategoryFilterButton", () => {
 
     expect(button).toBeInTheDocument();
     expect(button).toHaveAttribute("aria-pressed", "true");
-    expect(button).toHaveClass("bg-[#52EE8533]", "text-green-600");
+    expect(button).toHaveClass("bg-surface-primary-alpha-subtler", "text-text-brand-default");
+    expect(button).not.toHaveClass("bg-surface-strong", "text-text-muted");
+    // 선택 상태에서는 체크 아이콘이 함께 렌더된다.
+    expect(button.querySelector("svg")).toBeInTheDocument();
   });
 
   it("handles click events properly", async () => {
