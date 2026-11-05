@@ -201,26 +201,27 @@ export function TextInput({
         )}
       </div>
 
-      {showCount && (
-        <div className="flex w-full justify-end">
-          <span
-            className={cn(
-              "text-sm",
-              error ? "text-text-status-negative-default" : "text-text-muted"
-            )}
-            aria-live="polite"
-          >
-            {characterCount}/{maxLength}
-          </span>
+      {((error && errorMessage) || helperText || showCount) && (
+        <div className="flex w-full items-center justify-between gap-2">
+          {error && errorMessage ? (
+            <HelperText id={errorMessageId} text={errorMessage} type="negative" className="mt-0" />
+          ) : helperText ? (
+            <HelperText text={helperText} type={helperTextType} className="mt-0" />
+          ) : null}
+
+          {showCount && (
+            <span
+              className={cn(
+                "ml-auto shrink-0 text-sm",
+                error ? "text-text-status-negative-default" : "text-text-muted"
+              )}
+              aria-live="polite"
+            >
+              {characterCount}/{maxLength}
+            </span>
+          )}
         </div>
       )}
-
-      {/* Priority: errorMessage > helperText */}
-      {error && errorMessage ? (
-        <HelperText id={errorMessageId} text={errorMessage} type="negative" />
-      ) : helperText ? (
-        <HelperText text={helperText} type={helperTextType} />
-      ) : null}
     </div>
   );
 }
