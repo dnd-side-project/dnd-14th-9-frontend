@@ -5,6 +5,10 @@ import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { cn } from "@/lib/utils/utils";
 
+// 모바일 32px / md 이상 28px 정사각 버튼. 시안의 상태별 테두리: hover 32% · 눌림 64% · 비활성 border/disabled
+const STEP_BUTTON_CLASS =
+  "flex size-8 md:size-7 min-w-0 items-center justify-center rounded-sm bg-surface-strong p-0 hover:border-border-strong active:border-border-stronger disabled:border disabled:border-border-disabled";
+
 interface NumericStepperProps {
   label: string;
   hint: string;
@@ -84,7 +88,8 @@ export function NumericStepper({
   };
 
   return (
-    <div className={cn("p-md border-border-default shrink-0 rounded-sm border", className)}>
+    // p-md 같은 커스텀 토큰은 tailwind-merge가 p-0과 충돌로 보지 않아 호출부의 p-0이 무시된다. 값이 같은 p-4를 쓴다.
+    <div className={cn("border-border-default shrink-0 rounded-sm border p-4", className)}>
       <div className="flex h-full flex-col gap-[20px]">
         {!hideHeader && (
           <div className="flex items-center justify-between gap-1">
@@ -94,17 +99,17 @@ export function NumericStepper({
             <span className="text-text-muted text-right text-[10px] break-keep">{hint}</span>
           </div>
         )}
-        <div className="flex items-center justify-center gap-3">
+        <div className="gap-2xs md:gap-xs flex items-center justify-center">
           <Button
             type="button"
             variant={isAtMin ? "solid" : "outlined"}
             colorScheme="secondary"
             size="xsmall"
             iconOnly
-            leftIcon={<MinusIcon className="h-[13px] w-[13px]" />}
+            leftIcon={<MinusIcon className="h-4 w-4 md:h-5 md:w-5" />}
             onClick={handleDecrementClick}
             disabled={isAtMin}
-            className="flex h-7 w-7 min-w-0 items-center justify-center rounded-xs p-0"
+            className={STEP_BUTTON_CLASS}
           />
           {allowKeyboardInput ? (
             <div className="bg-surface-strong px-xs py-2xs flex items-center gap-0.5 rounded-xs">
@@ -119,7 +124,7 @@ export function NumericStepper({
               <span className="text-text-secondary text-sm select-none">명</span>
             </div>
           ) : (
-            <span className="text-text-secondary text-center text-sm break-keep">
+            <span className="text-text-tertiary px-3 text-center text-[13px] break-keep md:w-16 md:text-lg md:font-semibold">
               {displayValue}
             </span>
           )}
@@ -129,10 +134,10 @@ export function NumericStepper({
             colorScheme="secondary"
             size="xsmall"
             iconOnly
-            leftIcon={<PlusIcon size="small" />}
+            leftIcon={<PlusIcon size="small" className="h-4 w-4 md:h-5 md:w-5" />}
             onClick={handleIncrementClick}
             disabled={isAtMax}
-            className="flex h-7 w-7 min-w-0 items-center justify-center rounded-xs p-0"
+            className={STEP_BUTTON_CLASS}
           />
         </div>
       </div>

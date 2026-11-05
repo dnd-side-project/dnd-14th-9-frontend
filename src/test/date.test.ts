@@ -2,6 +2,8 @@ import {
   formatDateDot,
   formatTimeHHMM,
   formatDateTime,
+  formatSessionStartDisplay,
+  formatSessionTimeRange,
   isToday,
   isPastTime,
   getCurrentYear,
@@ -152,6 +154,36 @@ describe("isPastTime", () => {
   it("먼 미래 날짜를 false로 반환해야 합니다", () => {
     const farFuture = new Date("2030-12-31T23:59:59");
     expect(isPastTime(farFuture)).toBe(false);
+  });
+});
+
+describe("formatSessionStartDisplay", () => {
+  it("MM.DD (요일) · HH:mm 형식으로 포맷해야 합니다", () => {
+    expect(formatSessionStartDisplay(new Date("2030-10-23T10:00:00"))).toBe("10.23 (수) · 10:00");
+  });
+
+  it("한 자리 월·일·시·분을 0으로 채워야 합니다", () => {
+    expect(formatSessionStartDisplay(new Date("2030-03-01T09:05:00"))).toBe("03.01 (금) · 09:05");
+  });
+});
+
+describe("formatSessionTimeRange", () => {
+  it("시작 시각에 진행 시간을 더한 종료 시각까지 표시해야 합니다", () => {
+    expect(formatSessionTimeRange(new Date("2030-10-23T10:00:00"), 60)).toBe(
+      "10.23 (수) 10:00 ~ 11:00"
+    );
+  });
+
+  it("분 단위 진행 시간도 정확히 더해야 합니다", () => {
+    expect(formatSessionTimeRange(new Date("2030-10-23T10:00:00"), 90)).toBe(
+      "10.23 (수) 10:00 ~ 11:30"
+    );
+  });
+
+  it("자정을 넘기면 종료 시각이 다음 날 시각으로 표시됩니다", () => {
+    expect(formatSessionTimeRange(new Date("2030-10-23T23:30:00"), 60)).toBe(
+      "10.23 (수) 23:30 ~ 00:30"
+    );
   });
 });
 

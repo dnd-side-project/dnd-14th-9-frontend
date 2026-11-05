@@ -14,13 +14,21 @@ describe("CategoryFilterButton", () => {
     expect(button).toHaveClass(
       "bg-surface-strong",
       "text-text-muted",
-      "text-xs",
+      "text-sm",
+      "md:text-base",
       "font-semibold",
-      "py-sm",
-      "px-md",
-      "rounded-sm"
+      "h-11",
+      "md:h-14",
+      "rounded-md"
     );
-    expect(button).toHaveClass("hover:bg-surface-subtle", "hover:text-text-primary");
+    // 시안 tertiary: hover는 배경만, 눌림은 배경 subtler + 글자 secondary
+    expect(button).toHaveClass(
+      "hover:bg-surface-subtle",
+      "active:bg-surface-subtler",
+      "active:text-text-secondary"
+    );
+    expect(button).not.toHaveClass("hover:text-text-primary");
+    expect(button.querySelector("svg")).toBeNull();
   });
 
   it("renders with selected styles and aria-pressed=true when isSelected is true", () => {
@@ -30,7 +38,15 @@ describe("CategoryFilterButton", () => {
 
     expect(button).toBeInTheDocument();
     expect(button).toHaveAttribute("aria-pressed", "true");
-    expect(button).toHaveClass("bg-[#52EE8533]", "text-green-600");
+    expect(button).toHaveClass("bg-surface-primary-alpha-subtler", "text-text-brand-default");
+    expect(button).not.toHaveClass("bg-surface-strong", "text-text-muted");
+    // 시안 secondary: hover 16% · 눌림 24%
+    expect(button).toHaveClass(
+      "hover:bg-surface-primary-alpha-subtle",
+      "active:bg-surface-primary-alpha-default"
+    );
+    // 선택 상태에서는 체크 아이콘이 함께 렌더된다.
+    expect(button.querySelector("svg")).toBeInTheDocument();
   });
 
   it("handles click events properly", async () => {
