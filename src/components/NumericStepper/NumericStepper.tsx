@@ -5,9 +5,9 @@ import { MinusIcon } from "@/components/Icon/MinusIcon";
 import { PlusIcon } from "@/components/Icon/PlusIcon";
 import { cn } from "@/lib/utils/utils";
 
-// 모바일 32px / md 이상 28px 정사각 버튼
+// 모바일 32px / md 이상 28px 정사각 버튼. 시안의 상태별 테두리: hover 32% · 눌림 64% · 비활성 border/disabled
 const STEP_BUTTON_CLASS =
-  "flex size-8 md:size-7 min-w-0 items-center justify-center rounded-sm bg-surface-strong p-0";
+  "flex size-8 md:size-7 min-w-0 items-center justify-center rounded-sm bg-surface-strong p-0 hover:border-border-strong active:border-border-stronger disabled:border disabled:border-border-disabled";
 
 interface NumericStepperProps {
   label: string;
