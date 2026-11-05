@@ -17,15 +17,16 @@ const CATEGORY_FILTER_BUTTON_VARIANTS = cva(
     "h-11 py-sm px-lg md:h-14 md:py-md",
     "rounded-md",
     "cursor-pointer",
+    "disabled:cursor-not-allowed disabled:bg-surface-disabled disabled:text-text-disabled",
     "transition-colors",
     "border-none",
   ],
   {
     variants: {
       isSelected: {
-        true: "bg-surface-primary-alpha-subtler text-text-brand-default md:px-2xl",
+        true: "bg-surface-primary-alpha-subtler text-text-brand-default hover:bg-surface-primary-alpha-subtle active:bg-surface-primary-alpha-default md:px-2xl",
         false:
-          "md:px-xl hover:bg-surface-subtle hover:text-text-primary active:bg-surface-subtle active:text-text-primary",
+          "md:px-xl hover:bg-surface-subtle active:bg-surface-subtler active:text-text-secondary",
       },
     },
     defaultVariants: {
