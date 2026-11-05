@@ -181,13 +181,23 @@ export function formatLocalDateTime(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+export function formatDateTimeDisplay(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const dayOfWeek = getKoreanDayOfWeek(date);
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${month}/${day}(${dayOfWeek}) ${hours}:${minutes}`;
+}
+
 const pad2 = (n: number) => String(n).padStart(2, "0");
 const formatMonthDayWeek = (date: Date) =>
   `${pad2(date.getMonth() + 1)}.${pad2(date.getDate())} (${getKoreanDayOfWeek(date)})`;
 const formatHourMinute = (date: Date) => `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
 
-/** 세션 시작 일시 입력창 표시 형식. 예: "10.23 (수) · 10:00" */
-export function formatDateTimeDisplay(date: Date): string {
+/** 세션 생성 폼의 시작 일시 입력창 표시 형식. 예: "10.23 (수) · 10:00" */
+export function formatSessionStartDisplay(date: Date): string {
   return `${formatMonthDayWeek(date)} · ${formatHourMinute(date)}`;
 }
 

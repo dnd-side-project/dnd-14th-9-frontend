@@ -114,7 +114,7 @@ export function StepperSlide({
             // 시안은 10px 점 + 반투명 링. 조작 편의를 위해 ::before로 클릭 영역을 넓힌다.
             "bg-surface-primary-default h-2.5 w-2.5 rounded-full",
             "shadow-[0_0_0_6px_var(--color-surface-primary-alpha-default)]",
-            "before:absolute before:-inset-3 before:content-['']",
+            "before:absolute before:-inset-3",
             "cursor-grab focus:ring-2 focus:ring-green-400 focus:outline-none",
             isDragging && "scale-110 cursor-grabbing"
           )}

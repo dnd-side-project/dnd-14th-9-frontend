@@ -23,11 +23,10 @@ const imageUploaderVariants = cva(
     "justify-center",
     "gap-3",
     "w-full",
-    // 시안 패딩 64/40(64)은 안쪽 선 1px을 포함한 값이라 border 1px을 뺀다.
-    "px-[63px]",
-    "py-[39px] md:py-[63px]",
+    // 시안의 선은 안쪽에 그려져 패딩에 포함된다. 테두리 대신 inset ring으로 그려 패딩을 토큰 값 그대로 쓴다.
+    "px-4xl",
+    "py-3xl md:py-4xl",
     "rounded-sm",
-    "border",
     "cursor-pointer",
     "transition-colors",
     "duration-200",
@@ -40,13 +39,13 @@ const imageUploaderVariants = cva(
   {
     variants: {
       state: {
-        // 기본 상태의 점선은 CSS dashed로는 대시 길이를 정할 수 없어 SVG로 그린다(시안: 4/4, 1px, 반경 6).
+        // 기본 상태의 점선은 CSS dashed로는 대시 길이를 정할 수 없어 마스크 이미지로 그린다(시안: 4/4, 1px, 반경 6).
         default: ["bg-surface-default", "hover:bg-green-950"],
-        dragging: ["border-solid", "border-green-600", "bg-green-950"],
-        uploading: ["border-solid", "border-green-600", "bg-transparent", "cursor-default"],
+        dragging: ["inset-ring-1", "inset-ring-green-600", "bg-green-950"],
+        uploading: ["inset-ring-1", "inset-ring-green-600", "bg-transparent", "cursor-default"],
       },
       disabled: {
-        true: ["cursor-not-allowed", "opacity-50", "border-gray-600", "hover:bg-transparent"],
+        true: ["cursor-not-allowed", "opacity-50", "inset-ring-gray-600", "hover:bg-transparent"],
         false: "",
       },
     },
@@ -166,10 +165,7 @@ export function ImageUploader({
     <div className={cn("w-full", containerClassName)}>
       <div
         ref={containerRef}
-        className={cn(
-          imageUploaderVariants({ state, disabled, className }),
-          state === "default" && "border-transparent"
-        )}
+        className={cn(imageUploaderVariants({ state, disabled, className }))}
         onDragEnter={dragHandlers.onDragEnter}
         onDragLeave={dragHandlers.onDragLeave}
         onDragOver={dragHandlers.onDragOver}
@@ -184,7 +180,7 @@ export function ImageUploader({
         {state === "default" && (
           <span
             aria-hidden="true"
-            className="bg-border-default pointer-events-none absolute -inset-px"
+            className="bg-border-default pointer-events-none absolute inset-0"
             style={{
               maskImage: DASHED_BORDER_MASK,
               WebkitMaskImage: DASHED_BORDER_MASK,

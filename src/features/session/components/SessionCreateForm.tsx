@@ -29,8 +29,8 @@ import {
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { toast } from "@/lib/toast";
 import {
-  formatDateTimeDisplay,
   formatLocalDateTime,
+  formatSessionStartDisplay,
   formatSessionTimeRange,
 } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/utils";
@@ -551,7 +551,9 @@ export function SessionCreateForm({
                     : "border-border-subtle text-text-muted"
                 )}
               >
-                <span>{startDateTime ? formatDateTimeDisplay(startDateTime) : "MM.DD 00:00"}</span>
+                <span>
+                  {startDateTime ? formatSessionStartDisplay(startDateTime) : "MM.DD 00:00"}
+                </span>
                 <CalendarIcon size="medium" className="text-text-muted shrink-0" />
               </button>
             </div>

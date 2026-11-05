@@ -2,7 +2,7 @@ import {
   formatDateDot,
   formatTimeHHMM,
   formatDateTime,
-  formatDateTimeDisplay,
+  formatSessionStartDisplay,
   formatSessionTimeRange,
   isToday,
   isPastTime,
@@ -157,13 +157,13 @@ describe("isPastTime", () => {
   });
 });
 
-describe("formatDateTimeDisplay", () => {
+describe("formatSessionStartDisplay", () => {
   it("MM.DD (요일) · HH:mm 형식으로 포맷해야 합니다", () => {
-    expect(formatDateTimeDisplay(new Date("2030-10-23T10:00:00"))).toBe("10.23 (수) · 10:00");
+    expect(formatSessionStartDisplay(new Date("2030-10-23T10:00:00"))).toBe("10.23 (수) · 10:00");
   });
 
   it("한 자리 월·일·시·분을 0으로 채워야 합니다", () => {
-    expect(formatDateTimeDisplay(new Date("2030-03-01T09:05:00"))).toBe("03.01 (금) · 09:05");
+    expect(formatSessionStartDisplay(new Date("2030-03-01T09:05:00"))).toBe("03.01 (금) · 09:05");
   });
 });
 
