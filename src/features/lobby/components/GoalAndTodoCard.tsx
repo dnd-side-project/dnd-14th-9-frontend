@@ -40,6 +40,13 @@ interface DraftTodo {
   isNew?: boolean;
 }
 
+function getFieldError(value: string, max: number, label: string, emptyMessage: string) {
+  const length = value.trim().length;
+  if (length === 0) return emptyMessage;
+  if (length > max) return `${label} 최대 ${max}자까지 입력 가능합니다`;
+  return undefined;
+}
+
 export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
@@ -60,12 +67,18 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
   const [draftGoal, setDraftGoal] = useState("");
   const [draftTodos, setDraftTodos] = useState<DraftTodo[]>([]);
   const [deletedTodoIds, setDeletedTodoIds] = useState<number[]>([]);
-  const [goalLengthError, setGoalLengthError] = useState(false);
-  const [todoLengthErrorIds, setTodoLengthErrorIds] = useState<number[]>([]);
 
   // 표시할 값
   const goal = taskGoal;
   const todos = taskTodos;
+
+  const goalError = getFieldError(draftGoal, GOAL_MAX_LENGTH, "목표는", "목표를 입력해주세요");
+  const isFormValid =
+    !goalError &&
+    draftTodos.length > 0 &&
+    draftTodos.every(
+      (draft) => !getFieldError(draft.content, TODO_MAX_LENGTH, "할 일은", "할 일을 입력해주세요")
+    );
 
   const handleEdit = () => {
     setDraftGoal(goal);
@@ -76,30 +89,16 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
       }))
     );
     setDeletedTodoIds([]);
-    setGoalLengthError(false);
-    setTodoLengthErrorIds([]);
     setIsEditing(true);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
     setDeletedTodoIds([]);
-    setGoalLengthError(false);
-    setTodoLengthErrorIds([]);
   };
 
   const handleSave = async () => {
-    if (!taskId) return;
-
-    const isGoalTooLong = draftGoal.trim().length > GOAL_MAX_LENGTH;
-    const tooLongTodoIds = draftTodos
-      .filter((draft) => draft.content.trim().length > TODO_MAX_LENGTH)
-      .map((draft) => draft.subtaskId);
-
-    setGoalLengthError(isGoalTooLong);
-    setTodoLengthErrorIds(tooLongTodoIds);
-
-    if (isGoalTooLong || tooLongTodoIds.length > 0) return;
+    if (!taskId || !isFormValid) return;
 
     setIsSaving(true);
 
@@ -129,7 +128,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
 
       // 3. 새로 추가된 todo 생성 (배열로 한 번에 전송)
       const newTodos = draftTodos
-        .filter((draft) => draft.isNew && draft.content.trim())
+        .filter((draft) => draft.isNew)
         .map((draft) => ({ todoContent: draft.content.trim() }));
 
       const createTodoPromise =
@@ -171,18 +170,14 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
   };
 
   const handleGoalChange = (content: string) => {
-    setDraftGoal(content);
-    if (content.trim().length <= GOAL_MAX_LENGTH) {
-      setGoalLengthError(false);
-    }
+    setDraftGoal(content.trim() === "" ? "" : content);
   };
 
   const handleTodoChange = (index: number, content: string) => {
-    const target = draftTodos[index];
-    if (target && content.trim().length <= TODO_MAX_LENGTH) {
-      setTodoLengthErrorIds((prev) => prev.filter((id) => id !== target.subtaskId));
-    }
-    setDraftTodos((prev) => prev.map((todo, i) => (i === index ? { ...todo, content } : todo)));
+    const normalized = content.trim() === "" ? "" : content;
+    setDraftTodos((prev) =>
+      prev.map((todo, i) => (i === index ? { ...todo, content: normalized } : todo))
+    );
   };
 
   const handleRemoveTodo = (index: number) => {
@@ -190,9 +185,6 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
     // 기존 todo만 삭제 목록에 추가 (새로 추가된 것은 제외)
     if (todoToRemove && !todoToRemove.isNew) {
       setDeletedTodoIds((prev) => [...prev, todoToRemove.subtaskId]);
-    }
-    if (todoToRemove) {
-      setTodoLengthErrorIds((prev) => prev.filter((id) => id !== todoToRemove.subtaskId));
     }
     setDraftTodos((prev) => prev.filter((_, i) => i !== index));
   };
@@ -269,8 +261,8 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
               fullWidth
               showCharacterCount
               maxLength={GOAL_MAX_LENGTH}
-              error={goalLengthError}
-              errorMessage={`목표는 최대 ${GOAL_MAX_LENGTH}자까지 입력 가능합니다`}
+              error={Boolean(goalError)}
+              errorMessage={goalError}
             />
           ) : (
             <div className="bg-surface-strong border-border-subtle p-xs text-text-primary flex h-13.5 items-center rounded-sm border text-base">
@@ -300,34 +292,42 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
 
           {isEditing ? (
             <ul className="scrollbar-hide flex min-h-0 flex-col gap-2 overflow-y-auto xl:flex-1">
-              {draftTodos.map((todo, index) => (
-                <li key={todo.subtaskId} className="flex shrink-0 items-start gap-2">
-                  <TextInput
-                    value={todo.content}
-                    onChange={(e) => handleTodoChange(index, e.target.value)}
-                    onClear={() => handleTodoChange(index, "")}
-                    placeholder="할 일을 입력하세요"
-                    className="h-13.5 focus:bg-transparent"
-                    fullWidth
-                    containerClassName="flex-1"
-                    showCharacterCount
-                    maxLength={TODO_MAX_LENGTH}
-                    error={todoLengthErrorIds.includes(todo.subtaskId)}
-                    errorMessage={`할 일은 최대 ${TODO_MAX_LENGTH}자까지 입력 가능합니다`}
-                  />
-                  {draftTodos.length > 1 && (
-                    <Button
-                      iconOnly
-                      variant="ghost"
-                      colorScheme="secondary"
-                      className="mt-1.25 h-11 w-11 min-w-0 p-0"
-                      leftIcon={<MinusIcon size="small" />}
-                      onClick={() => handleRemoveTodo(index)}
-                      aria-label={`할 일 ${index + 1} 삭제`}
+              {draftTodos.map((todo, index) => {
+                const todoError = getFieldError(
+                  todo.content,
+                  TODO_MAX_LENGTH,
+                  "할 일은",
+                  "할 일을 입력해주세요"
+                );
+                return (
+                  <li key={todo.subtaskId} className="flex shrink-0 items-start gap-2">
+                    <TextInput
+                      value={todo.content}
+                      onChange={(e) => handleTodoChange(index, e.target.value)}
+                      onClear={() => handleTodoChange(index, "")}
+                      placeholder="할 일을 입력하세요"
+                      className="h-13.5 focus:bg-transparent"
+                      fullWidth
+                      containerClassName="flex-1"
+                      showCharacterCount
+                      maxLength={TODO_MAX_LENGTH}
+                      error={Boolean(todoError)}
+                      errorMessage={todoError}
                     />
-                  )}
-                </li>
-              ))}
+                    {draftTodos.length > 1 && (
+                      <Button
+                        iconOnly
+                        variant="ghost"
+                        colorScheme="secondary"
+                        className="mt-1.25 h-11 w-11 min-w-0 p-0"
+                        leftIcon={<MinusIcon size="small" />}
+                        onClick={() => handleRemoveTodo(index)}
+                        aria-label={`할 일 ${index + 1} 삭제`}
+                      />
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           ) : displayTodos.length === 0 ? (
             <p className="text-text-muted py-md text-center text-sm">등록된 할 일이 없습니다</p>
@@ -364,7 +364,7 @@ export function GoalAndTodoCard({ sessionId, task }: GoalAndTodoCardProps) {
               size="medium"
               className="text-sm"
               onClick={handleSave}
-              disabled={isSaving}
+              disabled={isSaving || !isFormValid}
             >
               {isSaving ? "저장 중..." : "저장하기"}
             </Button>
