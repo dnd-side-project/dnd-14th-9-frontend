@@ -190,3 +190,19 @@ export function formatDateTimeDisplay(date: Date): string {
 
   return `${month}/${day}(${dayOfWeek}) ${hours}:${minutes}`;
 }
+
+const pad2 = (n: number) => String(n).padStart(2, "0");
+const formatMonthDayWeek = (date: Date) =>
+  `${pad2(date.getMonth() + 1)}.${pad2(date.getDate())} (${getKoreanDayOfWeek(date)})`;
+const formatHourMinute = (date: Date) => `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+
+/** 세션 생성 폼의 시작 일시 입력창 표시 형식. 예: "10.23 (수) · 10:00" */
+export function formatSessionStartDisplay(date: Date): string {
+  return `${formatMonthDayWeek(date)} · ${formatHourMinute(date)}`;
+}
+
+/** 시작~종료 요약. 예: "10.23 (수) 10:00 ~ 11:00" (자정을 넘기면 종료 시각만 다음 날로 표시된다) */
+export function formatSessionTimeRange(start: Date, durationMinutes: number): string {
+  const end = new Date(start.getTime() + durationMinutes * 60_000);
+  return `${formatMonthDayWeek(start)} ${formatHourMinute(start)} ~ ${formatHourMinute(end)}`;
+}

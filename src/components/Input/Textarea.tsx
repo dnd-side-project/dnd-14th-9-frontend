@@ -13,18 +13,19 @@ import { cn } from "@/lib/utils/utils";
 import { HelperText, type HelperTextType } from "./HelperText";
 
 const SIZE_STYLES = {
-  medium: { minHeight: "98px" },
-  small: { minHeight: "87px" },
+  medium: "min-h-[78px] md:min-h-[98px]",
+  small: "min-h-[87px]",
 } as const;
 
 const textareaVariants = cva(
   [
     "w-full",
     "max-w-90",
-    "p-md",
+    // 시안: 오른쪽 패딩만 8px (왼쪽 · 위 · 아래는 모바일 12 / md 16)
+    "py-sm pr-xs pl-sm md:py-md md:pl-md",
     "rounded-sm",
     "border",
-    "text-base",
+    "text-[13px] md:text-base",
     "transition-[border-color,box-shadow]",
     "outline-none",
     "placeholder:text-text-muted",
@@ -38,17 +39,20 @@ const textareaVariants = cva(
           "border-border-subtle",
           "text-text-primary",
           "focus:border-text-brand-default",
-          "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
+          "focus:shadow-[0_0_16px_0]",
+          "focus:shadow-text-brand-default/30",
         ],
         filled: [
-          "border-border-subtle",
+          "border-border-default",
           "text-text-primary",
           "focus:border-text-brand-default",
-          "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
+          "focus:shadow-[0_0_16px_0]",
+          "focus:shadow-text-brand-default/30",
         ],
         error: [
           "border-border-error-default",
-          "text-text-primary",
+          "text-text-status-negative-default",
+          "placeholder:text-text-status-negative-default",
           "focus:shadow-[0_0_8px_rgba(239,68,68,0.5)]",
         ],
         disabled: [
@@ -142,7 +146,10 @@ export function Textarea({
   return (
     <div className={cn("flex w-full max-w-90 flex-col gap-2", containerClassName)}>
       {label && (
-        <label htmlFor={textareaId} className="text-text-secondary text-base">
+        <label
+          htmlFor={textareaId}
+          className="text-text-secondary text-xs font-semibold md:text-base"
+        >
           {label}
           {required && (
             <span className="text-text-status-negative-default ml-1" aria-hidden="true">
@@ -155,8 +162,7 @@ export function Textarea({
       <textarea
         ref={ref}
         id={textareaId}
-        className={cn(textareaVariants({ state: getState() }), className)}
-        style={SIZE_STYLES[size]}
+        className={cn(textareaVariants({ state: getState() }), SIZE_STYLES[size], className)}
         disabled={disabled}
         value={currentValue}
         maxLength={maxLength}
@@ -170,14 +176,8 @@ export function Textarea({
       />
 
       {showCount && (
-        <div className="flex w-full justify-end">
-          <span
-            className={cn(
-              "text-sm",
-              error ? "text-text-status-negative-default" : "text-text-muted"
-            )}
-            aria-live="polite"
-          >
+        <div className="flex w-full">
+          <span className="text-text-disabled text-[11px] md:text-xs" aria-live="polite">
             {characterCount}/{maxLength}
           </span>
         </div>

@@ -43,18 +43,20 @@ export function SessionCreateConfirmDialog({
           if (!isPending) onClose();
         }}
         onClick={handleBackdropClick}
-        className="bg-surface-default p-3xl max-md:p-xl fixed inset-0 m-auto flex w-full max-w-100 flex-col gap-6 rounded-lg border border-gray-900 backdrop:bg-(--color-overlay-default) max-md:w-[calc(100%-2rem)]"
+        className="bg-surface-default border-border-default p-2xl max-md:p-xl fixed inset-0 m-auto flex w-full max-w-110 flex-col gap-16 rounded-lg border shadow-[0_0_2px_rgba(0,0,0,0.08),0_16px_24px_rgba(0,0,0,0.12)] backdrop:bg-(--color-overlay-strong) max-md:w-[calc(100%-2rem)] max-md:gap-6"
       >
         <div className="flex flex-col gap-2">
-          <h2 className="text-text-primary text-lg font-bold">이대로 세션을 만들까요?</h2>
-          <p className="text-text-secondary text-sm">
+          <h2 className="text-text-primary text-lg leading-[1.4] font-bold">
+            이대로 세션을 만들까요?
+          </h2>
+          <p className="text-text-secondary text-[15px] leading-[1.4]">
             참여자 입장 후에는 세션 설정을 변경할 수 없어요.
             <br />
             현재 설정으로 세션을 생성할까요?
           </p>
         </div>
 
-        <div className="flex w-full gap-2">
+        <div className="flex w-full gap-3">
           <Button
             variant="solid"
             colorScheme="tertiary"
