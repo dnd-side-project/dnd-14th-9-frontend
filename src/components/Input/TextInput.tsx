@@ -32,17 +32,20 @@ const textInputVariants = cva(
           "border-border-subtle",
           "text-text-primary",
           "focus:border-text-brand-default",
-          "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
+          "focus:shadow-[0_0_16px_0]",
+          "focus:shadow-text-brand-default/30",
         ],
         filled: [
-          "border-border-subtle",
+          "border-border-default",
           "text-text-primary",
           "focus:border-text-brand-default",
-          "focus:shadow-[0_0_8px_rgba(34,197,94,0.5)]",
+          "focus:shadow-[0_0_16px_0]",
+          "focus:shadow-text-brand-default/30",
         ],
         error: [
           "border-border-error-default",
-          "text-text-primary",
+          "text-text-status-negative-default",
+          "placeholder:text-text-status-negative-default",
           "focus:shadow-[0_0_8px_rgba(239,68,68,0.5)]",
         ],
         disabled: [
@@ -54,7 +57,7 @@ const textInputVariants = cva(
         ],
       },
       size: {
-        md: "h-[56px] px-md",
+        md: "h-11 px-sm text-[13px] md:h-14 md:px-md md:text-base",
         sm: "h-[44px] px-md",
       },
     },
@@ -155,7 +158,7 @@ export function TextInput({
   return (
     <div className={cn("flex w-full flex-col gap-2", !fullWidth && "max-w-95", containerClassName)}>
       {label && (
-        <label htmlFor={inputId} className="text-text-secondary text-base">
+        <label htmlFor={inputId} className="text-text-secondary text-xs font-semibold md:text-base">
           {label}
           {required && (
             <span className="text-text-status-negative-default ml-1" aria-hidden="true">
@@ -201,27 +204,20 @@ export function TextInput({
         )}
       </div>
 
-      {((error && errorMessage) || helperText || showCount) && (
-        <div className="flex w-full items-center justify-between gap-2">
-          {error && errorMessage ? (
-            <HelperText id={errorMessageId} text={errorMessage} type="negative" className="mt-0" />
-          ) : helperText ? (
-            <HelperText text={helperText} type={helperTextType} className="mt-0" />
-          ) : null}
-
-          {showCount && (
-            <span
-              className={cn(
-                "ml-auto shrink-0 text-sm",
-                error ? "text-text-status-negative-default" : "text-text-muted"
-              )}
-              aria-live="polite"
-            >
-              {characterCount}/{maxLength}
-            </span>
-          )}
+      {showCount && (
+        <div className="flex w-full">
+          <span className="text-text-disabled text-[11px] md:text-xs" aria-live="polite">
+            {characterCount}/{maxLength}
+          </span>
         </div>
       )}
+
+      {/* Priority: errorMessage > helperText */}
+      {error && errorMessage ? (
+        <HelperText id={errorMessageId} text={errorMessage} type="negative" />
+      ) : helperText ? (
+        <HelperText text={helperText} type={helperTextType} />
+      ) : null}
     </div>
   );
 }
