@@ -30,8 +30,10 @@ const profile = {
   nickname: "경환",
 } as MemberProfileView;
 
-function stubMe(value: Partial<UseQueryResult<GetMeResponse>>): UseQueryResult<GetMeResponse> {
-  return value as UseQueryResult<GetMeResponse>;
+function stubMe(
+  value: Partial<UseQueryResult<GetMeResponse | null>>
+): UseQueryResult<GetMeResponse | null> {
+  return value as UseQueryResult<GetMeResponse | null>;
 }
 
 describe("useAuthState 마커 게이트", () => {
@@ -131,29 +133,12 @@ describe("useAuthState (마커 있음)", () => {
     expect(result.current).toEqual({ status: "authenticated", profile });
   });
 
-  it("인증 거부(401)로 해소되면 guest여야 한다", () => {
+  it("인증 거부로 해소된 me(null)는 guest여야 한다", () => {
     mockedUseMe.mockReturnValue(
       stubMe({
         isPending: false,
         isFetching: false,
-        data: undefined,
-        isError: true,
-        error: new ApiError("인증이 필요합니다.", 401),
-      })
-    );
-
-    const { result } = renderHook(() => useAuthState());
-
-    expect(result.current).toEqual({ status: "guest" });
-  });
-
-  it.each([401, 403])("이전 me 데이터가 있어도 인증 거부(%i) 후에는 guest여야 한다", (status) => {
-    mockedUseMe.mockReturnValue(
-      stubMe({
-        isPending: false,
-        isFetching: false,
-        data: { result: profile } as GetMeResponse,
-        error: new ApiError("인증이 필요합니다.", status),
+        data: null,
       })
     );
 

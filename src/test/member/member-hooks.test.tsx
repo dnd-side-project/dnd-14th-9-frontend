@@ -147,11 +147,10 @@ describe("memberHooks query", () => {
   });
 
   it.each([401, 403])(
-    "useMe는 인증 거부(%i) 후 이전 프로필 데이터를 노출하지 않아야 한다",
+    "useMe는 인증 거부(%i) 후 이전 프로필을 null로 덮어쓰고 재요청하지 않아야 한다",
     async (status) => {
       const queryClient = new QueryClient();
-      const previousResponse = createMockProfileResponse("previous");
-      queryClient.setQueryData(memberKeys.me(), previousResponse);
+      queryClient.setQueryData(memberKeys.me(), createMockProfileResponse("previous"));
       mockedMemberApi.getMe.mockRejectedValueOnce(new ApiError("인증이 필요합니다.", status));
 
       const { result } = renderHook(
@@ -166,9 +165,10 @@ describe("memberHooks query", () => {
         await result.current.refetch();
       });
 
-      await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(result.current.data).toBeUndefined();
-      expect(queryClient.getQueryData(memberKeys.me())).toEqual(previousResponse);
+      await waitFor(() => expect(result.current.data).toBeNull());
+      expect(result.current.isError).toBe(false);
+      expect(queryClient.getQueryData(memberKeys.me())).toBeNull();
+      expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(1);
     }
   );
 });
@@ -196,13 +196,14 @@ describe("memberQueries.me 재시도·포커스 재조회", () => {
     });
   }
 
-  it.each([401, 403])("인증 거부(%i)는 재시도하지 않아야 한다", async (status) => {
+  it.each([401, 403])("인증 거부(%i)는 재시도 없이 null로 해소되어야 한다", async (status) => {
     const queryClient = new QueryClient();
     mockedMemberApi.getMe.mockRejectedValue(new ApiError("인증이 필요합니다.", status));
 
     const { result } = renderMeQuery(queryClient);
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
+    expect(result.current.data).toBeNull();
     expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(1);
   });
 

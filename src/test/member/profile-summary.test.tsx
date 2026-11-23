@@ -1,11 +1,15 @@
 import { fireEvent, render } from "@testing-library/react";
 
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { ProfileSummary } from "@/features/member/components/Profile/ProfileSummary";
-import { useMe, useUpdateProfileImage } from "@/features/member/hooks/useMemberHooks";
+import { useUpdateProfileImage } from "@/features/member/hooks/useMemberHooks";
 import { toast } from "@/lib/toast";
 
+jest.mock("@/features/auth/hooks/useAuthState", () => ({
+  useAuthState: jest.fn(),
+}));
+
 jest.mock("@/features/member/hooks/useMemberHooks", () => ({
-  useMe: jest.fn(),
   useUpdateProfileImage: jest.fn(),
 }));
 
@@ -20,7 +24,7 @@ jest.mock("@/lib/toast", () => ({
   },
 }));
 
-const mockedUseMe = useMe as jest.MockedFunction<typeof useMe>;
+const mockedUseAuthState = jest.mocked(useAuthState);
 const mockedUseUpdateProfileImage = useUpdateProfileImage as jest.MockedFunction<
   typeof useUpdateProfileImage
 >;
@@ -46,7 +50,23 @@ const mockProfile = {
 describe("ProfileSummary", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockedUseMe.mockReturnValue({ data: { result: mockProfile } } as ReturnType<typeof useMe>);
+    mockedUseAuthState.mockReturnValue({ status: "authenticated", profile: mockProfile });
+    mockedUseUpdateProfileImage.mockReturnValue({
+      mutate: jest.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useUpdateProfileImage>);
+  });
+
+  it.each([
+    { status: "guest" as const },
+    { status: "recovering" as const },
+    { status: "unavailable" as const, retry: jest.fn() },
+  ])("인증 상태가 $status이면 프로필을 렌더링하지 않아야 한다", (authState) => {
+    mockedUseAuthState.mockReturnValue(authState);
+
+    const { container } = render(<ProfileSummary />);
+
+    expect(container).toBeEmptyDOMElement();
   });
 
   it("유효한 이미지 파일 선택 시 프로필 이미지 수정 mutation을 호출해야 한다", () => {
@@ -101,20 +121,19 @@ describe("ProfileSummary", () => {
   });
 
   it("프로필 기본 정보와 formatHHMMSS로 포맷된 누적 시간을 렌더링해야 한다", () => {
-    mockedUseMe.mockReturnValue({
-      data: {
-        result: {
-          ...mockProfile,
-          nickname: "각 잡은 호랑이 #1234",
-          email: "tiger1234@gmail.com",
-          bio: "안녕하세요!",
-          participationSessionCount: 24,
-          totalParticipationTime: 2912, // 00:48:32
-          todoCompletionRate: 85,
-          focusRate: 30,
-        },
+    mockedUseAuthState.mockReturnValue({
+      status: "authenticated",
+      profile: {
+        ...mockProfile,
+        nickname: "각 잡은 호랑이 #1234",
+        email: "tiger1234@gmail.com",
+        bio: "안녕하세요!",
+        participationSessionCount: 24,
+        totalParticipationTime: 2912, // 00:48:32
+        todoCompletionRate: 85,
+        focusRate: 30,
       },
-    } as ReturnType<typeof useMe>);
+    });
 
     const { getByText } = render(<ProfileSummary />);
 

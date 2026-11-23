@@ -54,10 +54,16 @@ export const memberQueries = {
   me: () =>
     queryOptions({
       queryKey: memberKeys.me(),
-      queryFn: memberApi.getMe,
+      // 인증 거부(401/403)는 에러가 아니라 "로그인 안 됨"(null)이라는 정상 결과로 캐시를 덮어쓴다.
+      // 에러로 두면 이전 프로필이 캐시에 남아, 이후 일시 오류가 에러를 덮어쓸 때 되살아난다.
+      queryFn: () =>
+        memberApi.getMe().catch((error: unknown) => {
+          if (isAuthRejectedError(error)) return null;
+          throw error;
+        }),
       staleTime: MEMBER_STALE_TIME,
-      // 인증 거부(401/403)는 재시도하지 않고, 그 외 오류는 최대 2회 재시도한다.
-      retry: (failureCount, error) => !isAuthRejectedError(error) && failureCount < 2,
+      // 인증 거부는 위에서 성공(null)으로 바뀌므로 재시도 대상이 아니다. 일시 오류만 최대 2회 재시도한다.
+      retry: 2,
       meta: {
         transientErrorToast: "로그인 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
       },
@@ -81,13 +87,17 @@ interface UseMeOptions {
   enabled?: boolean;
 }
 
+/**
+ * 내 프로필 조회 쿼리 훅.
+ *
+ * 화면에서 로그인 여부를 판정하거나 프로필을 표시할 때는 이 훅을 직접 쓰지 말고
+ * `useAuthState()`를 사용하세요.
+ */
 export function useMe(options?: UseMeOptions) {
-  const query = useQuery({
+  return useQuery({
     ...memberQueries.me(),
     ...options,
   });
-
-  return isAuthRejectedError(query.error) ? { ...query, data: undefined } : query;
 }
 
 export const useDeleteMe = memberCore.useDelete!;

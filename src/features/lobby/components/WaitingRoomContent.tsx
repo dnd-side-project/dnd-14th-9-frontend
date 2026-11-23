@@ -8,7 +8,6 @@ import { Button } from "@/components/Button/Button";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
-import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useSessionDetail, useWaitingRoom } from "@/features/session/hooks/useSessionHooks";
 import { useSessionStatusSSE } from "@/features/session/hooks/useSessionStatusSSE";
 import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
@@ -50,13 +49,13 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
   const isAuthenticated = authState.status === "authenticated";
   const isMockMode = isMockModeEnabled();
   const { data, isLoading, error, refetch } = useSessionDetail(sessionId);
-  const { data: meData, isLoading: isMeLoading } = useMe({ enabled: isAuthenticated });
   // 초기 데이터: REST API로 조회
   const { data: initialWaitingData, isLoading: isWaitingRoomLoading } = useWaitingRoom(sessionId, {
     enabled: isAuthenticated,
   });
-  const isAuthDataLoading = isAuthenticated && (isWaitingRoomLoading || isMeLoading);
-  const myMemberId = isAuthDataLoading ? undefined : meData?.result?.id;
+  const isAuthDataLoading = isAuthenticated && isWaitingRoomLoading;
+  const myMemberId =
+    authState.status === "authenticated" && !isAuthDataLoading ? authState.profile.id : undefined;
 
   // SSE KICKED 이벤트 콜백
   const handleKicked = useCallback(

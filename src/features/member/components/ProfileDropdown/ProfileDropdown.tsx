@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/Avatar/Avatar";
 import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { useLogout } from "@/features/auth/hooks/useAuthHooks";
-import { useMe } from "@/features/member/hooks/useMemberHooks";
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { cn } from "@/lib/utils/utils";
 
 import { useProfileDropdownDialog } from "../../hooks/useProfileDropdownDialog";
@@ -57,8 +57,8 @@ export function ProfileDropdown() {
     closeDropdown,
     toggleDropdown,
   } = useProfileDropdownDialog();
-  const { data, isPending, isError } = useMe();
-  const profile = data?.result;
+  const authState = useAuthState();
+  const profile = authState.status === "authenticated" ? authState.profile : undefined;
   const { mutate: logout } = useLogout();
 
   const handleLogout = () => {
@@ -78,11 +78,11 @@ export function ProfileDropdown() {
   };
 
   const renderPopupContent = () => {
-    if (isPending) {
+    if (authState.status === "recovering") {
       return <ProfilePopupSkeleton />;
     }
 
-    if (isError) {
+    if (authState.status === "unavailable") {
       return (
         <PopupStatusMessage variant="error" icon={<AlertIcon className="h-4 w-4 shrink-0" />}>
           프로필 정보를 불러오지 못했습니다.
@@ -90,7 +90,7 @@ export function ProfileDropdown() {
       );
     }
 
-    if (!profile) {
+    if (authState.status !== "authenticated") {
       return (
         <PopupStatusMessage icon={<AlertIcon className="h-4 w-4 shrink-0" />}>
           프로필 정보가 없습니다.
@@ -98,7 +98,13 @@ export function ProfileDropdown() {
       );
     }
 
-    return <ProfilePopup profile={profile} onClose={closeDropdown} onLogoutClick={handleLogout} />;
+    return (
+      <ProfilePopup
+        profile={authState.profile}
+        onClose={closeDropdown}
+        onLogoutClick={handleLogout}
+      />
+    );
   };
 
   return (

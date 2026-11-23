@@ -4,8 +4,8 @@ import { useState } from "react";
 
 import { Button } from "@/components/Button/Button";
 import { ChevronRightIcon } from "@/components/Icon/ChevronRightIcon";
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { useDeleteAccountFlow } from "@/features/member/hooks/useDeleteAccountFlow";
-import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { cn } from "@/lib/utils/utils";
 
 import { AccountProfileCard } from "./AccountProfileCard";
@@ -56,8 +56,9 @@ export function ProfileAccountContent() {
   const [isAgreed, setIsAgreed] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  const { data, isPending: isProfilePending } = useMe();
-  const profile = data?.result;
+  const authState = useAuthState();
+  const profile = authState.status === "authenticated" ? authState.profile : undefined;
+  const isProfilePending = authState.status === "recovering";
   const { deleteAccount, isDeleting } = useDeleteAccountFlow();
 
   return (

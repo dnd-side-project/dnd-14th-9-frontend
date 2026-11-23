@@ -6,17 +6,12 @@ import { WaitingRoomContent } from "@/features/lobby/components/WaitingRoomConte
 const mockUseAuthState = jest.fn();
 const mockUseSessionDetail = jest.fn();
 const mockUseWaitingRoom = jest.fn();
-const mockUseMe = jest.fn();
 const mockUseWaitingMembersSSE = jest.fn();
 
 jest.mock("next/dynamic", () => () => () => null);
 
 jest.mock("@/features/auth/hooks/useAuthState", () => ({
   useAuthState: () => mockUseAuthState(),
-}));
-
-jest.mock("@/features/member/hooks/useMemberHooks", () => ({
-  useMe: () => mockUseMe(),
 }));
 
 jest.mock("@/features/session/hooks/useSessionHooks", () => ({
@@ -110,10 +105,6 @@ describe("WaitingRoomContent", () => {
     mockUseAuthState.mockReturnValue({
       status: "recovering",
     });
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-    });
 
     render(<WaitingRoomContent sessionId="1" />);
 
@@ -124,7 +115,6 @@ describe("WaitingRoomContent", () => {
   it("인증 조회 실패 시 스켈레톤이나 로그인 안내 대신 재시도 화면을 표시한다", async () => {
     const retry = jest.fn();
     mockUseAuthState.mockReturnValue({ status: "unavailable", retry });
-    mockUseMe.mockReturnValue({ data: undefined, isLoading: false });
 
     render(<WaitingRoomContent sessionId="1" />);
 
@@ -135,14 +125,6 @@ describe("WaitingRoomContent", () => {
   });
 
   it("waitingRoom 데이터 로딩 중이면 스켈레톤을 표시해야 한다", () => {
-    mockUseMe.mockReturnValue({
-      data: {
-        result: {
-          id: 7,
-        },
-      },
-      isLoading: false,
-    });
     mockUseWaitingRoom.mockReturnValue({
       data: undefined,
       isLoading: true,
@@ -155,15 +137,6 @@ describe("WaitingRoomContent", () => {
   });
 
   it("인증 완료 + 데이터 로딩 완료면 정상 UI를 렌더링해야 한다", () => {
-    mockUseMe.mockReturnValue({
-      data: {
-        result: {
-          id: 7,
-        },
-      },
-      isLoading: false,
-    });
-
     render(<WaitingRoomContent sessionId="1" />);
 
     expect(screen.queryByTestId("waiting-room-skeleton")).not.toBeInTheDocument();
@@ -174,15 +147,16 @@ describe("WaitingRoomContent", () => {
     expect(screen.getByTestId("participant-list-card")).toBeInTheDocument();
   });
 
-  it("me 정보가 아직 로딩 중이면 참여 여부를 판단하지 않고 스켈레톤을 유지해야 한다", () => {
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: true,
+  it("대기방 멤버 목록에 authState.profile.id가 없으면 참여 모달을 표시해야 한다", () => {
+    mockUseAuthState.mockReturnValue({
+      status: "authenticated",
+      profile: {
+        id: 99,
+      },
     });
 
     render(<WaitingRoomContent sessionId="1" />);
 
-    expect(screen.getByTestId("waiting-room-skeleton")).toBeInTheDocument();
-    expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
+    expect(screen.getByTestId("session-join-modal")).toBeInTheDocument();
   });
 });
