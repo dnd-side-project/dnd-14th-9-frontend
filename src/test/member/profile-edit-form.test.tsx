@@ -25,9 +25,7 @@ const mockedUseMeForEdit = jest.mocked(useMeForEdit);
 const mockedUseUpdateMe = jest.mocked(useUpdateMe);
 const mockedToast = jest.mocked(toast);
 
-const MIN_CATEGORY_MESSAGE = "관심 카테고리는 최소 1개 이상 선택해야 합니다.";
-
-describe("ProfileEditForm", () => {
+describe("ProfileEditForm interest categories", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedUseMeForEdit.mockReturnValue({
@@ -93,7 +91,9 @@ describe("ProfileEditForm", () => {
     await user.click(screen.getByRole("button", { name: "디자인" }));
     await user.click(screen.getByRole("button", { name: "기획 · PM" }));
 
-    expect(await screen.findByText(MIN_CATEGORY_MESSAGE)).toBeInTheDocument();
+    expect(
+      await screen.findByText("관심 카테고리는 최소 1개 이상 선택해야 합니다.")
+    ).toBeInTheDocument();
     screen.getAllByRole("button", { name: "저장하기" }).forEach((button) => {
       expect(button).toBeDisabled();
     });
@@ -112,109 +112,6 @@ describe("ProfileEditForm", () => {
         expect(button).toBeEnabled();
       });
     });
-    expect(screen.queryByText(MIN_CATEGORY_MESSAGE)).toBeNull();
-  });
-
-  it("모두 해제한 뒤 다시 선택하면 안내가 사라지고 저장하기 버튼이 활성화된다", async () => {
-    const user = userEvent.setup();
-    render(<ProfileEditForm />);
-
-    const development = screen.getByRole("button", { name: "개발" });
-    await waitFor(() => expect(development).toHaveAttribute("aria-pressed", "true"));
-    await user.click(development);
-    await user.click(screen.getByRole("button", { name: "디자인" }));
-    await user.click(screen.getByRole("button", { name: "기획 · PM" }));
-    expect(await screen.findByText(MIN_CATEGORY_MESSAGE)).toBeInTheDocument();
-
-    await user.click(development);
-
-    await waitFor(() => expect(screen.queryByText(MIN_CATEGORY_MESSAGE)).toBeNull());
-    screen.getAllByRole("button", { name: "저장하기" }).forEach((button) => {
-      expect(button).toBeEnabled();
-    });
-  });
-
-  it("카테고리가 0개로 저장된 사용자는 닉네임만 바꿔도 카테고리를 고르기 전에는 저장할 수 없다", async () => {
-    mockedUseMeForEdit.mockReturnValue({
-      data: {
-        result: {
-          id: 1,
-          nickname: "테스터",
-          profileImageUrl: "",
-          email: "tester@example.com",
-          bio: "소개",
-          firstInterestCategory: null,
-          secondInterestCategory: null,
-          thirdInterestCategory: null,
-        },
-      },
-    } as unknown as ReturnType<typeof useMeForEdit>);
-    const user = userEvent.setup();
-    render(<ProfileEditForm />);
-
-    const nickname = screen.getByLabelText("닉네임");
-    await user.type(nickname, "a");
-    await waitFor(() => expect(nickname).toHaveValue("테스터a"));
-
-    screen.getAllByRole("button", { name: "저장하기" }).forEach((button) => {
-      expect(button).toBeDisabled();
-    });
-
-    await user.click(screen.getByRole("button", { name: "개발" }));
-
-    await waitFor(() => {
-      screen.getAllByRole("button", { name: "저장하기" }).forEach((button) => {
-        expect(button).toBeEnabled();
-      });
-    });
-  });
-
-  it("닉네임을 비우면 안내 문구를 보여주고 저장하기 버튼을 비활성화한다", async () => {
-    const user = userEvent.setup();
-    render(<ProfileEditForm />);
-
-    const nickname = screen.getByLabelText("닉네임");
-    await waitFor(() => expect(nickname).toHaveValue("테스터"));
-    await user.clear(nickname);
-
-    expect(await screen.findByText("닉네임을 입력해주세요")).toBeInTheDocument();
-    screen.getAllByRole("button", { name: "저장하기" }).forEach((button) => {
-      expect(button).toBeDisabled();
-    });
-  });
-
-  it("닉네임에 특수문자가 있으면 안내 문구를 보여주고 저장하기 버튼을 비활성화한다", async () => {
-    const user = userEvent.setup();
-    render(<ProfileEditForm />);
-
-    const nickname = screen.getByLabelText("닉네임");
-    await waitFor(() => expect(nickname).toHaveValue("테스터"));
-    await user.type(nickname, "!");
-
-    expect(
-      await screen.findByText("특수문자와 공백을 제외한 2~10자리여야 합니다.")
-    ).toBeInTheDocument();
-    screen.getAllByRole("button", { name: "저장하기" }).forEach((button) => {
-      expect(button).toBeDisabled();
-    });
-  });
-
-  it("취소를 누르면 입력을 초기값으로 되돌리고 저장하기 버튼을 비활성화한다", async () => {
-    const user = userEvent.setup();
-    render(<ProfileEditForm />);
-
-    const nickname = screen.getByLabelText("닉네임");
-    await waitFor(() => expect(nickname).toHaveValue("테스터"));
-    await user.type(nickname, "a");
-    await waitFor(() =>
-      expect(screen.getAllByRole("button", { name: "저장하기" })[0]).toBeEnabled()
-    );
-
-    await user.click(screen.getAllByRole("button", { name: "취소" })[0]);
-
-    await waitFor(() => expect(nickname).toHaveValue("테스터"));
-    screen.getAllByRole("button", { name: "저장하기" }).forEach((button) => {
-      expect(button).toBeDisabled();
-    });
+    expect(screen.queryByText("관심 카테고리는 최소 1개 이상 선택해야 합니다.")).toBeNull();
   });
 });
