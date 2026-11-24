@@ -80,4 +80,38 @@ describe("ProfileEditForm interest categories", () => {
     expect(fourthCategory).toHaveAttribute("aria-pressed", "true");
     expect(mockedToast.info).not.toHaveBeenCalled();
   });
+
+  it("모든 카테고리를 해제하면 안내 문구를 보여주고 저장하기 버튼을 비활성화한다", async () => {
+    const user = userEvent.setup();
+    render(<ProfileEditForm />);
+
+    const development = screen.getByRole("button", { name: "개발" });
+    await waitFor(() => expect(development).toHaveAttribute("aria-pressed", "true"));
+    await user.click(development);
+    await user.click(screen.getByRole("button", { name: "디자인" }));
+    await user.click(screen.getByRole("button", { name: "기획 · PM" }));
+
+    expect(
+      await screen.findByText("관심 카테고리는 최소 1개 이상 선택해야 합니다.")
+    ).toBeInTheDocument();
+    screen.getAllByRole("button", { name: "저장하기" }).forEach((button) => {
+      expect(button).toBeDisabled();
+    });
+  });
+
+  it("카테고리를 1개 이상 남긴 채 변경하면 저장하기 버튼이 활성화된다", async () => {
+    const user = userEvent.setup();
+    render(<ProfileEditForm />);
+
+    const development = screen.getByRole("button", { name: "개발" });
+    await waitFor(() => expect(development).toHaveAttribute("aria-pressed", "true"));
+    await user.click(development);
+
+    await waitFor(() => {
+      screen.getAllByRole("button", { name: "저장하기" }).forEach((button) => {
+        expect(button).toBeEnabled();
+      });
+    });
+    expect(screen.queryByText("관심 카테고리는 최소 1개 이상 선택해야 합니다.")).toBeNull();
+  });
 });
