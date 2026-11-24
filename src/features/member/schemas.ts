@@ -13,7 +13,10 @@ export const profileEditSchema = z.object({
       message: "올바른 이메일 형식을 입력해주세요",
     }),
   bio: z.string().max(100, "한 줄 소개는 최대 100자까지 입력 가능합니다"),
-  interestCategories: z.array(z.string()).max(3, "관심 카테고리는 최대 3개까지 선택 가능합니다."),
+  interestCategories: z
+    .array(z.string())
+    .min(1, "관심 카테고리는 최소 1개 이상 선택해야 합니다.")
+    .max(3, "관심 카테고리는 최대 3개까지 선택 가능합니다."),
 });
 
 export type ProfileEditFormValues = z.infer<typeof profileEditSchema>;
