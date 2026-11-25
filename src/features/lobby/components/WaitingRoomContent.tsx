@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/Button/Button";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
+import { getAuthProfile } from "@/features/auth/lib/auth-profile";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
 import { useSessionDetail, useWaitingRoom } from "@/features/session/hooks/useSessionHooks";
 import { useSessionStatusSSE } from "@/features/session/hooks/useSessionStatusSSE";
@@ -54,8 +55,7 @@ export function WaitingRoomContent({ sessionId }: WaitingRoomContentProps) {
     enabled: isAuthenticated,
   });
   const isAuthDataLoading = isAuthenticated && isWaitingRoomLoading;
-  const myMemberId =
-    authState.status === "authenticated" && !isAuthDataLoading ? authState.profile.id : undefined;
+  const myMemberId = isAuthDataLoading ? undefined : getAuthProfile(authState)?.id;
 
   // SSE KICKED 이벤트 콜백
   const handleKicked = useCallback(

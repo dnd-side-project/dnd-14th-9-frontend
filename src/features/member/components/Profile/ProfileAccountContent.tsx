@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/Button/Button";
 import { ChevronRightIcon } from "@/components/Icon/ChevronRightIcon";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
+import { getAuthProfile } from "@/features/auth/lib/auth-profile";
 import { useDeleteAccountFlow } from "@/features/member/hooks/useDeleteAccountFlow";
 import { cn } from "@/lib/utils/utils";
 
@@ -57,7 +58,7 @@ export function ProfileAccountContent() {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const authState = useAuthState();
-  const profile = authState.status === "authenticated" ? authState.profile : undefined;
+  const profile = getAuthProfile(authState);
   const isProfilePending = authState.status === "recovering";
   const { deleteAccount, isDeleting } = useDeleteAccountFlow();
 

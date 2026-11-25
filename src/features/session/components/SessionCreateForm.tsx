@@ -17,6 +17,7 @@ import { TextInput } from "@/components/Input/TextInput";
 import { NumericStepper } from "@/components/NumericStepper/NumericStepper";
 import { StepperSlide } from "@/components/StepperSlide/StepperSlide";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
+import { getAuthProfile } from "@/features/auth/lib/auth-profile";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { ApiError } from "@/lib/api/api-client";
@@ -120,7 +121,7 @@ export function SessionCreateForm({
 }: SessionCreateFormProps = {}) {
   const isEdit = mode === "edit";
   const authState = useAuthState();
-  const myProfile = authState.status === "authenticated" ? authState.profile : undefined;
+  const myProfile = getAuthProfile(authState);
 
   // edit 모드: initialValues로 초기값을 시드한다. (category는 한글 라벨→enum 역변환)
   const [roomName, setRoomName] = useState(initialValues?.title ?? "");

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/Button/Button";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
+import { getAuthProfile } from "@/features/auth/lib/auth-profile";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
 import { usePreventBackNavigation } from "@/hooks/usePreventBackNavigation";
 import { ApiError } from "@/lib/api/api-client";
@@ -138,8 +139,7 @@ export function SessionPageContent({ sessionId }: SessionPageContentProps) {
   }
 
   // 참여 여부 확인
-  const myMemberId =
-    authState.status === "authenticated" && !isAuthDataLoading ? authState.profile.id : undefined;
+  const myMemberId = isAuthDataLoading ? undefined : getAuthProfile(authState)?.id;
   const isParticipant = isAuthDataLoading
     ? false
     : (waitingRoomData?.result?.members?.some((member) => member.memberId === myMemberId) ?? false);

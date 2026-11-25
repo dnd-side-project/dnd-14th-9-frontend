@@ -8,6 +8,7 @@ import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { ShareIcon } from "@/components/Icon/ShareIcon";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
+import { getAuthProfile } from "@/features/auth/lib/auth-profile";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
 import { useDialog } from "@/hooks/useDialog";
 import { ApiError } from "@/lib/api/api-client";
@@ -46,7 +47,7 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
 
   const session = data?.result;
   const isSessionNotFound = sessionError instanceof ApiError && sessionError.status === 404;
-  const myMemberId = authState.status === "authenticated" ? authState.profile.id : undefined;
+  const myMemberId = getAuthProfile(authState)?.id;
   const hasParticipationCheckError = isAuthenticated && Boolean(waitingRoomError);
 
   // 참여 여부 확인 (내 member id가 확정된 뒤에만 판정)

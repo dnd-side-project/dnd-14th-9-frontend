@@ -2,6 +2,7 @@ import { Avatar } from "@/components/Avatar/Avatar";
 import { Button } from "@/components/Button/Button";
 import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
+import { getAuthProfile } from "@/features/auth/lib/auth-profile";
 import { CATEGORY_LABELS, type Category } from "@/lib/constants/category";
 import { cn } from "@/lib/utils/utils";
 
@@ -23,8 +24,7 @@ export function OnboardingConfirm({
   onConfirm,
 }: OnboardingConfirmProps) {
   const authState = useAuthState();
-  const profileImageUrl =
-    authState.status === "authenticated" ? authState.profile.profileImageUrl : null;
+  const profileImageUrl = getAuthProfile(authState)?.profileImageUrl ?? null;
 
   return (
     <div
