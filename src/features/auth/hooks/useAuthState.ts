@@ -30,6 +30,11 @@ export function useAuthState(): AuthState {
   if (data?.result) {
     return { status: "authenticated", profile: data.result };
   }
+  // 확정된 guest(null)는 재조회 중에도 recovering으로 바꾸지 않는다. 깜빡이면 소비처가 자식을 내렸다 올리며 재요청이 반복될 수 있다.
+  // 직전 재조회가 일시 오류로 끝났다면(error) 아래에서 recovering/unavailable로 넘긴다.
+  if (data === null && !error) {
+    return GUEST_AUTH_STATE;
+  }
   if (isPending || isFetching) {
     return { status: "recovering" };
   }

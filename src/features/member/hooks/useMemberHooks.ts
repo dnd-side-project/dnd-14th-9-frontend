@@ -61,7 +61,10 @@ export const memberQueries = {
           if (isAuthRejectedError(error)) return null;
           throw error;
         }),
-      staleTime: MEMBER_STALE_TIME,
+      // 오류 없이 확정된 guest(null)는 신선하게 두지 않는다. 일시적 401/403 뒤에도 포커스 복귀·재마운트 때
+      // 다시 확인해 복구한다. 이후 일시 오류가 난 상태(error)는 재시도 버튼이 있으므로 기존 staleTime을 따른다.
+      staleTime: (query) =>
+        query.state.data === null && !query.state.error ? 0 : MEMBER_STALE_TIME,
       // 인증 거부는 위에서 성공(null)으로 바뀌므로 재시도 대상이 아니다. 일시 오류만 최대 2회 재시도한다.
       retry: 2,
       meta: {

@@ -140,25 +140,63 @@ describe("useAuthState + 실제 QueryClient 통합 동작", () => {
     }
   );
 
-  it("마커가 남은 채 401로 거부돼도 staleTime 안에서는 포커스 복귀와 재마운트로 /me를 다시 요청하지 않는다", async () => {
+  it("마커가 남은 채 일시적으로 401을 받아도 포커스 복귀 때 /me가 성공하면 authenticated로 복구된다", async () => {
     setAuthMarkerCookie(true);
     const queryClient = makeQueryClient();
-    mockedMemberApi.getMe.mockRejectedValue(new ApiError("인증이 필요합니다.", 401));
+    mockedMemberApi.getMe
+      .mockRejectedValueOnce(new ApiError("인증이 필요합니다.", 401))
+      .mockResolvedValueOnce(createMeResponse());
 
-    const first = renderHook(() => useAuthState(), { wrapper: createWrapper(queryClient) });
+    const { result } = renderHook(() => useAuthState(), { wrapper: createWrapper(queryClient) });
     await waitFor(() => {
-      expect(first.result.current).toEqual({ status: "guest" });
+      expect(result.current).toEqual({ status: "guest" });
     });
 
     await act(async () => {
       focusManager.setFocused(false);
       focusManager.setFocused(true);
     });
+
+    await waitFor(() => {
+      expect(result.current.status).toBe("authenticated");
+    });
+    expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(2);
+  });
+
+  it("마커가 남은 채 401로 거부되면 포커스 복귀와 재마운트 때 /me를 다시 확인하되 recovering으로 바뀌지 않고 guest를 유지한다", async () => {
+    setAuthMarkerCookie(true);
+    const queryClient = makeQueryClient();
+    mockedMemberApi.getMe.mockRejectedValue(new ApiError("인증이 필요합니다.", 401));
+    const statuses: string[] = [];
+    const useRecordedAuthState = () => {
+      const state = useAuthState();
+      statuses.push(state.status);
+      return state;
+    };
+
+    const first = renderHook(useRecordedAuthState, { wrapper: createWrapper(queryClient) });
+    await waitFor(() => {
+      expect(first.result.current).toEqual({ status: "guest" });
+    });
+    const firstGuestIndex = statuses.indexOf("guest");
+
+    await act(async () => {
+      focusManager.setFocused(false);
+      focusManager.setFocused(true);
+    });
+    await waitFor(() => {
+      expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(2);
+    });
+
     first.unmount();
-    const second = renderHook(() => useAuthState(), { wrapper: createWrapper(queryClient) });
+    const second = renderHook(useRecordedAuthState, { wrapper: createWrapper(queryClient) });
 
     expect(second.result.current).toEqual({ status: "guest" });
-    expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(mockedMemberApi.getMe).toHaveBeenCalledTimes(3);
+    });
+    // 재조회가 진행되는 동안에도 guest가 recovering으로 깜빡이면 소비처가 자식을 내렸다 올리며 재요청이 반복될 수 있다.
+    expect(statuses.slice(firstGuestIndex)).not.toContain("recovering");
   });
 
   it("/me 성공 후 프록시가 마커 쿠키를 삭제하고 401을 반환해도 guest로 전환되고 이전 캐시가 null로 덮인다", async () => {
