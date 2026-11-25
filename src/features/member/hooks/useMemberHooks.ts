@@ -34,6 +34,8 @@ import type {
 const MEMBER_STALE_TIME = 5 * 60 * 1000;
 
 // createSingletonHooks로 기본 me 관련 훅 생성 (Session의 createCrudHooks와 동일한 역할)
+// 주의: 여기서 쓰는 것은 키와 useDelete뿐이다. useGet/prefetch는 /me에서 401을 던지는 정책이라
+// 같은 캐시 키를 쓰는 memberQueries.me()(401/403 → null)와 의미가 다르므로, /me 조회는 memberQueries.me() 기반(useMe/useAuthState)을 사용한다.
 const memberCore = createSingletonHooks<MemberProfileView, never>({
   queryKey: "member",
   get: memberApi.getMe,
