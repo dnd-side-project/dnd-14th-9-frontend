@@ -4,11 +4,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { HeaderAuthActions } from "@/components/Header/HeaderAuthActions";
 import { memberApi } from "@/features/member/api";
 import { OnboardingConfirm } from "@/features/member/components/Onboarding/OnboardingConfirm";
 import { ProfileAccountContent } from "@/features/member/components/Profile/ProfileAccountContent";
 import { ProfileSummary } from "@/features/member/components/Profile/ProfileSummary";
-import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
 import { memberKeys } from "@/features/member/hooks/useMemberHooks";
 import type { GetMeResponse, MemberProfileView } from "@/features/member/types";
 import { SessionCreateForm } from "@/features/session/components/SessionCreateForm";
@@ -188,7 +188,7 @@ describe("useAuthState 소비처 컴포넌트 + 실제 QueryClient 통합 테스
     expect(screen.getByRole("button", { name: "회원 탈퇴하기" })).toBeDisabled();
   });
 
-  it("ProfileDropdown은 authenticated 시 프로필 팝업을 열고, 401 후에는 이전 프로필을 노출하지 않아야 한다", async () => {
+  it("HeaderAuthActions는 authenticated 시 프로필 팝업을 열고, 401 후에는 이전 프로필 없이 로그인 링크를 표시해야 한다", async () => {
     const user = userEvent.setup();
     setAuthMarkerCookie(true);
     const queryClient = makeQueryClient();
@@ -196,7 +196,7 @@ describe("useAuthState 소비처 컴포넌트 + 실제 QueryClient 통합 테스
       .mockResolvedValueOnce(createMeResponse())
       .mockRejectedValueOnce(new ApiError("인증이 필요합니다.", 401));
 
-    renderWithQueryClient(<ProfileDropdown />, queryClient);
+    renderWithQueryClient(<HeaderAuthActions />, queryClient);
 
     await waitFor(() => {
       expect(screen.getAllByAltText("기존유저").length).toBeGreaterThan(0);
@@ -210,29 +210,10 @@ describe("useAuthState 소비처 컴포넌트 + 실제 QueryClient 통합 테스
     });
 
     await waitFor(() => {
-      expect(screen.getByText("프로필 정보가 없습니다.")).toBeInTheDocument();
+      expect(screen.getAllByRole("link", { name: "로그인" })).toHaveLength(2);
     });
     expect(screen.queryByText("prev@example.com")).not.toBeInTheDocument();
     expect(screen.queryByAltText("기존유저")).not.toBeInTheDocument();
-  });
-
-  it("ProfileDropdown은 초기 /me 일시 실패(unavailable) 시 기존 오류 문구만 표시하고 재시도 버튼을 추가하지 않아야 한다", async () => {
-    jest.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
-    setAuthMarkerCookie(true);
-    const queryClient = makeQueryClient();
-    mockedMemberApi.getMe.mockRejectedValue(new ApiError("서버 오류", 500));
-
-    renderWithQueryClient(<ProfileDropdown />, queryClient);
-
-    await act(async () => {
-      await jest.advanceTimersByTimeAsync(10000);
-    });
-
-    await user.click(screen.getByRole("button", { name: "프로필 메뉴" }));
-
-    expect(await screen.findByText("프로필 정보를 불러오지 못했습니다.")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /다시 시도/ })).not.toBeInTheDocument();
   });
 
   it("OnboardingConfirm은 memberKeys.me() 무효화 시 최신 프로필 이미지를 반영하고 401 후에는 숨겨야 한다", async () => {

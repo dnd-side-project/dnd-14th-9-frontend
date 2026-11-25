@@ -43,7 +43,7 @@ export function HeaderAuthActions() {
         >
           세션 만들기
         </Button>
-        <ProfileDropdown />
+        <ProfileDropdown profile={authState.profile} />
       </>
     );
   }
