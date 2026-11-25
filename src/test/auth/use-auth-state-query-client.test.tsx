@@ -6,11 +6,10 @@ import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { memberApi } from "@/features/member/api";
 import { memberKeys } from "@/features/member/hooks/useMemberHooks";
-import type { GetMeResponse, MemberProfileView } from "@/features/member/types";
 import { ApiError } from "@/lib/api/api-client";
-import { AUTH_MARKER_COOKIE } from "@/lib/auth/cookie-constants";
 import { makeQueryClient } from "@/lib/getQueryClient";
 import { toast } from "@/lib/toast";
+import { createMeResponse, setAuthMarkerCookie } from "@/test/auth/me-test-fixtures";
 
 jest.mock("@/features/member/api", () => ({
   memberApi: {
@@ -28,43 +27,6 @@ jest.mock("@/lib/toast", () => ({
 
 const mockedMemberApi = jest.mocked(memberApi);
 const mockedToastError = jest.mocked(toast.error);
-
-function createProfile(overrides: Partial<MemberProfileView> = {}): MemberProfileView {
-  return {
-    id: 7,
-    nickname: "테스터",
-    profileImageUrl: "https://example.com/avatar.png",
-    email: "tester@example.com",
-    bio: "소개",
-    socialProvider: "kakao",
-    totalParticipationTime: 120,
-    focusedTime: 90,
-    focusRate: 75,
-    totalTodoCount: 4,
-    completedTodoCount: 3,
-    todoCompletionRate: 75,
-    participationSessionCount: 2,
-    firstLogin: false,
-    ...overrides,
-  };
-}
-
-function createMeResponse(overrides: Partial<MemberProfileView> = {}): GetMeResponse {
-  return {
-    isSuccess: true,
-    code: "COMMON200",
-    message: "성공",
-    result: createProfile(overrides),
-  };
-}
-
-function setAuthMarkerCookie(present: boolean) {
-  if (present) {
-    document.cookie = `${AUTH_MARKER_COOKIE}=1; path=/`;
-    return;
-  }
-  document.cookie = `${AUTH_MARKER_COOKIE}=; max-age=0; path=/`;
-}
 
 function createWrapper(queryClient: QueryClient) {
   return function Wrapper({ children }: PropsWithChildren) {

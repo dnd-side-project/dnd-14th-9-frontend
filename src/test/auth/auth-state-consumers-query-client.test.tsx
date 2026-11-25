@@ -10,11 +10,10 @@ import { OnboardingConfirm } from "@/features/member/components/Onboarding/Onboa
 import { ProfileAccountContent } from "@/features/member/components/Profile/ProfileAccountContent";
 import { ProfileSummary } from "@/features/member/components/Profile/ProfileSummary";
 import { memberKeys } from "@/features/member/hooks/useMemberHooks";
-import type { GetMeResponse, MemberProfileView } from "@/features/member/types";
 import { SessionCreateForm } from "@/features/session/components/SessionCreateForm";
 import { ApiError } from "@/lib/api/api-client";
-import { AUTH_MARKER_COOKIE } from "@/lib/auth/cookie-constants";
 import { makeQueryClient } from "@/lib/getQueryClient";
+import { createMeResponse, setAuthMarkerCookie } from "@/test/auth/me-test-fixtures";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn(), refresh: jest.fn() }),
@@ -55,43 +54,6 @@ jest.mock("@/lib/toast", () => ({
 }));
 
 const mockedMemberApi = jest.mocked(memberApi);
-
-function createProfile(overrides: Partial<MemberProfileView> = {}): MemberProfileView {
-  return {
-    id: 1,
-    nickname: "기존유저",
-    profileImageUrl: "https://example.com/initial.png",
-    email: "prev@example.com",
-    bio: "기존 소개",
-    socialProvider: "kakao",
-    totalParticipationTime: 3600,
-    focusedTime: 1800,
-    focusRate: 50,
-    totalTodoCount: 10,
-    completedTodoCount: 4,
-    todoCompletionRate: 40,
-    participationSessionCount: 3,
-    firstLogin: false,
-    ...overrides,
-  };
-}
-
-function createMeResponse(overrides: Partial<MemberProfileView> = {}): GetMeResponse {
-  return {
-    isSuccess: true,
-    code: "COMMON200",
-    message: "성공",
-    result: createProfile(overrides),
-  };
-}
-
-function setAuthMarkerCookie(present: boolean) {
-  if (present) {
-    document.cookie = `${AUTH_MARKER_COOKIE}=1; path=/`;
-    return;
-  }
-  document.cookie = `${AUTH_MARKER_COOKIE}=; max-age=0; path=/`;
-}
 
 function renderWithQueryClient(ui: ReactNode, queryClient: QueryClient = makeQueryClient()) {
   const result = render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
