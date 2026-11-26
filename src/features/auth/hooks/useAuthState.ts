@@ -1,16 +1,20 @@
 "use client";
 
 import { useMe } from "@/features/member/hooks/useMemberHooks";
-import { isAuthRejectedError } from "@/lib/api/api-client";
-import {
-  createAuthenticatedAuthState,
-  createRecoveringAuthState,
-  GUEST_AUTH_STATE,
-} from "@/lib/auth/auth-state";
-import type { AuthState } from "@/lib/auth/auth-state";
+import type { MemberProfileView } from "@/features/member/types";
 import { isMockModeEnabled } from "@/mocks/is-mock-mode-enabled";
 
 import { useHasAuthMarker } from "./useHasAuthMarker";
+
+export type AuthState =
+  | { status: "guest" }
+  | { status: "recovering" }
+  | { status: "unavailable"; retry: () => void }
+  | { status: "authenticated"; profile: MemberProfileView };
+
+const GUEST_AUTH_STATE: AuthState = {
+  status: "guest",
+};
 
 export function useAuthState(): AuthState {
   const hasAuthMarker = useHasAuthMarker();
@@ -20,16 +24,19 @@ export function useAuthState(): AuthState {
 
   // 비활성 쿼리는 isPending이 계속 true이므로 마커 판정을 먼저 반영한다.
   if (!canFetchMe) {
-    return hasAuthMarker === null ? createRecoveringAuthState() : GUEST_AUTH_STATE;
+    return hasAuthMarker === null ? { status: "recovering" } : GUEST_AUTH_STATE;
   }
-  if (isAuthRejectedError(error)) {
+  // 인증 거부는 me 쿼리가 null로 해소하므로 data가 없으면 게스트로 귀결된다.
+  if (data?.result) {
+    return { status: "authenticated", profile: data.result };
+  }
+  // 확정된 guest(null)는 재조회 중에도 recovering으로 바꾸지 않는다. 깜빡이면 소비처가 자식을 내렸다 올리며 재요청이 반복될 수 있다.
+  // 직전 재조회가 일시 오류로 끝났다면(error) 아래에서 recovering/unavailable로 넘긴다.
+  if (data === null && !error) {
     return GUEST_AUTH_STATE;
   }
-  if (data?.result) {
-    return createAuthenticatedAuthState(data.result);
-  }
   if (isPending || isFetching) {
-    return createRecoveringAuthState();
+    return { status: "recovering" };
   }
   // 조회가 끝났어도 인증 여부를 확인하지 못했다면 재시도를 제공한다.
   if (error) {

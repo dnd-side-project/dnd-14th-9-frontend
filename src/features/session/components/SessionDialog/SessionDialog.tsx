@@ -8,8 +8,8 @@ import { AlertIcon } from "@/components/Icon/AlertIcon";
 import { CloseIcon } from "@/components/Icon/CloseIcon";
 import { ShareIcon } from "@/components/Icon/ShareIcon";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
+import { getAuthProfile } from "@/features/auth/lib/auth-profile";
 import { SessionJoinModal } from "@/features/lobby/components/SessionJoinModal";
-import { useMe } from "@/features/member/hooks/useMemberHooks";
 import { useDialog } from "@/hooks/useDialog";
 import { ApiError } from "@/lib/api/api-client";
 import { navigateWithHardReload } from "@/lib/navigation/hardNavigate";
@@ -35,16 +35,6 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
   const isRecovering = authState.status === "recovering";
   const [showJoinModal, setShowJoinModal] = useState(false);
 
-  // 현재 사용자 정보 (인증된 경우만)
-  const {
-    data: meData,
-    isLoading: isMeLoading,
-    error: meError,
-    refetch: refetchMe,
-  } = useMe({
-    enabled: isAuthenticated,
-  });
-
   // 대기방 참여자 정보 (인증된 경우만)
   const {
     data: waitingRoomData,
@@ -57,8 +47,8 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
 
   const session = data?.result;
   const isSessionNotFound = sessionError instanceof ApiError && sessionError.status === 404;
-  const myMemberId = meData?.result?.id;
-  const hasParticipationCheckError = isAuthenticated && Boolean(meError || waitingRoomError);
+  const myMemberId = getAuthProfile(authState)?.id;
+  const hasParticipationCheckError = isAuthenticated && Boolean(waitingRoomError);
 
   // 참여 여부 확인 (내 member id가 확정된 뒤에만 판정)
   const isParticipant =
@@ -78,7 +68,7 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
   }, [isParticipant, sessionId, dialogRef]);
 
   // 참여 여부 확인 중인지 여부
-  const isCheckingParticipation = isAuthenticated && (isMeLoading || isWaitingRoomLoading);
+  const isCheckingParticipation = isAuthenticated && isWaitingRoomLoading;
 
   const statusDisplay = session ? getSessionStatusDisplay(session.status) : null;
 
@@ -115,7 +105,6 @@ export function SessionDialog({ sessionId }: SessionDialogProps) {
         colorScheme="secondary"
         size="medium"
         onClick={() => {
-          void refetchMe();
           void refetchWaitingRoom();
         }}
       >

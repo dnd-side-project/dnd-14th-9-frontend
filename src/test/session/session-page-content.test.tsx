@@ -7,7 +7,6 @@ const mockUseAuthState = jest.fn();
 const mockUseSessionDetail = jest.fn();
 const mockUseInProgressData = jest.fn();
 const mockUseWaitingRoom = jest.fn();
-const mockUseMe = jest.fn();
 
 jest.mock("next/navigation", () => ({
   notFound: jest.fn(),
@@ -15,10 +14,6 @@ jest.mock("next/navigation", () => ({
 
 jest.mock("@/features/auth/hooks/useAuthState", () => ({
   useAuthState: () => mockUseAuthState(),
-}));
-
-jest.mock("@/features/member/hooks/useMemberHooks", () => ({
-  useMe: () => mockUseMe(),
 }));
 
 jest.mock("@/features/session/hooks/useSessionHooks", () => ({
@@ -132,8 +127,8 @@ describe("SessionPageContent", () => {
     });
   });
 
-  it("me 정보가 아직 로딩 중이면 참여 여부를 판단하지 않고 스켈레톤을 유지해야 한다", () => {
-    mockUseMe.mockReturnValue({
+  it("waitingRoom 정보가 아직 로딩 중이면 참여 여부를 판단하지 않고 스켈레톤을 유지해야 한다", () => {
+    mockUseWaitingRoom.mockReturnValue({
       data: undefined,
       isLoading: true,
     });
@@ -148,10 +143,6 @@ describe("SessionPageContent", () => {
     mockUseAuthState.mockReturnValue({
       status: "recovering",
     });
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-    });
 
     render(<SessionPageContent sessionId="1" />);
 
@@ -165,7 +156,6 @@ describe("SessionPageContent", () => {
   it("인증 조회 실패 시 스켈레톤이나 로그인 안내 대신 재시도 화면을 표시한다", async () => {
     const retry = jest.fn();
     mockUseAuthState.mockReturnValue({ status: "unavailable", retry });
-    mockUseMe.mockReturnValue({ data: undefined, isLoading: false });
 
     render(<SessionPageContent sessionId="1" />);
 
@@ -176,15 +166,6 @@ describe("SessionPageContent", () => {
   });
 
   it("authenticated + 참여자이면 메인 콘텐츠를 렌더링해야 한다", () => {
-    mockUseMe.mockReturnValue({
-      data: {
-        result: {
-          id: 7,
-        },
-      },
-      isLoading: false,
-    });
-
     render(<SessionPageContent sessionId="1" />);
 
     expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: true });
@@ -195,7 +176,6 @@ describe("SessionPageContent", () => {
 
   it("헤더·상세·타이머는 한 묶음으로 Figma 간격을 갖는다 (모바일 16px, 태블릿부터 40px)", () => {
     // Given: 참여자로 인증된 상태
-    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
     // When: 메인 콘텐츠를 렌더링하면
     render(<SessionPageContent sessionId="1" />);
@@ -215,7 +195,6 @@ describe("SessionPageContent", () => {
 
   it("헤더 묶음과 카드 행 사이 간격은 루트 gap이 정한다 (모바일 24px, 태블릿 40px, 데스크톱 80px)", () => {
     // Given: 참여자로 인증된 상태
-    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
     // When: 메인 콘텐츠를 렌더링하면
     render(<SessionPageContent sessionId="1" />);
@@ -232,7 +211,6 @@ describe("SessionPageContent", () => {
 
   it("본문 바깥 여백은 화면 크기별 Figma Main Content와 같다 (좌우 20/40/54, 위 16/40/64, 아래 56/80/128)", () => {
     // Given: 참여자로 인증된 상태
-    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
     // When: 메인 콘텐츠를 렌더링하면
     render(<SessionPageContent sessionId="1" />);
@@ -248,7 +226,6 @@ describe("SessionPageContent", () => {
 
   it("카드 행은 xl 미만에서 세로로 쌓이고(간격 40px) xl부터 가로로 나란히 놓인다(간격 20px)", () => {
     // Given: 참여자로 인증된 상태
-    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
     // When: 메인 콘텐츠를 렌더링하면
     render(<SessionPageContent sessionId="1" />);
@@ -261,7 +238,6 @@ describe("SessionPageContent", () => {
 
   it("태블릿은 참여자 카드만 560px(Fixed), 데스크톱은 행이 560px을 정하고, 모바일은 둘 다 내용만큼이다", () => {
     // Given: 참여자로 인증된 상태
-    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
     // When: 메인 콘텐츠를 렌더링하면
     render(<SessionPageContent sessionId="1" />);
@@ -282,7 +258,6 @@ describe("SessionPageContent", () => {
 
   it("두 카드의 폭 비율(6:4)은 xl에서만 넘긴다", () => {
     // Given: 참여자로 인증된 상태
-    mockUseMe.mockReturnValue({ data: { result: { id: 7 } }, isLoading: false });
 
     // When: 메인 콘텐츠를 렌더링하면
     render(<SessionPageContent sessionId="1" />);
@@ -295,10 +270,6 @@ describe("SessionPageContent", () => {
   it("guest 상태이면 로그인 유도 UI를 노출해야 한다", () => {
     mockUseAuthState.mockReturnValue({
       status: "guest",
-    });
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: false,
     });
     mockUseWaitingRoom.mockReturnValue({
       data: undefined,

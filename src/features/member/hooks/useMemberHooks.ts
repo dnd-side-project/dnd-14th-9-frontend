@@ -34,6 +34,8 @@ import type {
 const MEMBER_STALE_TIME = 5 * 60 * 1000;
 
 // createSingletonHooks로 기본 me 관련 훅 생성 (Session의 createCrudHooks와 동일한 역할)
+// 주의: 여기서 쓰는 것은 키와 useDelete뿐이다. useGet/prefetch는 /me에서 401을 던지는 정책이라
+// 같은 캐시 키를 쓰는 memberQueries.me()(401/403 → null)와 의미가 다르므로, /me 조회는 memberQueries.me() 기반(useMe/useAuthState)을 사용한다.
 const memberCore = createSingletonHooks<MemberProfileView, never>({
   queryKey: "member",
   get: memberApi.getMe,
@@ -54,10 +56,19 @@ export const memberQueries = {
   me: () =>
     queryOptions({
       queryKey: memberKeys.me(),
-      queryFn: memberApi.getMe,
-      staleTime: MEMBER_STALE_TIME,
-      // 인증 거부(401/403)는 재시도하지 않고, 그 외 오류는 최대 2회 재시도한다.
-      retry: (failureCount, error) => !isAuthRejectedError(error) && failureCount < 2,
+      // 인증 거부(401/403)는 에러가 아니라 "로그인 안 됨"(null)이라는 정상 결과로 캐시를 덮어쓴다.
+      // 에러로 두면 이전 프로필이 캐시에 남아, 이후 일시 오류가 에러를 덮어쓸 때 되살아난다.
+      queryFn: () =>
+        memberApi.getMe().catch((error: unknown) => {
+          if (isAuthRejectedError(error)) return null;
+          throw error;
+        }),
+      // 오류 없이 확정된 guest(null)는 신선하게 두지 않는다. 일시적 401/403 뒤에도 포커스 복귀·재마운트 때
+      // 다시 확인해 복구한다. 이후 일시 오류가 난 상태(error)는 재시도 버튼이 있으므로 기존 staleTime을 따른다.
+      staleTime: (query) =>
+        query.state.data === null && !query.state.error ? 0 : MEMBER_STALE_TIME,
+      // 인증 거부는 위에서 성공(null)으로 바뀌므로 재시도 대상이 아니다. 일시 오류만 최대 2회 재시도한다.
+      retry: 2,
       meta: {
         transientErrorToast: "로그인 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
       },
@@ -81,13 +92,17 @@ interface UseMeOptions {
   enabled?: boolean;
 }
 
+/**
+ * 내 프로필 조회 쿼리 훅.
+ *
+ * 화면에서 로그인 여부를 판정하거나 프로필을 표시할 때는 이 훅을 직접 쓰지 말고
+ * `useAuthState()`를 사용하세요.
+ */
 export function useMe(options?: UseMeOptions) {
-  const query = useQuery({
+  return useQuery({
     ...memberQueries.me(),
     ...options,
   });
-
-  return isAuthRejectedError(query.error) ? { ...query, data: undefined } : query;
 }
 
 export const useDeleteMe = memberCore.useDelete!;

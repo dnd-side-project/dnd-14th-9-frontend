@@ -4,7 +4,6 @@ import { SessionDialog } from "@/features/session/components/SessionDialog/Sessi
 import { ApiError } from "@/lib/api/api-client";
 
 const mockUseAuthState = jest.fn();
-const mockUseMe = jest.fn();
 const mockUseSessionDetail = jest.fn();
 const mockUseWaitingRoom = jest.fn();
 const mockUseShareSession = jest.fn();
@@ -12,10 +11,6 @@ const mockNavigateWithHardReload = jest.fn();
 
 jest.mock("@/features/auth/hooks/useAuthState", () => ({
   useAuthState: () => mockUseAuthState(),
-}));
-
-jest.mock("@/features/member/hooks/useMemberHooks", () => ({
-  useMe: (...args: unknown[]) => mockUseMe(...args),
 }));
 
 jest.mock("@/features/session/hooks/useSessionHooks", () => ({
@@ -120,19 +115,16 @@ describe("SessionDialog", () => {
 
   it("guest 상태에서는 로그인 CTA 하나만 노출해야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "guest" });
-    mockUseMe.mockReturnValue({ data: undefined });
 
     render(<SessionDialog sessionId="1" />);
 
     expectGuestLoginCta();
-    expect(mockUseMe).toHaveBeenCalledWith({ enabled: false });
     expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: false });
   });
 
   it("인증 조회 실패 시 세션 카드를 유지하고 인증 재시도를 제공한다", () => {
     const retry = jest.fn();
     mockUseAuthState.mockReturnValue({ status: "unavailable", retry });
-    mockUseMe.mockReturnValue({ data: undefined });
 
     render(<SessionDialog sessionId="1" />);
 
@@ -145,14 +137,7 @@ describe("SessionDialog", () => {
   });
 
   it("authenticated 상태에서는 single footer 액션을 유지해야 한다", () => {
-    mockUseAuthState.mockReturnValue({ status: "authenticated" });
-    mockUseMe.mockReturnValue({
-      data: {
-        result: {
-          id: 7,
-        },
-      },
-    });
+    mockUseAuthState.mockReturnValue({ status: "authenticated", profile: { id: 7 } });
 
     render(<SessionDialog sessionId="1" />);
 
@@ -162,12 +147,13 @@ describe("SessionDialog", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("me 정보가 아직 없으면 참여 여부 확인 중 상태를 유지해야 한다", () => {
-    mockUseAuthState.mockReturnValue({ status: "authenticated" });
-    mockUseMe.mockReturnValue({
+  it("대기방 참여 정보를 불러오는 중이면 참여 여부 확인 중 상태를 유지해야 한다", () => {
+    mockUseAuthState.mockReturnValue({ status: "authenticated", profile: { id: 7 } });
+    mockUseWaitingRoom.mockReturnValue({
       data: undefined,
       isLoading: true,
       error: null,
+      refetch: jest.fn(),
     });
 
     render(<SessionDialog sessionId="1" />);
@@ -181,16 +167,7 @@ describe("SessionDialog", () => {
   });
 
   it("이미 참여 중인 사용자는 세션 페이지로 자동 이동해야 한다", async () => {
-    mockUseAuthState.mockReturnValue({ status: "authenticated" });
-    mockUseMe.mockReturnValue({
-      data: {
-        result: {
-          id: 7,
-        },
-      },
-      isLoading: false,
-      error: null,
-    });
+    mockUseAuthState.mockReturnValue({ status: "authenticated", profile: { id: 7 } });
     mockUseWaitingRoom.mockReturnValue({
       data: {
         result: {
@@ -208,31 +185,8 @@ describe("SessionDialog", () => {
     });
   });
 
-  it("guest + meError 상태에서는 retry 대신 로그인 CTA를 노출해야 한다", () => {
-    mockUseAuthState.mockReturnValue({ status: "guest" });
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: new Error("me failed"),
-      refetch: jest.fn(),
-    });
-
-    render(<SessionDialog sessionId="1" />);
-
-    expectGuestLoginCta();
-    expect(mockUseMe).toHaveBeenCalledWith({ enabled: false });
-    expect(mockNavigateWithHardReload).not.toHaveBeenCalled();
-    expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
-  });
-
   it("guest + waitingRoomError 상태에서는 retry 대신 로그인 CTA를 노출해야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "guest" });
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: jest.fn(),
-    });
     mockUseWaitingRoom.mockReturnValue({
       data: undefined,
       isLoading: false,
@@ -248,20 +202,13 @@ describe("SessionDialog", () => {
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
   });
 
-  it("인증 조회 실패 후 guest로 rerender되면 로그인 CTA가 복구되어야 한다", () => {
-    const refetchMe = jest.fn();
+  it("참여 확인 실패 후 guest로 rerender되면 로그인 CTA가 복구되어야 한다", () => {
     const refetchWaitingRoom = jest.fn();
-    mockUseAuthState.mockReturnValue({ status: "authenticated" });
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: new Error("me failed"),
-      refetch: refetchMe,
-    });
+    mockUseAuthState.mockReturnValue({ status: "authenticated", profile: { id: 7 } });
     mockUseWaitingRoom.mockReturnValue({
       data: undefined,
       isLoading: false,
-      error: null,
+      error: new Error("waiting room failed"),
       refetch: refetchWaitingRoom,
     });
 
@@ -273,24 +220,13 @@ describe("SessionDialog", () => {
     rerender(<SessionDialog sessionId="1" />);
 
     expectGuestLoginCta();
-    expect(refetchMe).not.toHaveBeenCalled();
     expect(refetchWaitingRoom).not.toHaveBeenCalled();
     expect(mockNavigateWithHardReload).not.toHaveBeenCalled();
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
   });
 
-  it("guest에 이전 me/참여자 성공 캐시가 남아도 자동 이동하지 않아야 한다", () => {
+  it("guest에 이전 참여자 성공 캐시가 남아도 자동 이동하지 않아야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "guest" });
-    mockUseMe.mockReturnValue({
-      data: {
-        result: {
-          id: 7,
-        },
-      },
-      isLoading: false,
-      error: null,
-      refetch: jest.fn(),
-    });
     mockUseWaitingRoom.mockReturnValue({
       data: {
         result: {
@@ -309,18 +245,8 @@ describe("SessionDialog", () => {
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
   });
 
-  it("recovering에 이전 me/참여자 성공 캐시가 남아도 자동 이동하지 않아야 한다", () => {
+  it("recovering에 이전 참여자 성공 캐시가 남아도 자동 이동하지 않아야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "recovering" });
-    mockUseMe.mockReturnValue({
-      data: {
-        result: {
-          id: 7,
-        },
-      },
-      isLoading: false,
-      error: null,
-      refetch: jest.fn(),
-    });
     mockUseWaitingRoom.mockReturnValue({
       data: {
         result: {
@@ -344,16 +270,9 @@ describe("SessionDialog", () => {
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
   });
 
-  it("authenticated + 참여 확인 오류에서는 retry를 유지하고 클릭 시 refetch만 호출해야 한다", () => {
-    const refetchMe = jest.fn();
+  it("authenticated + 참여 확인 오류에서는 retry를 유지하고 클릭 시 waitingRoom refetch만 호출해야 한다", () => {
     const refetchWaitingRoom = jest.fn();
-    mockUseAuthState.mockReturnValue({ status: "authenticated" });
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: new Error("me failed"),
-      refetch: refetchMe,
-    });
+    mockUseAuthState.mockReturnValue({ status: "authenticated", profile: { id: 7 } });
     mockUseWaitingRoom.mockReturnValue({
       data: undefined,
       isLoading: false,
@@ -372,7 +291,6 @@ describe("SessionDialog", () => {
 
     fireEvent.click(retryButton);
 
-    expect(refetchMe).toHaveBeenCalledTimes(1);
     expect(refetchWaitingRoom).toHaveBeenCalledTimes(1);
     expect(mockNavigateWithHardReload).not.toHaveBeenCalled();
     expect(screen.queryByTestId("session-join-modal")).not.toBeInTheDocument();
@@ -380,12 +298,6 @@ describe("SessionDialog", () => {
 
   it("recovering 상태에서는 로그인 상태 확인 중 CTA를 유지해야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "recovering" });
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: jest.fn(),
-    });
 
     render(<SessionDialog sessionId="1" />);
 
@@ -398,18 +310,12 @@ describe("SessionDialog", () => {
     expect(
       screen.queryByRole("link", { name: "로그인하고 참여하기", hidden: true })
     ).not.toBeInTheDocument();
-    expect(mockUseMe).toHaveBeenCalledWith({ enabled: false });
+    expect(mockUseWaitingRoom).toHaveBeenCalledWith("1", { enabled: false });
     expect(mockNavigateWithHardReload).not.toHaveBeenCalled();
   });
 
   it("공개 세션 조회 실패 시 닫기 CTA를 우선해야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "guest" });
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: new Error("me failed"),
-      refetch: jest.fn(),
-    });
     mockUseSessionDetail.mockReturnValue({
       data: undefined,
       error: new Error("session failed"),
@@ -434,12 +340,6 @@ describe("SessionDialog", () => {
 
   it("공개 세션 404에서는 존재하지 않는 세션 안내와 닫기 CTA를 유지해야 한다", () => {
     mockUseAuthState.mockReturnValue({ status: "guest" });
-    mockUseMe.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: jest.fn(),
-    });
     mockUseSessionDetail.mockReturnValue({
       data: undefined,
       error: new ApiError("session not found", 404),

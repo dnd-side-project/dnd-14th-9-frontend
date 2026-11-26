@@ -8,6 +8,7 @@ import { Button } from "@/components/Button/Button";
 import { ErrorFallbackUI } from "@/components/Error/ErrorFallbackUI";
 import { TrashIcon } from "@/components/Icon/TrashIcon";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
+import { getAuthProfile } from "@/features/auth/lib/auth-profile";
 import { ApiError } from "@/lib/api/api-client";
 import { DEFAULT_API_ERROR_MESSAGE } from "@/lib/error/error-codes";
 import { LOGIN_ROUTE } from "@/lib/routes/route-paths";
@@ -60,7 +61,7 @@ export function SessionEditContent({ sessionId }: SessionEditContentProps) {
   // 호스트만 수정/삭제 가능 — 세션 상세 API에는 호스트 식별자가 없어 대기방 멤버의 role로 판별한다.
   // 대기방 조회 실패는 "권한 없음"과 구분해야 한다. 실패를 그대로 fail-closed 처리하면
   // 실제 호스트에게도 권한 안내가 뜨므로, 재시도 가능한 오류 화면으로 분기한다.
-  const myMemberId = isAuthenticated ? authState.profile.id : undefined;
+  const myMemberId = getAuthProfile(authState)?.id;
   const isHost =
     !waitingRoomError &&
     myMemberId !== undefined &&

@@ -4,18 +4,19 @@ import { useState } from "react";
 
 import { Avatar } from "@/components/Avatar/Avatar";
 import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
-import { useMe } from "@/features/member/hooks/useMemberHooks";
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { useProfileImageUpload } from "@/features/member/hooks/useProfileImageUpload";
 import { formatHHMMSS } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/utils";
 
 export function ProfileSummary() {
-  const { data } = useMe();
+  const authState = useAuthState();
   const { handleProfileImageChange, isUpdatingProfileImage } = useProfileImageUpload();
-  const profile = data?.result;
   const [isHovered, setIsHovered] = useState(false);
 
-  if (!profile) return null;
+  if (authState.status !== "authenticated") return null;
+
+  const { profile } = authState;
 
   return (
     <div className="flex w-full flex-col items-start gap-6 md:gap-10">

@@ -30,8 +30,10 @@ const profile = {
   nickname: "경환",
 } as MemberProfileView;
 
-function stubMe(value: Partial<UseQueryResult<GetMeResponse>>): UseQueryResult<GetMeResponse> {
-  return value as UseQueryResult<GetMeResponse>;
+function stubMe(
+  value: Partial<UseQueryResult<GetMeResponse | null>>
+): UseQueryResult<GetMeResponse | null> {
+  return value as UseQueryResult<GetMeResponse | null>;
 }
 
 describe("useAuthState 마커 게이트", () => {
@@ -131,14 +133,12 @@ describe("useAuthState (마커 있음)", () => {
     expect(result.current).toEqual({ status: "authenticated", profile });
   });
 
-  it("인증 거부(401)로 해소되면 guest여야 한다", () => {
+  it("인증 거부로 해소된 me(null)는 guest여야 한다", () => {
     mockedUseMe.mockReturnValue(
       stubMe({
         isPending: false,
         isFetching: false,
-        data: undefined,
-        isError: true,
-        error: new ApiError("인증이 필요합니다.", 401),
+        data: null,
       })
     );
 
@@ -147,19 +147,52 @@ describe("useAuthState (마커 있음)", () => {
     expect(result.current).toEqual({ status: "guest" });
   });
 
-  it.each([401, 403])("이전 me 데이터가 있어도 인증 거부(%i) 후에는 guest여야 한다", (status) => {
+  it("인증 거부(null)를 재조회하는 중에도 recovering이 아니라 guest를 유지해야 한다", () => {
     mockedUseMe.mockReturnValue(
       stubMe({
         isPending: false,
-        isFetching: false,
-        data: { result: profile } as GetMeResponse,
-        error: new ApiError("인증이 필요합니다.", status),
+        isFetching: true,
+        data: null,
       })
     );
 
     const { result } = renderHook(() => useAuthState());
 
     expect(result.current).toEqual({ status: "guest" });
+  });
+
+  it("인증 거부(null) 뒤 일시 오류가 나면 guest가 아니라 재시도 가능한 unavailable이어야 한다", () => {
+    const refetch = jest.fn();
+    mockedUseMe.mockReturnValue(
+      stubMe({
+        isPending: false,
+        isFetching: false,
+        data: null,
+        isError: true,
+        error: new ApiError("서버 오류", 500),
+        refetch,
+      })
+    );
+
+    const { result } = renderHook(() => useAuthState());
+
+    expect(result.current).toEqual({ status: "unavailable", retry: refetch });
+  });
+
+  it("인증 거부(null) 뒤 일시 오류 상태에서 재조회하는 중에는 recovering이어야 한다", () => {
+    mockedUseMe.mockReturnValue(
+      stubMe({
+        isPending: false,
+        isFetching: true,
+        data: null,
+        isError: true,
+        error: new ApiError("서버 오류", 500),
+      })
+    );
+
+    const { result } = renderHook(() => useAuthState());
+
+    expect(result.current).toEqual({ status: "recovering" });
   });
 
   it("일시 실패 후에도 이전 me 데이터가 있으면 authenticated를 유지해야 한다", () => {

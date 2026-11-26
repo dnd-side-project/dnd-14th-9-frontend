@@ -1,10 +1,10 @@
 import { Avatar } from "@/components/Avatar/Avatar";
 import { Button } from "@/components/Button/Button";
 import { ChipBadge } from "@/components/ChipBadge/ChipBadge";
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
+import { getAuthProfile } from "@/features/auth/lib/auth-profile";
 import { CATEGORY_LABELS, type Category } from "@/lib/constants/category";
 import { cn } from "@/lib/utils/utils";
-
-import { useMe } from "../../hooks/useMemberHooks";
 
 interface OnboardingConfirmProps {
   className?: string;
@@ -23,8 +23,8 @@ export function OnboardingConfirm({
   onBack,
   onConfirm,
 }: OnboardingConfirmProps) {
-  const { data: meData } = useMe();
-  const profileImageUrl = meData?.result?.profileImageUrl ?? null;
+  const authState = useAuthState();
+  const profileImageUrl = getAuthProfile(authState)?.profileImageUrl ?? null;
 
   return (
     <div

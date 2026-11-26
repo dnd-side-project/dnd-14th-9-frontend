@@ -2,10 +2,29 @@ import Link from "next/link";
 
 import { Button } from "@/components/Button/Button";
 import { ProfileDropdown } from "@/features/member/components/ProfileDropdown/ProfileDropdown";
+import type { MemberProfileView } from "@/features/member/types";
 import { LOGIN_ROUTE, ROOT_ROUTE } from "@/lib/routes/route-paths";
 
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { Viewport } from "storybook/viewport";
+
+// Storybook에는 /me 응답이 없으므로 로그인 상태 스토리는 고정 프로필을 직접 넘긴다.
+const STORY_PROFILE: MemberProfileView = {
+  id: 1,
+  nickname: "빵가루 요정 쥐이",
+  profileImageUrl: "https://github.com/shadcn.png",
+  email: "sewonlim9060@naver.com",
+  bio: null,
+  socialProvider: "kakao",
+  totalParticipationTime: 60,
+  focusedTime: 30,
+  focusRate: 50,
+  totalTodoCount: 10,
+  completedTodoCount: 8,
+  todoCompletionRate: 80,
+  participationSessionCount: 5,
+  firstLogin: false,
+};
 
 function HeaderStory({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
@@ -31,7 +50,7 @@ function HeaderStory({ isAuthenticated }: { isAuthenticated: boolean }) {
             >
               세션 만들기
             </Button>
-            <ProfileDropdown />
+            <ProfileDropdown profile={STORY_PROFILE} />
           </>
         ) : (
           <Button

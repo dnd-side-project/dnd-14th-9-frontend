@@ -1,15 +1,18 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { SessionCreateForm } from "@/features/session/components/SessionCreateForm";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
 }));
 
-jest.mock("@/features/member/hooks/useMemberHooks", () => ({
-  useMe: () => ({ data: undefined }),
+jest.mock("@/features/auth/hooks/useAuthState", () => ({
+  useAuthState: jest.fn(),
 }));
+
+const mockedUseAuthState = jest.mocked(useAuthState);
 
 jest.mock("@/features/session/hooks/useSessionHooks", () => ({
   useCreateSession: () => ({ mutate: jest.fn(), isPending: false }),
@@ -26,6 +29,11 @@ jest.mock("@/components/DatePicker/DatePicker", () => ({
 }));
 
 describe("SessionCreateForm (생성 모드)", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockedUseAuthState.mockReturnValue({ status: "guest" });
+  });
+
   it("입력이 없는 초기 상태에서는 제출 버튼이 비활성이다", () => {
     render(<SessionCreateForm />);
 
